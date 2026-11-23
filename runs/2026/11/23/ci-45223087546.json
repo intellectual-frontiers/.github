@@ -1,0 +1,3425 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45223087546",
+    "workflow": "ci",
+    "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+    "at": "2026-11-23T17:22:53Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45223087546"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 549,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 22645,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 4,
+      "durationMs": 23651,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 579,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "headless",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 8010,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "headless",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 4627,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "systems",
+      "module": "headless",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4627,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 644,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 40820,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 14,
+      "durationMs": 64794,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 503,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "net",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1548,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "net",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2438,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 690,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9364,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "system",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12735,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-bridge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 173,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-bridge",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1409,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-bridge",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1409,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 166,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2479,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2479,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-gdrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-gdrive",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1622,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-gdrive",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1622,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-git",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 160,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-git",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21065,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-git",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21065,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 165,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-githost",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5326,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-githost",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5326,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-onedrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 187,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-onedrive",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1284,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-onedrive",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1284,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-posix",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-posix",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3388,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-posix",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3388,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 476,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1920,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1920,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-s3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 278,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-s3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 25642,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-s3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 25642,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-serve",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 188,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-serve",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2623,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-serve",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2623,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 395,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 263798,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 263798,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-ssh",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-ssh",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 75476,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-ssh",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 75476,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 150,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2660,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2660,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 134,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1240,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1240,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 129,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 55959,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-converge",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 55959,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 190,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 173038,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 173038,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 661,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-apt",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1060,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-apt",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1060,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36338,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-cloud-init",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36338,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 395,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-homebrew",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1130,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-homebrew",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1130,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 162,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-mise",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 618,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-mise",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 618,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 138,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2430,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2430,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 183,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1127,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1127,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 369,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-winget",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1329,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-winget",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1329,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 135,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dns",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1098,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dns",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1098,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 441,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-tool",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 869,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-tool",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 869,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 145,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 948,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 948,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "assessment",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 190,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "assessment",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1051,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "assessment",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1051,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 214,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 885,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 885,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1092,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1092,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 411,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 990,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 990,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "change-control",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 373,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "change-control",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2610,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "change-control",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2610,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 362,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 283,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "content",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 130,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "content",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 686,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "content",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 686,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-model",
+      "job": "verify",
+      "module": "content",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 686,
+      "exitStatus": 0,
+      "kanonCheck": "model"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "core",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 185,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "core",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 796,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "core",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 658,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5222,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "crypto",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4522,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 373,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 464,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 235799,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 312763,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 312763,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 329807,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 222,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 158966,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ergonex",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 88869,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1203,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1203,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 182,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 735,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 735,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1965,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1965,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 357,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1842,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1842,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 484,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 3300,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3300,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 126,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "findings",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 892,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "findings",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 892,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 194,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "formats",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4048,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "formats",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3002,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 197,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "gate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 135,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "gate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 577,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "gate",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 577,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 188,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "githost",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1042,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "githost",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 949,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 188,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "grc",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4122,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "grc",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2899,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "grc",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2899,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 196,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "headless",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8295,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "headless",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3795,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "headless",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3795,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 154,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 367,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1104,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 306,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 829,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 154,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 962,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 962,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 286,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 793,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1854,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1512,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1512,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 176,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1163,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "kanon",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 741,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 333,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lab",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58233,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "lab",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58233,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 106,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9457,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 180,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34744,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46969,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lint",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 167,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "lint",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 650,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lint",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2565,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 184,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58216,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58216,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-services",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-services",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1063,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "linux-services",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1063,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 398,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29197,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29197,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 146,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 11180,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 4,
+      "durationMs": 6338,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "net",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 952,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "net",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 923,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 138,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2647,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2647,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 145,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2099,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1510,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2599,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2599,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 283,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 873,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 873,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 388,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1052,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1052,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 183,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3777,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3777,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "posture-report",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 136,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "posture-report",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 580,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "posture-report",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 580,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "programs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 196,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "quality",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 167,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "quality",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 37627,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "quality",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22055,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 155,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 314,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "rdf",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 839,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 162,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 82083,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 82083,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 209,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2013,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2013,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "standards",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 118,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 144,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5983,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "system",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6619,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 134,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2691,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "telemetry",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3205,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "tenancy",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 184,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "tenancy",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 649,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "tenancy",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 649,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 179,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1102,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "terminal",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1207,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "test",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 109,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "test",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 958,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "test",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 672,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 176,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 826,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 826,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-0cbf1c811db2e361",
+      "tool": "bun-test",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "bac6422e6d41e949b4a74df60cb28d3f0e7a8b0204dee0c75cd9141c58ce439b"
+      },
+      "at": "2026-11-23T17:03:42Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-0e77154d6db6fec3",
+      "tool": "bun-test",
+      "module": "headless",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "387301b55071e14e92557a97740facd0f34e1961e17e40afd8e234fa45f73859"
+      },
+      "at": "2026-11-23T17:03:15Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made",
+      "key": "0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made"
+    },
+    {
+      "id": "f-1289c05a8ed3fe70",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-26ea56fd7e5137e2",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-2705acfa2ed0e0c2",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-findings.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-27d6c815009c629f",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ad7b2d78a5d4f8ae2e356b8dac4ee6365776813d728cdae33e0b7c820ebc6924"
+      },
+      "at": "2026-11-23T17:05:24Z",
+      "code": "test-failed",
+      "file": "suite/mizan.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+      "key": "0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one"
+    },
+    {
+      "id": "f-3609945717c229c1",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-367e813aaf0e3799",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "434959b6b4aeb73b7292a15132146bed6b5c4a087b4474712e11f6025d164f93"
+      },
+      "at": "2026-11-23T17:05:23Z",
+      "code": "test-failed",
+      "file": "suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-36d15410330916f7",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-3c193d9f9caedfca",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-history.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-428f687f79d2a37b",
+      "tool": "bun-test",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "bac6422e6d41e949b4a74df60cb28d3f0e7a8b0204dee0c75cd9141c58ce439b"
+      },
+      "at": "2026-11-23T17:03:42Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]",
+      "key": "0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]"
+    },
+    {
+      "id": "f-506bca6811f23cec",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-53439dd8ff5bbf9d",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-findings.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-5bc23c3989545605",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ad7b2d78a5d4f8ae2e356b8dac4ee6365776813d728cdae33e0b7c820ebc6924"
+      },
+      "at": "2026-11-23T17:05:24Z",
+      "code": "test-failed",
+      "file": "suite/mizan.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+      "key": "0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited"
+    },
+    {
+      "id": "f-5e289142e1b54856",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\pack-commons.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-6896ab53f32579e5",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1c48a331b21ae3476cd5a7f1ce4d5be7d2346f98f637c9eea680feeec6740af8"
+      },
+      "at": "2026-11-23T17:03:19Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-enx.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-7c38ef029c099442",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-89d0c6f62e926d4e",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-8a5ff888a3ad6334",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-9337ce92a3095da9",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-96acffe8bcdcb21e",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1c48a331b21ae3476cd5a7f1ce4d5be7d2346f98f637c9eea680feeec6740af8"
+      },
+      "at": "2026-11-23T17:03:19Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-wiring.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]",
+      "key": "0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]"
+    },
+    {
+      "id": "f-a1681e4338a8416c",
+      "tool": "verify",
+      "module": "anyfs-ssh",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "15e4bc1018fb581bbfa43fc9f4afb656569fec8670d45b371603e3efcf4d2adc"
+      },
+      "at": "2026-11-23T17:05:36Z",
+      "code": "test-failed",
+      "file": "suite/mirror.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-anyfs-ssh-mirror FR-004: two writers through the mirror who expect the same revision of the host are one winner and one conflict, and the replicas hold the winner (skipped where no server can be had)",
+      "key": "0005-anyfs-ssh-mirror FR-004: two writers through the mirror who expect the same revision of the host are one winner and one conflict, and the replicas hold the winner (skipped where no server can be had)"
+    },
+    {
+      "id": "f-a7a7be5bde8df5fc",
+      "tool": "verify",
+      "module": "headless",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "dea2d52a9854d52602e16b9d13130e2747a303b553c4c1c3e2e9c6f177c07888"
+      },
+      "at": "2026-11-23T17:03:07Z",
+      "code": "test-failed",
+      "file": "suite\\container-target.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made",
+      "key": "0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made"
+    },
+    {
+      "id": "f-a8de9aabe3910c63",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "424743e13697e9213da80af7ca19bb4cb0f33e7760a5899d92367229bc483a06"
+      },
+      "at": "2026-11-23T17:05:35Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+      "key": "0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one"
+    },
+    {
+      "id": "f-a9c9206fef4add00",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-history.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-af726f12df004ad8",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-b1f7b96a7fc7094a",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ad7b2d78a5d4f8ae2e356b8dac4ee6365776813d728cdae33e0b7c820ebc6924"
+      },
+      "at": "2026-11-23T17:05:24Z",
+      "code": "test-failed",
+      "file": "suite/mizan-integrations-formats.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+      "key": "0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited"
+    },
+    {
+      "id": "f-b25bd777d8595107",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-be14677783fc1ea0",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1c48a331b21ae3476cd5a7f1ce4d5be7d2346f98f637c9eea680feeec6740af8"
+      },
+      "at": "2026-11-23T17:03:19Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-wiring.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program",
+      "key": "0003-host FR-028: programsNamed finds each program of a name in the order of the PATH, enxChecks says it as a warning with the paths or as ok, and ergonex doctor reports it without running the program"
+    },
+    {
+      "id": "f-bfeea4e124326d97",
+      "tool": "verify",
+      "module": "headless",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "dea2d52a9854d52602e16b9d13130e2747a303b553c4c1c3e2e9c6f177c07888"
+      },
+      "at": "2026-11-23T17:03:07Z",
+      "code": "test-failed",
+      "file": "suite\\ssh-coverage.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made",
+      "key": "0005-reach-and-targets FR-011: exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made"
+    },
+    {
+      "id": "f-c0f91184103d0837",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-ca356e31f2f1b689",
+      "tool": "verify",
+      "module": "ergonex",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1c48a331b21ae3476cd5a7f1ce4d5be7d2346f98f637c9eea680feeec6740af8"
+      },
+      "at": "2026-11-23T17:03:19Z",
+      "code": "test-failed",
+      "file": "suite\\ergonex-agents.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]",
+      "key": "0006-agents FR-007: the token is read from the variable, then the file the variable names, then the file of the configuration folder; a file others can read is refused; nothing is ever shown but [secret]"
+    },
+    {
+      "id": "f-dfff34c91726ce27",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-e75fdcc326d94385",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\ci-accepted.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-e89173b65368c965",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "424743e13697e9213da80af7ca19bb4cb0f33e7760a5899d92367229bc483a06"
+      },
+      "at": "2026-11-23T17:05:35Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+      "key": "0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited"
+    },
+    {
+      "id": "f-ede1c52af63b5f62",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "5f34b07da4463ca4cb3f9297e5f85b27920450d22bd13663ef44ec95ddf8167c"
+      },
+      "at": "2026-11-23T17:04:40Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-efe6b4b56064beed",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "23de97dd3a3cf9278f84e515c0fce3e0b09e753e986cbc61a7e40825c3a2edab"
+      },
+      "at": "2026-11-23T17:04:00Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-fcd3c48e1b201af4",
+      "tool": "verify",
+      "module": "mizan",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ad7b2d78a5d4f8ae2e356b8dac4ee6365776813d728cdae33e0b7c820ebc6924"
+      },
+      "at": "2026-11-23T17:05:24Z",
+      "code": "test-failed",
+      "file": "suite/mizan-integrations-formats.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+      "key": "0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one"
+    },
+    {
+      "id": "f-ffc5c01fe2f2a103",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45223087546",
+        "commit": "c353a8bb191ba6fcdf4be7d7601449bd512cece0",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "434959b6b4aeb73b7292a15132146bed6b5c4a087b4474712e11f6025d164f93"
+      },
+      "at": "2026-11-23T17:05:23Z",
+      "code": "test-failed",
+      "file": "suite/journal.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    }
+  ]
+}
