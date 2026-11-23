@@ -22,6 +22,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { affectedBy } from "@intellectual-frontiers/libraries/affected";
+import { libraryDirs, readLibraries } from "@intellectual-frontiers/libraries/libraries";
 import { LIBRARY_CI } from "@intellectual-frontiers/libraries/workflows/definitions";
 import { symlink } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
@@ -238,8 +239,11 @@ export async function makePlan(w: World, base: string, all: boolean): Promise<Re
 export type Command = { readonly argv: readonly string[]; readonly cwd: string; readonly needs?: string };
 
 /** The program a proof runs, from the checkout's root; none where the proof runs elsewhere (CI, the nightly run, the release). */
-export function commandOf(repo: string, proof: Proof, base: string, folderOf: (name: LibraryName) => string = (n) => `commons/${n}`): Command | undefined {
+export function commandOf(repo: string, proof: Proof, base: string, known?: (name: LibraryName) => string): Command | undefined {
   const root = scopeOf(repo);
+  // where a library is comes from its manifest: an extension of a host is inside the folder of its host (0027-commons-libraries FR-026)
+  let dirs: ReadonlyMap<string, string> | undefined;
+  const folderOf = known ?? ((n: LibraryName): string => `commons/${(dirs ??= libraryDirs(readLibraries(root))).get(n) ?? n}`);
   const at = (name: LibraryName): string => join(root, folderOf(name));
   switch (proof.kind) {
     case "docs-check":

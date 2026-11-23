@@ -102,10 +102,10 @@ export function toolsOf(libraries: readonly ToolSource[], union: Tools, imported
 }
 
 /** The third-party packages imported by the packed sources of a library of the repository (`commons/<name>/<root>/**.ts`, `suite` and the like are not read). */
-export function sourcesOf(repo: string, name: string, roots: readonly string[]): readonly { readonly file: string; readonly text: string }[] {
+export function sourcesOf(repo: string, name: string, roots: readonly string[], folder: string = name): readonly { readonly file: string; readonly text: string }[] {
   const out: { file: string; text: string }[] = [];
   for (const r of roots) {
-    const dir = join(repo, "commons", name, r);
+    const dir = join(repo, "commons", folder, r);
     if (!existsSync(dir)) continue;
     for (const rel of filesUnder(dir)) if (rel.endsWith(".ts")) out.push({ file: `${name}/${r}/${rel}`, text: readTextFileSync(join(dir, rel)) });
   }

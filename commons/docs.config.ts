@@ -5,10 +5,12 @@
  *
  * @module
  */
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { About, BooksConfig, DocsConfig, EvidenceSource, IssuesOf, PackageConfig } from "./docs/src/config.ts";
 import { layeredLens } from "./docs/src/lens/layered.ts";
 import { DEFAULT_LICENSE } from "./libraries/src/license/standard.ts";
+import { readLibraries } from "./libraries/src/libraries.ts";
 import { guidesLens } from "./docs/src/lens/guides.ts";
 import { releasesLens } from "./docs/src/lens/releases.ts";
 import { programLens } from "./docs/src/lens/program.ts";
@@ -144,11 +146,10 @@ const repoOps = repoOpsLens({
   ],
 });
 
-/** The libraries of commons: each folder with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
-const libraryNames: readonly string[] = readdirSync(new URL("./", import.meta.url), { withFileTypes: true })
-  .filter((e) => e.isDirectory() && ["library.ts", "package.json", "about.ts"].every((f) => existsSync(new URL(`./${e.name}/${f}`, import.meta.url))))
-  .map((e) => e.name)
-  .sort();
+/** The libraries of commons with the folder of each from `commons/` (`anyfs/s3` for an extension of a host, 0027-commons-libraries FR-026): each with a manifest (`library.ts`), a `package.json` and an `about.ts`, in order of name. */
+const libraryFolders: readonly { readonly name: string; readonly dir: string }[] = readLibraries(fileURLToPath(new URL("../", import.meta.url))).flatMap((f) =>
+  "library" in f && ["package.json", "about.ts"].every((file) => existsSync(new URL(`./${f.dir}/${file}`, import.meta.url))) ? [{ name: f.library.name, dir: f.dir }] : [],
+);
 
 /** The folder that holds every one of the files: their longest shared path of folders (empty where they share none). */
 function commonFolder(files: readonly string[]): string {
@@ -163,22 +164,22 @@ function commonFolder(files: readonly string[]): string {
 const problems: { where: string; error: string }[] = [];
 
 /** A library as a package of the site, or, where its `about.ts` or its manifest cannot be read, a package that says so (the site is made whatever one library does). */
-async function libraryPackage(name: string): Promise<PackageConfig> {
+async function libraryPackage({ name, dir }: { readonly name: string; readonly dir: string }): Promise<PackageConfig> {
   try {
-    return await readLibraryPackage(name);
+    return await readLibraryPackage(name, dir);
   } catch (thrown) {
     const error = thrown instanceof Error ? thrown.message : String(thrown);
-    problems.push({ where: `commons/${name}`, error });
-    return { dir: `commons/${name}`, slug: name, about: { title: name, summary: `This library could not be read for the site: ${error.replace(/\s+/g, " ").slice(0, 200)}.` } };
+    problems.push({ where: `commons/${dir}`, error });
+    return { dir: `commons/${dir}`, slug: name, about: { title: name, summary: `This library could not be read for the site: ${error.replace(/\s+/g, " ").slice(0, 200)}.` } };
   }
 }
 
 /** A library as a package of the site: its own `about.ts`, with one area whose entry points are the files its `package.json` exports. */
-async function readLibraryPackage(name: string): Promise<PackageConfig> {
-  const pkg = JSON.parse(readFileSync(new URL(`./${name}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
+async function readLibraryPackage(name: string, dir: string): Promise<PackageConfig> {
+  const pkg = JSON.parse(readFileSync(new URL(`./${dir}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
   const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
-  const { about: written } = (await import(`./${name}/about.ts`)) as { readonly about: About };
-  const { library } = (await import(`./${name}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly license?: string; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
+  const { about: written } = (await import(`./${dir}/about.ts`)) as { readonly about: About };
+  const { library } = (await import(`./${dir}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly license?: string; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
   const about: About = {
     ...written,
     ...(library.kanon === undefined ? {} : { layers: library.kanon.units.filter((u) => typeof u.layer === "string").map((u) => ({ folder: u.folder, layer: u.layer ?? "", ...(u.mayImport === undefined ? {} : { mayImport: u.mayImport }) })) }),
@@ -190,8 +191,8 @@ async function readLibraryPackage(name: string): Promise<PackageConfig> {
       { label: "Import it as", value: `\`@intellectual-frontiers/${name}\`` },
     ],
   };
-  const entryPoints = [...new Set(targets)].filter((t) => existsSync(new URL(`./${name}/${t}`, import.meta.url)));
-  return { dir: `commons/${name}`, slug: name, about: entryPoints.length === 0 ? about : { ...about, areas: [{ title: about.title, slug: name, entryPoints, folder: commonFolder(entryPoints) }] } };
+  const entryPoints = [...new Set(targets)].filter((t) => existsSync(new URL(`./${dir}/${t}`, import.meta.url)));
+  return { dir: `commons/${dir}`, slug: name, about: entryPoints.length === 0 ? about : { ...about, areas: [{ title: about.title, slug: name, entryPoints, folder: commonFolder(entryPoints) }] } };
 }
 
 /** The pages people write for a newcomer: a path for each kind of reader, the concepts, and how to do the common things. */
@@ -325,7 +326,7 @@ export const config: DocsConfig = {
   repository: "https://github.com/intellectual-frontiers/.github",
   release: { package: "commons/commons/package.json", record: "commons/generated/release.auto.json" },
   home: { dir: "commons" },
-  packages: await Promise.all(libraryNames.map(libraryPackage)),
+  packages: await Promise.all(libraryFolders.map(libraryPackage)),
   specKits: [
     { layout: "commons", dir: "commons/spec-kit" },
     { layout: "commons", dir: "commons/core/spec-kit" },

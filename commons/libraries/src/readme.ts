@@ -163,6 +163,8 @@ const roleRank = (r: Role): number => {
 /** One row of the table. */
 export type Row = {
   readonly name: LibraryName;
+  /** The library's folder from `commons/` where it is not its name (`anyfs/s3`, 0027-commons-libraries FR-026). */
+  readonly dir?: string;
   readonly role: Role;
   readonly purpose: string;
   readonly shape: string;
@@ -251,6 +253,7 @@ export function rowOf(l: Library, summary: string): Result<Row, string> {
   if (role === undefined) return err(`commons/${l.name} has no role in ROLE_OF (commons/libraries/src/readme.ts): say whether it is a foundation, a pattern, a program or a standard`);
   return ok({
     name: name.value,
+    ...(l.dir === undefined || l.dir === l.name ? {} : { dir: l.dir }),
     role,
     purpose: firstClause(summary).replace(/\|/g, "\\|"),
     shape: shapeOf(l),
@@ -269,7 +272,7 @@ export function tableOf(rows: readonly Row[]): string {
   const head = ["| Library | Role | What it is | Kanon | Level | Published to |", "| --- | --- | --- | --- | --- | --- |"];
   const body = sorted.map((r) => {
     const pkg = `@intellectual-frontiers/${r.name}`;
-    const href = r.published ? `https://www.npmjs.com/package/${pkg}` : `commons/${r.name}`;
+    const href = r.published ? `https://www.npmjs.com/package/${pkg}` : `commons/${r.dir ?? r.name}`;
     return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.held === undefined ? r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ") : `not released (${r.held.kind})`} |`;
   });
   return [...head, ...body].join("\n");

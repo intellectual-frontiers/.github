@@ -26,9 +26,9 @@ import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/syst
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { importSpecifiers } from "./scan.ts";
 import { activeMode, MODE_VARIABLE } from "./distribution.ts";
-import { decodeLibrarySource, type Library, LIBRARY_FILE } from "./libraries.ts";
+import { decodeLibrarySource, type Library, LIBRARY_FILE, libraryDirs, readLibraries } from "./libraries.ts";
 import { COMMAND as LICENSE_COMMAND, licenseOf } from "./license.ts";
-import { basename, dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
+import { dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
 
 /** The scope of the packages of commons. */
@@ -190,9 +190,10 @@ export const tarballName = (name: string, version: string): string => `${name.re
 
 /** The version of a library of commons, from its `package.json`, and whether it is published to npm (its manifest names that). */
 function libraryOf(commons: string, name: string): { readonly version: string; readonly npm: boolean; readonly held: boolean } | undefined {
-  const pkg = join(commons, name, "package.json");
+  const folder = libraryDirs(readLibraries(dirname(commons))).get(name) ?? name; // an extension of a host is inside the folder of its host (0027-commons-libraries FR-026)
+  const pkg = join(commons, folder, "package.json");
   if (!existsSync(pkg)) return undefined;
-  const lib = join(commons, name, "library.ts");
+  const lib = join(commons, folder, "library.ts");
   const source = existsSync(lib) ? readTextFileSync(lib) : "";
   const npm = /distribution:\s*\[[^\]]*"npm"/.test(source);
   const held = /\bheld:\s*\{/.test(source);
@@ -298,12 +299,19 @@ function manifestOf(root: string): Library | undefined {
   return r.kind === "ok" ? r.value : undefined;
 }
 
+/** The folder `commons/` that holds the library at `root`: its parent, or the parent of its parent for an extension of a host (0027-commons-libraries FR-026). */
+function commonsOf(root: string): string {
+  for (let d = dirname(root); d !== dirname(d); d = dirname(d)) if (existsSync(join(d, "tsconfig.base.json"))) return d;
+  return dirname(root);
+}
+
 /** Builds and stages the package of the library at `root` (a folder `commons/<name>/` with a `package.json` and sources in `src/`), inspects it and, where nothing is wrong, packs it. */
 export async function packLibrary(root: string, options: PackOptions = {}): Promise<Packed> {
   const own = JSON.parse(readTextFileSync(join(root, "package.json"))) as Json;
   const name = text(own["name"]);
   const short = name.replace(`${SCOPE}/`, "");
-  const commons = dirname(resolve(root));
+  const commons = commonsOf(resolve(root));
+  const here = toPosix(relative(commons, resolve(root))); // `core`, or `anyfs/s3` for an extension of a host
   const dist = join(root, "dist");
   const stage = join(dist, "package");
   const bundle = options.bundle;
@@ -338,7 +346,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
   if (built.code !== 0)
     return { stage, tarball: undefined, findings: [`the compiler stopped: ${built.stdout || built.stderr}`.trim()], manifest: {} };
   // what src/ became is in out/<name>/src/: the declarations go to dist/, and the compiled files too unless the package is a bundle
-  const out = join(dist, "out", basename(resolve(root)), "src");
+  const out = join(dist, "out", here, "src");
   const findings: string[] = [];
   const ownExports = isObject(own["exports"]) ? own["exports"] : {};
   if (bundle === undefined) {
@@ -355,7 +363,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
     findings.push(
       ...vendorDeclarations(
         join(dist, "out"),
-        basename(resolve(root)),
+        here,
         entryFiles,
         join(stage, "dist"),
       ),
@@ -477,8 +485,8 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
       "LICENSE",
       ...extraFiles,
     ],
-    repository: { type: "git", url: "git+https://github.com/intellectual-frontiers/.github.git", directory: `commons/${short}` },
-    homepage: `https://github.com/intellectual-frontiers/.github/tree/main/commons/${short}`,
+    repository: { type: "git", url: "git+https://github.com/intellectual-frontiers/.github.git", directory: `commons/${here}` },
+    homepage: `https://github.com/intellectual-frontiers/.github/tree/main/commons/${here}`,
     bugs: { url: "https://github.com/intellectual-frontiers/.github/issues" },
     ...(bundle?.keywords === undefined ? {} : { keywords: bundle.keywords }),
     publishConfig: { access: "public" },
@@ -496,12 +504,12 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
         `bun add ${name}     # or: npm install ${name}`,
         "```",
         "",
-        `Sources and specifications: https://github.com/intellectual-frontiers/.github/tree/main/commons/${short}`,
+        `Sources and specifications: https://github.com/intellectual-frontiers/.github/tree/main/commons/${here}`,
         "",
       ].join("\n"),
   );
   if (existsSync(join(root, "LICENSE"))) copyFileSync(join(root, "LICENSE"), join(stage, "LICENSE"));
-  else findings.push(`commons/${short} has no LICENSE; run: ${LICENSE_COMMAND}`);
+  else findings.push(`commons/${here} has no LICENSE; run: ${LICENSE_COMMAND}`);
   findings.push(...inspectPackage(stage));
   if (findings.length > 0) return { stage, tarball: undefined, findings, manifest };
   const packed = await run([bun, "pm", "pack", "--destination", dist], { cwd: stage });

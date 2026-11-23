@@ -13,6 +13,7 @@ export type TraceGraph = {
   readonly downstreamOf: (sources: readonly ElementId[]) => ReadonlySet<ElementId>;
 };
 
+/** The graph of the elements of a layered model by what each is traced to, from which what is downstream of a change is read. */
 export function traceGraph(model: LayeredModel, byId: ReadonlyMap<ElementId, ModelElement>): TraceGraph {
   const next = new Map<ElementId, ElementId[]>();
   const invalid: TraceEdge[] = [];

@@ -156,10 +156,9 @@ export function classesOf(files: readonly ClassifiedFile[]): readonly ChangeClas
 
 /** The library whose folder holds a path of the repository, among these. */
 export function libraryOfPath(libraries: readonly { readonly name: LibraryName; readonly folder: string }[]): (path: string) => LibraryName | undefined {
-  return (path) => {
-    const m = LIBRARY_FILE.exec(path);
-    return m === null ? undefined : libraries.find((l) => l.folder === `commons/${m[1] ?? ""}`)?.name;
-  };
+  // the library whose folder is the longest prefix of the path: an extension of a host is inside the folder of its host (0027-commons-libraries FR-026)
+  const longest = [...libraries].sort((x, y) => y.folder.length - x.folder.length);
+  return (path) => (LIBRARY_FILE.test(path) ? longest.find((l) => path.startsWith(`${l.folder}/`))?.name : undefined);
 }
 
 const planned = (proof: Proof, why: Why): PlannedProof => ({ proof, tier: tierOfProof(proof), why });

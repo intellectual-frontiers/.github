@@ -41,7 +41,7 @@ import { existsSync, mkdirSync, readDirSync, readFileSync, readTextFileSync, rem
 import { dirname, join, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
 import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, optionalPeersAsPeerDependencies, SINGLE, SINGLE_BUDGET, SINGLE_EXCLUDED, SINGLE_PEERS, SINGLE_TARGETS } from "./distribution.ts";
-import { type Library, readLibraries } from "./libraries.ts";
+import { folderOf, type Library, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
 import { linkAll } from "./link.ts";
 import { devDependenciesOf, importedPackages, linkTools, sourcesOf, syncTools, toolFindings, toolsOf, type Tools } from "./pack-tools.ts";
@@ -69,6 +69,8 @@ export type Command = { readonly name: string; readonly library: string; readonl
 /** A library as the package reads it. */
 export type Facts = {
   readonly name: string;
+  /** The library's folder from `commons/` (`anyfs/s3`): its name where it is a folder of its own (0027-commons-libraries FR-026). */
+  readonly dir: string;
   readonly version: string;
   readonly summary: string;
   /** Each key of the library's `exports` and the source file it names, from the library's folder (`./src/mod.ts`). */
@@ -121,21 +123,21 @@ const rootOf = (target: string): string => noDot(target).split("/")[0] ?? "";
 /** The facts of a library from its manifest and its package; the problems where they do not agree. */
 export function factsOf(repo: string, l: Library): { readonly facts: Facts; readonly problems: Findings } {
   const problems: string[] = [];
-  const file = join(repo, "commons", l.name, "package.json");
+  const file = join(repo, "commons", folderOf(l), "package.json");
   const pkg = existsSync(file) ? objectOf(JSON.parse(readTextFileSync(file)) as unknown) : {};
-  if (!existsSync(file)) problems.push(`commons/${l.name}/package.json is missing`);
+  if (!existsSync(file)) problems.push(`commons/${folderOf(l)}/package.json is missing`);
   const exportsOut: Record<string, string> = {};
   for (const [k, v] of Object.entries(objectOf(pkg["exports"]))) {
     const target = typeof v === "string" ? v : text(targetsOf(v)["default"]);
-    if (!target.endsWith(".ts")) problems.push(`commons/${l.name}: the export ${k} names ${target === "" ? "no file" : target}, which is not a TypeScript source`);
+    if (!target.endsWith(".ts")) problems.push(`commons/${folderOf(l)}: the export ${k} names ${target === "" ? "no file" : target}, which is not a TypeScript source`);
     else exportsOut[k] = target;
   }
   const manifestKeys = [...l.exports].sort(byName).join(",");
   const packageKeys = Object.keys(exportsOut).sort(byName).join(",");
-  if (manifestKeys !== packageKeys) problems.push(`commons/${l.name}: the exports of library.ts (${manifestKeys}) are not those of package.json (${packageKeys})`);
+  if (manifestKeys !== packageKeys) problems.push(`commons/${folderOf(l)}: the exports of library.ts (${manifestKeys}) are not those of package.json (${packageKeys})`);
   const bin = Object.fromEntries(Object.entries(objectOf(pkg["bin"])).flatMap(([k, v]) => (typeof v === "string" ? [[k, v] as const] : [])));
   const roots = [...new Set([...Object.values(exportsOut), ...Object.values(bin).filter((b) => b.endsWith(".ts"))].map(rootOf))].filter((r) => r !== "").sort(byName);
-  const dir = join(repo, "commons", l.name);
+  const dir = join(repo, "commons", folderOf(l));
   const folders = (existsSync(dir) ? readDirSync(dir) : []).filter((e) => e.isDirectory && !e.name.startsWith(".") && !NOT_RUNTIME.has(e.name) && !roots.includes(e.name)).map((e) => e.name).sort(byName);
   const strings = (v: unknown): Record<string, string> => Object.fromEntries(Object.entries(objectOf(v)).flatMap(([k, x]) => (typeof x === "string" ? [[k, x] as const] : [])));
   const declared = Object.fromEntries(Object.entries(strings(pkg["dependencies"])).filter(([k]) => !k.startsWith(`${SCOPE}/`)));
@@ -149,6 +151,7 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
   return {
     facts: {
       name: l.name,
+      dir: folderOf(l),
       version: l.version,
       summary: l.summary ?? text(pkg["description"]),
       exports: exportsOut,
@@ -171,13 +174,13 @@ export const LAUNCHED: ReadonlyMap<string, { readonly module: string; readonly f
 ]);
 
 /** The module a command's launcher imports, read from the library's own bin file (`import { main } from "../src/x.ts"`) or from `LAUNCHED`. */
-export function commandOf(repo: string, library: string, name: string, target: string): { readonly command: Command | undefined; readonly problem: string | undefined } {
+export function commandOf(repo: string, library: string, name: string, target: string, dir: string = library): { readonly command: Command | undefined; readonly problem: string | undefined } {
   const known = LAUNCHED.get(`${library}:${name}`);
   if (known !== undefined) return { command: { name, library, module: known.module, form: known.form }, problem: undefined };
-  const file = join(repo, "commons", library, noDot(target));
-  if (!existsSync(file)) return { command: undefined, problem: `commons/${library}: the command ${name} names ${target}, which is not there, and no launcher is known for it` };
+  const file = join(repo, "commons", dir, noDot(target));
+  if (!existsSync(file)) return { command: undefined, problem: `commons/${dir}: the command ${name} names ${target}, which is not there, and no launcher is known for it` };
   const m = /import\s*\{\s*main\s*\}\s*from\s*["'](\.[^"']+\.ts)["']/.exec(readTextFileSync(file));
-  if (m?.[1] === undefined) return { command: undefined, problem: `commons/${library}: the command ${name} (${target}) does not import \`main\` from a module of the library` };
+  if (m?.[1] === undefined) return { command: undefined, problem: `commons/${dir}: the command ${name} (${target}) does not import \`main\` from a module of the library` };
   return { command: { name, library, module: noDot(toPosix(join(dirname(noDot(target)), m[1]))), form: "main" }, problem: undefined };
 }
 
@@ -194,7 +197,7 @@ export function commandsOf(repo: string, facts: readonly Facts[]): { readonly co
         continue;
       }
       seen.set(name, f.name);
-      const c = commandOf(repo, f.name, name, target);
+      const c = commandOf(repo, f.name, name, target, f.dir);
       if (c.problem !== undefined) problems.push(c.problem);
       if (c.command !== undefined) commands.push(c.command);
     }
@@ -606,7 +609,7 @@ async function compileLibrary(repo: string, f: Facts, work: string, bun: string,
           skipLibCheck: true,
           preserveSymlinks: true,
         },
-        include: f.roots.map((r) => `${toPosix(join(commons, f.name, r))}/**/*.ts`),
+        include: f.roots.map((r) => `${toPosix(join(commons, f.dir, r))}/**/*.ts`),
       },
       null,
       2,
@@ -716,14 +719,14 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   const unknown = new Set<string>();
   for (const f of facts) {
     const out = join(work, f.name, "out");
-    if (existsSync(join(out, f.name)))
-      for (const rel of filesUnder(join(out, f.name))) {
-        if (rel.endsWith(".d.ts")) place(join(out, f.name, rel), join(stage, f.name, "dist", rel), names, unknown, `${f.name}/dist/${rel}`);
-        else if (rel.endsWith(".js")) place(join(out, f.name, rel), join(stage, f.name, rel), names, unknown, `${f.name}/${rel}`);
+    if (existsSync(join(out, f.dir)))
+      for (const rel of filesUnder(join(out, f.dir))) {
+        if (rel.endsWith(".d.ts")) place(join(out, f.dir, rel), join(stage, f.name, "dist", rel), names, unknown, `${f.name}/dist/${rel}`);
+        else if (rel.endsWith(".js")) place(join(out, f.dir, rel), join(stage, f.name, rel), names, unknown, `${f.name}/${rel}`);
       }
-    for (const other of existsSync(out) ? filesUnder(out).map((p) => p.split("/")[0] ?? "") : []) if (other !== f.name && other !== "") unknown.add(`${f.name} reaches the folder ${other} of commons by a relative path`);
+    for (const other of existsSync(out) ? filesUnder(out).map((p) => p.split("/")[0] ?? "") : []) if (other !== (f.dir.split("/")[0] ?? "") && other !== "") unknown.add(`${f.name} reaches the folder ${other} of commons by a relative path`);
     for (const r of f.roots) {
-      const from = join(root, "commons", f.name, r);
+      const from = join(root, "commons", f.dir, r);
       if (!existsSync(from)) continue;
       for (const rel of filesUnder(from)) {
         const source = join(from, rel);
@@ -733,7 +736,7 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
     }
     // the folders the library reads at run time, once: the compiled files are beside their sources, so the module that reads them finds them at the same path under Bun and under Node
     for (const r of f.folders) {
-      const from = join(root, "commons", f.name, r);
+      const from = join(root, "commons", f.dir, r);
       for (const rel of filesUnder(from)) place(join(from, rel), join(stage, f.name, r, rel), names, unknown, `${f.name}/${r}/${rel}`);
     }
   }
@@ -835,7 +838,7 @@ export function singleExportKeys(repo: string): readonly string[] {
 /** The tools that compiling the libraries needs (FR-029): from their manifests and from what their packed sources import. */
 export function toolsOfLibraries(repo: string, facts: readonly Facts[], union: Tools): { readonly tools: Tools; readonly problems: Findings } {
   const sources = facts.map((f) => ({ name: f.name, roots: f.roots, dependencies: f.dependencies, devDependencies: f.devDependencies }));
-  const imported = importedPackages(facts.flatMap((f) => sourcesOf(repo, f.name, f.roots)));
+  const imported = importedPackages(facts.flatMap((f) => sourcesOf(repo, f.name, f.roots, f.dir)));
   // what the package asks of the consumer is not installed by it, and compiling needs it at the version the libraries are written against
   const pinned = Object.fromEntries(facts.flatMap((f) => Object.entries(f.peers)));
   return toolsOf(sources, { ...pinned, ...union }, imported);

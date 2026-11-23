@@ -41,6 +41,7 @@ const REPO = resolve(LIBRARIES, "..", "..");
 
 const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   name,
+  dir: name,
   version: "0.1.0",
   summary: `${name}.`,
   exports: { ".": "./src/mod.ts" },

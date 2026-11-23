@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { libraryDir } from "@intellectual-frontiers/libraries/libraries";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { summariseStryker } from "../src/mutation.ts";
 
@@ -18,7 +19,7 @@ if (library === undefined) {
   proc.exit(2);
 }
 const out = path.resolve(flag("--out") ?? path.join(ROOT, "_evidence"));
-const folder = path.join(ROOT, "commons", library);
+const folder = path.join(ROOT, libraryDir(ROOT, library));
 const suite = flag("--suite") ?? "suite";
 if (!fs.existsSync(path.join(folder, suite)) || !fs.existsSync(path.join(folder, "src"))) {
   console.error(`mutation: ${library} has no src/ and ${suite}/ to run`);
@@ -54,7 +55,7 @@ try {
     console.error(`mutation: the run of ${library} left no report (exit ${r.code})`);
     proc.exit(2);
   }
-  const s = summariseStryker(fs.readTextFileSync(report), library, `commons/${library}`);
+  const s = summariseStryker(fs.readTextFileSync(report), library, libraryDir(ROOT, library));
   if ("error" in s) {
     console.error(`mutation: ${s.error}`);
     proc.exit(2);

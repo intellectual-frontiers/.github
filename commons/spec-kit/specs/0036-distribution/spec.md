@@ -87,7 +87,7 @@
 
 - **FR-035**: A Commons change that affects the published package MUST be carried through a release of a new version to the configured package registry. After publication, the change owner MUST update every exact `@intellectual-frontiers/commons` pin and its lockfile in Erga to that version and install from the registry with the frozen lockfiles. The change owner MUST run Erga's full `./agora doctor`, `./agora check`, and `./agora test` and the verification commands of each Erga consumer against those installs. The change owner MUST review the findings and record the package version and verification results before declaring the change complete.
 
-- **FR-036**: A change of the folder of a library MUST NOT change what a consumer imports: the exports map of the one package (`./<library>` and `./<library>/<subpath>`, FR-021) MUST be identical, key for key and target for target in name, before and after the move, and a test MUST compare the list of the exports of the packed tarball with the list recorded before the move.
+- **FR-036**: A change of the folder of a library MUST NOT change what a consumer imports: the exports map of the one package (`./<library>` and `./<library>/<subpath>`, FR-021) MUST lose or rename no key: every key the exports map had before the move MUST be in the map after it, and a test MUST compare the keys of the exports of the packed tarball with the keys recorded before the move (a library added later adds keys and loses none).
 
 ## Acceptance scenarios
 

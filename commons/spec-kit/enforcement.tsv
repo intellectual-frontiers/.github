@@ -716,7 +716,7 @@ requirement	mechanism	by	note
 0036-distribution FR-033	check	.github: cd commons/libraries && bun test suite/	pack-commons.test.ts: a static import of an optional peer is a finding and a dynamic one is not; commons-package.test.ts imports every entry with no optional peer installed
 0036-distribution FR-034	check	.github: cd commons/repoctl && bun test suite/	usage.test.ts: the libraries imported, reached and never touched, from the consumer's files and the installed package
 0036-distribution FR-035	review	0036-distribution FR-035	Check the published version, the Erga manifests and lockfiles, and the results of the full Erga checks against the registry installs.
-0036-distribution FR-036	check	.github: bun test ./tests/release/	commons-package.test.ts: the exports of the packed tarball are those recorded before the folders moved
+0036-distribution FR-036	check	.github: bun test ./tests/release/	commons-package.test.ts: the keys of the exports of the packed tarball include every key recorded before the folders moved
 0011-documentation FR-036	check	.github: cd commons/docs && bun run verify	newcomer.test.ts: five newcomer questions answered from the site, retired names and history words found, none on commons' site
 0011-documentation FR-037	check	.github: cd commons/docs && bun run verify	highlight.test.ts: each language cut into tokens with its colour for both schemes, the same runs every time, and the diagram drawn into the page
 0011-documentation FR-038	check	.github: cd commons/docs && bun run verify	ai-guides.test.ts: the AI guides have the headings and a prompt block, and every path, repoctl command, script and specification they name exists

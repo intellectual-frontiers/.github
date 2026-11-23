@@ -7,6 +7,7 @@
  *
  * @module
  */
+import { libraryDir } from "@intellectual-frontiers/libraries/libraries";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { parseLcov } from "../src/coverage.ts";
 
@@ -19,7 +20,7 @@ if (library === undefined) {
   proc.exit(2);
 }
 const out = path.resolve(flag("--out") ?? path.join(ROOT, "_evidence"));
-const folder = library === "repository" ? ROOT : path.join(ROOT, "commons", library);
+const folder = library === "repository" ? ROOT : path.join(ROOT, libraryDir(ROOT, library));
 const suite = flag("--suite") ?? (library === "repository" ? "tests" : fs.existsSync(path.join(folder, "suite")) ? "suite" : "tests");
 if (!fs.existsSync(path.join(folder, suite))) {
   console.error(`evidence: ${library} has no ${suite}/ to run`);

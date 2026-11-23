@@ -41,7 +41,7 @@ import { label, paint } from "@intellectual-frontiers/terminal/palette";
 import { affectedBy, changedSince, everyLibrary } from "./affected.ts";
 import { linkAll } from "./link.ts";
 import { judge as judgeLicense, sentence as licenseSentence } from "./license.ts";
-import type { Library } from "./libraries.ts";
+import { folderOf, type Library } from "./libraries.ts";
 
 /** What the loop is asked about: what changed since a revision, a list of files, named libraries or everything. */
 export type Scope =
@@ -135,7 +135,7 @@ export async function affectedOf(repo: string, scope: Scope): Promise<Result<{ r
       const all = everyLibrary(repo);
       const unknown = scope.names.filter((n) => !all.some((l) => l.name === n));
       if (unknown.length > 0) return err(`no library named ${unknown.join(", ")} (they are: ${all.map((l) => l.name).join(", ")})`);
-      const roots = all.filter((l) => scope.names.includes(l.name)).flatMap((l) => `commons/${l.name}/library.ts`);
+      const roots = all.filter((l) => scope.names.includes(l.name)).flatMap((l) => `commons/${folderOf(l)}/library.ts`);
       return ok({ libs: affectedBy(repo, roots, "code"), why: `${scope.names.join(", ")} and what imports them` });
     }
     case "since": {

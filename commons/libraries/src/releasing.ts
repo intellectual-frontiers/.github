@@ -49,7 +49,7 @@ import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
 import { activeMode, type DistributionMode, GITHUB_REGISTRY, MODE_VARIABLE, type PublishTarget, PUBLISH_TARGETS, SINGLE, SINGLE_TARGETS } from "./distribution.ts";
 import { packableLibraries, rewriteSpecifiers, singleExportKeys } from "./pack-commons.ts";
-import { decodeLibrarySource, type Hold, holdSentence, LIBRARY_FILE, publishedPackage, type VersionConstant } from "./libraries.ts";
+import { decodeLibrarySource, folderOf, type Hold, holdSentence, LIBRARY_FILE, libraryDirs, publishedPackage, readLibraries, type VersionConstant } from "./libraries.ts";
 import { membersOf } from "./metapackages.ts";
 import { everyLibrary } from "./affected.ts";
 
@@ -459,10 +459,12 @@ export function realRegistrySingle(repo: string, registry: RegistryAt = registry
       if (!tgz.ok) return "unknown";
       const published = tarballOf(new Uint8Array(await tgz.arrayBuffer()));
       const names = new Set(packableLibraries(repo).libraries.map((l) => l.name));
+      const dirs = libraryDirs(readLibraries(repo));
       return driftOfSingle(published, {
         keys: singleExportKeys(repo),
         source: (path) => {
-          const f = join(repo, "commons", path);
+          const [library = "", ...rest] = path.split("/");
+          const f = join(repo, "commons", dirs.get(library) ?? library, ...rest);
           return existsSync(f) ? rewriteSpecifiers(readTextFileSync(f), names).text : undefined;
         },
       });
@@ -545,7 +547,7 @@ export async function singleFactsOf(repo: string, registry: Registry = realRegis
   const folders = workFolders(tree.value.paths);
   const held = packableLibraries(repo);
   if (held.problems.length > 0) return err(held.problems.join("; "));
-  const scopes = [...held.libraries.map((l) => `commons/${l.name}`), SINGLE.folder].map((folder) => {
+  const scopes = [...held.libraries.map((l) => `commons/${folderOf(l)}`), SINGLE.folder].map((folder) => {
     const text = tree.value.records.get(folder);
     const record = text === undefined ? undefined : decodeReleaseSource(text);
     return record?.kind === "ok" ? scopeOf(folder, folders, record.value.exclude ?? [], record.value.paths ?? []) : scopeOf(folder, folders, [], []);

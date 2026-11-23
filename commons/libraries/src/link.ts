@@ -22,7 +22,7 @@
  *
  * @module
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, symlinkSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, symlinkSync, unlinkSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
@@ -64,6 +64,24 @@ export function linksOf(repo: string): ReadonlyMap<string, string> {
   return links;
 }
 
+/** Whether the path is a symbolic link, a dangling one too. */
+function isLink(at: string): boolean {
+  try {
+    return lstatSync(at).isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
+
+/** Whether the link at `at` leads to the folder `dir`. */
+function sameFolder(at: string, dir: string): boolean {
+  try {
+    return !isLink(at) || resolve(dirname(at), readlinkSync(at)) === resolve(dir);
+  } catch {
+    return false;
+  }
+}
+
 /** Links each package that is not linked yet, and gives how many it linked, or why it could not. */
 export function linkAll(repo: string): { readonly made: number } | { readonly problem: string } {
   try {
@@ -71,8 +89,9 @@ export function linkAll(repo: string): { readonly made: number } | { readonly pr
     let made = 0;
     for (const [name, dir] of linksOf(repo)) {
       const at = join(scope, name.slice(SCOPE.length));
-      if (existsSync(at)) continue;
+      if (existsSync(at) && sameFolder(at, dir)) continue;
       if (made === 0) mkdirSync(scope, { recursive: true });
+      if (isLink(at)) unlinkSync(at); // a link to where the library was before its folder moved (0027-commons-libraries FR-026), or to nothing
       symlinkSync(dir, at, "junction");
       made += 1;
     }

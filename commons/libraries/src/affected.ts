@@ -34,7 +34,7 @@ import { dirname, join, normalize, resolve, toPosix } from "@intellectual-fronti
 import { stdio } from "@intellectual-frontiers/system";
 import { run } from "@intellectual-frontiers/system/proc";
 import { isSingle, SINGLE } from "./distribution.ts";
-import { type Library, readLibraries } from "./libraries.ts";
+import { folderOf as libraryFolder, type Library, readLibraries } from "./libraries.ts";
 
 /** What a library reads: its folder, the folders and files it takes from others, what it depends on, and the files it imports one by one. */
 export type Inputs = {
@@ -95,12 +95,13 @@ function readPackage(dir: string): Pkg | undefined {
 }
 
 /** The files under a folder that are sources, from the repository's root (`node_modules` and `dist` are not looked into). */
-function sourcesUnder(root: string, dir: string): readonly string[] {
+function sourcesUnder(root: string, dir: string, skip: ReadonlySet<string> = new Set()): readonly string[] {
   const out: string[] = [];
   const walk = (d: string): void => {
     for (const e of readDirSync(join(root, d))) {
       if (e.name === "node_modules" || e.name === "dist" || e.name.startsWith(".")) continue;
       const p = `${d}/${e.name}`;
+      if (e.isDirectory && skip.has(p)) continue; // the folder of another library, an extension of this host (0027-commons-libraries FR-026)
       if (e.isDirectory) walk(p);
       else if (e.isFile && SOURCE.test(e.name)) out.push(p);
     }
@@ -144,24 +145,70 @@ function closure(root: string, entries: readonly string[]): ReadonlySet<string> 
 }
 
 /** The path as a filter reads it: the folder of a file two levels under `commons/<folder>/` is `commons/<folder>/<sub>/**`, one level `commons/<folder>/**`, and a file at the top is itself. */
-function folderOf(file: string): string {
-  const parts = file.split("/");
-  if (parts[0] === "commons" && parts.length >= 4) return `commons/${parts[1] ?? ""}/${parts[2] ?? ""}/**`;
-  if (parts[0] === "commons" && parts.length === 3) return `commons/${parts[1] ?? ""}/**`;
-  return file;
+function folderOf(file: string, dirs: Dirs): string {
+  const own = dirs.ownerOf(file);
+  if (own === undefined) {
+    // a folder that is no library (a shared tool, a folder of sources a library reaches into): one or two levels under commons/
+    const parts = file.split("/");
+    if (parts[0] === "commons" && parts.length >= 4) return `commons/${parts[1] ?? ""}/${parts[2] ?? ""}/**`;
+    if (parts[0] === "commons" && parts.length === 3) return `commons/${parts[1] ?? ""}/**`;
+    return file;
+  }
+  const rest = file.slice(`commons/${own.dir}/`.length).split("/");
+  return rest.length >= 2 ? `commons/${own.dir}/${rest[0] ?? ""}/**` : `commons/${own.dir}/**`;
+}
+
+/** Where the libraries are, from `commons/` (0027-commons-libraries FR-026): the folder of each by name, and the library that owns a path (the one whose folder is the longest prefix of it). */
+export type Dirs = {
+  readonly byName: ReadonlyMap<string, string>;
+  /** The folders of all the libraries, from the repository's root: `commons/anyfs/s3`. */
+  readonly folders: ReadonlySet<string>;
+  ownerOf(path: string): { readonly name: string; readonly dir: string } | undefined;
+};
+
+/** The folders of the libraries of a repository. */
+export function dirsOf(root: string): Dirs {
+  const pairs = readLibraries(root).flatMap((f) => ("library" in f ? [[f.library.name, f.dir] as const] : []));
+  const byName = new Map(pairs);
+  const folders = new Set(pairs.map(([, d]) => `commons/${d}`));
+  const longest = [...pairs].sort((a, b) => b[1].length - a[1].length);
+  return {
+    byName,
+    folders,
+    ownerOf: (path) => {
+      const hit = longest.find(([, d]) => path.startsWith(`commons/${d}/`));
+      return hit === undefined ? undefined : { name: hit[0], dir: hit[1] };
+    },
+  };
+}
+
+/**
+ * The paths of a library's own folder as an input: `commons/<folder>/**`, and for a host whose extensions are inside its folder (0027-commons-libraries FR-026) the host's own folders and files, so that a change
+ * of an extension does not reach the host.
+ */
+function ownPaths(root: string, folder: string, folders: ReadonlySet<string>): readonly string[] {
+  const nested = [...folders].filter((f) => f.startsWith(`${folder}/`));
+  if (nested.length === 0) return [`${folder}/**`];
+  return readDirSync(join(root, folder)).flatMap((e) => {
+    if (e.name === "node_modules") return [];
+    const p = `${folder}/${e.name}`;
+    if (nested.includes(p)) return [];
+    return e.isDirectory ? [`${p}/**`] : [p];
+  });
 }
 
 /** What the library `name` reads (FR-020). */
-export function inputsOf(repo: string, name: string): Inputs {
+export function inputsOf(repo: string, name: string, known?: Dirs): Inputs {
   const root = repo.replace(/[\\/]$/, "");
+  const dirs = known ?? dirsOf(root);
   // in single mode the one package is made of every library, so it reads all of commons (0036-distribution FR-021)
   if (name === SINGLE.slug && isSingle(process.env["IFC_DISTRIBUTION"])) {
-    const others = readLibraries(root).flatMap((f) => ("library" in f && f.dir !== name ? [f.dir] : []));
+    const others = readLibraries(root).flatMap((f) => ("library" in f && f.library.name !== name ? [f.library.name] : []));
     return { paths: ["commons/**", ...SHARED, ".github/workflows/ci.auto.yml"].sort(), dependsOn: others, files: [], imports: others, codePaths: ["commons/**"] };
   }
-  const folder = `commons/${name}`;
+  const folder = `commons/${dirs.byName.get(name) ?? name}`;
   const pkg = readPackage(join(root, folder));
-  const sources = sourcesUnder(root, folder);
+  const sources = sourcesUnder(root, folder, dirs.folders);
   const texts = sources.map((f) => ({ f, ...referencesOf(readTextFileSync(join(root, f))) }));
   const entries = new Set<string>();
   const codeEntries = new Set<string>();
@@ -176,7 +223,7 @@ export function inputsOf(repo: string, name: string): Inputs {
     const dir = posix(join(folder, m[1]));
     if (dir.startsWith("..") || !existsSync(join(root, dir))) continue;
     const depPkg = readPackage(join(root, dir));
-    dependsOn.add(dir.split("/")[1] ?? dir);
+    dependsOn.add(dirs.ownerOf(`${dir}/`)?.name ?? dir.split("/")[1] ?? dir);
     const importedBy = (own: readonly (typeof texts)[number][]): ReadonlySet<string> => {
       const found = new Set<string>();
       for (const { targets, unresolved } of own) {
@@ -189,7 +236,7 @@ export function inputsOf(repo: string, name: string): Inputs {
     // what its types and tests read is what its own code (`about.ts` and `src/`) imports; its suite and its tools also read the packages their scripts run
     const imported = importedBy(texts);
     const ownCode = importedBy(texts.filter((t) => t.f === `${folder}/about.ts` || t.f.startsWith(`${folder}/src/`)));
-    if (ownCode.size > 0 && existsSync(join(root, dir, "library.ts"))) imports.add(dir.split("/")[1] ?? dir);
+    if (ownCode.size > 0 && existsSync(join(root, dir, "library.ts"))) imports.add(dirs.ownerOf(`${dir}/`)?.name ?? dir.split("/")[1] ?? dir);
     for (const [keys, into, all] of [
       [imported, entries, whole],
       [ownCode, codeEntries, codeWhole],
@@ -207,17 +254,18 @@ export function inputsOf(repo: string, name: string): Inputs {
       if (!p.startsWith("..") && existsSync(join(root, p)) && SOURCE.test(p)) entries.add(p);
     }
   const files = [...closure(root, [...entries])].filter((f) => !f.startsWith(`${folder}/`)).sort();
-  const paths = [`${folder}/**`, ...new Set([...files.map(folderOf), ...whole, ...SHARED, ".github/workflows/ci.auto.yml"])].sort();
+  const own = ownPaths(root, folder, dirs.folders);
+  const paths = [...own, ...new Set([...files.map((x) => folderOf(x, dirs)), ...whole, ...SHARED, ".github/workflows/ci.auto.yml"])].sort();
   for (const f of files) {
-    const d = f.split("/")[1];
-    if (d !== undefined && d !== name && existsSync(join(root, "commons", d, "library.ts"))) dependsOn.add(d);
+    const d = dirs.ownerOf(f)?.name;
+    if (d !== undefined && d !== name) dependsOn.add(d);
   }
   const codeFiles = [...closure(root, [...codeEntries])].filter((f) => !f.startsWith(`${folder}/`));
   for (const f of codeFiles) {
-    const d = f.split("/")[1];
-    if (d !== undefined && d !== name && existsSync(join(root, "commons", d, "library.ts"))) imports.add(d);
+    const d = dirs.ownerOf(f)?.name;
+    if (d !== undefined && d !== name) imports.add(d);
   }
-  const codePaths = [`${folder}/**`, ...new Set([...codeFiles.map(folderOf), ...codeWhole])].sort();
+  const codePaths = [...own, ...new Set([...codeFiles.map((x) => folderOf(x, dirs)), ...codeWhole])].sort();
   return { paths, dependsOn: [...dependsOn].sort(), files, imports: [...imports].sort(), codePaths };
 }
 
@@ -241,7 +289,8 @@ export type Reach = "verify" | "code";
 export function affectedBy(repo: string, changed: readonly string[], reach: Reach = "verify"): readonly (Library & { readonly folder: string })[] {
   const root = repo.replace(/[\\/]$/, "");
   const libs = readLibraries(root).flatMap((f) => ("library" in f ? [f.library] : []));
-  const inputs = new Map(libs.map((l) => [l.name, inputsOf(root, l.name)]));
+  const dirs = dirsOf(root);
+  const inputs = new Map(libs.map((l) => [l.name, inputsOf(root, l.name, dirs)]));
   const pathsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.paths : inputs.get(n)?.codePaths) ?? [];
   const depsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.dependsOn : inputs.get(n)?.imports) ?? [];
   const hit = new Set(libs.filter((l) => changed.some((c) => matches(pathsOf(l.name), c))).map((l) => l.name));
@@ -254,7 +303,7 @@ export function affectedBy(repo: string, changed: readonly string[], reach: Reac
       }
     }
   }
-  return libs.filter((l) => hit.has(l.name)).map((l) => ({ ...l, folder: `commons/${l.name}` }));
+  return libs.filter((l) => hit.has(l.name)).map((l) => ({ ...l, folder: `commons/${libraryFolder(l)}` }));
 }
 
 /** The files changed since the merge base of `base` and the head, the working tree's tracked and new files included; undefined where Git cannot say. */
