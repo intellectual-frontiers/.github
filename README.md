@@ -87,7 +87,7 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/terminal`](https://www.npmjs.com/package/@intellectual-frontiers/terminal) | Foundation | A typed command-line parser (`args`) whose options are declared once as data | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/assessment`](commons/assessment) | Pattern | Assessment-objective evidence | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/content`](commons/content) | Pattern | Collects governed claims and their evidence into a checked model for publication | layers | L1 | GitHub |
+| [`@intellectual-frontiers/content`](https://www.npmjs.com/package/@intellectual-frontiers/content) | Pattern | Collects governed claims and their evidence into a checked model for publication | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/gate`](commons/gate) | Pattern | A policy gate: policies written as code over the subjects of a change (assets, resources, endpoints) | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |

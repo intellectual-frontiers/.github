@@ -83,8 +83,9 @@ proves(
         "https://npm.pkg.github.com",
         "the package is sent to the GitHub package registry alone",
       );
-      // what the package asks of the consumer is not installed with it (0036-distribution FR-023): no dependency, and the drivers, what Docs loads and the compiler as optional peers with their ranges
-      assertEquals(obj(manifest["dependencies"]), {}, "the package installs nothing but itself");
+      // The parser is a runtime dependency. Drivers, the Docs tools, and the compiler are optional peers (0036-distribution FR-023).
+      const kanonPackage = obj(JSON.parse(await fs.readTextFile(path.join(ROOT, "commons", "kanon", "package.json"))));
+      assertEquals(obj(manifest["dependencies"]), obj(kanonPackage["dependencies"]), "the package installs Kanon's parser dependencies");
       // the GitHub package registry drops peerDependenciesMeta from the metadata a package manager resolves from, so the optional peers are not peerDependencies entries (a package manager would install them): they are named in ifcOptionalPeers
       const peerDependencies = obj(manifest["peerDependencies"]);
       const optionalPeers = obj(manifest["ifcOptionalPeers"]);
@@ -94,7 +95,8 @@ proves(
       }
       assertEquals(peerDependencies, { "@types/node": ">=26" }, "the types of Node are the one peer a package manager sees");
       // the content policy and the budget (FR-030 to FR-032): dist/ holds declarations, no file is shipped twice, and the package is within its budget
-      for (const rel of filesUnder(unpacked)) if (/^[^/]+\/dist\//.test(rel)) assert(rel.endsWith(".d.ts"), `${rel} is in dist/, which holds declarations only`);
+      for (const rel of filesUnder(unpacked))
+        if (/^[^/]+\/dist\//.test(rel)) assert(rel.endsWith(".d.ts"), `${rel} is in dist/, which holds declarations only`);
       assert(bytes <= SINGLE_BUDGET.tarballBytes, `the tarball is ${bytes} bytes, over its budget of ${SINGLE_BUDGET.tarballBytes}`);
       const sideEffects = manifest["sideEffects"];
       assert(

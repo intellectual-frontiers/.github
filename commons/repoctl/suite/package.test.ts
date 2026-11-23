@@ -1,5 +1,5 @@
 /**
- * The package of Repoctl (commons repoctl 0010-repoctl-host FR-003): the tarball made by the packer of commons is installed under the `node_modules` of an empty project and run by Node with no network and no configuration: `repoctl --help`
+ * The package of Repoctl (commons repoctl 0010-repoctl-host FR-003): the tarball made by the packer of commons is installed in an empty project and run by Node with no network and no configuration: `repoctl --help`
  * lists the verbs, `repoctl doctor` says there is no configuration, and the entry exports the host, `defineConfig` and the types of the configuration, with the license. In `single` distribution mode (the mode of the repository) the tarball is the one package
  * `@intellectual-frontiers/commons`, which holds Repoctl, names the command `repoctl` in its `bin` and exports it as `@intellectual-frontiers/commons/repoctl`; in `per-library` mode (`IFC_DISTRIBUTION=per-library` for the packer of this test) it is the package of Repoctl alone, with the optional peer.
  *
@@ -48,8 +48,7 @@ const obj = (v: unknown): Json => (typeof v === "object" && v !== null && !Array
 
 proves(["0010-repoctl-host FR-003"], "in single mode the packed commons tarball holds Repoctl, its bin map names repoctl, and the tarball installed into a scratch project runs repoctl --help and repoctl doctor offline, and its repoctl entry exports the host, defineConfig and the types", async () => {
   const node = proc.which("node");
-  const tar = proc.which("tar");
-  if (!CAN_RUN || node === undefined || tar === undefined) return;
+  if (!CAN_RUN || node === undefined) return;
   const install0 = await proc.run(["bun", "install", "--frozen-lockfile"], { cwd: COMMONS });
   assertEquals(install0.code, 0, `${install0.stdout}${install0.stderr}`);
   const packed = await proc.run(["bun", "tools/pack.ts"], { cwd: COMMONS, env: { IFC_DISTRIBUTION: "single" } });
@@ -58,7 +57,11 @@ proves(["0010-repoctl-host FR-003"], "in single mode the packed commons tarball 
   const tarball = path.join(COMMONS, `dist/intellectual-frontiers-commons-${version}.tgz`);
   assert(await fs.exists(tarball), tarball);
   await fs.withTempDir(async (dir) => {
-    const installed = await install(tar, tarball, dir, "@intellectual-frontiers/commons");
+    await fs.writeTextFile(path.join(dir, "package.json"), '{ "name": "scratch", "private": true, "type": "module" }\n');
+    await git(dir, "init", "-q");
+    const added = await proc.run(["bun", "add", tarball], { cwd: dir });
+    assertEquals(added.code, 0, added.stdout + added.stderr);
+    const installed = path.join(dir, "node_modules", "@intellectual-frontiers/commons");
     const manifest = JSON.parse(await fs.readTextFile(path.join(installed, "package.json"))) as { bin: Record<string, string>; exports: Record<string, unknown>; license: string };
     assertEquals(manifest.bin["repoctl"], "./bin/repoctl.mjs");
     assert(manifest.exports["./repoctl"] !== undefined, "the entry ./repoctl is exported");
