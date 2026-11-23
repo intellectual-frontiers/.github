@@ -173,7 +173,7 @@ export type ParsedSource = {
   readonly references: ReturnType<typeof readModuleReferences>;
 };
 
-/** The references of a source file, read once, so that the checks of its imports read the file one time. */
+/** Parse the module references of one source file, once, for the layer and extension rules. */
 export const parseImports = (file: SourceFile): ParsedSource => ({ path: file.path, references: readModuleReferences(file.text) });
 
 /** Make a finding with its key. */
@@ -295,7 +295,7 @@ export function importFindings(
   return parsedImportFindings(table, files.map(parseImports), exportsMap);
 }
 
-/** The findings of the imports of files already read: each import against the layer rules of the table and the exports map. */
+/** The findings of the layer and extension rules over files that are already parsed. */
 export function parsedImportFindings(table: Table, files: readonly ParsedSource[], exportsMap: ExportsMap): readonly Finding[] {
   const out: Finding[] = [];
   const undeclared = new Set<string>();
