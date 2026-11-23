@@ -138,7 +138,7 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
   const bin = Object.fromEntries(Object.entries(objectOf(pkg["bin"])).flatMap(([k, v]) => (typeof v === "string" ? [[k, v] as const] : [])));
   const roots = [...new Set([...Object.values(exportsOut), ...Object.values(bin).filter((b) => b.endsWith(".ts"))].map(rootOf))].filter((r) => r !== "").sort(byName);
   const dir = join(repo, "commons", folderOf(l));
-  const folders = (existsSync(dir) ? readDirSync(dir) : []).filter((e) => e.isDirectory && !e.name.startsWith(".") && !NOT_RUNTIME.has(e.name) && !roots.includes(e.name)).map((e) => e.name).sort(byName);
+  const folders = (existsSync(dir) ? readDirSync(dir) : []).filter((e) => e.isDirectory && !e.name.startsWith(".") && !NOT_RUNTIME.has(e.name) && !roots.includes(e.name) && !existsSync(join(dir, e.name, "library.ts"))).map((e) => e.name).sort(byName);
   const strings = (v: unknown): Record<string, string> => Object.fromEntries(Object.entries(objectOf(v)).flatMap(([k, x]) => (typeof x === "string" ? [[k, x] as const] : [])));
   const declared = Object.fromEntries(Object.entries(strings(pkg["dependencies"])).filter(([k]) => !k.startsWith(`${SCOPE}/`)));
   const dev = strings(pkg["devDependencies"]);

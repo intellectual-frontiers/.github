@@ -1,0 +1,38 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-native-pinned-layers FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: a dialect of the Archon family and the shared checker finds nothing
+0001-native-pinned-layers FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: no other dialect or plugin is imported and archon and toolchain only through their exports
+0001-native-pinned-layers FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: the package exports the dialect and the pure install logic
+0001-native-pinned-layers FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: verify runs every check
+0001-native-pinned-layers FR-005	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: the release record agrees with the manifest
+0001-native-pinned-layers FR-006	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/layers.test.ts: no package manager, administrator rights or compiler
+0002-native-pinned-install FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: the hash is checked before anything is unpacked
+0002-native-pinned-install FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: zip, tar and gzipped tar give the same files and an unsafe path, a path twice and a link refuse the archive
+0002-native-pinned-install FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: the program must be in the unpacked files
+0002-native-pinned-install FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: the install record is written and read back
+0002-native-pinned-install FR-005	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: drift finds every change
+0002-native-pinned-install FR-006	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/install.test.ts: shims and what is refused
+0003-native-pinned-store FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: the short path of a tool
+0003-native-pinned-store FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: nothing is written outside the store
+0003-native-pinned-store FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: a verified download kept only where pinned
+0003-native-pinned-store FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: one lock per tool and a second run finds the first's copy
+0003-native-pinned-store FR-005	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: the switch with a retried rename and the old copy kept where it fails
+0003-native-pinned-store FR-006	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: the program of an install is executable and its shim written
+0003-native-pinned-store FR-007	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: clean removes what can be got again
+0004-native-pinned-dialect FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: guarantees as data and the plan file read back
+0004-native-pinned-dialect FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: the observation of the store, the path and a program that cannot be asked
+0004-native-pinned-dialect FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: the plan file rendered and the steps name its digest
+0004-native-pinned-dialect FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: check changes nothing, apply installs, a second apply changes nothing
+0004-native-pinned-dialect FR-005	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: failures name the tool, the step and the next action
+0004-native-pinned-dialect FR-006	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: a tool that is as pinned costs no request
+0004-native-pinned-dialect FR-007	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/dialect.test.ts: a pin with no download is told with its reason
+0005-native-pinned-pin FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-005	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0005-native-pinned-pin FR-006	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/pin.test.ts
+0002-native-pinned-install FR-007	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/links.test.ts: a Node release and a Temurin JRE unpack with their links, and each way a link cannot be trusted is refused with its reason
+0002-native-pinned-install FR-008	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/links.test.ts: hard links are copies, execute bits are given, links are copies where the system has none
+0003-native-pinned-store FR-008	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: an xz-compressed tar with links is installed with its links, its execute bits and its record

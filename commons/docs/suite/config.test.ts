@@ -7,6 +7,7 @@
  */
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { readLibraries } from "@intellectual-frontiers/libraries/libraries";
 import { findConfig, loadConfig, main, parseArgs } from "../src/cli.ts";
 import { normalDir, resolveConfig, under } from "../src/config.ts";
 import { CONFIG, ROOT } from "./helpers.ts";
@@ -17,16 +18,15 @@ proves(["0011-documentation FR-023"], "commons' configuration resolves: its root
   assertEquals([CONFIG.name, CONFIG.subject, CONFIG.branch], ["IF Commons", "commons", "main"]);
   assertEquals(CONFIG.home, { dir: "commons", slug: "home", about: { kind: "file", file: "commons/about.ts" } });
   // every library of commons (a folder with a manifest, a package.json and an about.ts) is a package of the site, after IFC TypeScript, and none that is not one
-  const everyLibrary = [...fs.readDirSync(path.join(ROOT, "commons"))]
-    .filter((e) => e.isDirectory && ["library.ts", "package.json", "about.ts"].every((f) => fs.existsSync(path.join(ROOT, "commons", e.name, f))))
-    .map((e) => e.name)
-    .sort();
-  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), everyLibrary.map((n) => [`commons/${n}`, n]));
+  // (an extension of a host is in the folder of its host, 0027-commons-libraries FR-026)
+  const found = readLibraries(ROOT).flatMap((f) => ("library" in f ? [{ name: f.library.name, dir: f.dir }] : []));
+  const everyLibrary = found.filter((f) => ["package.json", "about.ts"].every((file) => fs.existsSync(path.join(ROOT, "commons", f.dir, file))));
+  assertEquals(CONFIG.packages.map((p) => [p.dir, p.slug]), everyLibrary.map((f) => [`commons/${f.dir}`, f.name]));
   // a library's spec kit is named beside commons' own, so that it is published with it and never twice (0027-commons-libraries FR-009)
   const kits = CONFIG.specKits.map((k) => k.dir);
   assertEquals(kits[0], "commons/spec-kit");
   assertEquals(new Set(kits).size, kits.length, "no kit twice");
-  const libraries = [...fs.readDirSync(path.join(ROOT, "commons"))].filter((e) => e.isDirectory && fs.existsSync(path.join(ROOT, "commons", e.name, "spec-kit", "registry.tsv"))).map((e) => `commons/${e.name}/spec-kit`);
+  const libraries = found.filter((f) => fs.existsSync(path.join(ROOT, "commons", f.dir, "spec-kit", "registry.tsv"))).map((f) => `commons/${f.dir}/spec-kit`);
   assertEquals([...kits.slice(1)].sort(), libraries.sort(), "every library that has a spec kit is named, and none that has not");
   assert(CONFIG.specKits.every((k) => k.layout === "commons"));
   assertEquals([CONFIG.citations.prefix, CONFIG.citations.digits], ["commons", 4]);

@@ -7,7 +7,7 @@
 import { mkdirSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { derivedDir, LIBRARY_FILE, libraryDir, libraryDirs, manifestFindings, readLibraries } from "../src/libraries.ts";
+import { derivedDir, idsIn, LIBRARY_FILE, libraryDir, libraryDirs, manifestFindings, readLibraries } from "../src/libraries.ts";
 import { decodeLibrarySource } from "../src/libraries.ts";
 
 const SPEC = "0027-commons-libraries";
@@ -67,4 +67,22 @@ proves([`${SPEC} FR-026`], "a library out of the folder its manifest derives is 
     assertEquals(found.length, 1);
     assertStringIncludes(found[0] ?? "", "commons/anyfs/s3");
   });
+});
+
+proves([`${SPEC} FR-026`, `${SPEC} FR-011`], "the number a library keeps is read from its line whether its folder is `commons/<name>` or `commons/<host>/<extension>`", () => {
+  const spec = [
+    "## The libraries",
+    "",
+    "<!-- libraries:begin -->",
+    "",
+    "- **FR-140**: `commons/archon/dialect-apt` MUST be a library",
+    "- **FR-141**: `commons/core` MUST be a library",
+    "",
+    "<!-- libraries:end -->",
+    "",
+  ].join("\n");
+  const ids = idsIn(spec);
+  assertEquals(ids.get("archon-dialect-apt"), "FR-140");
+  assertEquals(ids.get("core"), "FR-141");
+  assertEquals(ids.has("archon"), false);
 });

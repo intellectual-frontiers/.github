@@ -132,6 +132,8 @@ export function readSources(root: string, files: Files = systemFiles, dir = ""):
     const rel = dir === "" ? e.name : `${dir}/${e.name}`;
     if (e.isDirectory) {
       if (SKIPPED.has(e.name)) continue;
+      // a folder of its own library inside this one is an extension of this host, read as its own library (0027-commons-libraries FR-026)
+      if (dir === "" && files.exists(`${root}/${rel}/${MANIFEST}`)) continue;
       const inner = readSources(root, files, rel);
       if (inner.kind === "err") return inner;
       out.push(...inner.value);
@@ -178,8 +180,9 @@ export function findings(root: string, files: Files = systemFiles): Result<reado
   const sources = readSources(root, files);
   if (sources.kind === "err") return sources;
   if (table.value.extends === undefined) return ok(importFindings(table.value, sources.value, exported.value));
-  // an extension is a folder beside its host's, which its package names (0027-commons-libraries FR-013: a package's folder is its name)
-  const hostRoot = `${root}/../${splitPackage(table.value.extends).base}`;
+  // an extension is inside its host's folder (0027-commons-libraries FR-026) or, where it is not moved, a folder beside it which its package names
+  const parent = readTable(`${root}/..`, files);
+  const hostRoot = parent.kind === "ok" && parent.value.package === table.value.extends ? `${root}/..` : `${root}/../${splitPackage(table.value.extends).base}`;
   const host = readTable(hostRoot, files);
   if (host.kind === "err") return err(`the host ${table.value.extends}: ${host.error}`);
   const hostExports = readExports(hostRoot, files);

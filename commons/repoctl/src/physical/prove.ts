@@ -260,9 +260,9 @@ export function commandOf(repo: string, proof: Proof, base: string, known?: (nam
       return { argv: ["bun", "commons/libraries/src/versions.ts", "check", "--base", base], cwd: root };
     case "suite":
     case "smoke":
-      return { argv: ["bun", "test", "suite/"], cwd: at(proof.library), needs: "suite" };
+      return { argv: ["bun", "test", "./suite/"], cwd: at(proof.library), needs: "suite" };
     case "seam":
-      return { argv: ["bun", "test", "suite/"], cwd: at(proof.consumer), needs: "suite" };
+      return { argv: ["bun", "test", "./suite/"], cwd: at(proof.consumer), needs: "suite" };
     case "pack":
       return { argv: ["bun", "tools/pack.ts", "--check"], cwd: at(proof.library), needs: "tools/pack.ts" };
     case "end-to-end":

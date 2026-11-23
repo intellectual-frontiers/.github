@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { About, BooksConfig, DocsConfig, EvidenceSource, IssuesOf, PackageConfig } from "./docs/src/config.ts";
 import { layeredLens } from "./docs/src/lens/layered.ts";
@@ -353,13 +353,13 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-github/spec-kit" },
     { layout: "commons", dir: "commons/archon/spec-kit" },
     { layout: "commons", dir: "commons/toolchain/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-native-pinned/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-native-pinned/spec-kit" },
     { layout: "commons", dir: "commons/package-managers/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-apt/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-homebrew/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-mise/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-winget/spec-kit" },
-    { layout: "commons", dir: "commons/archon-tool/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-apt/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-homebrew/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-mise/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-winget/spec-kit" },
+    { layout: "commons", dir: "commons/archon/tool/spec-kit" },
     { layout: "commons", dir: "commons/estate/spec-kit" },
     { layout: "commons", dir: "commons/anyfs/spec-kit" },
     { layout: "commons", dir: "commons/anyfs-posix/spec-kit" },
@@ -381,11 +381,11 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/content/spec-kit" },
     { layout: "commons", dir: "commons/lab/spec-kit" },
     { layout: "commons", dir: "commons/machine-probe/spec-kit" },
-    { layout: "commons", dir: "commons/archon-boot/spec-kit" },
-    { layout: "commons", dir: "commons/archon-converge/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-ansible/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-cloud-init/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dns/spec-kit" },
+    { layout: "commons", dir: "commons/archon/boot/spec-kit" },
+    { layout: "commons", dir: "commons/archon/converge/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-ansible/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-cloud-init/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dns/spec-kit" },
     { layout: "commons", dir: "commons/catalog-nist-csf-2/spec-kit" },
     { layout: "commons", dir: "commons/catalog-nist-sp800/spec-kit" },
     { layout: "commons", dir: "commons/lang-sql/spec-kit" },
@@ -401,7 +401,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/pentest/spec-kit" },
     { layout: "commons", dir: "commons/findings/spec-kit" },
     { layout: "commons", dir: "commons/scanners/spec-kit" },
-    { layout: "commons", dir: "commons/archon-dialect-opentofu/spec-kit" },
+    { layout: "commons", dir: "commons/archon/dialect-opentofu/spec-kit" },
     { layout: "commons", dir: "commons/catalog-soc2/spec-kit" },
     { layout: "commons", dir: "commons/assessment/spec-kit" },
     { layout: "commons", dir: "commons/tenancy/spec-kit" },

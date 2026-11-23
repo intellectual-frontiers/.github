@@ -326,7 +326,7 @@ export type Found = { readonly dir: string; readonly library: Library } | { read
  * The hosts whose extensions the check holds to the folder FR-026 derives: a family is added here with the commit that moves it, and the set is every host of the repository when the last family is moved
  * (the folders of a host's extensions are then a rule and not a plan).
  */
-export const LAYOUT_HOSTS: ReadonlySet<string> = new Set<string>([]);
+export const LAYOUT_HOSTS: ReadonlySet<string> = new Set<string>(["archon"]);
 
 /** The folders of `commons/` that hold no library of their own and are never searched for one. */
 const NOT_LIBRARY_FOLDERS: ReadonlySet<string> = new Set(["node_modules", "dist", "generated", "spec-kit", "src", "suite", "tools"]);
@@ -416,7 +416,7 @@ export function docsConfigFindings(root: string, libraries: readonly Library[]):
   const text = readTextFileSync(file);
   return libraries.flatMap((l) => {
     if (l.specKit === undefined) return [];
-    const dir = `commons/${l.name}/${l.specKit}`;
+    const dir = `commons/${folderOf(l)}/${l.specKit}`;
     return text.includes(`"${dir}"`)
       ? []
       : [`commons/${DOCS_CONFIG} does not list the spec kit of ${l.name}: add { layout: "commons", dir: "${dir}" } to specKits (FR-025)`];
@@ -530,8 +530,9 @@ export function idsIn(spec: string): ReadonlyMap<string, string> {
   const b = bounds(spec);
   if (b === undefined) return out;
   for (const line of spec.slice(b.from, b.to).split("\n")) {
-    const m = /^- \*\*(FR-\d+)\*\*: `commons\/([a-z][a-z0-9-]*)`/.exec(line);
-    if (m?.[1] !== undefined && m[2] !== undefined) out.set(m[2], m[1]);
+    // the folder is `commons/<name>` or, for an extension of a host, `commons/<host>/<extension>`, whose library is named `<host>-<extension>` (0027-commons-libraries FR-026)
+    const m = /^- \*\*(FR-\d+)\*\*: `commons\/([a-z][a-z0-9-]*)(?:\/([a-z][a-z0-9-]*))?`/.exec(line);
+    if (m?.[1] !== undefined && m[2] !== undefined) out.set(m[3] === undefined ? m[2] : `${m[2]}-${m[3]}`, m[1]);
   }
   return out;
 }

@@ -1,0 +1,35 @@
+{
+  "name": "@intellectual-frontiers/archon-dialect-winget",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The dialect of tools for Archon that installs them with WinGet: WinGet, whose manifests carry the SHA-256 of each installer, which it checks before it runs one.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../../tools/mizan-check.ts --root spec-kit && bun ../../libraries/src/check.ts --root spec-kit --level L1 && bun ../../kanon/src/check.ts && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/archon": "link:..",
+    "@intellectual-frontiers/core": "link:../../core",
+    "@intellectual-frontiers/kanon": "link:../../kanon",
+    "@intellectual-frontiers/libraries": "link:../../libraries",
+    "@intellectual-frontiers/mizan": "link:../../mizan",
+    "@intellectual-frontiers/package-managers": "link:../../package-managers",
+    "@intellectual-frontiers/ontology": "link:../../ontology",
+    "@intellectual-frontiers/system": "link:../../system",
+    "@intellectual-frontiers/test": "link:../../test",
+    "@intellectual-frontiers/toolchain": "link:../../toolchain",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

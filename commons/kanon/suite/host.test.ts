@@ -188,3 +188,14 @@ proves(["0002-kanon-content-checks FR-011"], "a folder is read as a bundle, noth
   assertEquals(readBundle(`${dir}/absent`).kind, "err");
   assertEquals((await runBundle(dir)).code, 2);
 });
+
+proves(["0027-commons-libraries FR-026", "0033-kanon FR-035"], "a folder of a library inside a host's folder is an extension read as its own library, and the host's sources do not include it", () => {
+  const root = library(MANIFEST, { "src/mod.ts": "export const a = 1;\n", "ext/library.ts": "export const library = {};\n", "ext/src/mod.ts": "export const b = 1;\n" });
+  try {
+    const paths = unwrap(readSources(root)).map((f) => f.path);
+    assert(paths.includes("src/mod.ts"));
+    assert(!paths.some((p) => p.startsWith("ext/")), `the extension's files are the host's: ${paths.join(", ")}`);
+  } finally {
+    fs.removeSync(root, { recursive: true });
+  }
+});

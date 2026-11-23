@@ -239,7 +239,7 @@ export async function runTests(repo: string, libs: readonly Lib[], width: number
   const suites = libs.filter((l) => existsSync(join(repo, l.folder, "suite"))).sort((a, b) => files(b) - files(a));
   if (suites.length === 0) return { kind: "skipped", detail: "no library of these has a suite" };
   const results = await pool(suites, width, async (l) => {
-    const r = await run(["bun", "test", ...(bail ? ["--bail"] : []), "suite/"], { cwd: join(repo, l.folder), env: { CI: "" } });
+    const r = await run(["bun", "test", ...(bail ? ["--bail"] : []), "./suite/"], { cwd: join(repo, l.folder), env: { CI: "" } });
     const text = `${r.stdout}\n${r.stderr}`;
     return { name: l.name, code: r.code, counts: bunCounts(text), text };
   });
