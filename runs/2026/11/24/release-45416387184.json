@@ -1,0 +1,63 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45416387184",
+    "workflow": "release",
+    "commit": "d06b0b795f5a07ca2942ecb204b6aa733a4d9b2a",
+    "at": "2026-11-24T14:41:05Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45416387184"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-3",
+      "job": "build",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 358,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-package-that-is-published-5",
+      "job": "build",
+      "module": "commons",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22563,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-which-includes-the-packing-4",
+      "job": "build",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23303,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-libraries-linked-by-name-before-any--4",
+      "job": "publish",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-the-command-reads-from-the--3",
+      "job": "publish",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
