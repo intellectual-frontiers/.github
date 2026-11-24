@@ -621,7 +621,7 @@ const tests: Workflow = {
     tests: job({
       runsOn: expr("matrix.os"),
       timeoutMinutes: 15,
-      strategy: { failFast: false, matrix: { os: ["ubuntu-latest", "macos-latest"], runtime: ["bun", "node"] } },
+      strategy: { failFast: false, matrix: { os: ["ubuntu-latest"], runtime: ["bun", "node"] } },
       steps: [
         checkout(),
         bun(),
@@ -652,6 +652,17 @@ const tests: Workflow = {
           when: "matrix.runtime == 'bun'",
         }),
         run('node --test "tests/*.test.ts"', { name: "The tests on Node 26", when: "matrix.runtime == 'node'" }),
+      ],
+    }),
+    installers: job({
+      comment: "the one test of the root that has code of its own for macOS (the one-command installers of agora); the others run on Linux alone (0038-build-policy: a system is run only for code that is its own)",
+      runsOn: "macos-latest",
+      timeoutMinutes: 15,
+      steps: [
+        checkout(),
+        bun(),
+        tools(".", "The root's development tools, from bun.lock"),
+        run("timeout 5m bun test tests/agora-install.test.ts", { name: "The installers of agora on macOS" }),
       ],
     }),
     workflows: job({

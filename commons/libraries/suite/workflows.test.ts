@@ -266,3 +266,16 @@ proves([`${SPEC} FR-010`], "no script of a bash step pipes into head: under pipe
       for (const s of j.steps) if (s.kind === "run" && (s.shell === "bash" || s.shell === undefined) && /\|\s*head\b/.test(s.run)) found.push(`${w.file}/${id}: ${s.name ?? s.run.slice(0, 40)}`);
   assertEquals(found, []);
 });
+
+proves([`${SPEC} FR-013`], "the tests of the root run on Linux alone, and the installers of agora alone on macOS", () => {
+  const w = workflows().find((x) => x.file === "tests");
+  assert(w !== undefined, "the workflow tests exists");
+  const runners = Object.entries(w.jobs).map(([name, j]) => [name, typeof j.runsOn === "string" ? j.runsOn : "matrix"] as const);
+  assertEquals(
+    runners.filter(([, os]) => os === "macos-latest" || os === "windows-latest").map(([n]) => n).filter((n) => n !== "windows"),
+    ["installers"],
+    "macOS has one job, the installers; Windows has its own job as it had",
+  );
+  const matrix = w.jobs["tests"]?.strategy?.matrix;
+  assert(matrix !== undefined && typeof matrix === "object" && !("expression" in matrix), "the matrix of tests is data");
+});

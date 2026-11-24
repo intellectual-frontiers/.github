@@ -117,7 +117,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         runtime: [bun, node]
     steps:
       - uses: actions/checkout@v4
@@ -180,6 +180,42 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: findings-tests-tests-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/findings
+          if-no-files-found: ignore
+          retention-days: 7
+        continue-on-error: true
+
+  # the one test of the root that has code of its own for macOS (the one-command installers of agora); the others run on Linux alone (0038-build-policy: a system is run only for code that is its own)
+  installers:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        continue-on-error: true
+      - uses: ./.github/actions/bun
+        continue-on-error: true
+      - name: "The root's development tools, from bun.lock"
+        id: the-root-s-development-tools-from-bun-lo-3
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-root-s-development-tools-from-bun-lo-3 --job "installers" --module "repository" --tool install --timeout 4 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: bun install --frozen-lockfile
+        working-directory: .
+        continue-on-error: true
+      - name: The installers of agora on macOS
+        id: the-installers-of-agora-on-macos-4
+        shell: bash
+        run: |
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-installers-of-agora-on-macos-4 --job "installers" --module "repository" --tool bun-test --timeout 12 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+        env:
+          IFC_STEP_SCRIPT: timeout 5m bun test tests/agora-install.test.ts
+        continue-on-error: true
+      - name: "The findings of this job, kept for the job that gathers them"
+        if: "always()"
+        uses: actions/upload-artifact@v4
+        with:
+          name: findings-tests-installers-${{ strategy.job-index }}
           path: ${{ runner.temp }}/findings
           if-no-files-found: ignore
           retention-days: 7
@@ -286,7 +322,7 @@ jobs:
     name: findings
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [check, tests, workflows, windows, robot]
+    needs: [check, tests, installers, workflows, windows, robot]
     if: "always()"
     permissions:
       contents: read
