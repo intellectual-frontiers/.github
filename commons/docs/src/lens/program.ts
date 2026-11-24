@@ -45,7 +45,7 @@ function propertiesTable(e: LayerElement, skip: readonly string[] = []): readonl
 export function programLens(options: ProgramLensOptions): Lens {
   let models: readonly LayeredModel[] = [];
   const group = options.group ?? "Programs";
-  /** The program a model is of: the name of the model without the tier at its end (`ergonex-operator` is of `ergonex`). */
+  /** The program a model is of: the name of the model without the tier at its end (`repoctl-contributor` is of `repoctl`). */
   const programOf = (m: LayeredModel): string => m.name.replace(/-[^-]+$/, "");
   /** The tier of a model: what follows the program in its name. */
   const tierOf = (m: LayeredModel): string => `${m.name.slice(programOf(m).length + 1)} tier`;

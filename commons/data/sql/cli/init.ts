@@ -186,7 +186,7 @@ export async function runInit(argv: readonly string[], io: InitIo): Promise<Outc
     const r = secretOf(io.env, "ARCA_DATABASE_URL");
     return r.kind === "ok" ? r.value : undefined;
   })();
-  const found = discover({ paths: P, env: io.env, ...(urlGiven === undefined ? {} : { url: urlGiven }), ...(a.switches.has("--local") ? { local: true } : {}), state, ...(io.env["ERGONEX_HOME"] === undefined ? {} : { workspace: io.env["ERGONEX_HOME"] as string }) });
+  const found = discover({ paths: P, env: io.env, ...(urlGiven === undefined ? {} : { url: urlGiven }), ...(a.switches.has("--local") ? { local: true } : {}), state, ...(io.env["ARCACTL_ROOT"] === undefined ? {} : { workspace: io.env["ARCACTL_ROOT"] as string }) });
   let candidates = [...found.candidates];
   const wanted = a.values.get("--instance") ?? (candidates.length === 1 && !a.switches.has("--discover") ? undefined : undefined);
   const looking = a.switches.has("--discover") || wanted === undefined;
@@ -195,7 +195,7 @@ export async function runInit(argv: readonly string[], io: InitIo): Promise<Outc
   if (looking) {
     say("Instances you can reach:");
     say(table(rows));
-    if (found.configs.length > 0) say(`\nIn your Ergonex workspace: ${found.configs.join(", ")}`);
+    if (found.configs.length > 0) say(`\nConfigurations under ARCACTL_ROOT: ${found.configs.join(", ")}`);
     say();
   }
 

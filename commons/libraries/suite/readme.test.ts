@@ -38,13 +38,13 @@ proves([`${SPEC} FR-017`], "a row is made from a manifest, a library with no rol
   };
   const a = rowOf(lib("core", 'distribution: ["github", "npm"],'), "Errors as values. More.");
   const b = rowOf(lib("kanon", 'distribution: ["github"],'), "The pattern.");
-  const c = rowOf(lib("ergonex"), "The command.");
+  const c = rowOf(lib("repoctl"), "The command.");
   const d = rowOf(lib("data"), "Governed data.");
   assert(a.kind === "ok" && b.kind === "ok" && c.kind === "ok" && d.kind === "ok");
   assertEquals(a.value.shape, "-");
   const table = tableOf([c.value, b.value, d.value, a.value]);
   const names = table.split("\n").slice(2).map((l) => /`@intellectual-frontiers\/([a-z-]+)`/.exec(l)?.[1]);
-  assertEquals(names, ["core", "kanon", "data", "ergonex"]);
+  assertEquals(names, ["core", "kanon", "data", "repoctl"]);
   assertStringIncludes(table, "[`@intellectual-frontiers/kanon`](commons/kanon)");
   assertStringIncludes(table, "https://www.npmjs.com/package/@intellectual-frontiers/core");
   const none = rowOf(lib("brand-new"), "A new one.");

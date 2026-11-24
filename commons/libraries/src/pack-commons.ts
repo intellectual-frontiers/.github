@@ -16,7 +16,7 @@
  * is written as `@intellectual-frontiers/commons/<library>[/<subpath>]` in the compiled files, the declarations and the sources the package carries (the package names itself, which Node, Bun and TypeScript resolve). The sources of this repository keep the name of
  * the library (Kanon, 0033-kanon FR-010). The dependencies are the union of the runtime dependencies of the libraries, each at an exact version, except the packages `SINGLE_PEERS` names (the database drivers the libraries take as ports, what only Docs loads and the TypeScript compiler), which are optional peer dependencies the consumer installs; the commands are those the libraries declare,
  * each a launcher in `bin/` that imports the compiled module; the files of the package that do something when they are loaded (a module that installs a port, a command) are named in `sideEffects`, and every other is free of effects, which the inspection proves by
- * reading the compiled files. A folder of a library other than its entries' folders and those of {@link NOT_RUNTIME} (the data of a catalog, the guides of Docs, the installers of Ergonex) is shipped once, beside the sources, and the compiled file of each source is beside it, so that a module reads it at the
+ * reading the compiled files. A folder of a library other than its entries' folders and those of {@link NOT_RUNTIME} (the data of a catalog, the guides of Docs) is shipped once, beside the sources, and the compiled file of each source is beside it, so that a module reads it at the
  * same relative path from its source (Bun) and from its compiled file (Node), and no file is in the package twice (`dist/` holds declarations only). The libraries are resolved by name and the third-party packages from `commons/commons` alone (they are linked under `commons/node_modules`, which is not committed), so that a fresh clone in which only
  * that folder was installed packs the package; the folder's `package.json` and `bun.lock` hold what that takes (`pack-tools.ts`), which the packer checks before it compiles.
  *
@@ -113,7 +113,7 @@ export function packableLibraries(repo: string): { readonly libraries: readonly 
 /**
  * The folders of a library's folder that are not shipped: what develops, proves and documents the library and is never read by its code at run time (its tests, its specifications, its tools and its acceptance kits, 0027-commons-libraries FR-025), what
  * the packer makes itself (the launchers of `bin`) and what a build or an install leaves. Every other folder of a library's folder is shipped beside its sources and its compiled files, so that a folder a library reads at run time (the data of a catalog, the guides of
- * Docs, the installers of Ergonex) is in the package without a list that someone keeps.
+ * Docs) is in the package without a list that someone keeps.
  */
 export const NOT_RUNTIME: ReadonlySet<string> = new Set(["suite", "spec-kit", "tools", "acceptance", "oat", "uat", "aat", "bin", "dist", "node_modules"]);
 

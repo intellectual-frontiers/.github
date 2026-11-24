@@ -134,7 +134,7 @@ const VENDOR = [
   /["']https?:\/\/[^"']*\.(?:ts|js|mjs)["']/,
 ];
 /** The files that name a vendor's API on purpose: the rule's own list, the library that builds a binary with Bun and the installers' texts, which say what they install. */
-const VENDOR_ALLOWED = /^commons\/(lint\/|system\/src\/compile\.ts|ergonex\/src\/install\/)/;
+const VENDOR_ALLOWED = /^commons\/(lint\/|system\/src\/compile\.ts)/;
 
 proves(["0005-typescript-practice FR-004"], "no source of a library uses a vendor global, a registry or a URL import", () => {
   const bad: string[] = [];

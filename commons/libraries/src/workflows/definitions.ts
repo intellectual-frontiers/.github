@@ -98,7 +98,6 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
   formats: node,
   crypto: node,
   quality: node,
-  ergonex: { nodeTests: NODE_TESTS, systems: ALL_OTHER },
   "integrations-github": node,
   "integrations-fhir": node,
   "integrations-x12": node,

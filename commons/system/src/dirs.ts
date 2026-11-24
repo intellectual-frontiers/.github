@@ -18,7 +18,7 @@
  * ```ts
  * import { dirsOf } from "./dirs.ts";
  * const env = (n: string): string | undefined => ({ HOME: "/home/a" })[n];
- * dirsOf("ergonex", env, "linux").config; // "/home/a/.config/ergonex"
+ * dirsOf("acme", env, "linux").config; // "/home/a/.config/acme"
  * ```
  *
  * @module

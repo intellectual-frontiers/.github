@@ -27,7 +27,7 @@ import { bytes } from "./support.ts";
 
 const DIGEST = `sha256:${"0".repeat(64)}`;
 const HASH = `sha256:${"a".repeat(64)}`;
-const AGENT = { role: "agent-workspace", disposability: "disposable", isolation: "vm", "os-family": "arch", distro: "arch", omarchy: true, harnesses: ["claude-code", "codex", "herdr"], coordinator: "0.5.7", persona: "agent", "agents-policy": DIGEST } as const;
+const AGENT = { role: "agent-workspace", disposability: "disposable", isolation: "vm", "os-family": "arch", distro: "arch", omarchy: true, harnesses: ["claude-code", "codex", "herdr"], "agents-policy": DIGEST } as const;
 
 const made = (r: ReturnType<typeof defineAsset>): Asset => {
   assert(r.kind === "ok", r.kind === "err" ? r.error.join("; ") : "");
@@ -43,11 +43,11 @@ const ws = (id: string, state: "discovered" | "adopted" | "managed", attributes:
 proves(["0008-estate-workstations FR-001", "0008-estate-workstations FR-002"], "a workstation is in the catalog with attributes none of which is required, defiant with none is accepted, and Omarchy is a flag on distro arch", () => {
   const spec = kindSpec("workstation");
   assert(spec !== undefined && spec.attributes.every((a) => a.required !== true));
-  assertEquals(spec.attributes.map((a) => a.name), ["role", "disposability", "isolation", "os-family", "distro", "omarchy", "harnesses", "coordinator", "persona", "agents-policy"]);
+  assertEquals(spec.attributes.map((a) => a.name), ["role", "disposability", "isolation", "os-family", "distro", "omarchy", "harnesses", "agents-policy"]);
   made(defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
   assertEquals(checkAttributes("workstation", AGENT), []);
   assert(checkAttributes("workstation", { role: "robot" })[0]?.includes("none of agent-workspace, developer, other") === true);
-  assert(checkAttributes("workstation", { isolation: "bare" }).length === 1 && checkAttributes("workstation", { persona: "bot" }).length === 1 && checkAttributes("workstation", { "os-family": "beos" }).length === 1);
+  assert(checkAttributes("workstation", { isolation: "bare" }).length === 1 && checkAttributes("workstation", { role: "bot" }).length === 1 && checkAttributes("workstation", { "os-family": "beos" }).length === 1);
   assert(checkAttributes("workstation", { distro: "omarchy" })[0]?.includes("none of arch") === true, "omarchy is no distro");
   assert(checkAttributes("workstation", { omarchy: "yes" })[0]?.includes("a boolean") === true);
   assert(checkAttributes("workstation", { harnesses: "codex" })[0]?.includes("list of strings") === true);
@@ -63,7 +63,7 @@ proves(["0008-estate-workstations FR-003"], "agent-harness is a tier, a harness 
   assert(checkAttributes("application", { harness: "codex" })[0]?.includes("for the tier agent-harness") === true);
   assert(checkAttributes("application", { tier: "agent-harness", harness: "gemini" })[0]?.includes("none of claude-code, codex, herdr, other") === true);
   assertEquals(checkAttributes("application", { tier: "web" }), []);
-  const adopted = { state: "adopted", origin: "paired", owners: { observe: "ergonex", verify: "ergonex" } } as const;
+  const adopted = { state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" } } as const;
   const ok = defineEstate({ agentbox: { kind: "workstation", ...adopted, attributes: AGENT }, "codex-on-agentbox": { kind: "application", ...adopted, attributes: { tier: "agent-harness", harness: "codex" } } }, [{ from: "codex-on-agentbox", to: "agentbox", kind: "runs-on" }]);
   assert(ok.kind === "ok", ok.kind === "err" ? ok.error.join("; ") : "");
   const bad = defineEstate({ agentbox: { kind: "workstation", ...adopted, attributes: AGENT }, "codex-on-agentbox": { kind: "application", ...adopted, attributes: { tier: "web", harness: "codex" } } }, [{ from: "codex-on-agentbox", to: "agentbox", kind: "runs-on" }]);
@@ -78,19 +78,19 @@ proves(["0008-estate-workstations FR-004", "0008-estate-workstations FR-005"], "
 });
 
 proves(["0008-estate-workstations FR-006", "0008-estate-workstations FR-007"], "a booted and bootstrapped machine is never provisioned and may be paired, self or scan, and a managed one keeps its origin", () => {
-  const owners = workstationOwners({ state: "adopted" });
+  const owners = workstationOwners({ system: "opsfolio", state: "adopted" });
   assert(refusal(ws("omarchybox", "adopted", AGENT, owners, "provisioned")).includes("only a managed asset can be provisioned"));
   for (const origin of ["paired", "self", "scan", "integration"] as const) made(ws("omarchybox", "adopted", AGENT, owners, origin));
   const paired = made(ws("omarchybox", "adopted", AGENT, owners, "paired"));
-  const managed = moveState(paired, "managed", workstationOwners({ state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH });
-  assert(managed.kind === "ok" && managed.value.origin === "paired", "installing Ergonex is not installing the operating system");
+  const managed = moveState(paired, "managed", workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH });
+  assert(managed.kind === "ok" && managed.value.origin === "paired", "a bootstrapped machine is not an installed operating system");
   assert(managed.kind === "ok" && ownerOf(managed.value, "provision") === undefined, "a machine someone else installed does not offer provision");
-  made(ws("labbox", "managed", { ...AGENT, isolation: "container" }, workstationOwners({ state: "managed", disposability: "disposable", provision: "lab" }), "provisioned"));
+  made(ws("labbox", "managed", { ...AGENT, isolation: "container" }, workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable", provision: "lab" }), "provisioned"));
 });
 
 proves(["0008-estate-workstations FR-008", "0008-estate-workstations FR-012"], "a discovered device is adopted as a workstation only with an approval, attributes survive a move, and managing needs the approval of the plan", () => {
   const device = made(defineAsset({ id: "device-aabbccddeeff", kind: "device", state: "discovered", origin: "scan", owners: {} }));
-  const owners = workstationOwners({ state: "adopted" });
+  const owners = workstationOwners({ system: "opsfolio", state: "adopted" });
   const as = { kind: "workstation", approval: { by: "a person", planHash: HASH } };
   const adopted = moveState(device, "adopted", owners, undefined, { as, attributes: AGENT });
   assert(adopted.kind === "ok" && adopted.value.kind === "workstation" && adopted.value.origin === "scan" && adopted.value.attributes?.["role"] === "agent-workspace");
@@ -103,33 +103,33 @@ proves(["0008-estate-workstations FR-008", "0008-estate-workstations FR-012"], "
   const same = moveState(device, "adopted", owners, undefined, { as: { kind: "device", approval: { by: "a person", planHash: HASH } } });
   assert(same.kind === "err" && same.error[0]?.includes("already a device") === true);
   assert(adopted.kind === "ok");
-  const later = moveState(adopted.value, "managed", workstationOwners({ state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH }, { as });
+  const later = moveState(adopted.value, "managed", workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH }, { as });
   assert(later.kind === "err" && later.error[0]?.includes("only when a discovered asset is adopted") === true);
-  assert(moveState(adopted.value, "managed", workstationOwners({ state: "managed", disposability: "disposable" })).kind === "err", "no approval, no managing");
-  const managed = moveState(adopted.value, "managed", workstationOwners({ state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH });
+  assert(moveState(adopted.value, "managed", workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" })).kind === "err", "no approval, no managing");
+  const managed = moveState(adopted.value, "managed", workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }), { by: "a person", planHash: HASH });
   assert(managed.kind === "ok" && managed.value.attributes?.["agents-policy"] === DIGEST && managed.value.attributes["omarchy"] === true, "attributes are kept across the move");
 });
 
-proves(["0008-estate-workstations FR-009", "0008-estate-workstations FR-010", "0008-estate-workstations FR-021"], "ergonex owns what its commands carry out, person owns the rest, and the owners make a managed workstation whole", () => {
-  assertEquals(workstationOwners({ state: "discovered" }), {});
-  assertEquals(workstationOwners({ state: "adopted" }), { observe: "ergonex", verify: "ergonex" });
-  const m = workstationOwners({ state: "managed", disposability: "disposable", identity: "ergonex" });
-  assertEquals([m.observe, m.verify, m.access, m.plan, m.converge, m.update, m.identity, m.backup, m.retire], ["ergonex", "ergonex", "ergonex", "ergonex", "ergonex", "ergonex", "ergonex", "person", "ergonex"]);
-  assertEquals(workstationOwners({ state: "managed" }).identity, "person");
-  const box = made(ws("agentbox", "managed", { ...AGENT }, workstationOwners({ state: "managed", disposability: "disposable" }), "paired"));
-  assertEquals(ownerOf(box, "converge"), "ergonex");
+proves(["0008-estate-workstations FR-009", "0008-estate-workstations FR-010", "0008-estate-workstations FR-021"], "the system the caller names owns what it carries out, person owns the rest, and the owners make a managed workstation whole", () => {
+  assertEquals(workstationOwners({ system: "opsfolio", state: "discovered" }), {});
+  assertEquals(workstationOwners({ system: "opsfolio", state: "adopted" }), { observe: "opsfolio", verify: "opsfolio" });
+  const m = workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable", identity: "opsfolio" });
+  assertEquals([m.observe, m.verify, m.access, m.plan, m.converge, m.update, m.identity, m.backup, m.retire], ["opsfolio", "opsfolio", "opsfolio", "opsfolio", "opsfolio", "opsfolio", "opsfolio", "person", "opsfolio"]);
+  assertEquals(workstationOwners({ system: "opsfolio", state: "managed" }).identity, "person");
+  const box = made(ws("agentbox", "managed", { ...AGENT }, workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }), "paired"));
+  assertEquals(ownerOf(box, "converge"), "opsfolio");
   assertEquals(ownerOf(box, "backup"), "person");
 });
 
 proves(["0008-estate-workstations FR-011"], "retire is a system's only for a disposable workstation, and a persistent one refuses a system with the reason", () => {
   const persistent = { ...AGENT, disposability: "persistent" } as const;
-  const bySystem = { ...workstationOwners({ state: "managed", disposability: "disposable" }) };
+  const bySystem = { ...workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }) };
   assert(refusal(ws("keepbox", "managed", persistent, bySystem, "paired")).includes("a persistent workstation is never retired by a system"));
-  made(ws("keepbox", "managed", persistent, workstationOwners({ state: "managed", disposability: "persistent" }), "paired"));
+  made(ws("keepbox", "managed", persistent, workstationOwners({ system: "opsfolio", state: "managed", disposability: "persistent" }), "paired"));
   assert(refusal(ws("keepbox", "managed", persistent, { ...bySystem, retire: "archon" }, "paired")).includes("owned by archon"));
   assert(refusal(ws("anybox", "managed", { role: "developer" }, bySystem, "paired")).includes("does not say it is disposable"));
   made(ws("anybox", "managed", { role: "developer", disposability: "disposable" }, bySystem, "paired"));
-  made(ws("anybox", "managed", { role: "developer" }, workstationOwners({ state: "managed" }), "paired"));
+  made(ws("anybox", "managed", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "managed" }), "paired"));
 });
 
 const violations = (assets: readonly Asset[], more: Partial<Parameters<typeof checkInvariants>[0]> = {}): readonly Violation[] => checkInvariants({ assets, observations: [], results: [], ...more });
@@ -137,37 +137,37 @@ const violations = (assets: readonly Asset[], more: Partial<Parameters<typeof ch
 proves(["0008-estate-workstations FR-013"], "NoAuthorityWithoutScope is checked for a workstation that is an agent workspace or holds harnesses, and for no other kind", () => {
   assertEquals(INVARIANT_COVERAGE.NoAuthorityWithoutScope, "checked");
   const { "agents-policy": _drop, ...unbounded } = AGENT;
-  const bad = made(ws("agentbox", "adopted", unbounded, workstationOwners({ state: "adopted" }), "paired"));
+  const bad = made(ws("agentbox", "adopted", unbounded, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   const found = violations([bad]);
   assert(found.length === 1 && found[0]?.invariant === "NoAuthorityWithoutScope" && found[0].subject === "agentbox" && found[0].message.includes("an agent workspace states no agents-policy"));
-  const holds = made(ws("devbox", "adopted", { role: "developer", harnesses: ["codex"] }, workstationOwners({ state: "adopted" }), "paired"));
+  const holds = made(ws("devbox", "adopted", { role: "developer", harnesses: ["codex"] }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   assert(violations([holds])[0]?.message.includes("holds harnesses") === true);
-  assertEquals(violations([made(ws("agentbox", "adopted", AGENT, workstationOwners({ state: "adopted" }), "paired"))]), []);
-  assertEquals(violations([made(ws("defiant", "adopted", {}, workstationOwners({ state: "adopted" }), "paired")), made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ state: "adopted" }), "paired"))]), []);
+  assertEquals(violations([made(ws("agentbox", "adopted", AGENT, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
+  assertEquals(violations([made(ws("defiant", "adopted", {}, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired")), made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
   const server = made(defineAsset({ id: "athens", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
   assertEquals(violations([server]), []);
 });
 
 proves(["0008-estate-workstations FR-014"], "a persistent agent workspace is managed only with an approval record, and a disposable one needs none", () => {
-  const owners = workstationOwners({ state: "managed", disposability: "persistent" });
+  const owners = workstationOwners({ system: "opsfolio", state: "managed", disposability: "persistent" });
   const keep = made(ws("keepbox", "managed", { ...AGENT, disposability: "persistent" }, owners, "paired"));
   const found = violations([keep]);
   assert(found.length === 1 && found[0]?.invariant === "PersistentAgentWorkspaceApproved");
   assertEquals(violations([keep], { approvals: [{ asset: "keepbox", by: "a person", planHash: HASH }] }), []);
   assertEquals(violations([keep], { approvals: [{ asset: "keepbox", by: "a person", planHash: "sha256:no" }] }).length, 1);
   assertEquals(violations([keep], { approvals: [{ asset: "otherbox", by: "a person", planHash: HASH }] }).length, 1);
-  const throwaway = made(ws("throwbox", "managed", AGENT, workstationOwners({ state: "managed", disposability: "disposable" }), "paired"));
+  const throwaway = made(ws("throwbox", "managed", AGENT, workstationOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }), "paired"));
   assertEquals(violations([throwaway]), []);
-  const adopted = made(ws("keepbox", "adopted", { ...AGENT, disposability: "persistent" }, workstationOwners({ state: "adopted" }), "paired"));
+  const adopted = made(ws("keepbox", "adopted", { ...AGENT, disposability: "persistent" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   assertEquals(violations([adopted]), []);
 });
 
 proves(["0008-estate-workstations FR-015", "0008-estate-workstations FR-022"], "what is observed of ambient secrets is their names and never a value, and an observation names its source", () => {
-  const box = made(ws("agentbox", "adopted", AGENT, workstationOwners({ state: "adopted" }), "paired"));
+  const box = made(ws("agentbox", "adopted", AGENT, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   const at = "2026-11-22T10:00:00Z";
   const obs = (agent: Record<string, string[]>, source = "opsfolio probe") => ({ asset: "agentbox", observation: { at, source, state: { agent } } });
-  assertEquals(violations([box], { observations: [obs({ "ambient-secret-names": ["ERGONEX_GITHUB_TOKEN", "AWS_SECRET_ACCESS_KEY"] })] }), []);
-  const leak = violations([box], { observations: [obs({ "ambient-secret-names": ["ERGONEX_GITHUB_TOKEN=ghp_notreal"] })] });
+  assertEquals(violations([box], { observations: [obs({ "ambient-secret-names": ["APP_GITHUB_TOKEN", "AWS_SECRET_ACCESS_KEY"] })] }), []);
+  const leak = violations([box], { observations: [obs({ "ambient-secret-names": ["APP_GITHUB_TOKEN=ghp_notreal"] })] });
   assert(leak.length === 1 && leak[0]?.invariant === "NoSecretValuesObserved" && leak[0].subject === "agentbox");
   assertEquals(violations([box], { observations: [obs({}, " ")] }).map((v) => v.invariant), ["NoEvidenceWithoutAttribution"]);
   assertEquals(violations([box], { observations: [obs({ "ambient-secret-names": [] })] }), []);
@@ -181,9 +181,9 @@ const policy = (): CapturePolicy => {
 
 proves(["0008-estate-workstations FR-016"], "an agent workspace is due within 15 minutes adopted or managed, a disposable one is journaled as changes and a heartbeat, and it is observed within its window", () => {
   const p = policy();
-  const adopted = made(ws("agentbox", "adopted", AGENT, workstationOwners({ state: "adopted" }), "paired"));
-  const keep = made(ws("keepbox", "managed", { ...AGENT, disposability: "persistent" }, workstationOwners({ state: "managed", disposability: "persistent" }), "paired"));
-  const dev = made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ state: "adopted" }), "paired"));
+  const adopted = made(ws("agentbox", "adopted", AGENT, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
+  const keep = made(ws("keepbox", "managed", { ...AGENT, disposability: "persistent" }, workstationOwners({ system: "opsfolio", state: "managed", disposability: "persistent" }), "paired"));
+  const dev = made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   assertEquals([cadenceOf(p, adopted), cadenceOf(p, keep), cadenceOf(p, dev), cadenceOf(p, { id: "athens", state: "adopted" })], ["PT15M", "PT15M", "P1D", "P1D"]);
   assertEquals(cadenceOf(p, { id: "printer", state: "discovered" }), undefined);
   const own = defineCapturePolicy({ ...AGENT_WORKSPACE_CAPTURE, cadence: { perRole: { "agent-workspace": "PT15M" }, perAsset: { agentbox: "PT20M" } } });
@@ -218,7 +218,7 @@ proves(["0008-estate-workstations FR-016"], "the policy of roles refuses what ca
 });
 
 proves(["0008-estate-workstations FR-020"], "the host-file declaration of a workstation is an asset that is written and read back with its attributes", () => {
-  const agentbox = { kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "ergonex", verify: "ergonex" }, attributes: AGENT } as const;
+  const agentbox = { kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" }, attributes: AGENT } as const;
   const asset = made(defineAsset({ id: "agentbox", ...agentbox }));
   const written = assetCodec.encode(asset);
   assert(written.kind === "ok");

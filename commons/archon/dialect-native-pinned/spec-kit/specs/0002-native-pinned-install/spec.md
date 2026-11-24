@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** What an install of a pinned tool is, as pure functions (reshaped from the workspaces manager's own, commons ergonex 0002-workspace-model FR-039): the bytes of a downloaded artifact are checked against the pinned SHA-256 before anything is unpacked, an archive is unpacked in memory with every path checked, the install record keeps the SHA-256 of each file so that a change since can be found, and a shim puts a command in one folder. No file is read or written here, and no network is reached.
+**Input:** What an install of a pinned tool is, as pure functions (the bytes of a download are checked before they are unpacked): the bytes of a downloaded artifact are checked against the pinned SHA-256 before anything is unpacked, an archive is unpacked in memory with every path checked, the install record keeps the SHA-256 of each file so that a change since can be found, and a shim puts a command in one folder. No file is read or written here, and no network is reached.
 
 ## Requirements
 

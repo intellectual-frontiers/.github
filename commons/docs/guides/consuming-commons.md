@@ -19,7 +19,7 @@ flowchart LR
 
 ## Install the package
 
-`@intellectual-frontiers/commons` holds every library of commons at one version, compiled, with their declarations and their sources, and the commands `anyfs`, `arcactl`, `ifc-docs`, `ergonex` and `repoctl` (commons 0036-distribution FR-021, FR-024). A library is imported under the package by its name, and each of its subpaths under that (commons 0036-distribution FR-022):
+`@intellectual-frontiers/commons` holds every library of commons at one version, compiled, with their declarations and their sources, and the commands `anyfs`, `arcactl`, `ifc-docs` and `repoctl` (commons 0036-distribution FR-021, FR-024). A library is imported under the package by its name, and each of its subpaths under that (commons 0036-distribution FR-022):
 
 | In the sources of commons | In a consumer |
 | --- | --- |
@@ -56,7 +56,7 @@ The package is on the GitHub package registry, which serves the scope `@intellec
 "@intellectual-frontiers" = { url = "https://npm.pkg.github.com/", token = "$NODE_AUTH_TOKEN" }
 ```
 
-Locally the token is a personal access token (classic) with the scope `read:packages`, exported as `NODE_AUTH_TOKEN` (`ERGONEX_GITHUB_TOKEN` where Ergonex supplies it). In a GitHub Actions workflow of a repository that is not `.github` the job's `GITHUB_TOKEN` is used, with `permissions: packages: read`, provided the package grants that repository read access: in the package's settings on GitHub, under "Manage Actions access", the button Add Repository gives the consumer repository the role Read.
+Locally the token is a personal access token (classic) with the scope `read:packages`, exported as `NODE_AUTH_TOKEN`. In a GitHub Actions workflow of a repository that is not `.github` the job's `GITHUB_TOKEN` is used, with `permissions: packages: read`, provided the package grants that repository read access: in the package's settings on GitHub, under "Manage Actions access", the button Add Repository gives the consumer repository the role Read.
 
 ## Upgrade
 
@@ -86,4 +86,4 @@ A finding names the path it was found at and the command that fixes it. Run the 
 
 ## Other packages
 
-A package of a private repository is published to the GitHub package registry alone, with `distribution: ["github"]` in its manifest, and is read through the same scoped `.npmrc` line and token (commons 0036-distribution FR-004). In `per-library` mode, which the owner can switch back to (commons 0036-distribution FR-019), each library is a package of its own and five metapackages (`commons`, `foundation`, `patterns`, `programs`, `standards`) install them as sets at exact versions. Writing the registry line during `ergonex init` is planned (commons 0036-distribution FR-016).
+A package of a private repository is published to the GitHub package registry alone, with `distribution: ["github"]` in its manifest, and is read through the same scoped `.npmrc` line and token (commons 0036-distribution FR-004). In `per-library` mode, which the owner can switch back to (commons 0036-distribution FR-019), each library is a package of its own and five metapackages (`commons`, `foundation`, `patterns`, `programs`, `standards`) install them as sets at exact versions.

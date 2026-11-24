@@ -20,7 +20,7 @@ flowchart TB
   end
   subgraph programs["Programs and domain libraries"]
     direction LR
-    ergonex["ergonex"] ~~~ archon["archon"] ~~~ data["data"] ~~~ grc["grc"] ~~~ libraries["libraries"]
+    archon["archon"] ~~~ data["data"] ~~~ grc["grc"] ~~~ libraries["libraries"]
   end
   subgraph patterns["Patterns: one definition, projected"]
     direction LR
@@ -46,16 +46,7 @@ flowchart TB
 - **IFCCM** (Capabilities Configuration Management): the capability is the unit of change, and every commit names its issue on a line of its own. [`0020-ifccm`](commons/spec-kit/specs/0020-ifccm/spec.md)
 - **Headless**: an action is defined once, with what it may do, and drawn as a command line, a tool server (MCP), a REST service or an SSH-reached command, so a program has no window it cannot do without. [`commons/headless`](commons/headless/about.ts)
 - **Repoctl** is the operations program of a repository, driven by a typed `repoctl.config.ts` at its root: the `repoctl` command makes every generated file in dependency order, merges without hand-resolving one, runs every named check in one report, makes the commit with the repository's identity and trailers and says what is wrong with a checkout; where the configuration turns them on it also tells each library's version in the repository, on npm and in its tag, plans and publishes a release, scaffolds a library, proves a change by its blast radius and builds the documentation, as a person types it or as an AI agent calls it through a tool server, by audience tier. It is published to npm, so a repository of your own installs it and writes its own configuration ([the guide](commons/docs/guides/repoctl-in-your-repo.md)). [`commons/repoctl`](commons/repoctl/about.ts)
-- **Ergonex** is the front door: the `ergonex` command sets up and runs a team's workspace (repositories, pinned tools, shell) on Windows, macOS and Linux, and shows its plan before it changes anything. [`commons/ergonex`](commons/ergonex/about.ts)
-
-```sh
-bunx @intellectual-frontiers/ergonex init                # the workspace root, a starter manifest, and `ergonex` on your path
-ergonex repos add github.com/owner/repo                  # put a repository on the list; `ergonex apply` clones it
-ergonex doctor                                           # what is wrong, and what to do about it
-ergonex setup --dry-run                                  # the plan for the host's tools; `ergonex setup` carries it out
-```
-
-Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for a command, and `ergonex shell print bash` for the shell snippet (`shell install` writes it to your start-up file). Bun is the default runtime and Node 26 the backup.
+Bun is the default runtime and Node 26 the backup. Each library is proved by one command, `bun run verify`, in its folder, in a repository cloned wherever you like.
 
 ## Libraries
 
@@ -111,7 +102,6 @@ Run `ergonex` with no arguments for the next step, `ergonex COMMAND --help` for 
 | [`@intellectual-frontiers/change-control`](commons/change-control) | Program | Change control for a fleet's repository | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/ergonex`](https://www.npmjs.com/package/@intellectual-frontiers/ergonex) | Program | The one command, `ergonex` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/estate-endpoints`](commons/estate-endpoints) | Program | Finds the endpoints of an estate from what describes or shows them | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/estate-iac`](commons/estate-iac) | Program | Reads infrastructure as code (OpenTofu and Terraform plans and state as JSON, CloudFormation templates, Kubernetes manifests, Compose files, Pulumi stack exports) into assets and links of the estate | layers | L1 | not released (owner-blocked) |
@@ -162,11 +152,11 @@ A repository other than this one gets commons code only by **installing a publis
 bun add --exact @intellectual-frontiers/commons@<version>      # or: npm install --save-exact @intellectual-frontiers/commons@<version>
 ```
 
-The package is read through a scoped line in `.npmrc` and a token that may read packages in the environment (`ERGONEX_GITHUB_TOKEN`, or `GITHUB_TOKEN` in a workflow of a repository the package grants read access).
+The package is read through a scoped line in `.npmrc` and a token that may read packages in the environment (`NODE_AUTH_TOKEN`, or `GITHUB_TOKEN` in a workflow of a repository the package grants read access).
 
 ```sh
 @intellectual-frontiers:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${ERGONEX_GITHUB_TOKEN}
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
 The guide [Consuming commons](https://intellectual-frontiers.github.io/.github/guides/consuming-commons.html) says how to install the set, how to upgrade it and how to read a finding of the check.
@@ -181,7 +171,7 @@ A comment says what a thing is. It cannot show how a model is layered or what a 
 | --- | --- | --- |
 | **API** (TSDoc) | The exports of each package, their types and comments | One page per package and entity, with signatures, examples and links between them |
 | **Layered model** ([`lens/layered.ts`](commons/docs/src/lens/layered.ts)) | The governance, logical and physical values of a Kanon library, such as the data models of `commons/data` | Each model layer by layer, every element with a stable id, where it is written, and the trace from governance down to the table |
-| **Program** ([`lens/program.ts`](commons/docs/src/lens/program.ts)) | A program built on `headless`, such as Ergonex, described by `describe(program)` | One page set for each audience tier: every command with its options, operands and examples, and its CLI, MCP and REST forms; a command a tier cannot see is listed with the reason |
+| **Program** ([`lens/program.ts`](commons/docs/src/lens/program.ts)) | A program built on `headless`, such as `repoctl`, described by `describe(program)` | One page set for each audience tier: every command with its options, operands and examples, and its CLI, MCP and REST forms; a command a tier cannot see is listed with the reason |
 | **Specifications** | The spec kit of each library | Every requirement with its identifier, so that code and tests that cite it link back |
 
 ## Where to go
@@ -264,6 +254,6 @@ The code is public to read and is licensed by Intellectual Frontiers LLC under t
 - **Needs a commercial license**: any commercial use, hosting, embedding, reselling and building a competing product. Open an issue titled **Commercial license** at <https://github.com/intellectual-frontiers/.github/issues>.
 - **Where to read more**: [`LICENSING.md`](LICENSING.md) (in plain words), [`COMMERCIAL.md`](COMMERCIAL.md) (what a commercial license covers), [`NOTICE`](NOTICE), [`CONTRIBUTING.md`](CONTRIBUTING.md) (contributions are licensed to the LLC under the public and commercial licenses; sign off with `git commit -s`) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Ergonex, Mizan, Kanon, Archon and Stolos and the logos are not licensed beyond saying what the software is.
+Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Mizan, Kanon, Archon and Stolos and the logos are not licensed beyond saying what the software is.
 
 Nothing here claims compliance with any regulation; it records evidence.

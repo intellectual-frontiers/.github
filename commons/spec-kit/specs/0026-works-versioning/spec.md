@@ -71,7 +71,7 @@
 
 ## Out of scope
 
-- The tags, signing and the trace chain of changes: `0020-ifccm`. The evidence tiers and the quality branch: `0021-ifqs`. The workspace that holds the repositories: `ergonex`, in `commons/ergonex/`.
+- The tags, signing and the trace chain of changes: `0020-ifccm`. The evidence tiers and the quality branch: `0021-ifqs`.
 - Minting or registering a DOI, the release workflow that generates provenance and the software bill of materials, and the comparison of an API surface or of an ontology's terms with a declared impact: later (FR-016, FR-025, FR-029, FR-030).
 - Versioning a harness's own products that are not works of this repository's own: the harness applies this specification to them through its own record files.
 

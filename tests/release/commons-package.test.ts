@@ -82,7 +82,7 @@ proves(
       assertEquals(manifest["name"], SELF);
       assertEquals(manifest["license"], "PolyForm-Noncommercial-1.0.0");
       assertStringIncludes(await fs.readTextFile(path.join(unpacked, "LICENSE")), "PolyForm Noncommercial License 1.0.0");
-      assertEquals(Object.keys(obj(manifest["bin"])).sort(), ["anyfs", "arcactl", "ergonex", "ifc-docs", "repoctl"]);
+      assertEquals(Object.keys(obj(manifest["bin"])).sort(), ["anyfs", "arcactl", "ifc-docs", "repoctl"]);
       assertEquals(obj(manifest["repository"])["url"], "git+https://github.com/intellectual-frontiers/.github.git");
       assertEquals(
         obj(manifest["publishConfig"])["registry"],
@@ -215,7 +215,7 @@ proves(
           );
         }
         // the commands run on Node, by their launchers
-        for (const c of ["anyfs", "ergonex", "repoctl", "ifc-docs", "arcactl"]) {
+        for (const c of ["anyfs", "repoctl", "ifc-docs", "arcactl"]) {
           const ran = await sh([node, path.join(project, "node_modules", ".bin", c), "--help"], project);
           assertEquals(ran.code, 0, `${tool}: ${c}: ${ran.out.slice(0, 500)}`);
           assert(ran.out.length > 20, `${c} printed nothing`);

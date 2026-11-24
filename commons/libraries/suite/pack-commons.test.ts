@@ -316,13 +316,12 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
 });
 
 
-proves([`${SPEC} FR-029`], "every folder of a library that is not one that only develops it is shipped, and the folders that are not shipped are the closed set NOT_RUNTIME; in the real repository the data of the catalogs, the guides of Docs and the installers of Ergonex are among them", () => {
+proves([`${SPEC} FR-029`], "every folder of a library that is not one that only develops it is shipped, and the folders that are not shipped are the closed set NOT_RUNTIME; in the real repository the data of the catalogs, the guides of Docs are among them", () => {
   assertEquals([...NOT_RUNTIME].sort(), ["aat", "acceptance", "bin", "dist", "node_modules", "oat", "spec-kit", "suite", "tools", "uat"]);
   const byName = new Map(packableLibraries(REPO).libraries.map((l) => [l.name, factsOf(REPO, l).facts.folders] as const));
   assertEquals(byName.get("catalog-nist-sp800"), ["data"]);
   assertEquals(byName.get("catalog-nist-csf-2"), ["data"]);
   assertEquals(byName.get("docs"), ["guides"]);
-  assertEquals(byName.get("ergonex"), ["install"]);
   for (const [name, folders] of byName) for (const f of folders) assert(!NOT_RUNTIME.has(f), `${name}/${f} is a development folder`);
 });
 

@@ -1,13 +1,13 @@
 // Spec: 0003-repoctl-sync FR-008
 /**
- * The constants of the sources that say a library's version (commons repoctl 0003-repoctl-sync FR-008): a constant named for its library (`ERGONEX_VERSION` of `ergonex`), or named by the manifest in `versionConstants`,
+ * The constants of the sources that say a library's version (commons repoctl 0003-repoctl-sync FR-008): a constant named for its library (`TOOL_VERSION` of `tool`), or named by the manifest in `versionConstants`,
  * must say the version of its package. A release that raised the manifest and the package and left such a constant behind broke a build at one release; this finds it before the push. Pure: it reads texts it is given.
  *
  * @example
  * ```ts
  * import { constantFindings } from "./constants.ts";
- * const lib = { name: "ergonex", folder: "commons/ergonex", version: "0.4.7", level: "L1", specKit: undefined, npm: true, versionConstants: [] };
- * constantFindings([lib], [{ path: "commons/ergonex/src/state-record.ts", text: 'export const ERGONEX_VERSION = "0.4.6";' }]).length; // 1
+ * const lib = { name: "tool", folder: "commons/tool", version: "0.4.7", level: "L1", specKit: undefined, npm: true, versionConstants: [] };
+ * constantFindings([lib], [{ path: "commons/tool/src/state-record.ts", text: 'export const TOOL_VERSION = "0.4.6";' }]).length; // 1
  * ```
  *
  * @module

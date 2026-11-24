@@ -13,7 +13,7 @@ export const about: About = {
   summary:
     "Everything that any company or harness of Intellectual Frontiers may use, as independent libraries. Each library is built in layers (Kanon): governance says what a thing is and may do, the logical layer is the model a program reasons with, " +
     "and the physical layer is what runs (tables, commands, tools, routes). Each has its own specifications, tests and package, and is proved by one command, `bun run verify`, in its folder. " +
-    "Start with `ergonex`, the front-door command: it sets up a workspace of the repositories, tools and shell a person needs, shows a plan before it changes anything, and checks the result. " +
+    "Start with the library you need: each is proved by one command, `bun run verify`, in its folder, whatever way the repository is cloned or the workspace is set up. " +
     "Read the libraries below for what each is for, the API reference to call them, the specifications for what each promises and how it is checked, and the models and programs for what the libraries say about themselves. " +
     "The code is source-available: free to read and to use noncommercially under the PolyForm Noncommercial License 1.0.0, and commercial use needs a paid license from the owner (see Licensing in Start here). " +
     "This repository holds no company fact and no secret: it is public.",

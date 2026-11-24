@@ -28,7 +28,6 @@
     "mizan/**/*.ts",
     "quality/**/*.ts",
     "workflows/**/*.ts",
-    "workspaces/**/*.ts",
     "tests/**/*.ts",
     "tools/**/*.ts",
     "examples/**/*.ts",

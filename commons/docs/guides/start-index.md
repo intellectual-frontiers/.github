@@ -2,7 +2,7 @@
 
 Intellectual Frontiers Commons is a set of independent libraries that share one way of being built and checked. Pick the path that fits you; each ends with one small task that shows you the whole loop.
 
-- [I am new to the repository](new-developer.md): set up a workspace with `ergonex`, run one library's checks, and read one specification.
+- [I am new to the repository](new-developer.md): clone the repository where you like, run one library's checks, and read one specification.
 - [I want to change something](contributor.md): how a change is made, from the requirement to the test that proves it.
 - [I am an agent](agent.md): where the machine-readable pages are, and how to find the code for a question without reading everything.
 - [I need to check the evidence](auditor.md): from a requirement to its enforcement, its test and the record of the run.

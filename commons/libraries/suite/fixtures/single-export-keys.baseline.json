@@ -182,7 +182,6 @@
     "./docs/lens/program",
     "./docs/lens/releases",
     "./docs/lens/repo-ops",
-    "./ergonex",
     "./estate",
     "./estate-endpoints",
     "./estate-endpoints/governance",

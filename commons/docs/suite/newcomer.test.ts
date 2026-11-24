@@ -18,7 +18,7 @@ const find = (rows: ReturnType<typeof searchIndex>, query: string): string[] => 
     .map((r) => r[1]);
 };
 
-proves(["0011-documentation FR-036"], "five questions a newcomer asks are answered from the site alone: the front door, what a library imports, where a requirement is proved, where a command is described, and how a release is made", async () => {
+proves(["0011-documentation FR-036"], "five questions a newcomer asks are answered from the site alone: what to run first, what a library imports, where a requirement is proved, where a command is described, and how a release is made", async () => {
   const built = await buildSite(CONFIG);
   const rows = searchIndex(built.pages);
   const text = (path: string): string => {
@@ -26,18 +26,19 @@ proves(["0011-documentation FR-036"], "five questions a newcomer asks are answer
     assert(p !== undefined, `the page ${path} exists`);
     return markdownOf(p);
   };
-  // 1. what do I run first? the front door, ergonex
+  // 1. what do I run first? clone it where you like and run one library's checks
   assertEquals(find(rows, "start here")[0]?.startsWith("start/"), true);
-  assertStringIncludes(text("start/new-developer.html"), "ergonex");
-  assertStringIncludes(text("start/new-developer.html"), "front door");
+  assertStringIncludes(text("start/new-developer.html"), "bun run verify");
   // 2. which libraries does headless import?
   assertStringIncludes(text("overview/headless.html"), "Imports");
   assertStringIncludes(text("overview/map.html"), "headless");
   // 3. where is a requirement proved? the spec page says which test names it
   assertStringIncludes(text("specs/0060-flow-ledger.html"), "suite/flow.test.ts");
-  // 4. where is a command of ergonex described, with the tools and routes it is drawn as?
-  assert(find(rows, "ergonex administrator").length > 0, "the programs are found by search");
-  assertStringIncludes(text("programs/ergonex-administrator/verb-doctor.html"), "Governance: the action");
+  // 4. where is a command of repoctl described, with the tools and routes it is drawn as?
+  assert(find(rows, "repoctl contributor").length > 0, "the programs are found by search");
+  const verbPage = built.pages.find((x) => x.path.startsWith("programs/repoctl-contributor/verb-"));
+  assert(verbPage !== undefined, "a verb page of the program exists");
+  assertStringIncludes(markdownOf(verbPage), "Governance: the action");
   // the license is on the page of every library, and the licensing page is in the site
   assertStringIncludes(text("overview/core.html"), "PolyForm-Noncommercial-1.0.0");
   assertStringIncludes(text("start/licensing.html"), "PolyForm Noncommercial License");

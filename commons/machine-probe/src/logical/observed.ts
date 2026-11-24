@@ -53,13 +53,9 @@ export type Observed = {
   readonly agent?: AgentFacts;
 };
 
-/** The facts of the section `@agent`: the version of the coordinator, the persona, the harnesses found, the digest of the typed agents policy that the coordinator recorded, the mode of the token file, the names (never the values) of the variables that look like secrets, the user, and what isolates the machine. */
+/** The facts of the section `@agent`: the harnesses found, the names (never the values) of the variables that look like secrets, the user id, and how the machine is isolated. */
 export type AgentFacts = {
-  readonly coordinator?: string;
-  readonly persona?: string;
   readonly harnesses: readonly string[];
-  readonly policyDigest?: string;
-  readonly tokenFileMode?: string;
   readonly ambientSecretNames: readonly string[];
   readonly uid?: number;
   readonly virt?: string;
@@ -117,10 +113,6 @@ function agentFacts(a: Readonly<Record<string, string>>): AgentFacts {
   return {
     harnesses: [...words(a["harnesses"])].sort(),
     ambientSecretNames: [...words(a["ambient-secret-names"])].sort(),
-    ...some("coordinator", a["coordinator"] || undefined),
-    ...some("persona", a["persona"] || undefined),
-    ...some("policyDigest", a["policy-digest"] || undefined),
-    ...some("tokenFileMode", a["token-file-mode"] || undefined),
     ...some("uid", num(a["uid"])),
     ...some("virt", a["virt"] || undefined),
     ...some("isolation", a["isolation"] || undefined),
@@ -145,10 +137,6 @@ export function observedState(o: Observed): Readonly<Record<string, Json>> {
           "agent": {
             harnesses: [...o.agent.harnesses],
             "ambient-secret-names": [...o.agent.ambientSecretNames],
-            ...(o.agent.coordinator === undefined ? {} : { coordinator: o.agent.coordinator }),
-            ...(o.agent.persona === undefined ? {} : { persona: o.agent.persona }),
-            ...(o.agent.policyDigest === undefined ? {} : { "policy-digest": o.agent.policyDigest }),
-            ...(o.agent.tokenFileMode === undefined ? {} : { "token-file-mode": o.agent.tokenFileMode }),
             ...(o.agent.uid === undefined ? {} : { uid: o.agent.uid }),
             ...(o.agent.isolation === undefined ? {} : { isolation: o.agent.isolation }),
           },

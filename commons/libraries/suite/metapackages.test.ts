@@ -49,7 +49,7 @@ proves([`${DIST} FR-004`], "a manifest of github alone is read (a private packag
 });
 
 proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in ROLE_OF, commons holds the four, a library held back is in none and a library with no role is a problem", () => {
-  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("ergonex", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("archon-dialect-apt"), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
+  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("repoctl", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("archon-dialect-apt"), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
   const names = (b: (typeof BUNDLES)[number]): readonly string[] => {
     const m = membersOf(b, libs);
     assert(m.kind === "ok");
@@ -57,9 +57,9 @@ proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in
   };
   assertEquals(names("foundation"), ["core"]);
   assertEquals(names("patterns"), ["kanon"]);
-  assertEquals(names("programs"), ["data", "ergonex"], "ordered by package: arcactl, ergonex");
+  assertEquals(names("programs"), ["data", "repoctl"], "ordered by package: arcactl, repoctl");
   assertEquals(names("standards"), ["mizan"]);
-  assertEquals(names("commons"), ["data", "core", "ergonex", "kanon", "mizan"], "ordered by package name; archon-dialect-apt is held back");
+  assertEquals(names("commons"), ["data", "core", "kanon", "mizan", "repoctl"], "ordered by package name; archon-dialect-apt is held back");
   assert(HELD_BACK.has("archon-dialect-apt") && !isConsumerFacing(lib("archon-dialect-apt")));
   assertEquals(isConsumerFacing(lib("p", { distribution: ["github"] })), false, "a private package is in no set");
   assertEquals(isConsumerFacing(lib("foundation", { bundle: "foundation" })), false);
@@ -81,7 +81,7 @@ proves([`${DIST} FR-007`], "the dependencies are the members at exact versions, 
   assertEquals(readSetFile("{}").kind, "err");
   assertEquals(readSetFile('{"dependencies":{"a":1}}').kind, "err");
   const readme = readmeOf("foundation", m);
-  for (const part of ["# @intellectual-frontiers/foundation", "overrides", "npm.pkg.github.com", "ERGONEX_GITHUB_TOKEN", "`0.1.5`"]) assertStringIncludes(readme, part);
+  for (const part of ["# @intellectual-frontiers/foundation", "overrides", "npm.pkg.github.com", "NODE_AUTH_TOKEN", "`0.1.5`"]) assertStringIncludes(readme, part);
 });
 
 proves([`${DIST} FR-005`, `${DIST} FR-006`, `${DIST} FR-007`, `${SPEC} FR-023`], "the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make", () => {

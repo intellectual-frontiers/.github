@@ -192,7 +192,7 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-VERSION-CONSTANT": {
     title: "A constant of the sources disagrees with its library's version",
-    what: "A constant named for a library (`ERGONEX_VERSION`) or named by its manifest in `versionConstants` does not say the version of its package.",
+    what: "A constant named for a library (`TOOL_VERSION`) or named by its manifest in `versionConstants` does not say the version of its package.",
     why: "The release raised the version in the manifest and the package and a constant in a source was left at the old one.",
     fix: "Set the constant to the version of its library; list it in the manifest's versionConstants so that the release writes it",
   },

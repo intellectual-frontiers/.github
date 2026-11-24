@@ -5,13 +5,13 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A machine on which coding harnesses work (an agent workspace, estate 0008-estate-workstations) needs facts the probe did not give: the coordinator, the harnesses, the policy that bounds them, whether a secret sits in the environment, whether the harness runs as root and how the machine is isolated. It also needs a policy to be data a person can read and review, and the probe's `supported-os` to know an Omarchy machine. The estate states what each rule compares with (estate 0008-estate-workstations FR-017 to FR-019).
+**Input:** A machine on which coding harnesses work (an agent workspace, estate 0008-estate-workstations) needs facts the probe did not give: the harnesses, whether a secret sits in the environment, whether the harness runs as root and how the machine is isolated. It also needs a policy to be data a person can read and review, and the probe's `supported-os` to know an Omarchy machine. The estate states what each rule compares with (estate 0008-estate-workstations FR-017 to FR-019).
 
 ## Requirements
 
-- **FR-001**: The POSIX probe MUST give a section `@agent` on a machine where a harness, the coordinator or the coordinator's folder is found, and no section elsewhere: `coordinator` (the version `ergonex --version` prints), `persona` (`ERGONEX_PERSONA`), `harnesses` (those of `claude-code`, `codex` and `herdr` found, sorted, found as a program on the `PATH` that is not a `mise` shim or as a directory of `mise` installs, and never by running a shim, which starts an install over the network), `policy-digest` (the first line of the file `agents-policy.digest` in the coordinator's configuration folder, which the coordinator writes), `token-file-mode` (the mode of the token file, four digits, where there is one), `ambient-secret-names`, `uid`, `virt` (what `systemd-detect-virt` says, `none`, or `unknown`) and `isolation` (`container`, `vm`, `physical` or `unknown`). It MUST change nothing, and `parseProbe` and `toObserved` MUST read the section as `agent` of the observation, and `observedState` MUST carry it (the names, the harnesses, the digest, the mode of the token file, the user and the isolation).
+- **FR-001**: The POSIX probe MUST give a section `@agent` on a machine where a harness is found, and no section elsewhere: `harnesses` (those of `claude-code`, `codex` and `herdr` found, sorted, found as a program on the `PATH` that is not a `mise` shim or as a directory of `mise` installs, and never by running a shim, which starts an install over the network), `ambient-secret-names`, `uid`, `virt` (what `systemd-detect-virt` says, `none`, or `unknown`) and `isolation` (`container`, `vm`, `physical` or `unknown`). It MUST change nothing, and `parseProbe` and `toObserved` MUST read the section as `agent` of the observation, and `observedState` MUST carry it (the names, the harnesses, the user and the isolation).
 - **FR-002**: A policy MAY be data: a `ProbeRule` with an id, a title, the controls of NIST SP 800-53 Rev 5, the section and the key it reads, a closed operator (`equals`, `not-equals`, `absent`, `le`, `ge`), a value, whether a miss `fail`s or `warn`s, what a key the probe did not give is (`unknown`, `pass` or `miss`; `absent` passes) and the fix in words; `evaluateRules` MUST judge a list of them against the probe's output, in order, giving the results of the existing pack (an id, a status, its controls, a detail and a fix); `le` and `ge` MUST compare dotted numbers (`0.5.7`, `0600`) and say `unknown` where a side is not one. The ten policies of the existing pack MUST stay as they are.
-- **FR-003**: The pack for an agent workspace, `agentWorkspaceRules`, MUST be the rules `agent-policy-present` (the digest equals the one the estate states: `fail`), `agent-token-file-private` (the mode is `0600`, or there is no file: `fail`), `agent-no-ambient-secrets` (no name: `fail`), `agent-not-root` (`uid` is not `0`: `fail`), `agent-coordinator-current` (at least the version the estate expects: `warn`), `agent-harness-known` (the harnesses found are those the estate declares: `warn`) and `agent-isolation-as-declared` (`isolation` is the one declared: `warn`), each with controls of SP 800-53 Rev 5, and `evaluateAgentWorkspace` MUST add `ssh-keys-only` of the existing pack.
+- **FR-003**: The pack for an agent workspace, `agentWorkspaceRules`, MUST be the rules `agent-no-ambient-secrets` (no name: `fail`), `agent-not-root` (`uid` is not `0`: `fail`), `agent-harness-known` (the harnesses found are those the estate declares: `warn`) and `agent-isolation-as-declared` (`isolation` is the one declared: `warn`), each with controls of SP 800-53 Rev 5, and `evaluateAgentWorkspace` MUST add `ssh-keys-only` of the existing pack.
 - **FR-004**: `supportedOs` MUST know that a family that says `(arch)` is Arch, a rolling distribution that is supported, so that `supported-os` of an Omarchy machine (`omarchy (arch)`) is `pass` and not `unknown`.
 - **FR-005**: The value of a variable MUST NOT be given: the probe says the names of the variables of its environment and of the profile files of the account (`.profile`, `.bash_profile`, `.bashrc`, `.zshenv`, `/etc/environment`, `environment.d`) whose name looks like a secret (it holds `TOKEN`, `SECRET`, `PASSWORD`, `PASSWD`, `CREDENTIAL`, `APIKEY`, `API_KEY`, `PRIVATEKEY`, `PRIVATE_KEY`, `ACCESSKEY` or `ACCESS_KEY`, and does not end in `_FILE`, `_PATH` or `TOKENS`), and nothing else of the variable.
 
@@ -25,14 +25,13 @@
 ## Out of scope
 
 - The probe of Windows (`machine-probe.ps1`): the section is for the POSIX probe.
-- Where the coordinator writes `agents-policy.digest`: that is the coordinator's (ergonex 0006-agents), and until it writes it the rule `agent-policy-present` is a miss.
 - Judging a harness's behavior: the probe says what is installed and how, not what a session did.
 
 ## Edge cases
 
 - A harness that is a `mise` shim is not found: it is not installed, and running it would install it over the network, per FR-001.
 - A machine with no `systemd-detect-virt` has `virt=unknown` and `isolation=unknown`, and the rule `agent-isolation-as-declared` says `unknown`, per FR-001 and FR-002.
-- The variable `ERGONEX_GITHUB_TOKEN_FILE` (a path) and `MAX_THINKING_TOKENS` (a count) are not secrets and are not named, per FR-005.
+- A variable that names a path (`..._TOKEN_FILE`) or a count (`MAX_THINKING_TOKENS`) is not a secret and are not named, per FR-005.
 
 ## Assumptions
 
@@ -43,7 +42,7 @@
 
 - The script ran on the published Omarchy 4.5.0 virtual machine image (downloaded, its SHA-256 and kernel and initrd checked, booted by QEMU software emulation with no KVM, over SSH as `omarchy`): its output is `suite/fixtures/facts-omarchy-4.5.0.txt`, and the tests read it. It gave `family=omarchy (arch)`, `harnesses=herdr` (`/usr/bin/herdr`; `claude` and `codex` are `mise` shims and were not found, as FR-001 says), `uid=1000`, `virt=qemu`, `isolation=vm` and no secret names.
 - The script ran on this container (a Docker container, root): it gave `isolation=container`, and the test runs it with a variable named like a secret and a value, and finds the name and never the value.
-- Not run on a real machine: `coordinator`, `policy-digest` and `token-file-mode`, because Ergonex is not installed on the image and the file `agents-policy.digest` is not written by any coordinator yet (the coordinator's wiring follows the next release); they are read from the output the script gives where the files exist, and tested on made up output. The PowerShell probe has no section.
+- The PowerShell probe has no section.
 
 ## Open questions
 

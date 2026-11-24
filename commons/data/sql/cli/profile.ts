@@ -1,8 +1,7 @@
 // Spec: 0047-arcactl-init FR-013
 /**
  * The shell profile (commons data 0047-arcactl-init FR-013): the script `arcactl shell` prints for a person's default instance is kept in a cache file of `arcactl`'s, so that a shell starts
- * fast and does not run `arcactl` each time, and a managed block in the profile of the shell sources it where it is there. The block is `arcactl:shell`, which is not the block of Ergonex
- * (`# >>> ergonex >>>`): both can be in one profile.
+ * fast and does not run `arcactl` each time, and a managed block in the profile of the shell sources it where it is there. The block is `arcactl:shell`, and the blocks of other programs in the same profile are left where they are.
  *
  * @module
  */

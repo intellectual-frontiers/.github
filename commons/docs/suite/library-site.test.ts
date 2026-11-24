@@ -23,7 +23,7 @@ proves(["0011-documentation FR-031"], "commons' site has a page and an API for e
   const built = await buildSite(CONFIG);
   assertEquals(built.found, []);
   const paths = new Set(built.pages.map((p) => p.path));
-  for (const lib of ["core", "data", "headless", "kanon", "ergonex", "integrations"]) {
+  for (const lib of ["core", "data", "headless", "kanon", "repoctl", "integrations"]) {
     assert(paths.has(`overview/${lib}.html`), `a page for ${lib}`);
     assert(paths.has(`api/${lib}/index.html`), `an API for ${lib}`);
   }

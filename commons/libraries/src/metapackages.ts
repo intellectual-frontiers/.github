@@ -162,7 +162,7 @@ export function readmeOf(bundle: BundleName, members: readonly Member[]): string
     "",
     "```sh",
     "@intellectual-frontiers:registry=https://npm.pkg.github.com",
-    "//npm.pkg.github.com/:_authToken=${ERGONEX_GITHUB_TOKEN}",
+    "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}",
     "```",
     "",
     `License: ${DEFAULT_LICENSE}. Sources and specifications: https://github.com/intellectual-frontiers/.github/tree/main/commons/${bundle}`,

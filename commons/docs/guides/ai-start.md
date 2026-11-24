@@ -18,11 +18,9 @@ Most work here is done with an assistant beside you. These guides say what to gi
 ## The guides
 
 - [Add a library](ai-add-a-library.md)
-- [Add a command to Ergonex](ai-add-a-command.md)
 - [Write a specification and its tests](ai-write-a-spec.md)
 - [Turn a ticket into a specification](ai-ticket-to-spec.md)
 - [Add a dialect](ai-add-a-dialect.md)
-- [Give an agent a machine](ai-give-an-agent-a-machine.md)
 - [Fix a failing check](ai-fix-a-failing-check.md)
 - [Review a diff](ai-review-a-diff.md)
 - [Cut a release](ai-cut-a-release.md)

@@ -1,7 +1,7 @@
 // Spec: 0047-arcactl-init FR-011, FR-012
 /**
  * Finding the instances a person can reach (commons data 0047-arcactl-init FR-011, FR-012): from the connection the environment names, libpq's own variables, the services of `pg_service.conf`, the
- * hosts `.pgpass` has passwords for, what `arcactl` already knows, and (where asked) PostgreSQL on this machine; and the `arca.config.ts` files in an Ergonex workspace. Then looking at each one
+ * hosts `.pgpass` has passwords for, what `arcactl` already knows, and (where asked) PostgreSQL on this machine; and the `arca.config.ts` files under a root the caller names (`ARCACTL_ROOT`). Then looking at each one
  * and saying, without changing anything, whether it is reached, as whom, what that role could do to it (read, migrate, migrate and guard) and what arca it has. A password goes only to the host it is
  * written for, never to a wildcard, and no password is printed.
  *
@@ -38,7 +38,7 @@ export interface DiscoverInput {
   /** Also look for PostgreSQL on this machine (`127.0.0.1:5432`). */
   readonly local?: boolean;
   readonly state: State;
-  /** The root of an Ergonex workspace, where it is known (`ERGONEX_HOME`). */
+  /** The root under which to look for `arca.config.ts` files, where the caller names one (`ARCACTL_ROOT`); the layout of the folders under it is not assumed. */
   readonly workspace?: string;
 }
 

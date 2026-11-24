@@ -50,7 +50,7 @@ const mode = (p: string): number => statSync(p).mode & 0o777;
 
 proves(
   ["0047-arcactl-init FR-011"],
-  "discovery finds the instances from the connection given, libpq's environment, the service file, the hosts `.pgpass` has passwords for, what arcactl knows and (where asked) this machine, makes one of the same place, names it by its service, never takes a wildcard host, drops the password of a URL, and finds the arca.config.ts of an Ergonex workspace",
+  "discovery finds the instances from the connection given, libpq's environment, the service file, the hosts `.pgpass` has passwords for, what arcactl knows and (where asked) this machine, makes one of the same place, names it by its service, never takes a wildcard host, drops the password of a URL, and finds the arca.config.ts under a root the caller names",
   () => {
     const { dir, paths, env } = home();
     try {
@@ -202,12 +202,12 @@ proves(
 
 proves(
   ["0047-arcactl-init FR-013", "0047-arcactl-init FR-014"],
-  "init asks a person what it needs and changes nothing they decline, leaves their own lines and the block of Ergonex where they are, uses a service they defined themselves, and undo takes away only what init put in",
+  "init asks a person what it needs and changes nothing they decline, leaves their own lines and the block of another program where they are, uses a service they defined themselves, and undo takes away only what init put in",
   async () => {
     const server = await pgliteServer();
     const { dir, paths, env } = home();
     try {
-      writeFileSync(join(dir, ".bashrc"), "export MINE=1\n\n# >>> ergonex >>>\nexport ERGONEX_HOME=\"$HOME/workspaces\"\n# <<< ergonex <<<\n");
+      writeFileSync(join(dir, ".bashrc"), "export MINE=1\n\n# >>> other-tool >>>\nexport OTHER_TOOL_HOME=\"$HOME/tools\"\n# <<< other-tool <<<\n");
       writeFileSync(paths.pgpass, "other.example:5432:*:me:keep\n", { mode: 0o600 });
       writeFileSync(paths.pgServiceFile, `[theirs]\nhost=127.0.0.1\nport=${server.port}\ndbname=postgres\nuser=postgres\nsslmode=disable\n`);
       writeFileSync(paths.psqlrc, "\\set MY 1\n");
@@ -236,13 +236,13 @@ proves(
       const pg = readFileSync(paths.pgpass, "utf8");
       assert(pg.startsWith("other.example:5432:*:me:keep\n") && pg.includes(`127.0.0.1:${server.port}:postgres:postgres:typed-secret`));
       const rc = readFileSync(join(dir, ".bashrc"), "utf8");
-      assert(rc.startsWith("export MINE=1\n") && rc.includes("# >>> ergonex >>>") && rc.includes("# >>> arcactl:shell >>>") && rc.indexOf("ergonex <<<") < rc.indexOf("arcactl:shell >>>"), rc);
+      assert(rc.startsWith("export MINE=1\n") && rc.includes("# >>> other-tool >>>") && rc.includes("# >>> arcactl:shell >>>") && rc.indexOf("other-tool <<<") < rc.indexOf("arcactl:shell >>>"), rc);
       assert(readFileSync(paths.psqlrc, "utf8").startsWith("\\set MY 1\n"));
       // undo: only what init put in
       const undo = await init(env, ["--undo", "--yes"]);
       same(undo.code, 0, undo.out + undo.err);
       same(readFileSync(paths.pgpass, "utf8"), "other.example:5432:*:me:keep\n");
-      same(readFileSync(join(dir, ".bashrc"), "utf8"), "export MINE=1\n\n# >>> ergonex >>>\nexport ERGONEX_HOME=\"$HOME/workspaces\"\n# <<< ergonex <<<\n");
+      same(readFileSync(join(dir, ".bashrc"), "utf8"), "export MINE=1\n\n# >>> other-tool >>>\nexport OTHER_TOOL_HOME=\"$HOME/tools\"\n# <<< other-tool <<<\n");
       same(readFileSync(paths.psqlrc, "utf8"), "\\set MY 1\n");
       assert(readFileSync(paths.pgServiceFile, "utf8").startsWith("[theirs]"));
       assert(!existsSync(paths.instances) && !existsSync(join(paths.cache, "shell.bash")), "its state and cache are gone");
@@ -377,7 +377,7 @@ proves(
       writeFileSync(paths.pgServiceFile, `[local-db]\nhost=127.0.0.1\nport=${server.port}\ndbname=postgres\nuser=postgres\nsslmode=disable\n`);
       writeFileSync(paths.pgpass, `127.0.0.1:${asks.port}:*:app:to-the-asking-server\n*:*:*:*:to-nobody-by-wildcard\n`, { mode: 0o600 });
       writeFileSync(paths.pgServiceFile, `${readFileSync(paths.pgServiceFile, "utf8")}\n[asks]\nhost=127.0.0.1\nport=${asks.port}\ndbname=db\nuser=app\nsslmode=disable\n`);
-      const r = await init({ ...env, ERGONEX_HOME: join(dir, "ws") }, ["--discover", "--dry-run", "--shell", "none"]);
+      const r = await init({ ...env, ARCACTL_ROOT: join(dir, "ws") }, ["--discover", "--dry-run", "--shell", "none"]);
       same(r.code, 0, r.out + r.err);
       assert(r.out.includes("Instances you can reach:") && r.out.includes("local-db") && r.out.includes("migrate+guard") && r.out.includes("identityAgent") && r.out.includes("asks"), r.out);
       assert(!r.out.includes("to-the-asking-server") && !r.out.includes("to-nobody-by-wildcard"));

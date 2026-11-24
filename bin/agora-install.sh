@@ -1,6 +1,6 @@
 #!/bin/sh
 # agora-install.sh: the one command that installs agora on Linux and macOS. You install Git and GitHub CLI; this does everything else: it signs
-# GitHub in where erga cannot be read yet (GitHub CLI, a code and a browser), copies the `.github` and `erga` repositories to ~/workspaces/github.com/intellectual-frontiers/<repo> (or
+# GitHub in where erga cannot be read yet (GitHub CLI, a code and a browser), copies the `.github` and `erga` repositories into the folder you name (`ERGA_WORKSPACES`, else the folder you run it in), as <folder>/<repo> (or
 # says they are there and brings them up to date) and runs the installer in erga, which gets Bun at its pin, installs agora's packages and runs the doctor. Safe to run again.
 #
 #   d=$(mktemp -d) && git clone --depth 1 https://github.com/intellectual-frontiers/.github "$d" && sh "$d/bin/agora-install.sh"
@@ -48,9 +48,9 @@ if ! readable; then
   readable || stop "your GitHub account cannot read intellectual-frontiers/erga" "ask for read access to the intellectual-frontiers organization, then run this again"
 fi
 
-# Both repositories live side by side in the workspace: ~/workspaces/github.com/intellectual-frontiers/<repo>. One that is there is said so and brought
+# Both repositories live side by side in one folder: <folder>/<repo>, whichever folder you choose. One that is there is said so and brought
 # up to date by a fast-forward (a copy that cannot be is left as it is, and said); one that is not is copied.
-base="${ERGA_WORKSPACES:-$HOME/workspaces/github.com/intellectual-frontiers}"
+base="${ERGA_WORKSPACES:-$PWD}"
 if [ -n "$destroy" ]; then
   for gone in "${XDG_DATA_HOME:-$HOME/.local/share}/erga" "${XDG_STATE_HOME:-$HOME/.local/state}/erga"; do
     if [ -e "$gone" ]; then say "🗑️ removing $gone (--destroy-existing)"; rm -rf "$gone"; fi

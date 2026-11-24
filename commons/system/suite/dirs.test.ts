@@ -16,31 +16,31 @@ proves(
   ["0001-system FR-008"],
   "on Linux the folders are the XDG defaults below the home with the program's name, there is no runtime folder, and the binary folder is ~/.local/bin; on Windows they are the known folders and there is no binary folder",
   () => {
-    assertEquals(dirsOf("ergonex", env({ HOME: "/home/a" }), "linux"), {
-      config: "/home/a/.config/ergonex",
-      data: "/home/a/.local/share/ergonex",
-      state: "/home/a/.local/state/ergonex",
-      cache: "/home/a/.cache/ergonex",
+    assertEquals(dirsOf("acme", env({ HOME: "/home/a" }), "linux"), {
+      config: "/home/a/.config/acme",
+      data: "/home/a/.local/share/acme",
+      state: "/home/a/.local/state/acme",
+      cache: "/home/a/.cache/acme",
       runtime: undefined,
       bin: "/home/a/.local/bin",
     });
-    assertEquals(dirsOf("ergonex", env({ HOME: "/home/a", XDG_RUNTIME_DIR: "/run/user/1000" }), "linux").runtime, "/run/user/1000/ergonex");
+    assertEquals(dirsOf("acme", env({ HOME: "/home/a", XDG_RUNTIME_DIR: "/run/user/1000" }), "linux").runtime, "/run/user/1000/acme");
     const win = dirsOf(
-      "ergonex",
+      "acme",
       env({ USERPROFILE: "C:\\Users\\a", APPDATA: "C:\\Users\\a\\AppData\\Roaming", LOCALAPPDATA: "D:\\Local" }),
       "windows",
     );
     assertEquals(win, {
-      config: "C:\\Users\\a\\AppData\\Roaming\\ergonex",
-      data: "D:\\Local\\ergonex",
-      state: "D:\\Local\\ergonex\\state",
-      cache: "D:\\Local\\ergonex\\cache",
+      config: "C:\\Users\\a\\AppData\\Roaming\\acme",
+      data: "D:\\Local\\acme",
+      state: "D:\\Local\\acme\\state",
+      cache: "D:\\Local\\acme\\cache",
       runtime: undefined,
       bin: undefined,
     });
     // LOCALAPPDATA and APPDATA not set: below the user's profile, as Windows has them
-    assertEquals(dirsOf("ergonex", env({ USERPROFILE: "C:\\Users\\a" }), "windows").data, "C:\\Users\\a\\AppData\\Local\\ergonex");
-    assertEquals(dirsOf("ergonex", env({ USERPROFILE: "C:\\Users\\a" }), "windows").config, "C:\\Users\\a\\AppData\\Roaming\\ergonex");
+    assertEquals(dirsOf("acme", env({ USERPROFILE: "C:\\Users\\a" }), "windows").data, "C:\\Users\\a\\AppData\\Local\\acme");
+    assertEquals(dirsOf("acme", env({ USERPROFILE: "C:\\Users\\a" }), "windows").config, "C:\\Users\\a\\AppData\\Roaming\\acme");
     assertEquals(
       [homeOf(env({ HOME: "/h", USERPROFILE: "C:\\u" }), "windows"), homeOf(env({ HOME: "/h", USERPROFILE: "C:\\u" }), "linux")],
       ["C:\\u", "/h"],

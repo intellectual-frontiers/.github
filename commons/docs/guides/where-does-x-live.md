@@ -8,7 +8,7 @@
 | What proves a requirement | the test that names it with `proves([...])`, in the library's `suite/` |
 | Who checks a requirement | the row of `enforcement.tsv` in the library's `spec-kit/` |
 | A data model | `commons/data/models/<name>/mod.ts` (governance); its typed tables are `commons/data/sql/typed/models/<name>.auto.ts`, generated |
-| A command-line program | `commons/ergonex/` (the workspaces command), built on `commons/headless/` |
+| A command-line program | a library of its own, built on `commons/headless/` (`commons/repoctl/` is the example) |
 | The layers of a library and what each may import | `about.ts` (folders) and the `kanon` table of its manifest |
 | An ontology or a standard's vocabulary | `commons/ontology/`; its generated forms are in `commons/generated/` |
 | The tools that check the repository | `commons/tools/` and `commons/libraries/src/` |

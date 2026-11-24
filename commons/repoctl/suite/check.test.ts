@@ -28,19 +28,19 @@ proves(["0003-repoctl-sync FR-007"], "a check program's end is findings: none fo
 proves(["0003-repoctl-sync FR-008"], "a constant named for its library or by its manifest that disagrees with the library's version is found with its file and line, and so is one the manifest names that is missing", () => {
   assertEquals(conventionName("integrations-github"), "INTEGRATIONS_GITHUB_VERSION");
   assertEquals(constantsIn({ path: "a.ts", text: 'const A = 1;\nexport const X_VERSION: string = "1.2.3";\nconst Y_VERSION = `no`;\n' }).map((c) => `${c.name} ${c.value} ${c.line}`), ["X_VERSION 1.2.3 2"]);
-  const ergonex = lib("ergonex", "0.4.7");
-  const old = { path: "commons/ergonex/src/state-record.ts", text: 'export const ERGONEX_VERSION = "0.4.6";\n' };
-  const found = constantFindings([ergonex], [old]);
+  const tool = lib("tool", "0.4.7");
+  const old = { path: "commons/tool/src/state-record.ts", text: 'export const TOOL_VERSION = "0.4.6";\n' };
+  const found = constantFindings([tool], [old]);
   assertEquals(found.map((f) => f.code), ["E-VERSION-CONSTANT"]);
-  assertStringIncludes(found[0]?.message ?? "", 'commons/ergonex/src/state-record.ts:1: ERGONEX_VERSION is "0.4.6" and the version of ergonex is "0.4.7"');
-  assertEquals(constantFindings([ergonex], [{ ...old, text: 'export const ERGONEX_VERSION = "0.4.7";\n' }]), []);
+  assertStringIncludes(found[0]?.message ?? "", 'commons/tool/src/state-record.ts:1: TOOL_VERSION is "0.4.6" and the version of tool is "0.4.7"');
+  assertEquals(constantFindings([tool], [{ ...old, text: 'export const TOOL_VERSION = "0.4.7";\n' }]), []);
   // a constant of another name is no constant of the library, unless the manifest names it
-  const other = { path: "commons/ergonex/src/pins.ts", text: 'export const BUN_VERSION = "1.4.4";\n' };
-  assertEquals(constantFindings([ergonex], [other]), []);
-  const named = lib("ergonex", "0.4.7", { versionConstants: [{ file: "src/pins.ts", name: "BUN_VERSION" }] });
+  const other = { path: "commons/tool/src/pins.ts", text: 'export const BUN_VERSION = "1.4.4";\n' };
+  assertEquals(constantFindings([tool], [other]), []);
+  const named = lib("tool", "0.4.7", { versionConstants: [{ file: "src/pins.ts", name: "BUN_VERSION" }] });
   assertEquals(constantFindings([named], [other]).length, 1);
   // a source of another library is not read for this one
-  assertEquals(constantFindings([ergonex], [{ path: "commons/core/src/mod.ts", text: 'export const ERGONEX_VERSION = "0.0.1";\n' }]), []);
+  assertEquals(constantFindings([tool], [{ path: "commons/core/src/mod.ts", text: 'export const TOOL_VERSION = "0.0.1";\n' }]), []);
   // a manifest that names a constant the file does not say
   const missing = constantFindings([lib("k", "1.0.0", { versionConstants: [{ file: "src/v.ts", name: "K_VERSION" }] })], [{ path: "commons/k/src/v.ts", text: "export const OTHER = 1;\n" }]);
   assertStringIncludes(missing[0]?.message ?? "", 'does not say K_VERSION = "<version>"');

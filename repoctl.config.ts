@@ -87,13 +87,6 @@ const generators: readonly GeneratorInput[] = [
     inputs: ["commons/*/library.ts", "commons/libraries/src/license/**"],
     outputs: ["LICENSE", "commons/*/LICENSE", "THIRD_PARTY_NOTICES.md"],
   },
-  {
-    id: "installers",
-    summary: "The installers of Ergonex (shell and PowerShell), from its pins and its version.",
-    command: ["bun", "commons/ergonex/tools/generate-installers.ts"],
-    inputs: ["commons/ergonex/src/install/**", "commons/ergonex/src/state-record.ts"],
-    outputs: ["commons/ergonex/install/*.auto.sh", "commons/ergonex/install/*.auto.ps1"],
-  },
 ];
 
 /**

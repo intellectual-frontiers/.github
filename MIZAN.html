@@ -180,7 +180,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
       <p class="eyebrow">Intellectual Frontiers Commons · Strategy and implementation</p>
       <h1 class="title">Mizan</h1>
       <p class="arabic" lang="ar">ميزان</p>
-      <p class="lede">The IF Spec Profile. A profile of GitHub Spec Kit, four strongly typed TypeScript ontologies and a shared ladder of eleven rungs, held together by one rule: take the standard before you invent a term, and keep specifications, ontology and code in balance. It carries three products written in its form: IFCCM for change, IFQS for quality and Ergonex for the workspace.</p>
+      <p class="lede">The IF Spec Profile. A profile of GitHub Spec Kit, four strongly typed TypeScript ontologies and a shared ladder of eleven rungs, held together by one rule: take the standard before you invent a term, and keep specifications, ontology and code in balance. It carries two products written in its form: IFCCM for change and IFQS for quality.</p>
       <div class="chips">
         <span class="chip draft">Specified: eleven specs, Draft</span>
         <span class="chip built">Built: M0 to M7</span>
@@ -220,7 +220,6 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <li><a href="#integrations">IFC Mizan Integrations</a></li>
     <li><a href="#ifccm">IFCCM: change control</a></li>
     <li><a href="#ifqs">IFQS: the quality system</a></li>
-    <li><a href="#ergonex">Ergonex: workspaces</a></li>
     <li><a href="#ai">AI-first, AI-native</a></li>
     <li><a href="#drift">Reducing drift: the controls</a></li>
     <li><a href="#roadmap">Built, in progress, not verified</a></li>
@@ -250,7 +249,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
 
   <div class="callout">
     <span class="t">How to read this document</span>
-    <p>Sections 2 to 4 give the rationale. Sections 5 to 9 are the substance: format, ladder, standards, ontology, integrations. Sections 10 to 12 are the three products written in Mizan's form: IFCCM, IFQS and Ergonex. Section 13 is how agents work in it, section 14 is the list of controls against drift, and sections 15 and 16 say honestly what is built, what is not yet verified and what was decided. Every item is marked <span class="chip built">Built</span>, <span class="chip draft">Specified</span> or <span class="chip plan">Planned</span>.</p>
+    <p>Sections 2 to 4 give the rationale. Sections 5 to 9 are the substance: format, ladder, standards, ontology, integrations. Sections 10 and 11 are the two products written in Mizan's form: IFCCM and IFQS. Section 12 is how agents work in it, section 13 is the list of controls against drift, and sections 14 and 15 say honestly what is built, what is not yet verified and what was decided. Every item is marked <span class="chip built">Built</span>, <span class="chip draft">Specified</span> or <span class="chip plan">Planned</span>.</p>
   </div>
 </section>
 
@@ -369,7 +368,7 @@ dl.gloss dt { font-weight: 700; margin-top: 14px; } dl.gloss dd { margin: 2px 0 
     <tr><td>TLA+, Alloy</td><td>Formal models</td><td>Valuable for some systems, not for everything. Not ruled out for a specification that needs it.</td></tr>
   </table></div>
   <h3>What Mizan adds, and what Spec Kit keeps</h3>
-  <p>The profile adds what Spec Kit does not state: the gapless <code>registry.tsv</code> and the proof register <code>enforcement.tsv</code>, the tracing of source files, tests and ontology terms to requirements, the ladder, the requirement syntax (RFC 2119 and EARS) and the standards rules. IFCCM departs from Spec Kit's words in one place: the unit of change is a <strong>capability</strong>, not a feature, and what Spec Kit calls a feature is a capability here. The specifications of IFCCM, IFQS and Ergonex (<code>0020</code> to <code>0022</code>, and <code>commons/ergonex/spec-kit/</code>) are themselves written in Mizan's form. Mizan stays the name of the specifications and ontology strategy; the workspace product is Ergonex and has its own name.</p>
+  <p>The profile adds what Spec Kit does not state: the gapless <code>registry.tsv</code> and the proof register <code>enforcement.tsv</code>, the tracing of source files, tests and ontology terms to requirements, the ladder, the requirement syntax (RFC 2119 and EARS) and the standards rules. IFCCM departs from Spec Kit's words in one place: the unit of change is a <strong>capability</strong>, not a feature, and what Spec Kit calls a feature is a capability here. The specifications of IFCCM and IFQS (<code>0020</code> to <code>0022</code>) are themselves written in Mizan's form.</p>
   <p>Spec Kit moves quickly (it already has a deprecated command and a new one for converging), so each Mizan specification says which version of Spec Kit's templates it follows where it departs from them.</p>
 </section>
 
@@ -756,27 +755,9 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
 </section>
 
 <!-- 12 -->
-<section id="ergonex">
-  <h2><span class="num">12</span>Ergonex: workspaces</h2>
-  <p class="kicker"><strong>Ergonex</strong> (<code>commons/ergonex/</code>, its specifications <code>0001-ergonex</code> to <code>0005-repositories</code>, the npm package <code>@intellectual-frontiers/ergonex</code>) is the managed place on a computer where repositories, worktrees, approved tools, policy and generated workspace files live. It replaced the earlier IFWS. Its command is <code>ergonex</code>. <span class="chip built">Built</span> <span class="chip draft">Specs: Draft</span></p>
-
-  <div class="cards">
-    <div class="card"><h4>One root, a layout that mirrors remotes</h4><p><code>$ERGONEX_HOME</code> (default <code>$HOME/workspaces</code>, <code>%USERPROFILE%\workspaces</code> on Windows). Repositories are at <code>&lt;home&gt;/&lt;git-host&gt;/&lt;path&gt;/&lt;repo&gt;</code>. Ergonex's own area beside them is <code>&lt;home&gt;/.ergonex/</code>: the manifest, the list of repositories, generated <code>*.auto.*</code> files and hooks; what it remembers and installs is in the XDG state and data folders.</p></div>
-    <div class="card"><h4>Add, remove, adopt</h4><p><code>ergonex add github.com/owner/repo</code> records a repository, <code>--apply</code> clones it; <code>remove</code> takes one out and <code>--delete</code> deletes only a clean folder; <code>adopt</code> finds repositories already on the disk.</p></div>
-    <div class="card"><h4>Plan, then apply</h4><p><code>plan(desired, observed)</code> is a pure function. Updates are fast-forward only; a tree with unpushed commits or changes is never deleted; one writer holds a lock; refusals say why.</p></div>
-    <div class="card"><h4>GitHub, GitLab, plain Git</h4><p>One interface (IFCCM's <code>0020-ifccm</code> FR-039 to FR-044), three adapters. GitLab groups nest to any depth. The token for reading packages is <code>ERGONEX_GITHUB_TOKEN</code>, taken from <code>gh auth token</code> in the shell and written to no file.</p></div>
-  </div>
-
-  <h3>The command</h3>
-  <p><code>bunx @intellectual-frontiers/ergonex init</code> makes the workspace and puts <code>ergonex</code> on the path. The modules are typed: <code>init</code>, <code>add</code>, <code>remove</code>, <code>adopt</code>, <code>plan</code>, <code>apply</code>, <code>status</code>, <code>doctor</code>, <code>verify</code>, <code>render</code>, <code>worktree</code>, <code>shell</code>, <code>paths</code>, <code>setup</code> (the only command that installs a pinned tool or changes the host, a dry run unless given <code>--apply</code>), <code>tools</code> and <code>hook</code>. Tools are pinned by version and SHA-256, a plaintext secret in managed configuration is an error, and every run writes evidence in the IFQS shape.</p>
-
-  <h3>Credits</h3>
-  <p>The layout and the <code>ensure</code>, <code>status</code> and <code>doctor</code> ideas come from the earlier workspace tools of Intellectual Frontiers' founder. <a href="https://www.chezmoi.io/">chezmoi</a> (Tom Payne and contributors, MIT) is credited for ideas only; Ergonex never calls it. See <a href="commons/ergonex/CREDITS.md">the credits</a>.</p>
-</section>
-
 <!-- 13 -->
 <section id="ai">
-  <h2><span class="num">13</span>AI-first, AI-native</h2>
+  <h2><span class="num">12</span>AI-first, AI-native</h2>
   <p class="kicker"><strong>AI-first</strong> means we assume an agent will read, write and change this system every day. <strong>AI-native</strong> means the artifacts are designed for that: structured, identifiable, checkable. The central principle is the same in both: <em>the agent proposes; deterministic checks and a person decide.</em></p>
 
   <h3>Why this design suits agents</h3>
@@ -817,7 +798,7 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
 
 <!-- 14 -->
 <section id="drift">
-  <h2><span class="num">14</span>Reducing drift: the controls</h2>
+  <h2><span class="num">13</span>Reducing drift: the controls</h2>
   <p class="kicker">Each kind of drift from <a href="#why">section 2</a> has a control that a program can run. Where no control can read the thing (meaning), a person reviews it and the reason is recorded.</p>
 
   <div class="table-scroll"><table>
@@ -833,7 +814,6 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <tr><td>D: invention</td><td>A basis on every term; <code>unaligned</code> needs justification and a Decision; the count only shrinks</td><td><code>0018-standards-first</code></td><td><span class="chip built">Built</span> (a basis on every term of commons' ontologies; 90 days; baseline)</td></tr>
     <tr><td>Change</td><td>Every commit names an issue on a line of its own; closing words and unfinished issues are findings; warn, then gate</td><td><code>0020-ifccm</code>, <code>commons/libraries/src/changes.ts</code></td><td><span class="chip built">Built</span></td></tr>
     <tr><td>Proof, over time</td><td>Evidence graded E0 to E5; a stale proof opens a nonconformance; a CAPA closes on a named test and a named person</td><td><code>0021-ifqs</code>, <code>commons/quality/src/</code></td><td><span class="chip built">Tiers 0 and 1</span> <span class="chip plan">Tier 2 in progress</span></td></tr>
-    <tr><td>The environment</td><td>Plan before apply; fast-forward only; pinned tools; secrets fail; generated files verified against a state record</td><td><code>0001-ergonex</code> to <code>0005-repositories</code>, <code>commons/ergonex/</code></td><td><span class="chip built">Built</span></td></tr>
     <tr><td>Languages</td><td>No fact kept as source outside natural language and TypeScript, except a named <code>Exception</code></td><td><code>0017-two-languages</code></td><td><span class="chip draft">Specified</span></td></tr>
     <tr><td>Meaning</td><td>A person reviews; the reason is in the register</td><td>Proof register mechanism <code>review</code></td><td><span class="chip built">Built</span></td></tr>
   </table></div>
@@ -844,7 +824,7 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
 
 <!-- 15 -->
 <section id="roadmap">
-  <h2><span class="num">15</span>Built, in progress and not verified</h2>
+  <h2><span class="num">14</span>Built, in progress and not verified</h2>
   <p class="kicker">The work is tracked in <a href="https://github.com/intellectual-frontiers/.github/issues/10">issue #10</a>, and every step is specification first: specifications, then ontology, then code, then tests, then documentation. What is marked Built is tested, runs on Bun and on Node 26, and is checked in CI. All eleven specifications are still <strong>Draft</strong>.</p>
 
   <h3>Milestones</h3>
@@ -854,12 +834,9 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <tr><td>M1</td><td>Specifications <code>0020</code> to <code>0022</code>; the ladder of eleven rungs; the ontologies <code>ifccm</code> and <code>ifqs</code> with their bases</td><td><span class="chip built">Done</span></td></tr>
     <tr><td>M2</td><td>IFCCM: <code>commons/mizan/src/changes/</code> and the command <code>changes.ts</code></td><td><span class="chip built">Done</span></td></tr>
     <tr><td>M3</td><td>IFQS Tier 0: the canonical record, the files and chain, the signed <code>quality</code> branch, the renderings</td><td><span class="chip built">Done</span></td></tr>
-    <tr><td>M4</td><td>The workspace core (types, portable paths, layout, manifest, state, plan, findings, policy), now Ergonex, and the GitHub, GitLab and plain Git adapters behind one interface</td><td><span class="chip built">Done</span></td></tr>
-    <tr><td>M5</td><td>The <code>ergonex</code> command (first written as <code>ifws</code>), modules, host layer, templates and <code>shell</code></td><td><span class="chip built">Done</span></td></tr>
-    <tr><td>M6</td><td>Tools, <code>ergonex setup</code> (dry run by default), and the policy scans</td><td><span class="chip built">Done</span></td></tr>
     <tr><td>M7</td><td>IFQS Tier 1: grades, review debt, freshness, nonconformance and CAPA, objectives, the index; the change check leaves its result as a quality record</td><td><span class="chip built">Done</span></td></tr>
     <tr><td>M9</td><td>IFQS Tier 2 (<code>0021</code> and <code>0022</code>): assessor pack, Trust page, attestation, pre-registered plans, mutation records, agent review</td><td><span class="chip plan">In progress</span></td></tr>
-    <tr><td>M10</td><td>Credits (<code>commons/ergonex/CREDITS.md</code>), this document and the README, and the Decisions</td><td><span class="chip plan">In progress</span></td></tr>
+    <tr><td>M10</td><td>Credits, this document and the README, and the Decisions</td><td><span class="chip plan">In progress</span></td></tr>
     <tr><td>Later</td><td>Migrate <code>stolos</code> first, then the other harnesses, and move each harness's ladder to an instance; their existing <code>unaligned</code> terms go into the baseline</td><td><span class="chip plan">Waiting for a go-ahead</span></td></tr>
   </table></div>
 
@@ -876,7 +853,7 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <li>OSCAL 1.2.3 is the newest release (tags 1.2.4, 1.2.5 and 1.3.0 do not exist) and is public domain and CC0. NIST SP 800-53 Rev. 5.2.0 (1,196 controls with enhancements) imports from a pinned <code>oscal-content</code> commit in 0.7 s.</li>
     <li>A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons used to write by hand. The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds the ontology conforms to its own shapes and rejects a broken individual; ROBOT reads the generated OWL.</li>
     <li>TypeScript 7 checks a 5,000-entry code list in 0.18 s and 85 MB, linear in its entries.</li>
-    <li>The GitHub, GitLab and plain Git adapters are tested with recorded exchanges written from the hosts' documented answers, a real HTTP server on loopback for the live transport, and real Git repositories. The change check, the quality branch (including signing with an SSH key made in the test where <code>ssh-keygen</code> exists) and <code>ergonex</code> run as programs on Bun and on Node 26 against real temporary repositories.</li>
+    <li>The GitHub, GitLab and plain Git adapters are tested with recorded exchanges written from the hosts' documented answers, a real HTTP server on loopback for the live transport, and real Git repositories. The change check, the quality branch (including signing with an SSH key made in the test where <code>ssh-keygen</code> exists) run as programs on Bun and on Node 26 against real temporary repositories.</li>
   </ul>
 
   <h3>Not verified</h3>
@@ -885,13 +862,13 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <li><strong>Private repositories on GitHub and GitLab.</strong> The adapters map an unauthenticated answer for a private repository to <code>unauthorized</code> or <code>not-found</code> as the host says, and take a token only from the environment; this is tested against recorded answers, not against a real private repository on either host.</li>
     <li><strong>The shell snippets for zsh, fish, PowerShell and Nushell</strong> are generated and were read, not run in those shells. Only bash is run.</li>
     <li>The licenses and redistribution terms of the remaining candidate importers (DPV, SPDX, CycloneDX, FHIR, NIEM), before each first import; SPDX 3 could not be fetched from the build environment.</li>
-    <li>Compliance. Nothing here claims that any harness complies with any regulation or standard. IFCCM, IFQS and Ergonex keep evidence an assessor can check.</li>
+    <li>Compliance. Nothing here claims that any harness complies with any regulation or standard. IFCCM and IFQS keep evidence an assessor can check.</li>
   </ul></div>
 </section>
 
 <!-- 16 -->
 <section id="decisions">
-  <h2><span class="num">16</span>Decisions taken</h2>
+  <h2><span class="num">15</span>Decisions taken</h2>
   <p class="kicker">What was decided, so that it is not decided again by accident.</p>
   <div class="table-scroll"><table>
     <tr><th>#</th><th>Decision</th></tr>
@@ -914,8 +891,6 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <tr><td>17</td><td>The ladder has eleven rungs: 0 to 7 required, 8 lifecycle (optional), 9 Evidence (observer) and 10 Workspace (environment), with <code>mz:RungKind</code> (required, optional, observer, environment).</td></tr>
     <tr><td>18</td><td>IFCCM: the unit of change is a capability; every commit names its issue on a line of its own; enforcement is a warning until a harness declares its production day, then a gate. "CCM" is never used alone.</td></tr>
     <tr><td>19</td><td>IFQS is based on Operational Truth: one canonical OpenTelemetry record per run, an append-only signed <code>quality</code> branch, evidence grades E0 to E5, a stale proof opens a nonconformance, and a CAPA closes only on a named test and a named person.</td></tr>
-    <tr><td>20</td><td>Ergonex is the workspace product and has its own name; Mizan stays the name of the specification and ontology strategy. Its command is <code>ergonex</code>; its area is <code>.ergonex/</code>; <code>ergonex</code> does not front <code>ifc</code>.</td></tr>
-    <tr><td>21</td><td>The workspace is not a dotfiles manager: it never edits a person's global Git configuration, shell rc files or <code>~/.ssh</code>; Git settings are per repository; <code>ergonex shell</code> prints and writes nothing unless asked with <code>--install</code>.</td></tr>
     <tr><td>22</td><td>Templates are typed TypeScript functions, not a template language. chezmoi is credited as inspiration for ideas; no code or program of it is used or required.</td></tr>
     <tr><td>23</td><td>Tools are pinned by version and SHA-256, never <code>latest</code>; <code>git</code>, <code>bun</code> and <code>node</code> are verified, never installed; a tool or module outside the catalog is informational for 90 days, then a warning. Plaintext tokens fail from day one.</td></tr>
     <tr><td>24</td><td>GitHub and plain Git first, GitLab shaped with them behind one interface; a token is read only from the environment, never stored or logged.</td></tr>
@@ -927,7 +902,7 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
 
 <!-- 17 -->
 <section id="glossary">
-  <h2><span class="num">17</span>Glossary and sources</h2>
+  <h2><span class="num">16</span>Glossary and sources</h2>
   <dl class="gloss">
     <dt>Basis</dt><dd>How a term relates to a standard: <code>adopts</code>, <code>specializes</code>, <code>maps</code> or <code>unaligned</code>.</dd>
     <dt>Baseline</dt><dd>A file of today's findings for a new rule. A new finding fails; a line that no longer occurs also fails, so it only shrinks.</dd>
@@ -941,7 +916,6 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <dt>Harness</dt><dd>A company or product repository of Intellectual Frontiers that uses commons.</dd>
     <dt>IFCCM</dt><dd>Intellectual Frontiers Capabilities Configuration Management: change control by capability and issue.</dd>
     <dt>IFQS</dt><dd>Intellectual Frontiers Quality System, based on Operational Truth.</dd>
-    <dt>Ergonex</dt><dd>The workspaces manager of Intellectual Frontiers, and its command <code>ergonex</code>.</dd>
     <dt>Ladder</dt><dd>The shared architecture of eleven rungs: 0 to 7 required, 8 lifecycle, 9 Evidence (observer), 10 Workspace (environment).</dd>
     <dt>Operational Truth</dt><dd>What is true of a system is what the system reports when it runs, kept as evidence anyone can check.</dd>
     <dt>Profile</dt><dd>A specification that narrows or extends another without replacing it; Mizan is a profile of GitHub Spec Kit.</dd>
@@ -961,7 +935,7 @@ bun commons/libraries/tools/changes.ts   <span class="c"># the same; the result 
     <li><a href="https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11">21 CFR Part 11 (eCFR)</a></li>
     <li><a href="https://pages.nist.gov/OSCAL/">NIST OSCAL</a>, <a href="https://www.fedramp.gov/">FedRAMP</a>, <a href="https://opentelemetry.io/">OpenTelemetry</a>, <a href="https://ctrf.io/">CTRF</a>, <a href="https://sarifweb.azurewebsites.net/">SARIF</a>, <a href="https://www.chezmoi.io/">chezmoi</a> (inspiration only), <a href="https://github.com/ontodev/robot">ROBOT</a>, <a href="https://rdflib.readthedocs.io/">rdflib</a>, <a href="https://github.com/RDFLib/pySHACL">pySHACL</a></li>
     <li><a href="https://schema.org/">schema.org</a>, <a href="https://www.w3.org/TR/prov-o/">PROV-O</a>, <a href="https://www.w3.org/TR/skos-reference/">SKOS</a>, <a href="https://www.w3.org/TR/shacl/">SHACL</a>, <a href="https://www.w3.org/TR/vocab-dcat-3/">DCAT</a>, <a href="https://mapping-commons.github.io/sssom/">SSSOM</a>, <a href="https://spdx.dev/">SPDX</a></li>
-    <li>In this repository: <a href="README.md"><code>README.md</code></a>, <a href="AGENTS.md"><code>AGENTS.md</code></a>, <a href="commons/spec-kit/"><code>commons/spec-kit/</code></a> (specifications <code>0003</code>, <code>0012</code>, <code>0015</code> to <code>0022</code>, <code>0026</code>), <a href="commons/ergonex/CREDITS.md">the credits of Ergonex</a>, <a href="commons/spec-kit/audits/2026-11-standards-audit.md">the Phase 0 audit</a></li>
+    <li>In this repository: <a href="README.md"><code>README.md</code></a>, <a href="AGENTS.md"><code>AGENTS.md</code></a>, <a href="commons/spec-kit/"><code>commons/spec-kit/</code></a> (specifications <code>0003</code>, <code>0012</code>, <code>0015</code> to <code>0022</code>, <code>0026</code>), <a href="commons/spec-kit/audits/2026-11-standards-audit.md">the Phase 0 audit</a></li>
   </ul>
 </section>
 

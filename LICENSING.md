@@ -40,7 +40,7 @@ A copy that a person already holds under the terms they received it keeps those 
 
 ## The names
 
-The names Ergonex, Mizan, Kanon, Archon and Stolos, and the logos, are trademarks of Intellectual Frontiers LLC. The license does not give them to you beyond what you need to say truthfully what the software is. See [`NOTICE`](NOTICE).
+The names Mizan, Kanon, Archon and Stolos, and the logos, are trademarks of Intellectual Frontiers LLC. The license does not give them to you beyond what you need to say truthfully what the software is. See [`NOTICE`](NOTICE).
 
 ## Other files
 

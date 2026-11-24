@@ -15,25 +15,24 @@
 - **FR-003**: macOS MUST use the same folders as Linux, and MUST NOT use `~/Library`, because `git` and `gh`, which this work stands on, do not.
 - **FR-004**: A folder MUST be undefined, and never guessed, where no home folder can be found and no variable names it.
 
-## What is installed, and by whom
+## What a program assumes of the repositories
 
-- **FR-005**: A program MUST NOT write an executable, a command file or a shim of its own into a folder that it made up or into one that another installer owns (a runtime's global folder, WinGet's links); it is installed by the runtime's global install (`bun add -g`, `npm install -g`) or by WinGet, and a program that a person puts by hand goes to `~/.local/bin`.
-- **FR-006**: On Windows a prerequisite (Bun, Node 26, Git, GitHub CLI) MUST be installed with `winget`, by its package identifier, and never by a download of ours put in a folder of ours.
-- **FR-007**: The WinGet package identifier of Ergonex MUST be `IntellectualFrontiers.Ergonex`, and a WinGet manifest MUST be made, as typed code made into YAML, only for a release that has a binary for it.
+- **FR-005**: A program of commons MUST NOT assume where repositories are kept or how a workspace is laid out (a `workspaces` folder, a host-and-organization path, a manifest of a workspace tool): it MUST find the repository by the Git root of the folder it is run in, by an explicit path argument or environment variable, or by the caller's own configuration, and it MUST behave the same for a repository in any folder, a deep path and a path with spaces.
 
 ## Acceptance scenarios
 
-1. **Given** `HOME=/home/a` and no `XDG_*` variable, **When** the folders of `ergonex` are asked for on Linux, **Then** config is `/home/a/.config/ergonex`, data `/home/a/.local/share/ergonex`, state `/home/a/.local/state/ergonex`, cache `/home/a/.cache/ergonex`, there is no runtime folder and the binary folder is `/home/a/.local/bin`, per FR-001.
-2. **Given** `XDG_CONFIG_HOME=/x/cfg`, **When** they are asked for on Linux, **Then** config is `/x/cfg/ergonex`, per FR-001 and FR-002.
-3. **Given** `XDG_DATA_HOME=relative/dir`, **When** they are asked for, **Then** it is ignored and data is `~/.local/share/ergonex`, per FR-002.
+1. **Given** `HOME=/home/a` and no `XDG_*` variable, **When** the folders of a program named `acme` are asked for on Linux, **Then** config is `/home/a/.config/acme`, data `/home/a/.local/share/acme`, state `/home/a/.local/state/acme`, cache `/home/a/.cache/acme`, there is no runtime folder and the binary folder is `/home/a/.local/bin`, per FR-001.
+2. **Given** `XDG_CONFIG_HOME=/x/cfg`, **When** they are asked for on Linux, **Then** config is `/x/cfg/acme`, per FR-001 and FR-002.
+3. **Given** `XDG_DATA_HOME=relative/dir`, **When** they are asked for, **Then** it is ignored and data is `~/.local/share/acme`, per FR-002.
 4. **Given** the same environment, **When** the folders are asked for on macOS, **Then** they are the same as on Linux, per FR-003.
-5. **Given** `APPDATA` and `LOCALAPPDATA` on Windows, **When** they are asked for, **Then** config is `%APPDATA%\ergonex` and data, state and cache are below `%LOCALAPPDATA%\ergonex`, and there is no binary folder, per FR-001.
-6. **Given** `XDG_STATE_HOME=C:\s` on Windows, **When** they are asked for, **Then** state is `C:\s\ergonex`, per FR-002.
+5. **Given** `APPDATA` and `LOCALAPPDATA` on Windows, **When** they are asked for, **Then** config is `%APPDATA%\acme` and data, state and cache are below `%LOCALAPPDATA%\acme`, and there is no binary folder, per FR-001.
+6. **Given** `XDG_STATE_HOME=C:\s` on Windows, **When** they are asked for, **Then** state is `C:\s\acme`, per FR-002.
 7. **Given** no `HOME` and no variable, **When** they are asked for on Linux, **Then** every folder is undefined, per FR-004.
+8. **Given** one repository cloned into a flat folder, one into a deep `host/organization/repository` path and one into a path with spaces, **When** the programs of commons are run in each, **Then** they find the repository and behave the same, per FR-005.
 
 ## Out of scope
 
-- Where a person keeps the repositories of a workspace (`~/workspaces`, which a person chooses): it is the person's work, not a program's files. A workspace's own folder beside the repositories (Ergonex's `.ergonex/`) holds what a person edits and other tools read (the manifest, the generated Git configuration, the hooks), as `.vscode/` does; it is a project folder, not a folder under the home folder, and what a program only remembers or installs is not in it.
+- Where a person keeps the repositories: it is the person's choice, and no program of commons has a view on it (FR-005). The files a program only remembers or installs are in the folders of FR-001, never beside the repositories.
 - The files a shell reads at its start (`~/.bashrc`, a PowerShell profile): they are the shell's, and a program edits them only on a person's request.
 
 ## Edge cases
@@ -46,7 +45,7 @@
 ## Assumptions
 
 - `git` and `gh` follow XDG on macOS (`~/.config/git`, `~/.config/gh`), and `gh` keeps its config in `%APPDATA%\GitHub CLI` on Windows; the editions of the standards are marked to verify in the term audit.
-- Bun or Node 26 is a prerequisite, because all our code is TypeScript; no binary of ours is shipped yet, so none is signed and no WinGet manifest is made (FR-007).
+- Bun or Node 26 is a prerequisite, because all our code is TypeScript; no binary of ours is shipped yet, so none is signed.
 
 ## Open questions
 

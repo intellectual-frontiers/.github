@@ -86,10 +86,8 @@ export function evaluateRules(rules: readonly ProbeRule[], out: ProbeOutput): re
   });
 }
 
-/** What an estate states of an agent workspace, which the pack compares with what the probe found: the digest of its agents policy, the version of the coordinator it expects at least, the harnesses it declares and how it is isolated. */
+/** What an estate states of an agent workspace, which the pack compares with what the probe found: the harnesses it declares and how it is isolated. */
 export type AgentWorkspaceDeclared = {
-  readonly policyDigest: string;
-  readonly coordinator: string;
   readonly harnesses: readonly string[];
   readonly isolation: "container" | "vm" | "physical";
 };
@@ -98,11 +96,8 @@ export type AgentWorkspaceDeclared = {
 export function agentWorkspaceRules(d: AgentWorkspaceDeclared): readonly ProbeRule[] {
   const at = (key: string) => ({ section: "agent", key });
   return [
-    { id: "agent-policy-present", title: "The agents policy is the one the estate states", controls: ["AC-6"], reads: at("policy-digest"), operator: "equals", value: d.policyDigest, miss: "fail", ifMissing: "miss", fix: "write the agents policy the estate states with the coordinator (the digest the host records must equal the estate's)" },
-    { id: "agent-token-file-private", title: "The token file is readable by its owner only", controls: ["IA-5"], reads: at("token-file-mode"), operator: "equals", value: "0600", miss: "fail", ifMissing: "pass", fix: "chmod 600 on the token file of the coordinator" },
     { id: "agent-no-ambient-secrets", title: "No secret is in the environment of the harness's account", controls: ["IA-5", "AC-6"], reads: at("ambient-secret-names"), operator: "absent", miss: "fail", ifMissing: "pass", fix: "remove the variables named from the profile and the environment of the account, and give the harness a token file or a short-lived token" },
     { id: "agent-not-root", title: "The harness does not run as root", controls: ["AC-6"], reads: at("uid"), operator: "not-equals", value: "0", miss: "fail", ifMissing: "unknown", fix: "run the harness as an account that is not root" },
-    { id: "agent-coordinator-current", title: "The coordinator is at the version the estate expects", controls: ["CM-2", "SI-2"], reads: at("coordinator"), operator: "ge", value: d.coordinator, miss: "warn", ifMissing: "miss", fix: `install Ergonex ${d.coordinator} or later` },
     { id: "agent-harness-known", title: "The harnesses found are the harnesses declared", controls: ["CM-7", "CM-8"], reads: at("harnesses"), operator: "equals", value: [...d.harnesses].sort().join(" "), miss: "warn", ifMissing: "miss", fix: "declare the harnesses the machine has, or remove the ones it should not have" },
     { id: "agent-isolation-as-declared", title: "The machine is isolated as declared", controls: ["CM-8"], reads: at("isolation"), operator: "equals", value: d.isolation, miss: "warn", ifMissing: "unknown", fix: `run the workspace in a ${d.isolation}, or declare how it is isolated` },
   ];

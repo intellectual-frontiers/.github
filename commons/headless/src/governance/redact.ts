@@ -4,7 +4,7 @@
  * Keeps a secret out of what a program prints, logs or returns (commons headless 0002-headless-governance FR-011, 0008-exit-style-consent FR-003). It redacts only what is a secret and
  * never what merely looks like a line about one: the secret values the program holds, the password of a URL and a `password=` assignment, the shapes of the tokens that have a known
  * form (GitHub, GitLab, Slack, AWS, npm, `sk-`, bearer and JWT tokens, private-key blocks), and the value of a key that the program declared secret (`KEY=value`, or
- * `"KEY": "value"`). A sentence that names a variable (`ERGONEX_GITHUB_TOKEN: the token is not set`) is prose and is left as it is, and so is a value that a shell expands (`KEY="$(command)"`),
+ * `"KEY": "value"`). A sentence that names a variable (`APP_GITHUB_TOKEN: the token is not set`) is prose and is left as it is, and so is a value that a shell expands (`KEY="$(command)"`),
  * which is a reference to a secret and not one (0008-exit-style-consent FR-003).
  *
  * @example

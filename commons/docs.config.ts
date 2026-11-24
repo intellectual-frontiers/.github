@@ -23,7 +23,6 @@ import { DISTRIBUTION, GITHUB_REGISTRY, SINGLE, SINGLE_TARGETS } from "./librari
 import { workflows as workflowDefinitions } from "./libraries/src/workflows/definitions.ts";
 import type { Triggers } from "./libraries/src/workflows/model.ts";
 import { VERBS } from "./repoctl/src/governance/verbs.ts";
-import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
 import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs/cli/src/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
@@ -52,11 +51,8 @@ const dataModels = layeredLens({
   },
 });
 
-/** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a command. */
-const INERT_HOST: ProgramHost = { env: {}, cwd: "/", today: "2026-11-20", platform: { os: "linux", arch: "x86_64", windows: false }, places: undefined, homeFor: () => undefined, stdin: () => Promise.resolve(""), argv: [], now: () => 0 } as unknown as ProgramHost;
-
-/** The programs built on headless, documented by tier from their own descriptions: ergonex, the workspaces tool, repoctl, the operations program of this repository, and anyfs, the command line of the stores. */
-const programs = programLens({ name: "programs", source: () => [...describe(ergonexProgram(INERT_HOST)), ...describe(repoctlProgram(REPOCTL_INERT_HOST)), ...describe(anyfsProgram(ANYFS_INERT_HOST))] });
+/** The programs built on headless, documented by tier from their own descriptions: repoctl, the operations program of this repository, and anyfs, the command line of the stores. */
+const programs = programLens({ name: "programs", source: () => [...describe(repoctlProgram(REPOCTL_INERT_HOST)), ...describe(anyfsProgram(ANYFS_INERT_HOST))] });
 
 /** What starts a workflow, in words: its typed triggers read one by one. */
 function triggerWords(on: Triggers): string[] {
@@ -223,22 +219,18 @@ const guides = guidesLens({
     { file: "commons/docs/guides/how-to-index.md", path: "how-to/index.html", section: "howto", group: "How-to", order: 0 },
     { file: "commons/docs/guides/where-does-x-live.md", path: "how-to/where-does-x-live.html", section: "howto", group: "How-to", order: 1 },
     { file: "commons/docs/guides/add-a-library.md", path: "how-to/add-a-library.html", section: "howto", group: "How-to", order: 2 },
-    { file: "commons/docs/guides/add-a-verb.md", path: "how-to/add-a-verb.html", section: "howto", group: "How-to", order: 3 },
     { file: "commons/docs/guides/cut-a-release.md", path: "how-to/cut-a-release.html", section: "howto", group: "How-to", order: 4 },
     { file: "commons/docs/guides/consuming-commons.md", path: "how-to/consuming-commons.html", section: "howto", group: "How-to", order: 5 },
     { file: "commons/docs/guides/repoctl-in-your-repo.md", path: "how-to/repoctl-in-your-repo.html", section: "howto", group: "How-to", order: 6 },
     { file: "commons/docs/guides/grc-entity-groups.md", path: "how-to/grc-entity-groups.html", section: "howto", group: "How-to", order: 7 },
-    { file: "commons/docs/guides/give-an-agent-a-machine.md", path: "how-to/give-an-agent-a-machine.html", section: "howto", group: "How-to", order: 8 },
     { file: "commons/docs/guides/ai-start.md", path: "how-to/ai-start.html", section: "howto", group: "With an AI assistant", order: 0 },
     { file: "commons/docs/guides/ai-add-a-library.md", path: "how-to/ai-add-a-library.html", section: "howto", group: "With an AI assistant", order: 1 },
     { file: "commons/docs/guides/ai-fix-a-failing-check.md", path: "how-to/ai-fix-a-failing-check.html", section: "howto", group: "With an AI assistant", order: 2 },
-    { file: "commons/docs/guides/ai-add-a-command.md", path: "how-to/ai-add-a-command.html", section: "howto", group: "With an AI assistant", order: 3 },
     { file: "commons/docs/guides/ai-write-a-spec.md", path: "how-to/ai-write-a-spec.html", section: "howto", group: "With an AI assistant", order: 4 },
     { file: "commons/docs/guides/ai-ticket-to-spec.md", path: "how-to/ai-ticket-to-spec.html", section: "howto", group: "With an AI assistant", order: 5 },
     { file: "commons/docs/guides/ai-add-a-dialect.md", path: "how-to/ai-add-a-dialect.html", section: "howto", group: "With an AI assistant", order: 6 },
     { file: "commons/docs/guides/ai-review-a-diff.md", path: "how-to/ai-review-a-diff.html", section: "howto", group: "With an AI assistant", order: 7 },
     { file: "commons/docs/guides/ai-cut-a-release.md", path: "how-to/ai-cut-a-release.html", section: "howto", group: "With an AI assistant", order: 8 },
-    { file: "commons/docs/guides/ai-give-an-agent-a-machine.md", path: "how-to/ai-give-an-agent-a-machine.html", section: "howto", group: "With an AI assistant", order: 9 },
   ],
 });
 
@@ -347,7 +339,6 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/formats/spec-kit" },
     { layout: "commons", dir: "commons/data/spec-kit" },
     { layout: "commons", dir: "commons/docs/spec-kit" },
-    { layout: "commons", dir: "commons/ergonex/spec-kit" },
     { layout: "commons", dir: "commons/libraries/spec-kit" },
     { layout: "commons", dir: "commons/quality/spec-kit" },
     { layout: "commons", dir: "commons/headless/spec-kit" },

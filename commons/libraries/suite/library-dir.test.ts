@@ -62,7 +62,7 @@ proves([`${SPEC} FR-026`], "a library out of the folder its manifest derives is 
   await withTempDir(async (root) => {
     lib(root, "anyfs", "anyfs", family("anyfs", "host"));
     lib(root, "anyfs-s3", "anyfs-s3", family("anyfs", "plugin"));
-    assert(!manifestFindings(root).some((x) => x.includes("puts it in")), "no finding while the host is not held to the layout");
+    assert(!manifestFindings(root, new Set()).some((x) => x.includes("puts it in")), "no finding while the host is not held to the layout");
     const found = manifestFindings(root, new Set(["anyfs"])).filter((x) => x.includes("puts it in"));
     assertEquals(found.length, 1);
     assertStringIncludes(found[0] ?? "", "commons/anyfs/s3");

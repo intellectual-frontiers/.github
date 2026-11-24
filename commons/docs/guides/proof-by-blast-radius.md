@@ -83,7 +83,7 @@ T0 static (budget 10s)
           the public surface of core changed in plain, which this library imports
   run   types of headless
           the public surface of core changed in plain, which this library imports
-  run   types of ergonex
+  run   types of repoctl
           the public surface of headless changed in Io, which this library imports
 T1 library (budget 30s)
   run   smoke gate of core
@@ -93,7 +93,7 @@ T1 library (budget 30s)
 T2 seam (budget 120s)
   run   seam core to headless
           the public surface of core changed in plain, which this library imports
-  run   seam headless to ergonex
+  run   seam headless to repoctl
           the public surface of headless changed in Io, which this library imports
   skip  T2 seam core to archon, archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise and 23 more: these 27 importers import other symbols of core than plain (symbols-unused)
   skip  T3 packaging: no class of this change needs it (source) (class-needs-none)
@@ -121,7 +121,7 @@ The same library, changed two ways, reaches very different sets. A change inside
 
 ```mermaid
 flowchart LR
-  quality["quality: body changed"] -->|surface unchanged| ergonex["ergonex: skipped"]
+  quality["quality: body changed"] -->|surface unchanged| repoctl["repoctl: skipped"]
   quality -->|surface unchanged| libraries["libraries: skipped"]
   quality -->|surface unchanged| repoctl["repoctl: skipped"]
 ```
@@ -135,9 +135,9 @@ flowchart LR
   core -->|plain| terminal["terminal"]
   core -->|plain| grc["grc"]
   core -->|plain| quality["quality"]
-  headless -->|Io| ergonex["ergonex"]
+  headless -->|Io| repoctl["repoctl"]
   headless -->|Io| integrations["integrations"]
-  terminal -->|Role| ergonex
+  terminal -->|Role| repoctl
   core -.-|other symbols| crypto["crypto, data, formats, kanon and 23 more: skipped"]
 ```
 

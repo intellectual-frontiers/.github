@@ -99,9 +99,7 @@ export const KINDS: readonly KindSpec[] = [
       str("distro", "The distribution, as observed (the real one: an Omarchy machine is arch).", { values: ["arch", "ubuntu", "debian", "rocky", "macos", "windows", "other"] }),
       bool("omarchy", "Whether the machine is an Omarchy machine (distro arch, with Omarchy on it), as observed."),
       strs("harnesses", "The coding harnesses installed: claude-code, codex, herdr or other."),
-      str("coordinator", "The version of the coordinator (Ergonex) that is installed."),
-      str("persona", "Who works on the machine.", { values: ["human", "agent"] }),
-      str("agents-policy", "The digest (sha256:, 64 hexadecimal digits) of the typed agents policy that bounds the harnesses."),
+      str("agents-policy", "The digest (sha256:, 64 hexadecimal digits) of the typed agents policy that bounds the harnesses, as the person who sets the machine up states it."),
     ],
   },
   {

@@ -49,7 +49,6 @@ ok    The specification kit of core
 ok    The specification kit of crypto
 ok    The specification kit of data
 ok    The specification kit of docs
-ok    The specification kit of ergonex
 ok    The specification kit of estate
 ok    The specification kit of estate-endpoints
 ok    The specification kit of estate-iac

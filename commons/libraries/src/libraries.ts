@@ -100,7 +100,7 @@ export type Library = {
   readonly group?: string;
   /** The license its `LICENSE` and its packed `package.json` carry, where it is not the default of the repository (`license/standard.ts`; commons 0035-licensing FR-003). */
   readonly license?: SpdxId;
-  /** The constants of its sources that say its own version (`ERGONEX_VERSION`), each a file from the library's folder and the name of the constant: the release rewrites them with the version, and a check finds one that disagrees. */
+  /** The constants of its sources that say its own version (`CORE_VERSION`), each a file from the library's folder and the name of the constant: the release rewrites them with the version, and a check finds one that disagrees. */
   readonly versionConstants?: readonly VersionConstant[];
   /** The package the library publishes where it is not `@intellectual-frontiers/<name>` (the `data` library publishes `@intellectual-frontiers/arcactl`; commons 0036-distribution FR-009). */
   readonly publishes?: PackageName;

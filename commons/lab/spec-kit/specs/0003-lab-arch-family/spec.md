@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Ergonex is to be used by coding harnesses on an Omarchy machine (ergonex 0006-agents), and its tests need a disposable machine of that kind. Lab knows two families, `debian` (apt) and `rhel` (dnf), from containers. This specification adds a third, `arch` (pacman), from a container, and a second kind of machine, a virtual machine booted from the image that Omarchy publishes for its own tests, because a container cannot be Omarchy: Omarchy's own packages are in a repository the container does not add, and a container has no desktop session and no boot chain. What was tried, and what it showed, is in `research.md` beside ergonex 0006-agents. The ticket is intellectual-frontiers/.github#25.
+**Input:** Coding harnesses are used on an Omarchy machine, and tests of what runs there need a disposable machine of that kind. Lab knows two families, `debian` (apt) and `rhel` (dnf), from containers. This specification adds a third, `arch` (pacman), from a container, and a second kind of machine, a virtual machine booted from the image that Omarchy publishes for its own tests, because a container cannot be Omarchy: Omarchy's own packages are in a repository the container does not add, and a container has no desktop session and no boot chain. What was tried, and what it showed, is in the ticket. The ticket is intellectual-frontiers/.github#25.
 
 ## The Arch family
 
@@ -49,7 +49,7 @@
 
 - Installing Omarchy's own packages into a container, or building Omarchy from its installer.
 - ARM images of Omarchy and Apple Silicon.
-- A pacman dialect for Archon or for `linux-observe`: Ergonex installs tools with `mise` and does not manage packages (ergonex 0006-agents FR-034); a pacman dialect is needed only if a later specification manages the packages of a fleet.
+- A pacman dialect for Archon or for `linux-observe`: it is needed only if a later specification manages the packages of a fleet.
 
 ## Edge cases
 
@@ -82,7 +82,7 @@ None open.
 
 ## Success criteria
 
-- **SC-001**: A test written for Ergonex runs on a container of the family `arch` and on the real Omarchy image with the same executor, and says which it ran on.
+- **SC-001**: A test written for a tool of a workstation runs on a container of the family `arch` and on the real Omarchy image with the same executor, and says which it ran on.
 
 ## Review & acceptance checklist
 
