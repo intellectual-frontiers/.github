@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { planOf } from "../src/plan.ts";
-import { doesOnce, parseShard, shardOf, type TestFile } from "../src/shard.ts";
+import { doesOnce, parseShard, shardOf, type TestFile, weighted } from "../src/shard.ts";
 
 const files = (sizes: readonly number[]): readonly TestFile[] => sizes.map((bytes, i) => ({ path: `suite/f${String(i).padStart(3, "0")}.test.ts`, bytes }));
 
@@ -49,4 +49,13 @@ proves(["0001-libraries FR-034"], "what a library does once is done by its first
   assertEquals(doesOnce(undefined), true);
   assertEquals(doesOnce({ k: 1, n: 4 }), true);
   assertEquals(doesOnce({ k: 2, n: 4 }), false);
+});
+
+proves(["0001-libraries FR-034"], "where a library keeps the seconds its files take, they balance the shards and not the sizes, and each file is still in exactly one", () => {
+  const all: readonly TestFile[] = ["a", "b", "c", "d", "e"].map((n) => ({ path: `suite/${n}.test.ts`, bytes: 10 }));
+  const w = weighted(all, "suite", { "a.test.ts": 40, "b.test.ts": 30, "c.test.ts": 30, "d.test.ts": 5 });
+  assertEquals(w.map((f) => f.bytes), [40000, 30000, 30000, 5000, 2000]);
+  const shards = [1, 2, 3].map((k) => shardOf(w, { k, n: 3 }));
+  assertEquals(shards.flat().sort(), all.map((f) => f.path).sort());
+  assertEquals(shards.find((s) => s.includes("suite/a.test.ts"))?.length, 1);
 });

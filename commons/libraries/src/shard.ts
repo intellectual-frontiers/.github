@@ -8,7 +8,7 @@
  *
  * @module
  */
-import { readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
@@ -44,6 +44,14 @@ export function shardOf(files: readonly TestFile[], shard: Shard): readonly stri
   return mine.sort();
 }
 
+/**
+ * The weights of the files a library keeps in `<dir>/shard-weights.json` (`{"dialects-postgres.test.ts": 26}`: the seconds each takes, as measured): where there is one, a file's weight is its seconds (2 for a file the record does not
+ * name) and not its size, because the size of a test file says little of how long it runs.
+ */
+export function weighted(files: readonly TestFile[], dir: string, weights: Readonly<Record<string, number>>): readonly TestFile[] {
+  return files.map((f) => ({ path: f.path, bytes: Math.round((weights[f.path.slice(dir.length).replace(/^\//, "")] ?? 2) * 1000) }));
+}
+
 /** The `*.test.ts` files under `dir`, with their sizes. */
 export function testFilesUnder(dir: string): readonly TestFile[] {
   const out: TestFile[] = [];
@@ -55,6 +63,18 @@ export function testFilesUnder(dir: string): readonly TestFile[] {
     }
   };
   walk(dir);
+  const weightsFile = join(dir, "shard-weights.json");
+  if (!existsSync(weightsFile)) return out;
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(weightsFile, "utf8"));
+    if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+      const weights: Record<string, number> = {};
+      for (const [k, v] of Object.entries(parsed)) if (typeof v === "number" && v >= 0) weights[k] = v;
+      return weighted(out, dir, weights);
+    }
+  } catch {
+    // a record that cannot be read is no record: the sizes balance the shards
+  }
   return out;
 }
 

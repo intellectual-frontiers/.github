@@ -16,7 +16,7 @@ import fc from "fast-check";
 import { dumpArgv, dumpText, importDumps, parseDump, redumpText } from "../src/physical/dump.ts";
 import type { SqlPort, SqlStore } from "../src/mod.ts";
 import { withPostgres } from "../tools/postgres-test.ts";
-import { asCore, bytes, closePools, duckdbMemory, ENGINES, monotone, osPath, p, pgliteMemory, realPostgres, replicaOf, sqliteFile, sqliteMemory, storeOn, text, withTemp } from "./kit.ts";
+import { asCore, bytes, closePools, duckdbMemory, monotone, osPath, p, pgliteMemory, realPostgres, replicaOf, sqliteFile, sqliteMemory, storeOn, text, withTemp } from "./kit.ts";
 
 const failures = (reports: readonly { readonly id: string; readonly failure?: string }[]): readonly string[] => reports.filter((r) => r.failure !== undefined).map((r) => `${r.id}: ${r.failure}`);
 
@@ -79,26 +79,6 @@ const shuffled = <T>(xs: readonly T[], seed: number): T[] => {
   }
   return out;
 };
-
-for (const engine of ENGINES) {
-  proves(["0010-sql-dialects FR-001"], `on ${engine.name} the store passes every case of the suite its capabilities name, and the merge suite of AnyFS`, async () => {
-    const reports = await runConformance(async () => asCore(await storeOn(await engine.make())));
-    assertEquals(failures(reports), []);
-    assert(reports.length >= 18, "the cases that need cas, batch, rename and history are run");
-    const replicas: MakeReplicas = async (count, options) => {
-      const clock = monotone();
-      const faces: MergeFace[] = [];
-      for (let i = 0; i < count; i++) {
-        const s = await storeOn(await engine.make(), { replica: replicaOf(i), clock, ...(options.trusting ? { trust: { kind: "open" as const } } : {}) });
-        faces.push({ store: s.store as unknown as MergeFace["store"], replica: s.replica });
-      }
-      return faces;
-    };
-    const merge = await runMergeConformance(replicas);
-    assertEquals(failures(merge), []);
-    assertEquals(merge.length, 12);
-  });
-}
 
 proves(["0010-sql-dialects FR-002"], "the search of PostgreSQL finds the words of a text and no operator can be written by the caller, and DuckDB has no search and says so", async () => {
   const pg = await storeOn(await pgliteMemory());

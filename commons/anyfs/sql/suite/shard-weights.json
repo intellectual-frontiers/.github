@@ -1,0 +1,10 @@
+{
+  "dump.test.ts": 36,
+  "signing.test.ts": 26,
+  "dialects-postgres.test.ts": 26,
+  "dialects-duckdb.test.ts": 18,
+  "dialects-sqlite.test.ts": 2,
+  "dialects.test.ts": 8,
+  "port.test.ts": 6,
+  "schema.test.ts": 4
+}
