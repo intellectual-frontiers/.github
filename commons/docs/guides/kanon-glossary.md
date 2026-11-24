@@ -63,6 +63,6 @@ The codes are a closed list, and each has a sentence. The import checks are in [
 
 ## How the quoted code is kept honest
 
-Each code block on these pages that names a source file in its first line is compared with that file by a test of the documentation, and the test fails if the block does not match. Each block of output names the command that produced it and the day it was run. A figure on the page `What consumers gain` carries its date and its method. If a figure matters to a decision, run the command again.
+Each code block on these pages that names its source file is compared with that file by a test of the documentation, and the test fails if the block does not match. Each block of output names the command that produced it and the day it was run. A figure on the page `What consumers gain` carries its date and its method. If a figure matters to a decision, run the command again.
 
 Back to the overview: [Kanon](concept-kanon.md).

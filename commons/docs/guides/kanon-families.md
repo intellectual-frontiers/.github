@@ -38,6 +38,8 @@ The arrows run from the extension to the host, never the other way. The host doe
 
 Here is how AnyFS, the host, declares itself. Its manifest says it is the host of its family, gives the naming rule, and lists its plugins by noun, with dependencies where one plugin needs another.
 
+*Source: `commons/anyfs/library.ts`, lines 20 to 24.*
+
 ```ts source=commons/anyfs/library.ts#L20-L24
   kanon: {
     package: "@intellectual-frontiers/anyfs",
@@ -49,6 +51,8 @@ Here is how AnyFS, the host, declares itself. Its manifest says it is the host o
 The `family` line is the naming rule: a plugin's package is named `{host}-{name}`, so the plugin `s3` is the package `@intellectual-frontiers/anyfs-s3`, and a dialect would be named `{host}-dialect-{name}`. The package of a member is **made from the rule and never written a second time**, so a package whose name the rule does not make is `family/name`.
 
 Archon declares eight dialects, each an instance of the same physical unit, placed in a package of its own, and four plugins:
+
+*Source: `commons/archon/library.ts`, lines 20 to 33.*
 
 ```ts source=commons/archon/library.ts#L20-L33
   kanon: {
@@ -71,9 +75,13 @@ Archon declares eight dialects, each an instance of the same physical unit, plac
 
 An extension has its own manifest and its own table. It says which host it extends and what it holds. This is the whole of the S3 backend's declaration:
 
+*Source: `commons/anyfs/s3/library.ts`, lines 17 to 17.*
+
 ```ts source=commons/anyfs/s3/library.ts#L17-L17
   family: { host: "anyfs", role: "plugin" },
 ```
+
+*Source: `commons/anyfs/s3/library.ts`, lines 20 to 29.*
 
 ```ts source=commons/anyfs/s3/library.ts#L20-L29
   kanon: {

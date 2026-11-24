@@ -23,6 +23,8 @@ Kanon adds structure. It pays where **one rule is carried into several places** 
 
 Write what the thing is and what it may do as **data**, in the words of the domain, in a folder of its own. Nothing in this folder imports another unit of the library.
 
+*Source: `commons/kanon/suite/examples/reminders/src/governance/reminder.ts`, lines 8 to 28.*
+
 ```ts source=commons/kanon/suite/examples/reminders/src/governance/reminder.ts#L8-L28
 /** What an action may do to the world. */
 export type Effect = "read" | "mutate" | "destructive";
@@ -51,6 +53,8 @@ Three actions, with their effect, whether they are safe to repeat, and an annota
 
 The folder exposes a public entry, so other units import it by name:
 
+*Source: `commons/kanon/suite/examples/reminders/src/governance/mod.ts`, lines 7 to 7.*
+
 ```ts source=commons/kanon/suite/examples/reminders/src/governance/mod.ts#L7-L7
 export { ACTIONS, type Action, type Effect } from "./reminder.ts";
 ```
@@ -58,6 +62,8 @@ export { ACTIONS, type Action, type Effect } from "./reminder.ts";
 ## 3. Derive the model: Logical
 
 The Logical layer makes the model a program reasons with, **by a function** from Governance. It does not copy a single value by hand.
+
+*Source: `commons/kanon/suite/examples/reminders/src/logical/verbs.ts`, lines 9 to 33.*
 
 ```ts source=commons/kanon/suite/examples/reminders/src/logical/verbs.ts#L9-L33
 /** The model of an action: its words, and what a caller must know before running it. */
@@ -93,6 +99,8 @@ export const VERBS: readonly Verb[] = ACTIONS.map(verbOf);
 
 Each surface makes its output from the model and imports Logical and Governance, and no other surface.
 
+*Source: `commons/kanon/suite/examples/reminders/src/physical/cli/command.ts`, lines 7 to 15.*
+
 ```ts source=commons/kanon/suite/examples/reminders/src/physical/cli/command.ts#L7-L15
 import { type Verb, VERBS } from "@example/reminders/logical";
 
@@ -104,6 +112,8 @@ export function usageOf(v: Verb): string {
 /** The help of the program: one line for each verb. */
 export const HELP: readonly string[] = VERBS.map(usageOf);
 ```
+
+*Source: `commons/kanon/suite/examples/reminders/src/physical/tool/tool.ts`, lines 7 to 26.*
 
 ```ts source=commons/kanon/suite/examples/reminders/src/physical/tool/tool.ts#L7-L26
 import { type Verb, VERBS } from "@example/reminders/logical";
@@ -133,6 +143,8 @@ The tool's three hints are not written by anyone. They come from the verb, which
 ## 5. Declare the table and the exports
 
 The table lists the units, each in one layer, and what each surface may import. This is the whole of it for the example:
+
+*Source: `commons/kanon/suite/examples/reminders/kanon.ts`, lines 8 to 17.*
 
 ```ts source=commons/kanon/suite/examples/reminders/kanon.ts#L8-L17
 export const kanon = {
@@ -184,6 +196,8 @@ Add the command to the library's `verify` script, so a library that is Kanon can
 ## 7. Test the projections
 
 The import check keeps the layers apart. It cannot tell whether a projection is right. Write the tests that compare each surface with the model, as Headless does. The example's test does it for the three actions:
+
+*Source: `commons/kanon/suite/examples.test.ts`, lines 48 to 60.*
 
 ```ts source=commons/kanon/suite/examples.test.ts#L48-L60
 proves(["0001-kanon-checker FR-019"], "each projection of the example is made from the action of Governance: a verb, a usage line and a tool for each, with the hints of its effect", () => {

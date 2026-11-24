@@ -43,6 +43,8 @@ flowchart TD
 
 The Governance layer of the library is data. A claim has an id, its text, where it came from, a label (evidence, vendor documentation, inference, hypothesis, opinion, illustration), the evidence sources it names, a date it was true, a date by which it should be checked again, how volatile the fact is, and its audit state.
 
+*Source: `commons/content/src/governance/mod.ts`, lines 33 to 46.*
+
 ```ts source=commons/content/src/governance/mod.ts#L33-L46
 export type Claim = {
   readonly id: string;
@@ -70,6 +72,8 @@ The collector accepts the blocks of a chapter from a structural parser, with the
 
 A rendition is observed from its **output**, not its source. An observation is what a rendition actually presents about a claim: which evidence it shows, which date, which audit status.
 
+*Source: `commons/content/src/physical/rendition/mod.ts`, lines 11 to 19.*
+
 ```ts source=commons/content/src/physical/rendition/mod.ts#L11-L19
 export type Observation = {
   readonly claim: string;
@@ -85,6 +89,8 @@ export type Rendition = { readonly name: string; readonly observations: readonly
 The assembly step takes the claims and the observations of each rendition, projects each claim through a Logical element to each rendition, and compares what each rendition shows with what the claim carries. For each annotation and each rendition the result is one of the endings from [the trace page](kanon-trace-and-dropped.md): expressed, carried, unexpressed or dropped.
 
 Here is the scenario that the library's test uses. A claim has one evidence source. The web page shows it. The Markdown twin shows an empty list.
+
+*Source: `commons/content/suite/content.test.ts`, lines 29 to 39.*
 
 ```ts source=commons/content/suite/content.test.ts#L29-L39
   const { claims } = collectChapter({ ...chapter, blocks: [publicBlock] }, "2026-11-22");
@@ -126,6 +132,8 @@ The library can publish the Logical model as a **bundle**: a set of files and a 
 ## The gate: a finding is not a failure
 
 What a finding does to a build is a decision of the host that runs the check, not a property of the finding. Kanon gives the same findings under any policy. The Content library states its policy as a small typed value:
+
+*Source: `commons/content/src/logical/mod.ts`, lines 118 to 132.*
 
 ```ts source=commons/content/src/logical/mod.ts#L118-L132
 /** Owner policy for escalating unaccounted evidence. */

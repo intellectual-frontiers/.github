@@ -8,6 +8,8 @@ The examples on this page use a small library kept in the repository for this pu
 
 Its table is a literal object, `kanon.ts`:
 
+*Source: `commons/kanon/suite/examples/reminders/kanon.ts`, lines 8 to 17.*
+
 ```ts source=commons/kanon/suite/examples/reminders/kanon.ts#L8-L17
 export const kanon = {
   package: "@example/reminders",

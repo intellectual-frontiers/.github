@@ -2,18 +2,18 @@
 
 This page follows one rule through the real code of Headless, the library of commons that holds the contract of a program with no window: a command line, a tool server for agents and a REST service, all made from one description of what each command is and what it may do.
 
-The rule is the one from [the first page](kanon-why.md): **a command that only reads, a command that changes something and a command that destroys something are different, and every surface must say so.** Every code block below is quoted from the file named in its heading line, and a test of the documentation fails if a quoted block does not match its file.
+The rule is the one from [the first page](kanon-why.md): **a command that only reads, a command that changes something and a command that destroys something are different, and every surface must say so.** Every code block below is quoted from the file named in the line above it, and a test of the documentation fails if a quoted block does not match its file.
 
 The path of the rule through the library is this:
 
 ```mermaid
 flowchart TD
-  a["Governance: ActionFacts. effect: read, mutate or destructive"]
-  b["Logical: placedCommands makes each command's facts with defineAction"]
-  c["Tool server: toolOf sets readOnlyHint, destructiveHint, idempotentHint"]
-  d["REST service: methodOf makes GET or POST, openApiOf the document"]
-  e["Command line: help, flags and refusals"]
-  t["Tests: each surface compared with the model"]
+  a["Governance: ActionFacts"]
+  b["Logical: placedCommands"]
+  c["Tool server: toolOf"]
+  d["REST: methodOf, openApiOf"]
+  e["Command line: help, refusals"]
+  t["Tests: compare each surface"]
   a --> b
   b --> c
   b --> d
@@ -26,6 +26,8 @@ flowchart TD
 ## Governance: the rule is stated once
 
 Governance states what an action is and what it may do. Headless's governance unit holds the type of the facts of an action.
+
+*Source: `commons/headless/src/governance/action.ts`, lines 36 to 53.*
 
 ```ts source=commons/headless/src/governance/action.ts#L36-L53
 export type ActionFacts = {
@@ -52,6 +54,8 @@ An action says what it does to the world (`effect`), whether it is safe to repea
 
 Defaults are part of the statement. A report reads and is safe to repeat. An action changes something and is not assumed safe to repeat until it says so.
 
+*Source: `commons/headless/src/governance/action.ts`, lines 73 to 86.*
+
 ```ts source=commons/headless/src/governance/action.ts#L73-L86
 export function defineAction(d: ActionDefinition): ActionFacts {
   return {
@@ -72,6 +76,8 @@ export function defineAction(d: ActionDefinition): ActionFacts {
 ## Logical: the model a program reasons with
 
 The Logical layer makes the model from Governance. A command in the program's tree carries its facts, and the facts are made by `defineAction`, which is Governance's function. Logical does not restate them.
+
+*Source: `commons/headless/src/logical/model.ts`, lines 181 to 192.*
 
 ```ts source=commons/headless/src/logical/model.ts#L181-L192
 /** A command together with the path of its words. */
@@ -97,6 +103,8 @@ Three surfaces face three kinds of caller. Each imports Logical and Governance a
 ### The tool server
 
 An agent connects to a tool server and asks what it may call. The descriptor of each tool is made from the facts of the command.
+
+*Source: `commons/headless/src/surfaces/mcp/tools.ts`, lines 47 to 66.*
 
 ```ts source=commons/headless/src/surfaces/mcp/tools.ts#L47-L66
 /** The tool of one command. */
@@ -127,6 +135,8 @@ The three annotations at the end are the rule, projected. `readOnlyHint` is true
 
 The OpenAPI document makes a path and a method for each command the caller's tier may see. The method is a projection of the effect.
 
+*Source: `commons/headless/src/surfaces/rest/openapi.ts`, lines 40 to 43.*
+
 ```ts source=commons/headless/src/surfaces/rest/openapi.ts#L40-L43
 /** The method of an operation: `GET` where the command only reads, `POST` where it changes something. */
 export function methodOf(p: Placed): "get" | "post" {
@@ -144,12 +154,16 @@ The command line makes its help, its flags and its refusals from the same facts.
 
 A projection is only as good as the test that compares it with its source. Headless's tests build a program with a read, a change and a wipe, and check that each surface says the same thing about each.
 
+*Source: `commons/headless/suite/mcp-rest.test.ts`, lines 87 to 88.*
+
 ```ts source=commons/headless/suite/mcp-rest.test.ts#L87-L88
   assertEquals(byName("archon_server_list")?.annotations, { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
   assertEquals([byName("archon_server_wipe")?.annotations.destructiveHint, byName("archon_server_wipe")?.annotations.readOnlyHint], [true, false]);
 ```
 
 The tool of the read command is read-only, and the tool of the wipe is destructive and not read-only. The same program's OpenAPI document makes the matching claim:
+
+*Source: `commons/headless/suite/mcp-rest.test.ts`, lines 203 to 205.*
 
 ```ts source=commons/headless/suite/mcp-rest.test.ts#L203-L205
   const list = pub.paths["/v1/server/list"]?.["get"];
@@ -162,6 +176,8 @@ The read command is found under `get`, its operation is named from the program a
 ## The table that keeps the layers apart
 
 All of this stays separate because Headless declares its layers as data, and a checker holds them. The start of Headless's table:
+
+*Source: `commons/headless/library.ts`, lines 20 to 39.*
 
 ```ts source=commons/headless/library.ts#L20-L39
     units: [

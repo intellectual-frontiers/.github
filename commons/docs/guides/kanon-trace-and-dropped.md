@@ -21,6 +21,8 @@ From the DSC resource you can walk upward and arrive at the requirement that say
 
 The code that builds the graph is short, and it shows the rule directly: an edge is **valid** only if both ends exist and the target stands exactly one layer below the source.
 
+*Source: `commons/kanon/src/trace.ts`, lines 16 to 30.*
+
 ```ts source=commons/kanon/src/trace.ts#L16-L30
 /** The trace graph of a layered model: each element's downstream reach and the edges that are invalid. */
 export function traceGraph(model: LayeredModel, byId: ReadonlyMap<ElementId, ModelElement>): TraceGraph {
@@ -57,6 +59,8 @@ An annotation that ends in none of the three is `kanon/dropped`. So is one that 
 
 The ending is data, called a **disposition**, and it is a closed type: each ending has exactly the fields it needs.
 
+*Source: `commons/kanon/src/model.ts`, lines 92 to 95.*
+
 ```ts source=commons/kanon/src/model.ts#L92-L95
 export type Disposition =
   | (DispositionBase & { readonly outcome: "expressed"; readonly target: ElementId })
@@ -69,6 +73,8 @@ export type Disposition =
 Where a library has several instances of one kind of physical unit, such as a dialect for each tool a program drives, the rule is checked for each instance. The result is a table: a row for each annotation of each requirement, and a cell for each instance.
 
 Kanon's own tests use a small host called `fleet`, with two dialects, `ansible` and `dsc`, and one requirement, "admin SSH keys", with two annotations. The dispositions of the fixture are data:
+
+*Source: `commons/kanon/suite/fixtures/fleet.ts`, lines 129 to 134.*
 
 ```ts source=commons/kanon/suite/fixtures/fleet.ts#L129-L134
 export const DISPOSITIONS: readonly Disposition[] = [
