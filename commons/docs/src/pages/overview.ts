@@ -14,7 +14,7 @@ import { specPage } from "../links.ts";
 import { type Block, type Card, type Inline, possessive, type Stat } from "../model.ts";
 import { type Area, areaFiles, type Package } from "../sources.ts";
 import { exampleBlocks } from "./areas.ts";
-import { type FamilyEntry, familiesOf } from "./families.ts";
+import { type FamilyEntry, familiesOf, nestLibraries } from "./families.ts";
 import { numberOf } from "./specs.ts";
 
 /** The first sentence of a text, for a card. */
@@ -181,6 +181,27 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
     if (p.dir !== "") b.files.set(p.dir, packagePage(p));
   }
   const capabilities = capabilityCards(b);
+  // the libraries as a tree of the navigation (0001-docs FR-044): a family or a named group is one folder, a library of neither stands alone
+  const factOf = (p: Package, label: string): string | undefined => p.about.facts?.find((f) => f.label === label)?.value.replace(/`/g, "");
+  const libraryPackages = packages.filter((p) => b.exists(under(p.dir, "library.ts")));
+  const nest = nestLibraries(libraryPackages.map((p): FamilyEntry => ({ slug: p.slug, title: p.about.title, ...(factOf(p, "Family") === undefined ? {} : { family: factOf(p, "Family") as string }), role: factOf(p, "Role") ?? "member" })));
+  const groupPath = (key: string): string => `overview/group-${key}.html`;
+  const parentPath = (parent: string): string => (parent.startsWith("group:") ? groupPath(parent.slice(6)) : packagePage(packages.find((q) => q.slug === parent) ?? top));
+  const extensionsOf = (slug: string): number => [...nest.placements].filter(([, pl]) => pl.parent === slug).length;
+  const libraryCards: Card[] = [
+    ...packages.filter((p) => !nest.placements.has(p.slug)).map((p): Card => {
+      const n = extensionsOf(p.slug);
+      return {
+        title: p.about.title,
+        href: { kind: "page", path: packagePage(p) },
+        text: [...b.line(firstSentence(p.about.summary), { page: home, file: p.file }), ...(n === 0 ? [] : [{ kind: "text", text: ` (${n} extension${n === 1 ? "" : "s"} beneath it)` } as Inline])],
+      };
+    }),
+    ...nest.groupPages.map((g): Card => {
+      const n = [...nest.placements].filter(([, pl]) => pl.parent === `group:${g.key}`).length;
+      return { title: g.title, href: { kind: "page", path: groupPath(g.key) }, text: [{ kind: "text", text: `${n} libraries that belong together.` }] };
+    }),
+  ];
   b.add({
     path: home,
     title: top.about.title,
@@ -194,11 +215,7 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
       heading("libraries", "Libraries"),
       {
         kind: "cards",
-        cards: packages.map((p) => ({
-          title: p.about.title,
-          href: { kind: "page", path: packagePage(p) },
-          text: b.line(firstSentence(p.about.summary), { page: home, file: p.file }),
-        })),
+        cards: libraryCards,
       },
       ...(capabilities.length === 0 ? [] : [
         heading("capabilities", "Capabilities"),
@@ -270,6 +287,21 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
       ],
     });
   }
+  for (const g of nest.groupPages) {
+    const members = packages.filter((p) => nest.placements.get(p.slug)?.parent === `group:${g.key}`);
+    b.add({
+      path: groupPath(g.key),
+      title: g.title,
+      description: `The libraries of the group ${g.title}.`,
+      section: "overview",
+      group: "Libraries",
+      order: 10,
+      blocks: [
+        { kind: "paragraph", inlines: [{ kind: "text", text: "These libraries belong together. A group of libraries moves no folder and changes no name." }] },
+        { kind: "cards", cards: members.map((p): Card => ({ title: p.about.title, href: { kind: "page", path: packagePage(p) }, text: b.line(firstSentence(p.about.summary), { page: groupPath(g.key), file: p.file }) })) },
+      ],
+    });
+  }
   packages.forEach((p, i) => {
     const page = packagePage(p);
     const file = p.file;
@@ -316,6 +348,18 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
     blocks.push(...aboutTables(b, p.about, file, page));
     if ((p.about.examples ?? []).length > 0) blocks.push(heading("examples", "Examples"));
     for (const x of p.about.examples ?? []) blocks.push(...exampleBlocks(b, under(p.dir, x.file), x.file, x.what, scope));
-    b.add({ path: page, title: p.about.title, description: firstSentence(p.about.summary), section: "overview", group: "Libraries", order: 10 + i, blocks });
+    const placed = nest.placements.get(p.slug);
+    b.add({
+      path: page,
+      title: p.about.title,
+      description: firstSentence(p.about.summary),
+      section: "overview",
+      group: "Libraries",
+      order: 10 + i,
+      ...(placed?.parent === undefined ? {} : { parent: parentPath(placed.parent) }),
+      ...(placed?.navTitle === undefined ? {} : { navTitle: placed.navTitle }),
+      ...(placed?.navKind === undefined ? {} : { navKind: placed.navKind }),
+      blocks,
+    });
   });
 }

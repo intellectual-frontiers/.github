@@ -25,7 +25,7 @@ function npmLibraries(): readonly { readonly name: string; readonly dir: string 
   for (const f of readLibraries(ROOT)) {
     if ("problem" in f) continue;
     if (!f.library.distribution.includes("npm")) continue;
-    const dir = path.join(ROOT, "commons", f.library.name);
+    const dir = path.join(ROOT, "commons", f.dir);
     if (fs.existsSync(path.join(dir, "tools", "pack.ts"))) out.push({ name: f.library.name, dir });
   }
   return out;
