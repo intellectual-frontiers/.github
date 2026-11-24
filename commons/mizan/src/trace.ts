@@ -227,7 +227,7 @@ export function parseCitation(text: string, line: number): readonly Citation[] {
  * (from a line that begins with a slash and an asterisk to the asterisk and slash that close it) gives what follows its leading asterisk, without the closing pair. A line of code that holds a
  * comment after the code is not a comment line.
  */
-export function commentLines(text: string): readonly { readonly line: number; readonly body: string }[] {
+function readCommentLines(text: string): readonly { readonly line: number; readonly body: string }[] {
   const out: { line: number; body: string }[] = [];
   let inBlock = false;
   for (const [i, raw] of text.split("\n").entries()) {
@@ -259,7 +259,7 @@ export function commentLines(text: string): readonly { readonly line: number; re
 }
 
 /** Every citation of a file's `Spec:` lines (FR-005, FR-012): `// Spec: ...`, and `Spec: ...` as a line of a block comment. */
-export function specLines(text: string): readonly Citation[] {
+function readSpecLines(text: string): readonly Citation[] {
   const out: Citation[] = [];
   for (const c of commentLines(text)) {
     const m = /^Spec: (.*)$/.exec(c.body);
@@ -317,11 +317,26 @@ function closing(text: string, open: number): number {
   return -1;
 }
 
+/** The line of an index of a text (1 for the first), by a search in the positions of its newlines, made once for each text (0015-trace FR-013). */
 function lineAt(text: string, index: number): number {
-  let n = 1;
-  for (let i = 0; i < index && i < text.length; i++) if (text[i] === "\n") n++;
-  return n;
+  let starts = NEWLINES.get(text);
+  if (starts === undefined) {
+    starts = [];
+    for (let i = text.indexOf("\n"); i >= 0; i = text.indexOf("\n", i + 1)) starts.push(i);
+    if (NEWLINES.size > 8) NEWLINES.clear();
+    NEWLINES.set(text, starts);
+  }
+  let lo = 0;
+  let hi = starts.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if ((starts[mid] ?? 0) < index) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo + 1;
 }
+
+const NEWLINES = new Map<string, number[]>();
 
 function asProof(text: string, line: number): Proof | undefined {
   const m = REQUIREMENT.exec(text.trim());
@@ -329,7 +344,7 @@ function asProof(text: string, line: number): Proof | undefined {
 }
 
 /** Every requirement a test file proves (FR-006, FR-012): in the array a `proves(` call opens, and on its `// Proves:` lines and the `Proves:` lines of its block comments. */
-export function proofsOf(text: string): readonly Proof[] {
+function readProofs(text: string): readonly Proof[] {
   const out: Proof[] = [];
   const consts = constants(text);
   for (const m of text.matchAll(/\bproves\(\s*/g)) {
@@ -365,6 +380,38 @@ export function proofsOf(text: string): readonly Proof[] {
   }
   return out;
 }
+
+/** The most characters of texts whose readings are kept (0015-trace FR-013). */
+const READINGS_LIMIT = 48_000_000;
+
+/** A reading of a text that is made once for each text: the result of an earlier reading of the same text, kept until the texts kept are more than the limit. */
+function oncePerText<R>(read: (text: string) => R): (text: string) => R {
+  let kept = new Map<string, R>();
+  let size = 0;
+  return (text) => {
+    const known = kept.get(text);
+    if (known !== undefined) return known;
+    const made = read(text);
+    if (text.length <= READINGS_LIMIT / 8) {
+      size += text.length;
+      if (size > READINGS_LIMIT) {
+        kept = new Map();
+        size = text.length;
+      }
+      kept.set(text, made);
+    }
+    return made;
+  };
+}
+
+/** The text of each line of a file that is a comment line (FR-005, FR-012), with its line number; read once for each text (FR-013). */
+export const commentLines: (text: string) => readonly { readonly line: number; readonly body: string }[] = oncePerText(readCommentLines);
+
+/** Every citation of a file's `Spec:` lines (FR-005, FR-012); read once for each text (FR-013). */
+export const specLines: (text: string) => readonly Citation[] = oncePerText(readSpecLines);
+
+/** Every requirement a test file proves (FR-006, FR-012); read once for each text (FR-013). */
+export const proofsOf: (text: string) => readonly Proof[] = oncePerText(readProofs);
 
 // ---- the ontology's citations (FR-008)
 

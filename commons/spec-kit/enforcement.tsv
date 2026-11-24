@@ -216,6 +216,7 @@ requirement	mechanism	by	note
 0015-trace FR-010	check	.github: cd commons/data && bun test suite/	kernel/trace.test.ts: imports of every form resolved; above and around found with both files and rungs; same rung and packages not
 0015-trace FR-011	check	.github: cd commons/data && bun test suite/	runtime/trace.test.ts: a fixture tree on disk read; its findings held against a baseline written, passing, then failing when stale
 0015-trace FR-012	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: Spec: and Proves: lines are read in block comments (a line with an asterisk, a one-line block), and a string or a comment after code is not read; the trace check traces a file whose only citation is in a block comment
+0015-trace FR-013	check	.github: cd commons/mizan && bun test suite/	trace.test.ts: the readings of one text are the same object, and the line of a proves call is the same as counting the lines before it
 0016-ladder FR-001	check	.github: bun test ./tests/	Mizan ontology: the nine rungs are individuals of mz:Rung with number, purpose, required and rely-on edges
 0016-ladder FR-002	check	.github: bun test ./tests/	Mizan ontology: rungs 0 to 7 are required, rung 8 is optional and relies on nothing
 0016-ladder FR-003	check	.github: bun test ./tests/	Mizan ontology: a rung relies only on rungs below it, and no rung relies on rung 8

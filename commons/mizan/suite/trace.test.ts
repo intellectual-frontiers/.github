@@ -17,6 +17,7 @@ import {
   proofsOf,
   report,
   specLines,
+  commentLines,
   type SourceFile,
   traceFindings,
   type TraceInput,
@@ -269,3 +270,24 @@ proves(["0015-trace FR-010"], "relative imports of every form, resolved; above a
     "rung 4 (Infrastructure) imports src/model/types.ts, on rung 2 (Data), which it may not rely on (it relies on 0, 3)",
   );
 });
+
+proves(
+  ["0015-trace FR-013"],
+  "the readings of one text are made once and are the same object, and the line of a proves call is the line it is on",
+  () => {
+    const text = ["// a", "", "proves([\"001-demo FR-001\"], \"one\", () => {});", "", "", "proves([\"001-demo FR-002\"], \"two\", () => {});", "// Proves: 001-demo FR-003", ""].join("\n");
+    assert(proofsOf(text) === proofsOf(text), "the same text, the same reading");
+    assert(specLines(text) === specLines(text));
+    assert(commentLines(text) === commentLines(text));
+    assertEquals(
+      proofsOf(text).map((p) => [p.requirement.kind === "one" ? p.requirement.id : "", p.line]),
+      [
+        ["FR-001", 3],
+        ["FR-002", 6],
+        ["FR-003", 7],
+      ],
+    );
+    // a text that is the same in content but not the same string is read again to the same result
+    assertEquals(proofsOf(`${text}`.slice(0)), proofsOf(text));
+  },
+);
