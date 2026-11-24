@@ -94,3 +94,13 @@ proves(["0001-docs FR-051"], "the generated site workflow gathers what the build
   assert(text.includes("::group::$g"), "and shown in order");
   assertEquals(text.split("The newest test reports").length - 1, 0, "the five steps are one");
 });
+
+proves(["0001-docs FR-048"], "no step of a generated workflow is wrapped with an empty module, which would keep neither its result nor its findings", () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+  const dir = join(root, ".github", "workflows");
+  const { readdirSync } = require("node:fs") as typeof import("node:fs");
+  for (const f of readdirSync(dir).filter((n) => n.endsWith(".auto.yml"))) {
+    const text = readFileSync(join(dir, f), "utf8");
+    assert(!/--module ""/.test(text), `${f} has a step wrapped with no module`);
+  }
+});

@@ -138,7 +138,7 @@ jobs:
         id: install
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id install --job "repository" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id install --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: .
@@ -147,7 +147,7 @@ jobs:
         id: the-documentation-generator-s-dependenci-4
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-documentation-generator-s-dependenci-4 --job "repository" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-documentation-generator-s-dependenci-4 --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
@@ -156,7 +156,7 @@ jobs:
         id: runner
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id runner --job "repository" --module "${{ matrix.name }}" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id runner --job "repository" --module "repository" --tool install --timeout 7 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/quality
@@ -165,7 +165,7 @@ jobs:
         id: the-libraries-linked-by-name-6
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-libraries-linked-by-name-6 --job "repository" --module "${{ matrix.name }}" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-libraries-linked-by-name-6 --job "repository" --module "repository" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: bun commons/libraries/src/link.ts
         continue-on-error: true
@@ -173,7 +173,7 @@ jobs:
         id: tests
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id tests --job "repository" --module "${{ matrix.name }}" --tool bun-test --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id tests --job "repository" --module "repository" --tool bun-test --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_SHARD: ${{ matrix.part }}/3
           IFC_STEP_SCRIPT: "bun commons/docs/tools/evidence.ts --library repository --coverage --out \"$RUNNER_TEMP/evidence\""
@@ -183,7 +183,7 @@ jobs:
         if: "always()"
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id why-there-is-a-report-or-none-8 --job "repository" --module "${{ matrix.name }}" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id why-there-is-a-report-or-none-8 --job "repository" --module "repository" --tool exit-status --timeout 20 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
           IFC_STEP_SCRIPT: |
             mkdir -p "$RUNNER_TEMP/evidence"

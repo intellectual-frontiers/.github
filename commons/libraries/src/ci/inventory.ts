@@ -29,6 +29,7 @@ export const stepName = (s: Step): string => s.name ?? (s.kind === "uses" ? s.us
 function moduleOf(file: string, jobId: string, job: Job): string {
   if (job.strategy === undefined || file === "tests") return "repository";
   if (file === "evidence" && jobId === "mutation") return "${{ matrix.library }}";
+  if (file === "evidence" && jobId === "repository") return "repository";
   if (file === "release" && jobId === "build") return "${{ matrix.slug }}";
   if (file === "conformance" && jobId === "compile") return "system";
   return "${{ matrix.name }}";
