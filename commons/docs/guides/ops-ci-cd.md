@@ -13,6 +13,10 @@ The repository's automation is six GitHub Actions workflows, and none of their f
 
 A run is red only for a fault of the pipeline's own scripting or configuration (the closed list of red causes, below on this page). Everything a module says (a failing test, a type error, a warning, a crashed command) is a finding: each step of a workflow that runs a module's command goes through one wrapper that keeps what the command printed, reads it into typed findings and ends green. The job that gathers a workflow's findings is the one result to require; it is red only where a cell that ran left no findings file. Each run is kept on the branch `findings-history`, and the people who review quality and risk read the findings, their history and the accepted risks on [the build findings page](site:quality/build-findings.html).
 
+## How long it takes
+
+[Build time](site:quality/ci.html) shows, for each workflow, the median and the 90th percentile of the wall time of its runs on `main` that passed, held against typed targets, and the slowest jobs of each with their slowest step. A target that is missed is a finding on that page and never fails a build.
+
 ## How the evidence and the site are made
 
 - **`evidence`** runs by the hour and by hand, never on a push: the tests of every library and of the repository's own `tests/` (one job for each, kept as a CTRF report with line coverage), a nightly job that runs mutation testing on a list of libraries (`MUTATION_LIBRARIES` in the definitions), and a `collect` job that gathers the reports into one artifact. A failed test is what the site is to show, so these jobs do not fail the workflow for what they find.
