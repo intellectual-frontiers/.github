@@ -66,3 +66,22 @@ proves(["0001-docs FR-044"], "in the navigation of the real site no two librarie
   }
   assertEquals(flat, [], "the libraries of a family that stand side by side in the navigation");
 });
+
+proves(["0001-docs FR-044"], "in the navigation of every section no two libraries of one family are flat siblings", async () => {
+  const built = await siteOnce();
+  const members = new Map<string, string[]>();
+  for (const p of CONFIG.packages) {
+    const fact = p.about !== undefined && typeof p.about === "object" && p.about.kind === "value" ? p.about.value.facts?.find((f) => f.label === "Family")?.value.replace(/`/g, "") : undefined;
+    if (fact !== undefined) members.set(fact, [...(members.get(fact) ?? []), p.slug]);
+  }
+  const sections = [...new Set(built.pages.map((pg) => pg.path.split("/")[0] ?? ""))].filter((s) => s !== "");
+  const flat: string[] = [];
+  for (const section of sections)
+    for (const [key, slugs] of members) {
+      if (slugs.length < 2) continue;
+      const pages = slugs.map((s) => built.pages.find((pg) => pg.path === `${section}/${s}.html`)).filter((pg) => pg !== undefined);
+      const roots = pages.filter((pg) => pg.parent === undefined);
+      if (roots.length > 1) flat.push(`${section}, ${key}: ${roots.map((r) => r.path).join(", ")}`);
+    }
+  assertEquals(flat, [], "the libraries of a family that stand side by side in the navigation of a section");
+});

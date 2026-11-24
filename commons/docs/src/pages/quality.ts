@@ -16,7 +16,7 @@ import { sparkText } from "../emit/html.ts";
 import { movementsOf, runsOf } from "../history.ts";
 import { specPage } from "../links.ts";
 import type { Area } from "../sources.ts";
-import type { Badge, Block, Inline, Page, Tone } from "../model.ts";
+import type { Badge, Block, Card, Inline, Page, Tone } from "../model.ts";
 import { slugOf } from "../model.ts";
 import { findingsData, findingsPage } from "./findings.ts";
 import { gateBlocks, gateMark, gateResult } from "./insight.ts";
@@ -230,6 +230,23 @@ export function qualityPages(b: Build): void {
       { kind: "paragraph", inlines: [link("quality/issues/index.html", "Every open issue and ticket"), text(" is in the register. Proved: requirements of the library's specifications whose every test passed (one with no test recorded is not counted as proved). Held: findings of the trace and specification checks held against a baseline. Issues and tickets: open ones.")] },
     ],
   });
+  // the page of each group of libraries, as the overview has one (0001-docs FR-044): the quality pages of its members
+  for (const g of b.pages.filter((p) => /^overview\/group-[^/]+\.html$/.test(p.path))) {
+    const key = g.path.replace(/^overview\/group-/, "").replace(/\.html$/, "");
+    const members = libraries.filter((lib) => b.pages.find((p) => p.path === `overview/${lib}.html`)?.parent === g.path);
+    b.add({
+      path: `quality/group-${key}.html`,
+      title: g.title,
+      description: `The quality of the libraries of the group ${g.title}.`,
+      section: "quality",
+      group: "Libraries",
+      order: 99,
+      blocks: [
+        { kind: "paragraph", inlines: [text("These libraries belong together; the quality of each is on its own page.")] },
+        { kind: "cards", cards: members.map((lib): Card => ({ title: title(lib), href: { kind: "page", path: `quality/${lib}.html` }, text: [text(`Test results, requirements proved and open issues of ${title(lib)}.`)] })) },
+      ],
+    });
+  }
   libraries.forEach((lib, i) => {
     const r = ev.results.get(lib);
     const q = requirementStanding(b, lib);
@@ -311,10 +328,15 @@ export function qualityPages(b: Build): void {
     if (open.length > 0 || tickets.length > 0) blocks.push({ kind: "heading", level: 2, id: "issues", text: [text("Open issues and tickets")] });
     if (open.length > 0) blocks.push(issueTable(b, open));
     if (tickets.length > 0) blocks.push(ticketTable(b, tickets));
+    // a library that is an extension of a family, or in a group, stands in the navigation beneath its host or its group, as its page of the overview does (0001-docs FR-044)
+    const placed = b.pages.find((p) => p.path === `overview/${lib}.html`);
+    const parent = placed?.parent === undefined ? undefined : placed.parent.replace(/^overview\//, "quality/");
     b.add({
       path: `quality/${lib}.html`,
       title: `${title(lib)}: quality`,
-      navTitle: title(lib),
+      navTitle: placed?.navTitle ?? title(lib),
+      ...(parent === undefined ? {} : { parent }),
+      ...(placed?.navKind === undefined ? {} : { navKind: placed.navKind }),
       description: `Test results, requirements proved and open issues of ${title(lib)}.`,
       section: "quality",
       group: "Libraries",
