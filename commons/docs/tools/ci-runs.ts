@@ -34,8 +34,9 @@ try {
   const list = await gh(`repos/${repo}/actions/workflows?per_page=100`);
   const workflows = isRecord(list) && Array.isArray(list["workflows"]) ? list["workflows"].filter(isRecord) : [];
   const out2: unknown[] = [];
-  for (const w of workflows.sort((a, b) => String(a["path"]) < String(b["path"]) ? -1 : 1)) {
-    if (typeof w["path"] !== "string" || !w["path"].endsWith(".auto.yml")) continue;
+  // the workflows are asked about at the same time (each answer is several calls of `gh`, one after the other), and the file keeps their order (0001-docs FR-013)
+  const handle = async (w: Record<string, unknown>): Promise<unknown> => {
+    if (typeof w["path"] !== "string" || !w["path"].endsWith(".auto.yml")) return undefined;
     const r = await gh(`repos/${repo}/actions/workflows/${String(w["id"])}/runs?branch=main&per_page=${per}`);
     const runs = (isRecord(r) && Array.isArray(r["workflow_runs"]) ? r["workflow_runs"] : []).filter(isRecord).map((x) => pick(x, ["id", "run_number", "event", "status", "conclusion", "head_sha", "display_title", "html_url", "created_at", "run_started_at", "updated_at"]));
     const failed: unknown[] = [];
@@ -81,8 +82,9 @@ try {
         // a run whose jobs cannot be read is left out
       }
     }
-    out2.push({ name: w["name"], path: w["path"], runs, failed, timing });
-  }
+    return { name: w["name"], path: w["path"], runs, failed, timing };
+  };
+  for (const r of await Promise.all(workflows.sort((a, b) => (String(a["path"]) < String(b["path"]) ? -1 : 1)).map(handle))) if (r !== undefined) out2.push(r);
   result = { repository: repo, workflows: out2 };
 } catch (thrown) {
   result = { repository: repo ?? null, workflows: [], error: thrown instanceof Error ? thrown.message : String(thrown) };

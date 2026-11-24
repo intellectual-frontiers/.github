@@ -131,9 +131,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           IFC_STEP_SCRIPT: |
             mkdir -p _evidence
-            # each page of the answer is an array: the pages are made one
-            gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/issues" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json
-            bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read'
+            # each page of the answer is an array: the pages are made one; the issues and the runs are asked for at the same time (0011-documentation FR-020)
+            (gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/issues" -f state=all -f per_page=100 --jq '.[]' | jq -s '.' > _evidence/github-issues.json || echo '[]' > _evidence/github-issues.json) &
+            (bun commons/docs/tools/ci-runs.ts --out _evidence/runs.json || echo 'the runs of the workflows could not be read') &
+            wait
             printf '{ "commit": "%s", "at": "%s", "url": "%s", "check": "%s" }\n' "$GITHUB_SHA" "$(date -u '+%Y-%m-%d %H:%M UTC')" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" "${{ needs.check.result }}" > _evidence/build.json
             ls -l _evidence | sed -n '1,80p'
         continue-on-error: true
