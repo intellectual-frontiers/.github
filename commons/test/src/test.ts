@@ -543,6 +543,15 @@ function register(name: string, requirements: readonly Requirement[], fn: TestFn
   void nodeTest(name, { timeout, ...(only ? { only: true } : {}) }, body);
 }
 
+/**
+ * Names each finding of `rule` on the standard error, as `finding: <rule>: <what>`, and returns how many there were; it never throws (0001-test FR-008). A test that scans the repository's own tree
+ * uses it for what it finds there: the check that reports the same findings is where they are read, and the rule itself is proved on a made-up fixture.
+ */
+export function reportFindings(rule: string, found: readonly string[]): number {
+  for (const f of found) console.warn(`finding: ${rule}: ${f}`);
+  return found.length;
+}
+
 /** A test registered with the runtime's runner, and recorded (0008-test-evidence FR-001). */
 export function test(name: string, fn: TestFn, options: TestOptions = {}): void {
   register(name, [], fn, options, options.file === undefined ? callerFile() : recordPath(options.file));

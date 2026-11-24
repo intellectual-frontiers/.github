@@ -28,6 +28,7 @@ import {
   proofs,
   proves,
   recorded,
+  reportFindings,
   reviewed,
   reviews,
   test,
@@ -421,3 +422,18 @@ proves(
     }
   },
 );
+
+proves(["0001-test FR-008"], "reportFindings names each finding on the standard error, returns their number and never throws", () => {
+  const lines: string[] = [];
+  const original = console.warn;
+  console.warn = (...a: unknown[]): void => {
+    lines.push(a.join(" "));
+  };
+  try {
+    assertEquals(reportFindings("0001-test FR-008", ["a is not b", "c"]), 2);
+    assertEquals(reportFindings("0001-test FR-008", []), 0);
+  } finally {
+    console.warn = original;
+  }
+  assertEquals(lines, ["finding: 0001-test FR-008: a is not b", "finding: 0001-test FR-008: c"]);
+});

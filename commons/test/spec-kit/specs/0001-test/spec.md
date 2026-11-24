@@ -23,6 +23,8 @@
 
 - **FR-007**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`, the registration and the assertions) and one for the record (`./record`, the pure model of a test's record and its OpenTelemetry form), built, inspected and packed by `tools/pack.ts` (commons 0032-libraries-by-concern FR-005, FR-013), and it MUST depend only on `core`, `crypto`, `system` and `telemetry`, so that it imports nothing of the evidence's reports, ledger or runner.
 
+- **FR-008**: The library MUST export `reportFindings(rule, found)`, which names each finding of `rule` on the standard error as `finding: <rule>: <what>`, returns the number of findings, and MUST NOT throw, so that a test of the repository's own tree reports what it finds and leaves the failing to the typed red causes of the build policy (commons 0038-build-policy).
+
 ## Acceptance scenarios
 
 1. **Given** a test file that imports `proves` and the assertions from this package, **When** it runs under `bun test` and under `node --test`, **Then** it passes unchanged on both, per FR-001.
