@@ -1,10 +1,19 @@
 {
-  "dump.test.ts": 36,
-  "signing.test.ts": 26,
+  "dump.test.ts": 25,
   "dialects-postgres.test.ts": 26,
   "dialects-duckdb.test.ts": 18,
   "dialects-sqlite.test.ts": 2,
   "dialects.test.ts": 8,
   "port.test.ts": 6,
-  "schema.test.ts": 4
+  "schema.test.ts": 4,
+  "signing-postgres.test.ts": 57,
+  "signing-duckdb.test.ts": 5,
+  "signing-sqlite.test.ts": 1,
+  "signing.test.ts": 1,
+  "compact.test.ts": 1,
+  "conformance.test.ts": 3,
+  "merge.test.ts": 1,
+  "store.test.ts": 1,
+  "governance.test.ts": 1,
+  "layers.test.ts": 1
 }

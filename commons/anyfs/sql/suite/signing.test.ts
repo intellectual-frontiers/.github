@@ -5,7 +5,6 @@
  *
  * @module
  */
-import { runSigningConformance, type MakeSigned } from "@intellectual-frontiers/anyfs/conformance";
 import { expectAny, ROOT, type ReplicaId } from "@intellectual-frontiers/anyfs/governance";
 import { generateSigningKey, makeSigner, rosterTrust, signDelta } from "@intellectual-frontiers/anyfs/merge";
 import { memoryStore } from "@intellectual-frontiers/anyfs/memory";
@@ -13,26 +12,7 @@ import { proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { adoptPublished, publishEpoch } from "../src/physical/compact.ts";
 import { dumpArgv, dumpText, importDumps, manifestText, parseManifest, signDump } from "../src/physical/dump.ts";
-import { ENGINES, bytes, monotone, osPath, p, replicaOf, sqliteFile, storeOn, text, withTemp } from "./kit.ts";
-
-const failures = (reports: readonly { readonly id: string; readonly failure?: string }[]): readonly string[] => reports.filter((r) => r.failure !== undefined).map((r) => `${r.id}: ${r.failure}`);
-
-for (const engine of ENGINES) {
-  proves(["0011-sql-signing FR-001"], `on ${engine.name} replicas pass every case of the suite of signed deltas`, async () => {
-    const make: MakeSigned = async (ids, trusts) => {
-      const clock = monotone(Date.now());
-      const faces = [];
-      for (const [i, id] of ids.entries()) {
-        const s = await storeOn(await engine.make(), { replica: id, clock, trust: trusts[i] ?? { kind: "open" } });
-        faces.push({ store: s.store as unknown as Parameters<MakeSigned>[0] extends never ? never : import("@intellectual-frontiers/anyfs/conformance").MergeFace["store"], replica: s.replica });
-      }
-      return faces;
-    };
-    const reports = await runSigningConformance(make);
-    assertEquals(failures(reports), []);
-    assertEquals(reports.length, 9);
-  });
-}
+import { bytes, monotone, osPath, p, replicaOf, sqliteFile, storeOn, text, withTemp } from "./kit.ts";
 
 const rid = (n: number): ReplicaId => replicaOf(n + 20);
 
