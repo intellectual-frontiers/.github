@@ -303,7 +303,9 @@ const conformance: Workflow = {
 
 const docsPaths = ["commons/**", "package.json", "bun.lock", own("site"), BUN_ACTION];
 /** A push to main, a run by hand on main, or the night's run: where the evidence is gathered and the site published. */
-const onMainOrSchedule = "github.event_name != 'pull_request' && github.ref == 'refs/heads/main'";
+/** Not a pull request, on main; where the event is the end of another workflow, that workflow's run was of main and was not cancelled (a workflow_run event carries the ref of the default branch whatever branch the run was of). */
+const onMainOrSchedule =
+  "github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion != 'cancelled'))";
 
 /**
  * The evidence of quality (commons 0011-documentation FR-042): the tests of every library and of the repository's own `tests/`, one job for each, kept whether they pass, fail or cannot be run, and gathered into one artifact
@@ -455,7 +457,8 @@ const site: Workflow = {
     "workflow `evidence` has kept (the tests of every library, with how old they are), the open issues and the runs of the workflows, and publishes it to GitHub Pages with GitHub's own actions WHATEVER failed: the generator's check, a",
     "library's tests, the evidence run, even the build, for which an emergency page is made from the evidence alone. The site is how a failure is seen. It is never committed.",
   ).trimEnd(),
-  on: { push: { paths: docsPaths }, pullRequest: { paths: docsPaths }, workflowDispatch: true, workflowRun: { workflows: ["evidence", "ci", "release", "tests", "conformance"] }, schedule: ["41 4 * * *"] },
+  // one build for each push to main (0011-documentation FR-020): the workflow `ci` finishing is the one event of it; a push that touches only this workflow builds directly, `evidence` and `release` refresh the site, and so does the night
+  on: { push: { paths: [own("site")] }, pullRequest: { paths: docsPaths }, workflowDispatch: true, workflowRun: { workflows: ["evidence", "ci", "release"] }, schedule: ["41 4 * * *"] },
   permissions: { contents: "read" },
   // on main a run in progress is finished and only the newest waiting one is kept, so that a busy main still publishes
   concurrency: { group: "site-${{ github.ref }}", cancelInProgress: expr("github.ref != 'refs/heads/main'") },

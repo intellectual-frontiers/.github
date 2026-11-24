@@ -71,23 +71,35 @@ export function exportsLine(packageJson: string): string {
 }
 
 /**
- * The libraries whose packing a push checks (FR-013): those that changed their `exports` since the base (a new library included), and every library where the packer itself changed. Git that cannot say gives every library.
+ * The libraries whose packing a push checks (0001-libraries FR-012). In `per-library` mode: those that changed their `exports` since the base (a new library included), and every library where the packer itself
+ * changed. In `single` mode there is one package, so its packing is checked once, in the cell of the library `commons`, where any library changed its `exports` or the packer changed, and in no other cell.
+ * Git that cannot say gives every library (`commons` alone in `single` mode).
  */
 export async function packsFor(repo: string, base: string, libs: readonly Planned[], single = isSingle(process.env["IFC_DISTRIBUTION"])): Promise<ReadonlySet<string>> {
-  const all = new Set(libs.map((l) => l.name));
+  const everything: ReadonlySet<string> = single ? new Set([PACKAGE_LIBRARY]) : new Set(libs.map((l) => l.name));
   const mb = await run(["git", "-C", repo, "merge-base", base, "HEAD"]);
-  if (mb.code !== 0) return all;
+  if (mb.code !== 0) return everything;
   const packer = await run(["git", "-C", repo, "diff", "--name-only", mb.stdout.trim(), "--", "commons/libraries/src/pack-library.ts", "commons/libraries/src/pack-commons.ts", "commons/libraries/src/distribution.ts"]);
-  if (packer.code !== 0 || packer.stdout.trim() !== "") return all;
+  if (packer.code !== 0 || packer.stdout.trim() !== "") return everything;
   const out = new Set<string>();
   for (const l of libs) {
     const before = await run(["git", "-C", repo, "show", `${mb.stdout.trim()}:${l.folder}/package.json`]);
     const now = join(repo, l.folder, "package.json");
     if (before.code !== 0 || !existsSync(now) || exportsLine(before.stdout) !== exportsLine(readTextFileSync(now))) out.add(l.name);
   }
-  // the one package is made of every library: it packs where any library's exports changed (0036-distribution FR-021)
-  if (single && out.size > 0) out.add("commons");
+  // the one package is made of every library: it is packed once, where any library's exports changed (0036-distribution FR-021)
+  if (single) return out.size > 0 ? new Set([PACKAGE_LIBRARY]) : new Set();
   return out;
+}
+
+/** The library whose `verify` packs the one package in `single` mode. */
+export const PACKAGE_LIBRARY = "commons";
+
+/** The libraries with the library `commons` among them where the packing is to be checked in its cell (`single` mode), and as they are otherwise. */
+export function withPackage(libs: readonly Planned[], packs: ReadonlySet<string>, repo: string): readonly Planned[] {
+  if (!packs.has(PACKAGE_LIBRARY) || libs.some((l) => l.name === PACKAGE_LIBRARY)) return libs;
+  const pkg = everyLibrary(repo).find((l) => l.name === PACKAGE_LIBRARY);
+  return pkg === undefined ? libs : [...libs, pkg];
 }
 
 /** The outputs of a step that a workflow reads: the matrices as one line of JSON each and whether each has a cell. */
@@ -125,13 +137,14 @@ export async function main(argv: readonly string[]): Promise<number> {
   let packs: ReadonlySet<string> = new Set();
   if (o.all) {
     libs = everyLibrary(o.repo);
-    packs = new Set(libs.map((l) => l.name));
+    packs = isSingle(process.env["IFC_DISTRIBUTION"]) ? new Set([PACKAGE_LIBRARY]) : new Set(libs.map((l) => l.name));
   } else if (files.length > 0) libs = affectedBy(o.repo, files);
   else if (o.base !== undefined) {
     const changed = await changedSince(o.repo, o.base);
     if (changed === undefined) stdio.stderr.writeSync(`plan: git cannot say what changed since ${o.base}; every library is planned\n`);
     libs = changed === undefined ? everyLibrary(o.repo) : affectedBy(o.repo, changed);
-    packs = changed === undefined ? new Set(libs.map((l) => l.name)) : await packsFor(o.repo, o.base, libs);
+    packs = changed === undefined ? (isSingle(process.env["IFC_DISTRIBUTION"]) ? new Set([PACKAGE_LIBRARY]) : new Set(libs.map((l) => l.name))) : await packsFor(o.repo, o.base, libs);
+    libs = withPackage(libs, packs, o.repo);
   } else {
     stdio.stderr.writeSync("plan: give --base REF, --files a,b or --all\n");
     return 2;

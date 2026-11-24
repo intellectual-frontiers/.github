@@ -130,9 +130,12 @@ proves(
       await g("commit", "-q", "-m", "packer");
       assertEquals([...(await packsFor(dir, "main", libs, false))].sort(), ["a", "b", "c"], "the packer changed: every library");
       assertEquals((await packsFor(dir, "no-such-base", libs, false)).size, 3, "Git cannot say: every library");
-      // the one package is packed where a library changed its exports (0036-distribution FR-021)
+      // the one package is packed once, in the cell of `commons`, and in no library's own cell (0001-libraries FR-012, 0036-distribution FR-021)
       const all = ["a", "b", "c", "commons"].map(lib);
-      assertEquals([...(await packsFor(dir, "no-such-base", all, true))].sort(), ["a", "b", "c", "commons"]);
+      assertEquals([...(await packsFor(dir, "no-such-base", all, true))], ["commons"], "Git cannot say: the package alone");
+      assertEquals([...(await packsFor(dir, "main", all, true))], ["commons"], "the packer changed: the package alone, not each library");
+      await g("checkout", "-q", "-b", "quiet", "main");
+      assertEquals((await packsFor(dir, "main", libs.slice(0, 2), true)).size, 0, "nothing changed its exports and the packer is the same: no packing");
     });
   },
 );

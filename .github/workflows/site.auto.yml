@@ -8,11 +8,7 @@ name: site
 on:
   push:
     paths:
-      - "commons/**"
-      - package.json
-      - bun.lock
       - .github/workflows/site.auto.yml
-      - ".github/actions/bun/**"
   pull_request:
     paths:
       - "commons/**"
@@ -24,7 +20,7 @@ on:
   schedule:
     - cron: "41 4 * * *"
   workflow_run:
-    workflows: [evidence, ci, release, tests, conformance]
+    workflows: [evidence, ci, release]
     types: [completed]
 
 permissions:
@@ -78,7 +74,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     needs: [check]
-    if: "always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'"
+    if: "always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion != 'cancelled'))"
     permissions:
       contents: read
       issues: read
@@ -215,7 +211,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs: [site]
-    if: "always() && needs.site.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'"
+    if: "always() && needs.site.result == 'success' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion != 'cancelled'))"
     permissions:
       pages: write
       id-token: write
