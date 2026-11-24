@@ -129,6 +129,8 @@ export type RunOptions = {
   readonly env?: Readonly<Record<string, string>>;
   /** The executable of a runtime, where it is not the one on `PATH`. */
   readonly executables?: Readonly<Partial<Record<Runtime, string>>>;
+  /** A folder that the line coverage of the files the Bun runner runs is written into as `lcov.info`, from the run that makes the record (FR-070); the Node runner ignores it. */
+  readonly coverageDir?: string;
 };
 
 /** What a run did. */
@@ -199,12 +201,12 @@ export async function testFiles(paths: readonly string[], cwd: string): Promise<
   return ok([...out].sort());
 }
 
-function runnerArgv(runtime: Runtime, exe: string, files: readonly string[]): readonly string[] {
+function runnerArgv(runtime: Runtime, exe: string, files: readonly string[], coverageDir?: string): readonly string[] {
   switch (runtime) {
     case "node":
       return [exe, "--test", ...files];
     case "bun":
-      return [exe, "test", ...files];
+      return [exe, "test", ...(coverageDir === undefined ? [] : ["--coverage", "--coverage-reporter=lcov", `--coverage-dir=${coverageDir}`]), ...files];
     default: {
       const never: never = runtime;
       return never;
@@ -402,7 +404,7 @@ export async function runTests(options: RunOptions = {}): Promise<Result<RunResu
       await writeTextFile(recordFile, "");
       let code: number;
       try {
-        const r = await output(runnerArgv(runtime, exe, files.value), {
+        const r = await output(runnerArgv(runtime, exe, files.value, options.coverageDir === undefined ? undefined : resolve(cwd, options.coverageDir)), {
           cwd,
           env: { ...inherited(), ...options.env, TRACEPARENT: `00-${traceId}-${spanId}-01`, IFC_TEST_RECORD: recordFile },
           clearEnv: true,

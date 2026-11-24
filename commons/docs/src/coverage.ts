@@ -20,7 +20,7 @@ export interface LibraryCoverage {
   readonly files: readonly FileCoverage[];
 }
 
-const isSource = (p: string): boolean => !/(^|\/)(suite|tests|node_modules|dist)\//.test(p) && !/\.test\.[cm]?[jt]sx?$/.test(p);
+export const isSource = (p: string): boolean => !/(^|\/)(suite|tests|node_modules|dist)\//.test(p) && !/\.test\.[cm]?[jt]sx?$/.test(p);
 
 /** The files of an LCOV text: each `SF:` begins a file and `LF:` and `LH:` give its lines found and hit; `base` is what the `SF:` paths are relative to, from the root of the repository. */
 export function parseLcov(lcov: string, base: string): readonly FileCoverage[] {

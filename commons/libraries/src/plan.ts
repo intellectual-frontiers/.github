@@ -55,7 +55,7 @@ export function planOf(libs: readonly Planned[], packs: ReadonlySet<string> = ne
 function shardedCells(cell: Cell): readonly Cell[] {
   const n = LIBRARY_CI[cell.name]?.shards ?? 1;
   if (n <= 1) return [cell];
-  return Array.from({ length: n }, (_, i) => ({ ...cell, name: `${cell.name} ${i + 1}/${n}`, shard: `${i + 1}/${n}`, pack: cell.pack && i === 0 }));
+  return Array.from({ length: n }, (_, i) => ({ ...cell, name: `${cell.name} ${i + 1}/${n}`, slug: `${cell.name}-${i + 1}-of-${n}`, shard: `${i + 1}/${n}`, pack: cell.pack && i === 0 }));
 }
 
 /** The exports of a package.json as one line, the keys in order, so that two of them are the same where the entries are. */

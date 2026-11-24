@@ -254,3 +254,27 @@ proves([FR("005"), FR("006")], "a runtime that is not installed is reported and 
     await remove(dir, { recursive: true });
   }
 });
+
+proves(["0001-quality-evidence FR-070"], "the line coverage of a Bun run is written from the run that makes the record, and a run without the option writes none", async () => {
+  if (RUNTIME !== "bun") return; // only the Bun runner writes coverage (FR-070)
+  const dir = await makeTempDir({ prefix: "ifc-test-coverage-" });
+  try {
+    await writeTextFile(join(dir, "answer.ts"), "export const answer = (n: number): number => (n > 0 ? 42 : 0);\n");
+    await writeTextFile(
+      join(dir, "answer.test.ts"),
+      `import { proves } from ${JSON.stringify(TEST_TS)};\nimport { answer } from "./answer.ts";\nproves(["fixture FR-001"], "answers", () => { if (answer(1) !== 42) throw new Error("no"); });\n`,
+    );
+    const without = await runTests({ runtimes: [RUNTIME], paths: ["answer.test.ts"], cwd: dir, out: "out-plain", output: "null" });
+    assert(without.kind === "ok", without.kind === "err" ? without.error : "");
+    const plain = await readFile(join(dir, "coverage", "lcov.info")).then(() => true).catch(() => false);
+    assertEquals(plain, false);
+    const withCoverage = await runTests({ runtimes: [RUNTIME], paths: ["answer.test.ts"], cwd: dir, out: "out-cov", coverageDir: "cov", output: "null" });
+    assert(withCoverage.kind === "ok", withCoverage.kind === "err" ? withCoverage.error : "");
+    assertEquals(withCoverage.value.code, 0);
+    const lcov = await readTextFile(join(dir, "cov", "lcov.info"));
+    assertStringIncludes(lcov, "SF:answer.ts");
+    assertStringIncludes(lcov, "DA:");
+  } finally {
+    await remove(dir, { recursive: true });
+  }
+});

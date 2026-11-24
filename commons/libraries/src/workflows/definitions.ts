@@ -113,6 +113,10 @@ export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
 /** A cell of the matrix of a job of `ci`: a library, and where it runs where it is not on Linux. */
 export type Cell = {
   readonly name: string;
+  /** The library, whatever shard the cell is (0001-libraries FR-035). */
+  readonly library: string;
+  /** A name for a file or an artifact: the cell's name with no space or slash, `data-1-of-4` (0001-libraries FR-035). */
+  readonly slug: string;
   readonly folder: string;
   readonly verify: string;
   /** The command that runs the tests on Node 26, or the empty string. */
@@ -132,6 +136,8 @@ export function cellOf(l: { readonly name: string; readonly folder: string; read
   const ci = LIBRARY_CI[l.name];
   return {
     name: l.name,
+    library: l.name,
+    slug: l.name,
     folder: l.folder,
     verify: l.verify,
     pack,
@@ -363,22 +369,23 @@ const evidence: Workflow = {
         { ...tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"), id: "install", continueOnError: true },
         { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
         { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
-        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.name }}" --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run('bun commons/docs/tools/evidence.ts --library "${{ matrix.library }}" --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, once, kept as a CTRF report and their line coverage (the files of this cell's shard where the library is split)", id: "tests", continueOnError: true, shell: "bash", env: { IFC_SHARD: expr("matrix.shard") } }),
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",
-            "printf '{ \"library\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.name }}\" \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/${{ matrix.name }}.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-${{ matrix.name }}.json\"",
+            "printf '{ \"library\": \"%s\", \"shard\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.library }}\" \"${{ matrix.shard }}\" \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(ls \"$RUNNER_TEMP/evidence/\"*.ctrf.json >/dev/null 2>&1 && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-${{ matrix.slug }}.json\"",
           ),
           { name: "Why there is a report, or none", when: "always()", shell: "bash" },
         ),
-        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-${{ matrix.name }}", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
+        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-${{ matrix.slug }}", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
       ],
     }),
     repository: job({
-      name: "tests (repository)",
+      name: "tests (repository ${{ matrix.part }}/3)",
       comment: "the tests of the repository's own files (`tests/`)",
       runsOn: "ubuntu-24.04",
       timeoutMinutes: 25,
+      strategy: { failFast: false, matrix: { part: ["1", "2", "3"] } },
       steps: [
         checkout({ fetchDepth: 0 }),
         bun(),
@@ -386,15 +393,15 @@ const evidence: Workflow = {
         { ...tools("commons/docs", "The documentation generator's dependencies, which the tests of the root import"), continueOnError: true },
         { ...tools("commons/quality", "The test runner's own packages (commons quality)"), id: "runner", continueOnError: true },
         run("bun commons/libraries/src/link.ts", { name: "The libraries, linked by name", continueOnError: true }),
-        run('bun commons/docs/tools/evidence.ts --library repository --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, kept as a CTRF report", id: "tests", continueOnError: true, shell: "bash" }),
+        run('bun commons/docs/tools/evidence.ts --library repository --coverage --out "$RUNNER_TEMP/evidence"', { name: "The tests, once, kept as a CTRF report and their line coverage (the files of this cell's shard)", id: "tests", continueOnError: true, shell: "bash", env: { IFC_SHARD: "${{ matrix.part }}/3" } }),
         run(
           lines(
             "mkdir -p \"$RUNNER_TEMP/evidence\"",
-            "printf '{ \"library\": \"repository\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(test -f \"$RUNNER_TEMP/evidence/repository.ctrf.json\" && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-repository.json\"",
+            "printf '{ \"library\": \"repository\", \"shard\": \"%s\", \"install\": \"%s\", \"runner\": \"%s\", \"tests\": \"%s\", \"reported\": %s }\\n' \"${{ matrix.part }}/3\" \"${{ steps.install.outputs.outcome }}\" \"${{ steps.runner.outputs.outcome }}\" \"${{ steps.tests.outputs.outcome }}\" \"$(ls \"$RUNNER_TEMP/evidence/\"*.ctrf.json >/dev/null 2>&1 && echo true || echo false)\" > \"$RUNNER_TEMP/evidence/status-repository-${{ matrix.part }}-of-3.json\"",
           ),
           { name: "Why there is a report, or none", when: "always()", shell: "bash" },
         ),
-        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-repository", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
+        use(PIN.uploadArtifact, { name: "The report and its status, kept for the site", when: "always()", with: { name: "evidence-repository-${{ matrix.part }}-of-3", path: "${{ runner.temp }}/evidence/*.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
       ],
     }),
     mutation: job({
@@ -425,6 +432,7 @@ const evidence: Workflow = {
         bun(),
         { ...tools("commons/docs", "The packages of the tool that keeps the history (commons docs)"), continueOnError: true },
         use(PIN.downloadArtifact, { name: "The reports of the tests", with: { pattern: "evidence-*", path: "_evidence", "merge-multiple": true } }),
+        run("bun commons/docs/tools/merge-shards.ts --evidence _evidence || echo 'the shards could not be put together'", { name: "The shards of a library, put together again (docs 0001-docs FR-049)", shell: "bash", continueOnError: true }),
         run(
           lines(
             "mkdir -p _evidence",

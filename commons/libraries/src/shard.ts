@@ -4,6 +4,7 @@
  * of the folder that `shardOf` gives it, so that each file is run by exactly one cell and no cell is left with all the long ones.
  *
  *     bun shard.ts --first COMMAND...  runs COMMAND in the first shard only (and where IFC_SHARD is empty), for what one cell of the library's cells has to do once: a check of the whole site, the packing
+ *     bun shard.ts --list DIR        prints the test files of the shard `k/N` of DIR (all of them where IFC_SHARD is empty), one a line, for a program that runs them itself (the evidence of quality, docs 0001-docs FR-048)
  *     bun shard.ts [--node] DIR      runs the tests of DIR with `bun test`, or with `node --test` where `--node` is given: all the files where IFC_SHARD is empty, and the files of the shard `k/N` where it names one
  *
  * @module
@@ -93,6 +94,10 @@ if (import.meta.main) {
   const dir = args.find((a) => !a.startsWith("--")) ?? "suite";
   const shard = parseShard(process.env["IFC_SHARD"]);
   const files = shard === undefined ? undefined : shardOf(testFilesUnder(dir), shard);
+  if (args.includes("--list")) {
+    for (const f of files ?? testFilesUnder(dir).map((x) => x.path).sort()) console.log(f);
+    process.exit(0);
+  }
   if (files !== undefined && files.length === 0) process.exit(0);
   const argv = node ? ["node", "--test", ...(files ?? [`${dir}/**/*.test.ts`])] : ["bun", "test", ...(files ?? [`${dir}/`])];
   const r = spawnSync(argv[0] ?? "bun", argv.slice(1), { stdio: "inherit", shell: false });

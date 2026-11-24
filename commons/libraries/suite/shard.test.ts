@@ -59,3 +59,27 @@ proves(["0001-libraries FR-034"], "where a library keeps the seconds its files t
   assertEquals(shards.flat().sort(), all.map((f) => f.path).sort());
   assertEquals(shards.find((s) => s.includes("suite/a.test.ts"))?.length, 1);
 });
+
+proves(["0001-libraries FR-035"], "a sharded cell carries its library and a slug with no space or slash, and --list prints the files of the shard", async () => {
+  const plan = planOf([{ name: "data", folder: "commons/data", verify: "bun run verify" }, { name: "assessment", folder: "commons/assessment", verify: "bun run verify" }]);
+  const cells = plan.linux.include.filter((c) => c.library === "data");
+  assertEquals(cells.map((c) => c.slug), ["data-1-of-4", "data-2-of-4", "data-3-of-4", "data-4-of-4"]);
+  for (const c of plan.linux.include) assert(!/[ /]/.test(c.slug), `slug ${c.slug}`);
+  assertEquals(plan.linux.include.find((c) => c.name === "assessment")?.slug, "assessment");
+  const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { spawnSync } = await import("node:child_process");
+  const dir = mkdtempSync(join(tmpdir(), "shard-list-"));
+  try {
+    mkdirSync(join(dir, "suite"));
+    for (const [i, size] of [30, 20, 10, 5].entries()) writeFileSync(join(dir, "suite", `f${i}.test.ts`), "x".repeat(size));
+    const list = (shard: string): string[] =>
+      spawnSync("bun", [join(import.meta.dirname, "..", "src", "shard.ts"), "--list", "suite"], { cwd: dir, env: { ...process.env, IFC_SHARD: shard }, encoding: "utf8" }).stdout.split("\n").filter((l) => l !== "");
+    const all = list("").sort();
+    assertEquals(all.length, 4);
+    assertEquals([...list("1/2"), ...list("2/2")].sort(), all);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

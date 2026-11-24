@@ -70,6 +70,7 @@ const RUN = {
   spec: value({ help: "Keep only this specification's requirements.", valueName: "SPEC" }),
   reviewed: value({ help: "Reviewed requirements: the requirement, a tab and the reason, one per line.", valueName: "FILE" }),
   ledger: value({ help: "The evidence ledger (JSON lines) the record's digest is appended to.", valueName: "FILE" }),
+  coverageDir: value({ help: "Write the line coverage of the Bun run as LCOV into this folder, from the same run.", valueName: "DIR" }),
   ...signing,
 };
 
@@ -140,6 +141,7 @@ export async function main(argv: readonly string[]): Promise<number> {
         ...(o.spec === undefined ? {} : { spec: o.spec }),
         ...(o.reviewed === undefined ? {} : { reviewed: o.reviewed }),
         ...(o.ledger === undefined ? {} : { ledger: o.ledger }),
+        ...(o.coverageDir === undefined ? {} : { coverageDir: o.coverageDir }),
         ...(o.signKey === undefined
           ? {}
           : { sign: { key: o.signKey, meaning: o.meaning, role: o.role, ...(o.keyid === undefined ? {} : { keyid: o.keyid }) } }),
