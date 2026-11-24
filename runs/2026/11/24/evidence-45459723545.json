@@ -1,0 +1,5800 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45459723545",
+    "workflow": "evidence",
+    "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+    "at": "2026-11-24T19:05:15Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45459723545"
+  },
+  "steps": [
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--3",
+      "job": "collect",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-run-added-to-the-history-7",
+      "job": "collect",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30147,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-shards-of-a-library-put-together-aga-5",
+      "job": "collect",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 81,
+      "exitStatus": 0
+    },
+    {
+      "id": "which-run-this-is-6",
+      "job": "collect",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-converge",
+      "tool": "exit-status",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 5478,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-dialect-apt",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10719,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-dialect-homebrew",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11200,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-dialect-mise",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8227,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 49,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-dialect-winget",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8167,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 28,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "archon-dns",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27544,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "mutation",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 147,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "catalog-nist-csf-2",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14281,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "mutation",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 288,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "catalog-nist-sp800",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142290,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "mutation",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 112,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "integrations-github",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 68497,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "mutation",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 135,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "integrations-x12",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23402,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "mutation",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 352,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-mutation-run-kept-as-a-small-report--6",
+      "job": "mutation",
+      "module": "lab",
+      "tool": "exit-status",
+      "outcome": "timeout",
+      "findings": 1,
+      "durationMs": 2160043
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--4",
+      "job": "mutation",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-bridge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-bridge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-bridge",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1145,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-bridge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-bridge",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 211,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-cli",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 465,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-cli",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-gdrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 211,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-gdrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-gdrive",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1014,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-gdrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-gdrive",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-git",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 110,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-git",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-git",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12869,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-git",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-git",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 124,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-githost",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4574,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-githost",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-onedrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 107,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-onedrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-onedrive",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 455,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-onedrive",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 79,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-onedrive",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-posix",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-posix",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-posix",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1711,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-posix",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-posix",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 334,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-query",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 802,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 52,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-query",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-s3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 125,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-s3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-s3",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21950,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-s3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-s3",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-serve",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 181,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-serve",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-serve",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1928,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-serve",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-serve",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-sql 1/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 329,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-sql 1/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-sql 1/3",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15043,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-sql 1/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-sql 1/3",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-sql 2/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 348,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-sql 2/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-sql 2/3",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 78114,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-sql 2/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 26,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-sql 2/3",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-sql 3/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 306,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-sql 3/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-sql 3/3",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 106054,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-sql 3/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-sql 3/3",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs-ssh",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs-ssh",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs-ssh",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32322,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs-ssh",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs-ssh",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "anyfs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 147,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "anyfs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "anyfs",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1370,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "anyfs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "anyfs",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-boot",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 353,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-boot",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-converge",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46080,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-converge",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-converge",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 115,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-ansible",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 123383,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-ansible",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 387,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-apt",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 451,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-apt",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-apt",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 294,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-cloud-init",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 28713,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-cloud-init",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 49,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-cloud-init",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 471,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-homebrew",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 421,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-homebrew",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 38,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-homebrew",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 145,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-mise",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 357,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-mise",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 62,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-mise",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-native-pinned",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1405,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-native-pinned",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-opentofu",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 485,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-opentofu",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 320,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dialect-winget",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 380,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dialect-winget",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dialect-winget",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 307,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-dns",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 402,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-dns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 78,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-dns",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 438,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon-tool",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 485,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 35,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon-tool",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "archon",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 321,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 28,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "archon",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "assessment",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "assessment",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "assessment",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 366,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "assessment",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "assessment",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 131,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 44,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "catalog-nist-csf-2",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 413,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "catalog-nist-csf-2",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 211,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "catalog-nist-sp800",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 407,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 55,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "catalog-nist-sp800",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 490,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "catalog-soc2",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 530,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "catalog-soc2",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "change-control",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 381,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "change-control",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "change-control",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2138,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "change-control",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "change-control",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 263,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 119,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "commons",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 89,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "commons",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "content",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 188,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "content",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "content",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 332,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "content",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "content",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "core",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 163,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "core",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "core",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 462,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "core",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 44,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "core",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "crypto",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 153,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "crypto",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "crypto",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2102,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "crypto",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "crypto",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 389,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "data 1/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24117,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 26,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "data 1/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 328,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "data 2/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45876,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "data 2/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 400,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "data 3/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21562,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "data 3/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 513,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "data 4/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 38172,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "data 4/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 68,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "docs 1/4",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 6,
+      "durationMs": 727,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "docs 1/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 513,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "docs 2/4",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 6,
+      "durationMs": 25745,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "docs 2/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 44,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 167,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "docs 3/4",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 877,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "docs 3/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 58,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "docs 4/4",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 10,
+      "durationMs": 692,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "docs 4/4",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "estate-endpoints",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 775,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "estate-endpoints",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "estate-iac",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 314,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "estate-iac",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "estate-query",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 414,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 108,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "estate-query",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 437,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "estate",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 566,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "estate",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 314,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "evidence-capture",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 2024,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "evidence-capture",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 160,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "findings",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 508,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 37,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "findings",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "formats",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3689,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "formats",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "foundation",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 98,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "foundation",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "gate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 205,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "gate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "gate",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 289,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "gate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "gate",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 122,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "githost",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 318,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "githost",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "githost",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "grc",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1826,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "grc",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 256,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "headless",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2098,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "headless",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "headless",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 111,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "integrations-fhir",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 186,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "integrations-fhir",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "integrations-github",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 211,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "integrations-github",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 127,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "integrations-identity",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 345,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "integrations-identity",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 111,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "integrations-x12",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 208,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "integrations-x12",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 113,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "integrations",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 473,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 67,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "integrations",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "kanon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 186,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "kanon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "kanon",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 396,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "kanon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 53,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "kanon",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 443,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "lab",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 49974,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "lab",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 170,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "lang-sql",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9457,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "lang-sql",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 132,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13820,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "libraries",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "lint",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 131,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "lint",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "lint",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 193,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "lint",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "lint",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 114,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "linux-observe",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43462,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "linux-observe",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "linux-services",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 157,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "linux-services",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "linux-services",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1106,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "linux-services",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 26,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "linux-services",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 320,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "machine-probe",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 42788,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "machine-probe",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 126,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 4,
+      "durationMs": 4650,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 25,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "mizan",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "net",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 673,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "net",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "net",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 125,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "netboot",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1472,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "netboot",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 230,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "ontology",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 688,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "ontology",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "package-managers",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1966,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "package-managers",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "patterns",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 115,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "patterns",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 135,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "pentest",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 341,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "pentest",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 326,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "planning-query",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 442,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "planning-query",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 161,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "planning",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3532,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 42,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "planning",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "posture-report",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 136,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "posture-report",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "posture-report",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 272,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "posture-report",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "posture-report",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "programs",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 97,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "programs",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "quality",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 165,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "quality",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "quality",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20603,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "quality",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "quality",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "rdf",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 328,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "rdf",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "rdf",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 331,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "rdf",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "rdf",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 295,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "repoctl",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 88898,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "repoctl",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 206,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "scanners",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1758,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 50,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "scanners",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 117,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "standards",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 102,
+      "exitStatus": 2
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "standards",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 202,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7091,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "system",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "telemetry",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 118,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "telemetry",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "telemetry",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2372,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "telemetry",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "telemetry",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "tenancy",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 145,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "tenancy",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "tenancy",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 309,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "tenancy",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "tenancy",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "terminal",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 124,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "terminal",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 13,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "terminal",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 358,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "terminal",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "terminal",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "test",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 141,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "test",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "test",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 405,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "test",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "test",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6,
+      "exitStatus": 0
+    },
+    {
+      "id": "install",
+      "job": "tests",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "runner",
+      "job": "tests",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "tests",
+      "job": "tests",
+      "module": "toolchain",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 518,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-tool-that-keeps-the--5",
+      "job": "tests",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 39,
+      "exitStatus": 0
+    },
+    {
+      "id": "why-there-is-a-report-or-none-7",
+      "job": "tests",
+      "module": "toolchain",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-04decdc7a202557e",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-0a5928445104837b",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-0b3875929bffdedc",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    },
+    {
+      "id": "f-16c8a94c6a210a76",
+      "tool": "bun-test",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "cdea37ae51ebe7193a6641d4c9b31849994dc131fa3c727994109186fc345953"
+      },
+      "at": "2026-11-24T18:31:42Z",
+      "code": "test-failed",
+      "file": "suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-173d30117cd33ea0",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-1bc066583d2f302e",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-2738b5548084a052",
+      "tool": "exit-status",
+      "code": "timeout",
+      "module": "lab",
+      "severity": "error",
+      "message": "the command was stopped after 36 minutes",
+      "key": "the-mutation-run-kept-as-a-small-report--6:timeout",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "the-mutation-run-kept-as-a-small-report--6",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "at": "2026-11-24T19:03:49Z"
+    },
+    {
+      "id": "f-2a32cadd44dfbcb1",
+      "tool": "bun-test",
+      "module": "lab",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "676d92f2f80fd5514b3cb75e9c5ae8e65d8dcb4b4725465423e309df4e7fdd3c"
+      },
+      "at": "2026-11-24T18:32:12Z",
+      "code": "test-failed",
+      "file": "suite/vm.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not",
+      "key": "0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not"
+    },
+    {
+      "id": "f-2cc58923dcb4a042",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-2f8863f1729aad30",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/kanon-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/kanon-guides.test.ts"
+    },
+    {
+      "id": "f-3143b8b0a2bbfbde",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-321ee9990782b65b",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-367f29c776c28770",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "patterns",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of bun-test reads",
+      "key": "tests:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "7a0b4db8a579f6aa471d1187fb7abcc48768ab58f9af5b28c54e59911cdc1bd4"
+      },
+      "at": "2026-11-24T18:32:23Z"
+    },
+    {
+      "id": "f-3d0fc16a7dac3042",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/program.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program.test.ts"
+    },
+    {
+      "id": "f-3d384d0940b726ee",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/read.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/read.test.ts"
+    },
+    {
+      "id": "f-3f6588595b2e0751",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-41690b66597cb78f",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-47fe7aca220a3699",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "8c5ab6533969d23c5757c5c36ae30802e55cb67d580536afe6b56463b7100d47"
+      },
+      "at": "2026-11-24T18:32:05Z",
+      "code": "test-failed",
+      "file": "suite/versions-pure.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+      "key": "0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one"
+    },
+    {
+      "id": "f-497c56a6632e499e",
+      "tool": "bun-test",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "cdea37ae51ebe7193a6641d4c9b31849994dc131fa3c727994109186fc345953"
+      },
+      "at": "2026-11-24T18:31:42Z",
+      "code": "test-failed",
+      "file": "suite/views.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-57e71cfdb84c4173",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-5846c2a51f27d02f",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/bridge.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/bridge.test.ts"
+    },
+    {
+      "id": "f-5ad6499983517343",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/merge.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/merge.test.ts"
+    },
+    {
+      "id": "f-65ce6bd607ce4e88",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/write.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/write.test.ts"
+    },
+    {
+      "id": "f-6c6573d1452df90b",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "8c5ab6533969d23c5757c5c36ae30802e55cb67d580536afe6b56463b7100d47"
+      },
+      "at": "2026-11-24T18:32:05Z",
+      "code": "test-failed",
+      "file": "suite/versions-pure.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+      "key": "0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited"
+    },
+    {
+      "id": "f-6f7bcbc7f8802f2f",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/signing.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/signing.test.ts"
+    },
+    {
+      "id": "f-75d077aaef35a6cb",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    },
+    {
+      "id": "f-7cec8e9df082f55f",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-7d319fa75d861025",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-8376da8beacf4153",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-861403ae36160c3f",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/mizan-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/mizan-guides.test.ts"
+    },
+    {
+      "id": "f-8f7218a6f95f8f91",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    },
+    {
+      "id": "f-93d6c8857648378b",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "commons",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of bun-test reads",
+      "key": "tests:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "838619e12138f5cc91443b0ea9b6a58e16871d474abeb031301e0a3569bcd5c2"
+      },
+      "at": "2026-11-24T18:29:40Z"
+    },
+    {
+      "id": "f-97a75e358939bbfa",
+      "tool": "bun-test",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "c60dfc2f5bc0036134cb1ccad011ff814f5755322b75bc65cac11f200c8ef655"
+      },
+      "at": "2026-11-24T18:31:25Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-984433480106efab",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-99d39d03f3ac9be4",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/grouping.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/grouping.test.ts"
+    },
+    {
+      "id": "f-9d1ca0c54c873386",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-a996cef88582cc46",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "standards",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of bun-test reads",
+      "key": "tests:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "5d1b671632a8bee829c3e29bfda46e25d5ca4e2d3920947005b99b59f9a70275"
+      },
+      "at": "2026-11-24T18:32:27Z"
+    },
+    {
+      "id": "f-af14bd5de70cef49",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/serve.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/serve.test.ts"
+    },
+    {
+      "id": "f-b4235af6eace0b5f",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "programs",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of bun-test reads",
+      "key": "tests:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "1dc5f26a823746dd2ac50cac4536d073cb1b0a8859cfd35865c036e87c210dcf"
+      },
+      "at": "2026-11-24T18:32:33Z"
+    },
+    {
+      "id": "f-b47c460bccabdf69",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "8c5ab6533969d23c5757c5c36ae30802e55cb67d580536afe6b56463b7100d47"
+      },
+      "at": "2026-11-24T18:32:05Z",
+      "code": "test-failed",
+      "file": "suite/mizan.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited",
+      "key": "0012-ontology FR-014: a term's mapping names a standard term, and an unaligned term of the audit says why and when it was audited"
+    },
+    {
+      "id": "f-b4dc80bbf7bb0634",
+      "tool": "exit-status",
+      "code": "no-output",
+      "module": "archon-converge",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of exit-status reads",
+      "key": "the-mutation-run-kept-as-a-small-report--6:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "the-mutation-run-kept-as-a-small-report--6",
+        "logSha256": "03f749e33fa04614b849a5dff05e72b2ae04e73ee484f4537537c92b71c6e43b"
+      },
+      "at": "2026-11-24T18:28:31Z"
+    },
+    {
+      "id": "f-bf23cd344f4e2468",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-c28e7021bc8bfa72",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-c4c47176263ac534",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "foundation",
+      "severity": "error",
+      "message": "the command ended with status 2 and printed nothing a parser of bun-test reads",
+      "key": "tests:no-output",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "457a90b3493b17864b102fd5e3fd50ef6cc8af7675d5dd7619f5148fe50e11a8"
+      },
+      "at": "2026-11-24T18:31:23Z"
+    },
+    {
+      "id": "f-c8452d812e9dc576",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-c958d0577d5890f9",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-cc49a111bbd873e2",
+      "tool": "bun-test",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "63239029b4d8127d204e616b22770f9759dfd67a25c6017ca989cd037fbce651"
+      },
+      "at": "2026-11-24T18:30:57Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-ccb69b903f973710",
+      "tool": "bun-test",
+      "module": "lab",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "676d92f2f80fd5514b3cb75e9c5ae8e65d8dcb4b4725465423e309df4e7fdd3c"
+      },
+      "at": "2026-11-24T18:32:12Z",
+      "code": "test-failed",
+      "file": "suite/arch.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not",
+      "key": "0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not"
+    },
+    {
+      "id": "f-ed94d81e61d3a498",
+      "tool": "bun-test",
+      "module": "mizan",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "8c5ab6533969d23c5757c5c36ae30802e55cb67d580536afe6b56463b7100d47"
+      },
+      "at": "2026-11-24T18:32:05Z",
+      "code": "test-failed",
+      "file": "suite/mizan.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one",
+      "key": "0012-ontology FR-014, 0018-standards-first FR-003: a term of an ontology with no record of its basis is found, and every term of the packaging ontology has one"
+    },
+    {
+      "id": "f-f190c18ec8022b32",
+      "tool": "bun-test",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "abb7510b5015889ad8e675b7348f77ebe1740bbeabd4e1afbaeacfe413e3285d"
+      },
+      "at": "2026-11-24T18:29:23Z",
+      "code": "unhandled-error",
+      "file": "suite/keys.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/keys.test.ts"
+    },
+    {
+      "id": "f-fc6059a2e806494b",
+      "tool": "bun-test",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "bfbb198dfda09c5b3f626607da1363bf0bb905d360a6f89cbc04ffcb3e02a91d"
+      },
+      "at": "2026-11-24T18:31:31Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-ff4daf01c2a1ea26",
+      "tool": "bun-test",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45459723545",
+        "commit": "1f9890df1bd3564b68f32aeafd86fdbb6d6c0385",
+        "step": "tests",
+        "logSha256": "6a7572a4512d5f9a73a80f27a050cbfe5999f549dfe1c0dabf842987b70011bc"
+      },
+      "at": "2026-11-24T18:30:55Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    }
+  ]
+}
