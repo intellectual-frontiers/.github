@@ -135,7 +135,7 @@ export async function affectedOf(repo: string, scope: Scope): Promise<Result<{ r
       const all = everyLibrary(repo);
       const unknown = scope.names.filter((n) => !all.some((l) => l.name === n));
       if (unknown.length > 0) return err(`no library named ${unknown.join(", ")} (they are: ${all.map((l) => l.name).join(", ")})`);
-      const roots = all.filter((l) => scope.names.includes(l.name)).flatMap((l) => `commons/${folderOf(l)}/library.ts`);
+      const roots = all.filter((l) => scope.names.includes(l.name)).flatMap((l) => `commons/${folderOf(l)}/**`);
       return ok({ libs: affectedBy(repo, roots, "code"), why: `${scope.names.join(", ")} and what imports them` });
     }
     case "since": {

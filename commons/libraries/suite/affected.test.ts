@@ -67,16 +67,16 @@ proves(
       const a = inputsOf(dir, "alpha");
       assertEquals(a.dependsOn, ["base"], "link:../base is a dependency and ^1.0.0 is not");
       assertEquals(a.files, ["commons/base/kernel/mod.ts", "commons/base/kernel/util.ts", "commons/tools/check.ts"]);
-      assert(a.paths.includes("commons/alpha/**") && a.paths.includes("commons/base/kernel/**") && a.paths.includes("commons/tools/**"));
+      assert(a.paths.includes("commons/alpha/**") && a.paths.some((x) => x.startsWith("commons/base/kernel/")) && a.paths.includes("commons/tools/**"));
       assert(a.paths.includes(".github/actions/**") && a.paths.includes(".github/workflows/ci.auto.yml"));
       assertEquals(a.imports, [], "the kernel is not a library");
-      assert(a.codePaths.includes("commons/base/kernel/**") && !a.codePaths.includes("commons/tools/**"), "the code reads what it imports and no tool");
+      assert(a.codePaths.some((x) => x.startsWith("commons/base/kernel/")) && !a.codePaths.includes("commons/tools/**"), "the code reads what it imports and no tool");
       assert(!a.paths.includes("commons/base/runtime/**") && !a.paths.includes("commons/base/**"), "the runtime is not imported");
       const b = inputsOf(dir, "beta");
       assertEquals(b.dependsOn, ["alpha", "base"]);
       assertEquals(b.imports, ["alpha"], "the libraries its own code imports by name");
       assert(b.paths.includes("commons/base/**"), "an import the exports do not give takes the whole dependency");
-      assert(b.paths.includes("commons/alpha/**"), "a dependency library's entry is an input");
+      assert(matches(b.paths, "commons/alpha/api.ts"), "a dependency library's entry is an input");
       assertEquals(matches(a.paths, "commons/base/kernel/util.ts"), true);
       assertEquals(matches(a.paths, "commons/base/runtime/mod.ts"), false);
       return Promise.resolve();
@@ -163,8 +163,24 @@ proves([`${SPEC} FR-020`], "the planner reads template imports and ignores strin
     put(dir, "commons/alpha/src/mod.ts", "const example = 'import(\"@x/base/runtime\")';");
     assert(!inputsOf(dir, "alpha").codePaths.includes("commons/base/runtime/**"));
     put(dir, "commons/alpha/src/mod.ts", "await import(`@x/base/runtime`);");
-    assert(inputsOf(dir, "alpha").codePaths.includes("commons/base/runtime/**"));
+    assert(inputsOf(dir, "alpha").codePaths.some((x) => x.startsWith("commons/base/runtime/")));
     put(dir, "commons/alpha/src/mod.ts", "await import(target);");
     assert(inputsOf(dir, "alpha").codePaths.includes("commons/base/**"));
   });
 });
+
+proves(
+  [`${SPEC} FR-021`],
+  "a library is affected by a file it reads, through the libraries it imports to their last import, and not by a file of a library it links that nothing it reads imports",
+  async () => {
+    await withTempDir((dir) => {
+      repo(dir);
+      writeTextFileSync(join(dir, "commons/alpha/unrelated.ts"), "export const unrelated = 1;\n");
+      const names = (files: readonly string[]): readonly string[] => affectedBy(dir, files, "verify").map((l) => l.name);
+      assertEquals(names(["commons/alpha/unrelated.ts"]), ["alpha"], "beta imports alpha's entry and not this file");
+      assertEquals(names(["commons/alpha/api.ts"]), ["alpha", "beta"], "beta imports this entry");
+      assertEquals(names(["commons/base/kernel/util.ts"]), ["alpha", "beta"], "beta reaches it through alpha, which imports it");
+      return Promise.resolve();
+    });
+  },
+);

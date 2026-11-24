@@ -110,13 +110,22 @@ function sourcesUnder(root: string, dir: string, skip: ReadonlySet<string> = new
   return out.sort();
 }
 
+const REFERENCES = new Map<string, { readonly targets: readonly string[]; readonly unresolved: boolean }>();
+
+/** The module references of a text, parsed once for each text (a library's closure reads the files of the libraries it imports, and so do the others'). */
 function referencesOf(text: string): { readonly targets: readonly string[]; readonly unresolved: boolean } {
+  const known = REFERENCES.get(text);
+  if (known !== undefined) return known;
   const parsed = readModuleReferences(text);
-  if (parsed.kind === "err") return { targets: [], unresolved: true };
-  return {
-    targets: parsed.value.flatMap((ref) => ref.kind === "computed-dynamic" ? [] : [ref.specifier]),
-    unresolved: parsed.value.some((ref) => ref.kind === "computed-dynamic"),
-  };
+  const refs =
+    parsed.kind === "err"
+      ? { targets: [] as readonly string[], unresolved: true }
+      : {
+          targets: parsed.value.flatMap((ref) => (ref.kind === "computed-dynamic" ? [] : [ref.specifier])),
+          unresolved: parsed.value.some((ref) => ref.kind === "computed-dynamic"),
+        };
+  REFERENCES.set(text, refs);
+  return refs;
 }
 
 /** The file a relative specifier names, from the repository's root: the path as written, or with `.ts`, `/mod.ts` or `/index.ts`. */
@@ -127,8 +136,8 @@ function resolveFile(root: string, from: string, specifier: string): string | un
   return undefined;
 }
 
-/** Every file reached from the entries by relative imports, the entries included. */
-function closure(root: string, entries: readonly string[]): ReadonlySet<string> {
+/** Every file reached from the entries by relative imports, and by the imports of another library of commons by its package (`pkg` says the files of its entry), the entries included. */
+function closure(root: string, entries: readonly string[], pkg: (specifier: string) => readonly string[] = () => []): ReadonlySet<string> {
   const seen = new Set<string>();
   const todo = [...entries];
   for (let f = todo.pop(); f !== undefined; f = todo.pop()) {
@@ -136,7 +145,10 @@ function closure(root: string, entries: readonly string[]): ReadonlySet<string> 
     seen.add(f);
     if (!SOURCE.test(f)) continue;
     for (const s of referencesOf(readTextFileSync(join(root, f))).targets) {
-      if (!s.startsWith(".")) continue;
+      if (!s.startsWith(".")) {
+        todo.push(...pkg(s));
+        continue;
+      }
       const r = resolveFile(root, f, s);
       if (r !== undefined) todo.push(r);
     }
@@ -144,18 +156,18 @@ function closure(root: string, entries: readonly string[]): ReadonlySet<string> 
   return seen;
 }
 
-/** The path as a filter reads it: the folder of a file two levels under `commons/<folder>/` is `commons/<folder>/<sub>/**`, one level `commons/<folder>/**`, and a file at the top is itself. */
-function folderOf(file: string, dirs: Dirs): string {
-  const own = dirs.ownerOf(file);
-  if (own === undefined) {
-    // a folder that is no library (a shared tool, a folder of sources a library reaches into): one or two levels under commons/
-    const parts = file.split("/");
-    if (parts[0] === "commons" && parts.length >= 4) return `commons/${parts[1] ?? ""}/${parts[2] ?? ""}/**`;
-    if (parts[0] === "commons" && parts.length === 3) return `commons/${parts[1] ?? ""}/**`;
-    return file;
+/**
+ * The files a closure of sources is, as the paths of a filter (0001-libraries FR-011): each source file itself, and the files that are no source in the folders of those (data they may read at run time), so that a change
+ * to a source that nothing the library reads imports does not reach the library. A folder of a closure was the path before, and a change to any file of `commons/libraries/src/` then reached every library.
+ */
+function exactPaths(root: string, files: readonly string[]): readonly string[] {
+  const out = new Set(files);
+  for (const dir of new Set(files.map((f) => posix(dirname(f))))) {
+    const full = join(root, dir);
+    if (!existsSync(full)) continue;
+    for (const e of readDirSync(full)) if (e.isFile && !SOURCE.test(e.name)) out.add(`${dir}/${e.name}`);
   }
-  const rest = file.slice(`commons/${own.dir}/`.length).split("/");
-  return rest.length >= 2 ? `commons/${own.dir}/${rest[0] ?? ""}/**` : `commons/${own.dir}/**`;
+  return [...out];
 }
 
 /** Where the libraries are, from `commons/` (0027-commons-libraries FR-026): the folder of each by name, and the library that owns a path (the one whose folder is the longest prefix of it). */
@@ -197,6 +209,24 @@ function ownPaths(root: string, folder: string, folders: ReadonlySet<string>): r
   });
 }
 
+const PACKAGE_DIRS = new Map<string, ReadonlyMap<string, string>>();
+
+/** The folder of each package of commons by its name (a library's, and a folder of shared sources that has a package), read once for a repository. */
+function packageDirs(root: string, dirs: Dirs): ReadonlyMap<string, string> {
+  const known = PACKAGE_DIRS.get(root);
+  if (known !== undefined) return known;
+  const out = new Map<string, string>();
+  const candidates = new Set<string>(dirs.folders);
+  if (existsSync(join(root, "commons")))
+    for (const e of readDirSync(join(root, "commons"))) if (e.isDirectory && e.name !== "node_modules") candidates.add(`commons/${e.name}`);
+  for (const dir of candidates) {
+    const name = readPackage(join(root, dir))?.name;
+    if (name !== undefined && name !== "") out.set(name, dir);
+  }
+  PACKAGE_DIRS.set(root, out);
+  return out;
+}
+
 /** What the library `name` reads (FR-020). */
 export function inputsOf(repo: string, name: string, known?: Dirs): Inputs {
   const root = repo.replace(/[\\/]$/, "");
@@ -223,7 +253,6 @@ export function inputsOf(repo: string, name: string, known?: Dirs): Inputs {
     const dir = posix(join(folder, m[1]));
     if (dir.startsWith("..") || !existsSync(join(root, dir))) continue;
     const depPkg = readPackage(join(root, dir));
-    dependsOn.add(dirs.ownerOf(`${dir}/`)?.name ?? dir.split("/")[1] ?? dir);
     const importedBy = (own: readonly (typeof texts)[number][]): ReadonlySet<string> => {
       const found = new Set<string>();
       for (const { targets, unresolved } of own) {
@@ -235,6 +264,8 @@ export function inputsOf(repo: string, name: string, known?: Dirs): Inputs {
     };
     // what its types and tests read is what its own code (`about.ts` and `src/`) imports; its suite and its tools also read the packages their scripts run
     const imported = importedBy(texts);
+    // a package that links a library and imports nothing of it (the libraries that every `verify` runs the tools of) does not depend on it: what it runs of it is the files of its scripts' closure
+    if (imported.size > 0) dependsOn.add(dirs.ownerOf(`${dir}/`)?.name ?? dir.split("/")[1] ?? dir);
     const ownCode = importedBy(texts.filter((t) => t.f === `${folder}/about.ts` || t.f.startsWith(`${folder}/src/`)));
     if (ownCode.size > 0 && existsSync(join(root, dir, "library.ts"))) imports.add(dirs.ownerOf(`${dir}/`)?.name ?? dir.split("/")[1] ?? dir);
     for (const [keys, into, all] of [
@@ -253,24 +284,35 @@ export function inputsOf(repo: string, name: string, known?: Dirs): Inputs {
       const p = posix(join(folder, m[1] ?? ""));
       if (!p.startsWith("..") && existsSync(join(root, p)) && SOURCE.test(p)) entries.add(p);
     }
-  const files = [...closure(root, [...entries])].filter((f) => !f.startsWith(`${folder}/`)).sort();
+  // the files of an entry of another folder of commons that an import by package names: what a library reads is what it imports, through the folders it imports from, to their last import
+  const pkgFiles = (spec: string): readonly string[] => {
+    const m = /^(@[^/]+\/[^/]+)(\/.*)?$/.exec(spec);
+    const dir = m?.[1] === undefined ? undefined : packageDirs(root, dirs).get(m[1]);
+    if (dir === undefined) return [];
+    const target = readPackage(join(root, dir))?.exports.get(m?.[2] === undefined ? "." : `.${m[2]}`);
+    return target === undefined ? sourcesUnder(root, dir, dirs.folders) : [posix(join(dir, target))];
+  };
+  const files = [...closure(root, [...entries], pkgFiles)].filter((f) => !f.startsWith(`${folder}/`)).sort();
   const own = ownPaths(root, folder, dirs.folders);
-  const paths = [...own, ...new Set([...files.map((x) => folderOf(x, dirs)), ...whole, ...SHARED, ".github/workflows/ci.auto.yml"])].sort();
-  for (const f of files) {
-    const d = dirs.ownerOf(f)?.name;
-    if (d !== undefined && d !== name) dependsOn.add(d);
-  }
-  const codeFiles = [...closure(root, [...codeEntries])].filter((f) => !f.startsWith(`${folder}/`));
+  const paths = [...own, ...new Set([...exactPaths(root, files), ...whole, ...SHARED, ".github/workflows/ci.auto.yml"])].sort();
+  // the tools a script runs are read as the exact files of their closure (`paths`), and a change to a file of one that the closure does not hold does not reach this library: the library is not marked as depending on
+  // the library that holds the tool, so that a change to `commons/libraries/src/plan.ts` does not reach every library (what a library depends on is what its package links)
+  const codeFiles = [...closure(root, [...codeEntries], pkgFiles)].filter((f) => !f.startsWith(`${folder}/`));
   for (const f of codeFiles) {
     const d = dirs.ownerOf(f)?.name;
     if (d !== undefined && d !== name) imports.add(d);
   }
-  const codePaths = [...own, ...new Set([...codeFiles.map((x) => folderOf(x, dirs)), ...codeWhole])].sort();
+  const codePaths = [...own, ...new Set([...exactPaths(root, codeFiles), ...codeWhole])].sort();
   return { paths, dependsOn: [...dependsOn].sort(), files, imports: [...imports].sort(), codePaths };
 }
 
 /** Whether a path of the repository is among the paths of an input: `dir/**` is the folder and what is under it, anything else the file. */
 export function matches(paths: readonly string[], file: string): boolean {
+  // a changed folder (`dir/**`, which the development loop names for a library whose dependents it asks for) is every file under it
+  if (file.endsWith("/**")) {
+    const prefix = file.slice(0, -2);
+    return paths.some((p) => (p.endsWith("/**") ? p.slice(0, -2).startsWith(prefix) || prefix.startsWith(p.slice(0, -2)) : p.startsWith(prefix)));
+  }
   return paths.some((p) => (p.endsWith("/**") ? file.startsWith(p.slice(0, -2)) : p === file));
 }
 
@@ -285,24 +327,14 @@ export function everyLibrary(repo: string): readonly (Library & { readonly folde
  */
 export type Reach = "verify" | "code";
 
-/** The libraries that a list of changed files affects (FR-021): those with a changed file among their inputs, and those that depend on one of these, in order of their names. */
+/** The libraries that a list of changed files affects (FR-021): those with a changed file among their inputs, in order of their names. What a library reads includes, through the libraries it imports by package, every file they import in turn (`inputsOf`), so a library that depends on one that changed is one of them by its own inputs. */
 export function affectedBy(repo: string, changed: readonly string[], reach: Reach = "verify"): readonly (Library & { readonly folder: string })[] {
   const root = repo.replace(/[\\/]$/, "");
   const libs = readLibraries(root).flatMap((f) => ("library" in f ? [f.library] : []));
   const dirs = dirsOf(root);
   const inputs = new Map(libs.map((l) => [l.name, inputsOf(root, l.name, dirs)]));
   const pathsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.paths : inputs.get(n)?.codePaths) ?? [];
-  const depsOf = (n: string): readonly string[] => (reach === "verify" ? inputs.get(n)?.dependsOn : inputs.get(n)?.imports) ?? [];
   const hit = new Set(libs.filter((l) => changed.some((c) => matches(pathsOf(l.name), c))).map((l) => l.name));
-  for (let grew = true; grew;) {
-    grew = false;
-    for (const l of libs) {
-      if (!hit.has(l.name) && depsOf(l.name).some((d) => hit.has(d))) {
-        hit.add(l.name);
-        grew = true;
-      }
-    }
-  }
   return libs.filter((l) => hit.has(l.name)).map((l) => ({ ...l, folder: `commons/${libraryFolder(l)}` }));
 }
 
