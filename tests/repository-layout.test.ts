@@ -36,7 +36,6 @@ proves(R, "the repository has only the top-level entries it is meant to have", a
     "CONTRIBUTING.md",
     "LICENSE",
     "LICENSING.md",
-    "MIZAN.html",
     "NOTICE",
     "README.md",
     "THIRD_PARTY_NOTICES.md",
