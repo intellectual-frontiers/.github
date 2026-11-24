@@ -43,6 +43,12 @@ async function newPglite(): Promise<PGlite> {
     await first.close();
     return dump;
   })();
+  // Node 26 does not end a test file that started a PGlite from a data directory (the promise of its closing stays pending), so the backup runtime initialises each as it always did.
+  if (process.versions["bun"] === undefined) {
+    const plain = new PGlite();
+    await plain.waitReady;
+    return plain;
+  }
   const db = new PGlite({ loadDataDir: await template });
   await db.waitReady;
   return db;
