@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "catalog-nist-sp800",
+  group: "catalogs",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

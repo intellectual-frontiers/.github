@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "estate-query",
+  group: "estate",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

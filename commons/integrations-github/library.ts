@@ -6,6 +6,7 @@
  */
 export const library = {
   name: "integrations-github",
+  group: "integrations",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

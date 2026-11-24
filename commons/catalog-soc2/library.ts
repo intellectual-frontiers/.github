@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "catalog-soc2",
+  group: "catalogs",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

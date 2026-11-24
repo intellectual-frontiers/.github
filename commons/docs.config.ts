@@ -25,7 +25,7 @@ import type { Triggers } from "./libraries/src/workflows/model.ts";
 import { VERBS } from "./repoctl/src/governance/verbs.ts";
 import { ergonexProgram, type ProgramHost } from "./ergonex/src/mod.ts";
 import { describe } from "./headless/src/describe/mod.ts";
-import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs-cli/src/mod.ts";
+import { anyfsProgram, INERT_HOST as ANYFS_INERT_HOST } from "./anyfs/cli/src/mod.ts";
 import { INERT_HOST as REPOCTL_INERT_HOST, repoctlProgram } from "./repoctl/src/mod.ts";
 import { SUBJECTS } from "./data/governance/api.ts";
 import { allModules } from "./data/sql/cli/config.ts";
@@ -179,7 +179,7 @@ async function readLibraryPackage(name: string, dir: string): Promise<PackageCon
   const pkg = JSON.parse(readFileSync(new URL(`./${dir}/package.json`, import.meta.url), "utf8")) as { readonly exports?: Readonly<Record<string, string | { readonly default?: string; readonly import?: string }>>; readonly description?: string };
   const targets = Object.values(pkg.exports ?? {}).map((t) => (typeof t === "string" ? t : (t.default ?? t.import ?? ""))).filter((t) => t.endsWith(".ts")).map((t) => t.replace(/^\.\//, ""));
   const { about: written } = (await import(`./${dir}/about.ts`)) as { readonly about: About };
-  const { library } = (await import(`./${dir}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly license?: string; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
+  const { library } = (await import(`./${dir}/library.ts`)) as { readonly library: { readonly version?: string; readonly level?: string; readonly distribution?: readonly string[]; readonly license?: string; readonly group?: string; readonly family?: { readonly host: string; readonly role: string }; readonly kanon?: { readonly units: readonly { readonly folder: string; readonly layer?: string; readonly mayImport?: readonly string[] }[] } } };
   const about: About = {
     ...written,
     ...(library.kanon === undefined ? {} : { layers: library.kanon.units.filter((u) => typeof u.layer === "string").map((u) => ({ folder: u.folder, layer: u.layer ?? "", ...(u.mayImport === undefined ? {} : { mayImport: u.mayImport }) })) }),
@@ -189,6 +189,7 @@ async function readLibraryPackage(name: string, dir: string): Promise<PackageCon
       ...(library.distribution === undefined ? [] : [{ label: "Distributed", value: library.distribution.join(", ") }]),
       { label: "License", value: `\`${library.license ?? DEFAULT_LICENSE}\`, source-available: free for noncommercial use, commercial use needs a license from the owner (see Licensing in Start here)` },
       { label: "Import it as", value: `\`@intellectual-frontiers/${name}\`` },
+      ...((library.family?.host ?? library.group) === undefined ? [] : [{ label: "Family", value: `\`${library.family?.host ?? library.group}\`` }, { label: "Role", value: `\`${library.family?.role ?? "member"}\`` }]),
     ],
   };
   const entryPoints = [...new Set(targets)].filter((t) => existsSync(new URL(`./${dir}/${t}`, import.meta.url)));
@@ -208,6 +209,7 @@ const guides = guidesLens({
     { file: "COMMERCIAL.md", path: "start/commercial.html", section: "start", group: "Licensing", order: 1 },
     { file: "THIRD_PARTY_NOTICES.md", path: "start/third-party-notices.html", section: "start", group: "Licensing", order: 2 },
     { file: "commons/docs/guides/concepts-index.md", path: "concepts/index.html", section: "concepts", group: "Concepts", order: 0 },
+    { file: "commons/docs/guides/libraries-organized.md", path: "concepts/libraries-organized.html", section: "concepts", group: "Concepts", order: 12 },
     { file: "commons/docs/guides/concept-mizan.md", path: "concepts/mizan.html", section: "concepts", group: "Concepts", order: 1 },
     { file: "commons/docs/guides/concept-kanon.md", path: "concepts/kanon.html", section: "concepts", group: "Concepts", order: 2 },
     { file: "commons/docs/guides/concept-ladder.md", path: "concepts/ladder.html", section: "concepts", group: "Concepts", order: 3 },

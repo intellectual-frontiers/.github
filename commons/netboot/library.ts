@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "netboot",
+  group: "lab",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

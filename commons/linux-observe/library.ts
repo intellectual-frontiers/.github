@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "linux-observe",
+  group: "linux",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "planning-query",
+  group: "planning",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

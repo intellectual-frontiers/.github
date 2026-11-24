@@ -14,6 +14,7 @@ import { specPage } from "../links.ts";
 import { type Block, type Card, type Inline, possessive, type Stat } from "../model.ts";
 import { type Area, areaFiles, type Package } from "../sources.ts";
 import { exampleBlocks } from "./areas.ts";
+import { type FamilyEntry, familiesOf } from "./families.ts";
 import { numberOf } from "./specs.ts";
 
 /** The first sentence of a text, for a card. */
@@ -237,6 +238,35 @@ export function overviewPages(b: Build, top: Package, packages: readonly Package
             (usedBy.get(p.slug) ?? []).flatMap((u, i): Inline[] => [...(i === 0 ? [] : [{ kind: "text", text: ", " } as Inline]), { kind: "code", text: u }]),
           ]),
         },
+      ],
+    });
+  }
+  if (libraries.length > 0) {
+    const factOf = (p: Package, label: string): string | undefined => p.about.facts?.find((f) => f.label === label)?.value.replace(/`/g, "");
+    const families = familiesOf(libraries.map((p): FamilyEntry => ({ slug: p.slug, title: p.about.title, ...(factOf(p, "Family") === undefined ? {} : { family: factOf(p, "Family") as string }), role: factOf(p, "Role") ?? "member" })));
+    b.add({
+      path: "overview/families.html",
+      title: "Libraries by family",
+      description: "The libraries of a host with its extensions, and the libraries that belong together.",
+      section: "overview",
+      group: "Libraries",
+      order: 8,
+      blocks: [
+        { kind: "paragraph", inlines: [{ kind: "text", text: "An extension of a host is a library of its own in the folder of its host. A group lists libraries that belong together but are not extensions of a host: no folder moves for a group and no name changes." }] },
+        ...families.flatMap((fam): Block[] => [
+          { kind: "heading", level: 2, id: fam.key, text: [{ kind: "text", text: fam.title }] },
+          {
+            kind: "table",
+            head: ["Library", "Role"].map((h) => [{ kind: "text", text: h } as Inline]),
+            rows: fam.members.map((m) => {
+              const q = bySlug.get(m.slug);
+              return [
+                q === undefined ? [{ kind: "code", text: m.slug } as Inline] : [{ kind: "link", href: { kind: "page", path: packagePage(q) }, children: [{ kind: "text", text: m.title }] } as Inline],
+                [{ kind: "text", text: m.role ?? "member" } as Inline],
+              ];
+            }),
+          },
+        ]),
       ],
     });
   }

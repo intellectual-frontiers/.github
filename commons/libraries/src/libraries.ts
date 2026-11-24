@@ -96,6 +96,8 @@ export type Library = {
   readonly kanon?: Table;
   /** Its host and its role where it is of a family (a host, a dialect of it or a plugin of it; 0033-kanon FR-021, 0027-commons-libraries FR-023). */
   readonly family?: LibraryFamily;
+  /** The named group of the documentation (`catalogs`, `linux`, `lab`) the library is listed under where it is of no family: a presentation only, which moves no folder and changes no name (0027-commons-libraries FR-027). */
+  readonly group?: string;
   /** The license its `LICENSE` and its packed `package.json` carry, where it is not the default of the repository (`license/standard.ts`; commons 0035-licensing FR-003). */
   readonly license?: SpdxId;
   /** The constants of its sources that say its own version (`ERGONEX_VERSION`), each a file from the library's folder and the name of the constant: the release rewrites them with the version, and a check finds one that disagrees. */
@@ -240,9 +242,9 @@ const constantName: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: unknownValue },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, group: nameDecoder, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: unknownValue },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "license", "versionConstants", "publishes", "bundle", "held"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "group", "license", "versionConstants", "publishes", "bundle", "held"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -311,6 +313,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     distribution,
     ...(kanon === undefined ? {} : { kanon }),
     ...(family === undefined ? {} : { family }),
+    ...(v.group === undefined ? {} : { group: v.group }),
     ...(license === undefined ? {} : { license }),
     ...(v.versionConstants === undefined ? {} : { versionConstants: v.versionConstants }),
     ...(publishes === undefined ? {} : { publishes }),

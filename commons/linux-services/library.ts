@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "linux-services",
+  group: "linux",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",

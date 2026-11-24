@@ -7,6 +7,7 @@
  */
 export const library = {
   name: "estate-endpoints",
+  group: "estate",
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
