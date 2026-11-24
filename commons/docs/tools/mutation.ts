@@ -29,6 +29,7 @@ if (!fs.existsSync(path.join(folder, suite)) || !fs.existsSync(path.join(folder,
   proc.exit(2);
 }
 await fs.ensureDir(out);
+if (incremental !== undefined) await fs.ensureDir(path.dirname(incremental)); // the cache of CI keeps this folder, and a folder that is not there is a cache that is not saved
 const work = await fs.makeTempDir({ prefix: "mutation-" });
 try {
   await fs.writeTextFile(path.join(work, "package.json"), '{ "name": "stryker-run", "private": true }\n');

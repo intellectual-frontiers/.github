@@ -84,6 +84,7 @@ proves(["0001-docs FR-050"], "the mutation job keeps Stryker's incremental file 
   assert(text.includes("--incremental") && text.includes("mutation-incremental/${{ matrix.library }}.json"), "the tool is given the file");
   const tool = readFileSync(join(root, "commons", "docs", "tools", "mutation.ts"), "utf8");
   assert(tool.includes("incrementalFile") && tool.includes('flag("--incremental")'), "the tool passes it to Stryker");
+  assert(tool.includes("ensureDir(path.dirname(incremental))"), "and makes the folder the cache of CI keeps, which it does not save where the folder is not there");
 });
 
 proves(["0001-docs FR-051"], "the generated site workflow gathers what the build reads in one step, the five sources at the same time", () => {
