@@ -1,0 +1,556 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45310829961",
+    "workflow": "site",
+    "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+    "at": "2026-11-24T02:18:55Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45310829961"
+  },
+  "steps": [
+    {
+      "id": "the-compiler-the-generator-s-tests-then--4",
+      "job": "check",
+      "module": "repository",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 26,
+      "durationMs": 26589,
+      "exitStatus": 1
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 21,
+      "exitStatus": 0
+    },
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54009,
+      "exitStatus": 0
+    },
+    {
+      "id": "package",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 39574,
+      "exitStatus": 0
+    },
+    {
+      "id": "registry",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 596,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-findings-of-the-runs-from-the-histor-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 196,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-newest-test-reports-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18864,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-open-issues-the-runs-of-the-workflow-6",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 48998,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-one-package-s-own-to-8",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 377,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-0149bb7757e4ad4f",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-03a2a73a077a094a",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-07f1bf68918a9a4b",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-20e5dda18e50bb63",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    },
+    {
+      "id": "f-2215467cb3ee3552",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-27ac8e4ab58f6767",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-294012c7b5666838",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-2968757d53f81b62",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    },
+    {
+      "id": "f-4fd7c880e25776a1",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-5495b36089b1b36d",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-5ca7c3e97e68942f",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-6090533b5efc1a78",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-793814c6373f7ec6",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-7d02b700917844df",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-87f4953ff2982a03",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-a3ffd090f541b6bf",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-b049df218e81959e",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-b13f565dc2e520a7",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-b5fc3b76b849acde",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    },
+    {
+      "id": "f-c2a4e468d4a61229",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-c4eb33e06645b940",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-c8e9711b88a61df5",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-ccb19d4408a545c2",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-f16d7c1e1423e1e3",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-f871f0e662a89bb3",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-fbe0376b0f2dfcfe",
+      "tool": "verify",
+      "module": "repository",
+      "evidence": {
+        "run": "45310829961",
+        "commit": "37f0570bd38d31a3913123f19dd2316b0e671175",
+        "step": "the-compiler-the-generator-s-tests-then--4",
+        "logSha256": "951d7829302005ebe92d02c718edadf3c4b09ec77219761f64bc53fe9ddb241c"
+      },
+      "at": "2026-11-24T02:14:43Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    }
+  ]
+}
