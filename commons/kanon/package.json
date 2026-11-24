@@ -20,6 +20,7 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
+    "@example/reminders": "link:./suite/examples/reminders",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",

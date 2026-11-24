@@ -1,0 +1,13 @@
+{
+  "name": "@example/reminders",
+  "private": true,
+  "version": "0.0.0",
+  "description": "The smallest worked example of a Kanon library: one rule, stated once, carried to a command line and a tool (documented in the Kanon guides of the site).",
+  "type": "module",
+  "exports": {
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./cli": "./src/physical/cli/mod.ts",
+    "./tool": "./src/physical/tool/mod.ts"
+  }
+}

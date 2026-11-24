@@ -1,29 +1,52 @@
 # Kanon
 
-Kanon is the pattern for a library that states a rule once and carries it into several implementations. **Governance** states what a thing is and what it may do. The **Logical** layer derives the model the program reasons with. The **Physical** layer uses that model to produce a table, command, route, or other output. Trace edges record where each projection came from. [Read the Kanon specification](../../spec-kit/specs/0033-kanon/spec.md).
+Kanon is a pattern for a library that **states a rule once and carries it into several implementations**, and a small program that checks that the pattern was followed. A library built this way has three layers: **Governance** states what a thing is and may do, the **Logical** layer derives the model a program reasons with, and the **Physical** layer makes a table, command, tool, route or page from that model. Imports run one way, every element traces to the statement it came from, and every promise Governance makes ends enforced, carried as data, or named with a reason as not yet enforced.
 
-## A rule through three layers
+## Why it exists
 
-Headless declares an action and its audience in Governance. It derives a verb in the Logical command model. Physical surfaces project that verb into a CLI command, tool, or REST route where the audience can use it. Its projection tests compare the model with the tool registry and OpenAPI document. Data uses the pattern to produce dialect-specific schemas from a model. Archon uses it for requirements, plans, and tool dialects.
+Kanon exists **to give AI agents guardrails and to reduce the likelihood of drift**, and because it is a good pattern for **medium and high complexity libraries that allow extensions and plugins on a tiny core**. In an era in which agents write a large share of the code, constraints that a program checks keep an agent on its task, tell it specifically when it leaves it, and stop a rule from being restated in five places. [Why Kanon exists](kanon-why.md) makes the argument in full.
 
-Adopt Kanon where multiple projections or extension boundaries make those rules worth checking. The library declares its units and allowed imports in the `kanon` field of `library.ts`. Models and Programs show the layers and their projections from the libraries’ own values.
+## Three ways to read this group
 
-## What runs
+The group is written so that each reader can stop when they have what they need.
 
-From an adopting library in the Commons checkout, run `bun ../kanon/src/check.ts` for the import check or `bun run verify` for the library’s verification. The import checker reads TypeScript syntax and reports the rule, file, and line. A computed import with no literal target remains unresolved. Model checks are separate. Run `bun commons/kanon/src/check.ts --bundle DIR` from the Commons root to verify a bundle and check its model. The model checks inspect the data a producer hands them, including vocabulary, trace links, and how it accounts for annotations. Consumer tests check the real output.
+**Technical executives and architects.** You want to know what it is, what it buys, what it costs and when not to use it.
 
-See [the Kanon library](../../kanon/) for the model and checker API, and [Quality System build findings](site:quality/build-findings.html#kanon) for recorded CI results.
+1. [Why Kanon exists](kanon-why.md)
+2. [Kanon in one page](kanon-one-page.md)
+3. [What consumers gain](kanon-gains.md), which starts with a one-page brief you can share on its own
+4. [Weaknesses, and how to avoid them](kanon-weaknesses.md)
+5. [Decision guide and FAQ](kanon-decision-guide.md)
 
-## Content and renditions
+**Senior engineers and library authors.** You want to see how it works in real code.
 
-In the draft content method, a dated claim and its source belong to Governance. The collector projects them into a typed model. An HTML page and its Markdown twin can each show the citation, carry it as data, or record why it is omitted. The matrix exposes an unaccounted annotation by rendition. A test against the rendered page can catch a missing citation even when the model says one is present.
+- Add [One rule through three layers](kanon-worked-example.md), [The trace graph and nothing silently dropped](kanon-trace-and-dropped.md), [Imports run one way](kanon-imports.md) and [Families, hosts and plugins](kanon-families.md).
 
-The [Content library](../../content/) collects parsed chapter blocks and checks evidence observed in each rendition. The Erga website has exercised an HTML and Markdown fixture. The production website rollout is draft work. [Read the content method](../../spec-kit/specs/0039-content-method/spec.md).
+**Mid-level engineers and people adopting it.** You want to build with it.
 
-For a synthetic claim with one evidence link, the checked output can look like this:
+- Add [Adopting Kanon in a library](kanon-adopting.md), which builds a small library step by step, [Content and renditions](kanon-content.md), and the [Glossary and sources](kanon-glossary.md).
 
-| Claim annotation | HTML | Markdown |
-| --- | --- | --- |
-| Evidence | Expressed as a citation | Dropped after removing the citation |
-| Date | Expressed on the page | Expressed in the twin |
-| Audit status | Expressed as not audited | Expressed as not audited |
+## The pages
+
+| Page | What it answers |
+| --- | --- |
+| [Why Kanon exists](kanon-why.md) | Why guardrails, why drift, why a tiny core and extensions |
+| [Kanon in one page](kanon-one-page.md) | The three layers, the six rules and the vocabulary |
+| [One rule through three layers](kanon-worked-example.md) | The real code of Headless, from one fact to three surfaces |
+| [The trace graph and nothing silently dropped](kanon-trace-and-dropped.md) | How a promise is accounted for, with the real matrix |
+| [Imports run one way](kanon-imports.md) | The table, the check and the findings it prints |
+| [Families, hosts and plugins](kanon-families.md) | A tiny core with extensions: AnyFS and Archon |
+| [Content and renditions](kanon-content.md) | The same pattern for claims published in several media |
+| [Adopting Kanon in a library](kanon-adopting.md) | A runnable example, step by step |
+| [What consumers gain](kanon-gains.md) | The executive brief and the benefits by reader, with evidence |
+| [Weaknesses and how to avoid them](kanon-weaknesses.md) | Twelve weaknesses, each with its guardrail |
+| [Decision guide and FAQ](kanon-decision-guide.md) | When to adopt, how far to go, and the skeptic's questions |
+| [Glossary and sources](kanon-glossary.md) | Every term, every code and every source |
+
+## What is built, and what is a draft
+
+The checker, the trace graph, the check of dropped annotations, the matrix, the family rules and the bundle of a published model are built in the library [`@intellectual-frontiers/kanon`](../../kanon/), and 58 library manifests in this repository declare a table and pass the check. The specification, [0033-kanon](../../spec-kit/specs/0033-kanon/spec.md), is a Draft, and the content method it serves is a draft too. Each page says which is which.
+
+## Where it sits
+
+Kanon is the rule of one library. [Mizan](concept-mizan.md) is the method for a whole harness, and its [ladder](mizan-ladder.md) is the same one-way rule applied to the rungs of a harness. A rung is never a layer.

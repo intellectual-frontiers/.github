@@ -26,3 +26,4 @@ requirement	mechanism	by	note
 0002-kanon-content-checks FR-009	check	.github: cd commons/kanon && bun run verify	content.test.ts: a bundle with a file changed, missing and extra is refused whole with each fault named, and a bad manifest is refused
 0002-kanon-content-checks FR-010	check	.github: cd commons/kanon && bun run verify	content.test.ts: a verified bundle loads equal to its model, and a verified file that is not of the form is the fault form
 0002-kanon-content-checks FR-011	check	.github: cd commons/kanon && bun run verify	tools/check.ts and the layers of the manifest: the bundle code imports core and crypto only; host.test.ts reads a folder as a bundle
+0001-kanon-checker FR-019	check	.github: cd commons/kanon && bun run verify	examples.test.ts: the example passes the check, its projections are made from Governance, and four broken copies give the four codes
