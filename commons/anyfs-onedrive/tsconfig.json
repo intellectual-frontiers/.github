@@ -1,8 +1,0 @@
-{
-  "extends": "../tsconfig.base.json",
-  "compilerOptions": {
-    "lib": ["es2024", "dom", "dom.iterable"],
-    "skipLibCheck": true
-  },
-  "include": ["about.ts", "src/**/*.ts", "suite/**/*.ts", "tools/**/*.ts"]
-}

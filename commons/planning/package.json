@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/anyfs": "link:../anyfs",
-    "@intellectual-frontiers/anyfs-sql": "link:../anyfs-sql",
+    "@intellectual-frontiers/anyfs-sql": "link:../anyfs/sql",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/evidence-capture": "link:../evidence-capture",

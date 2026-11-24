@@ -1,0 +1,29 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-query-layers FR-001	check	.github: cd commons/anyfs/query && bun run verify	suite/layers.test.ts
+0001-query-layers FR-002	check	.github: cd commons/anyfs/query && bun run verify	suite/layers.test.ts
+0002-query-language FR-001	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-002	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-003	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-004	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-005	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-006	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0002-query-language FR-007	check	.github: cd commons/anyfs/query && bun run verify	suite/language.test.ts
+0003-query-planning FR-001	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-002	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-003	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-004	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-005	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-006	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0003-query-planning FR-007	check	.github: cd commons/anyfs/query && bun run verify	suite/planning.test.ts
+0004-query-safety FR-001	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-002	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-003	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-004	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-005	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-006	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0004-query-safety FR-007	check	.github: cd commons/anyfs/query && bun run verify	suite/safety.test.ts
+0005-query-agreement FR-001	check	.github: cd commons/anyfs/query && bun run verify	suite/agreement.test.ts
+0005-query-agreement FR-002	check	.github: cd commons/anyfs/query && bun run verify	suite/agreement.test.ts
+0005-query-agreement FR-003	check	.github: cd commons/anyfs/query && bun run verify	suite/agreement.test.ts

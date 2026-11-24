@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/anyfs": "link:../anyfs",
-    "@intellectual-frontiers/anyfs-bridge": "link:../anyfs-bridge",
+    "@intellectual-frontiers/anyfs-bridge": "link:../anyfs/bridge",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/kanon": "link:../kanon",

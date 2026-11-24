@@ -8,11 +8,11 @@
 import { assert, assertEquals, proves } from "../commons/test/src/test.ts";
 import { expectAbsent } from "../commons/anyfs/src/governance/mod.ts";
 import { localStore } from "../commons/anyfs/src/physical/local/mod.ts";
-import { gitRefStore, parseIdentity } from "../commons/anyfs-git/src/mod.ts";
-import { openSshStore } from "../commons/anyfs-ssh/src/mod.ts";
+import { gitRefStore, parseIdentity } from "../commons/anyfs/git/src/mod.ts";
+import { openSshStore } from "../commons/anyfs/ssh/src/mod.ts";
 import { fs, path, proc } from "../commons/system/src/mod.ts";
 import { assessSnapshot, openFleetStore } from "../commons/estate/src/physical/mod.ts";
-import { executorOf, placeOf, withSshd } from "../commons/anyfs-ssh/tools/sshd-test.ts";
+import { executorOf, placeOf, withSshd } from "../commons/anyfs/ssh/tools/sshd-test.ts";
 import { adopted, managed, named, ticking } from "../commons/estate/suite/support.ts";
 
 const gitEnv = { GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_SYSTEM: "/dev/null" };

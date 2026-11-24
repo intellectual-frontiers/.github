@@ -1,0 +1,47 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-serve-layers FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/layers.test.ts
+0001-anyfs-serve-layers FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/layers.test.ts
+0002-anyfs-serve-governance FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-003	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-004	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-005	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-006	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-007	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0002-anyfs-serve-governance FR-008	check	.github: cd commons/anyfs/serve && bun run verify	suite/governance.test.ts
+0003-anyfs-serve-logical FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-003	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-004	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-005	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-006	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-007	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-008	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-009	check	.github: cd commons/anyfs/serve && bun run verify	suite/logical.test.ts
+0003-anyfs-serve-logical FR-010	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0003-anyfs-serve-logical FR-011	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0003-anyfs-serve-logical FR-012	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0003-anyfs-serve-logical FR-013	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0003-anyfs-serve-logical FR-014	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0003-anyfs-serve-logical FR-015	check	.github: cd commons/anyfs/serve && bun run verify	suite/handler.test.ts
+0004-anyfs-serve-physical FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/physical.test.ts
+0004-anyfs-serve-physical FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/physical.test.ts
+0004-anyfs-serve-physical FR-003	check	.github: cd commons/anyfs/serve && bun run verify	suite/physical.test.ts
+0005-anyfs-serve-conformance FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/conformance.test.ts
+0005-anyfs-serve-conformance FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/conformance.test.ts
+0005-anyfs-serve-conformance FR-003	check	.github: cd commons/anyfs/serve && bun run verify	suite/conformance.test.ts
+0005-anyfs-serve-conformance FR-004	check	.github: cd commons/anyfs/serve && bun run verify	suite/conformance.test.ts
+0006-anyfs-serve-nfs FR-001	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-002	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-003	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-004	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-005	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-006	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-007	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-008	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-009	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-010	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-011	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts
+0006-anyfs-serve-nfs FR-012	check	.github: cd commons/anyfs/serve && bun run verify	suite/nfs-*.test.ts

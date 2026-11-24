@@ -16,10 +16,10 @@ import {
   parseBucketName,
   parseEndpoint,
   staticCredentials,
-} from "../commons/anyfs-s3/src/mod.ts";
+} from "../commons/anyfs/s3/src/mod.ts";
 import { parsePlace } from "../commons/anyfs/src/governance/mod.ts";
 import { assessSnapshot, openFleetStore } from "../commons/estate/src/physical/mod.ts";
-import { rustfsBinary, startRustfs } from "../commons/anyfs-s3/tools/rustfs.ts";
+import { rustfsBinary, startRustfs } from "../commons/anyfs/s3/tools/rustfs.ts";
 import { adopted, managed, named, ticking } from "../commons/estate/suite/support.ts";
 
 const AT = Date.UTC(2026, 10, 20, 10, 0, 0);

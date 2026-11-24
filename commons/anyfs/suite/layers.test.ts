@@ -74,7 +74,7 @@ proves(["0001-anyfs-layers FR-003"], "the package exports the library and its la
 proves(["0001-anyfs-layers FR-004"], "verify runs the compiler, the specification checks, the layers check, the trace check, the tests and the check of the package", async () => {
   const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { scripts: Record<string, string> };
   const verify = pkg.scripts["verify"] ?? "";
-  for (const step of ["tsc -p tsconfig.json", "mizan-check.ts --root spec-kit", "check.ts --root spec-kit --level L1", "bun ../kanon/src/check.ts", "bun tools/check.ts", "bun test suite/", "bun tools/pack.ts --check"]) {
+  for (const step of ["tsc -p tsconfig.json", "mizan-check.ts --root spec-kit", "check.ts --root spec-kit --level L1", "bun ../kanon/src/check.ts", "bun tools/check.ts", "bun test ./suite/", "bun tools/pack.ts --check"]) {
     assert(verify.includes(step), `verify runs ${step}`);
   }
 });

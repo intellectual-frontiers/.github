@@ -1,0 +1,25 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-githost-layers FR-001	check	.github: cd commons/anyfs/githost && bun run verify	layers.test.ts: the table decodes and the checker finds nothing
+0001-anyfs-githost-layers FR-002	check	.github: cd commons/anyfs/githost && bun run verify	layers.test.ts: verify runs every check of the library
+0001-anyfs-githost-layers FR-003	check	.github: cd commons/anyfs/githost && bun run verify	layers.test.ts: no source calls fetch or imports a client of a host
+0001-anyfs-githost-layers FR-004	check	.github: cd commons/anyfs/githost && bun run verify	layers.test.ts: the manifest holds the library with the reason
+0001-anyfs-githost-layers FR-005	check	.github: cd commons/anyfs/githost && bun run verify	layers.test.ts: the packer is the library's own
+0002-anyfs-githost-store FR-001	check	.github: cd commons/anyfs/githost && bun run verify	governance.test.ts: identities, trailers and messages
+0002-anyfs-githost-store FR-002	check	.github: cd commons/anyfs/githost && bun run verify	governance.test.ts: the limit and the names of Git
+0002-anyfs-githost-store FR-003	check	.github: cd commons/anyfs/githost && bun run verify	token.test.ts: the sources of a token and where it never is
+0002-anyfs-githost-store FR-004	check	.github: cd commons/anyfs/githost && bun run verify	request.test.ts: the request layer and the table of statuses
+0002-anyfs-githost-store FR-005	check	.github: cd commons/anyfs/githost && bun run verify	errors.test.ts: the total table of failures
+0002-anyfs-githost-store FR-006	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: capabilities by permission, facts and the making of a branch
+0002-anyfs-githost-store FR-007	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: revisions, the name of the blob and tampering
+0002-anyfs-githost-store FR-008	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: expectations and races of writers on both hosts
+0002-anyfs-githost-store FR-009	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: one commit for a batch and a rename, none for no change
+0002-anyfs-githost-store FR-010	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: order, pages and whole trees
+0002-anyfs-githost-store FR-011	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: history
+0002-anyfs-githost-store FR-012	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: limits, names, collisions and links
+0002-anyfs-githost-store FR-013	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: throttles, failed hosts, protected branches and the retrying layer
+0002-anyfs-githost-store FR-014	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts and bridge.test.ts: the conformance suites on both hosts
+0003-anyfs-githost-tests FR-001	check	.github: cd commons/anyfs/githost && bun run verify	host.test.ts: one contract on the fake of each host
+0003-anyfs-githost-tests FR-002	check	.github: cd commons/anyfs/githost && bun run verify	real.test.ts: the contract on a real Git host where one can be run
+0003-anyfs-githost-tests FR-003	check	.github: cd commons/anyfs/githost && bun run verify	real.test.ts: a test says why it did not run a real host

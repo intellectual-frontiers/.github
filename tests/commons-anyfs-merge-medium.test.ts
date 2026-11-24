@@ -12,8 +12,8 @@ import { err } from "../commons/core/src/mod.ts";
 import { expectAny, parsePlace, ROOT, unavailable, type ReplicaId } from "../commons/anyfs/src/governance/mod.ts";
 import { makeStore, type OpCapability, type Store } from "../commons/anyfs/src/logical/mod.ts";
 import { localStore } from "../commons/anyfs/src/physical/local/mod.ts";
-import { adoptPublished, openSqlStore, publishEpoch, type SqlStore } from "../commons/anyfs-sql/src/mod.ts";
-import { openSqliteFile } from "../commons/anyfs-sql/src/physical/adapters/sqlite.ts";
+import { adoptPublished, openSqlStore, publishEpoch, type SqlStore } from "../commons/anyfs/sql/src/mod.ts";
+import { openSqliteFile } from "../commons/anyfs/sql/src/physical/adapters/sqlite.ts";
 import {
   type Mergeable,
   memoryCursor,
@@ -21,9 +21,9 @@ import {
   pruneDeltas,
   readVectors,
   syncThrough,
-} from "../commons/anyfs-bridge/src/exchange/mod.ts";
-import { gitRefStore, parseIdentity } from "../commons/anyfs-git/src/mod.ts";
-import { openSshStore } from "../commons/anyfs-ssh/src/mod.ts";
+} from "../commons/anyfs/bridge/src/exchange/mod.ts";
+import { gitRefStore, parseIdentity } from "../commons/anyfs/git/src/mod.ts";
+import { openSshStore } from "../commons/anyfs/ssh/src/mod.ts";
 import {
   createBucket,
   fetchTransport,
@@ -32,9 +32,9 @@ import {
   parseBucketName,
   parseEndpoint,
   staticCredentials,
-} from "../commons/anyfs-s3/src/mod.ts";
-import { rustfsBinary, startRustfs } from "../commons/anyfs-s3/tools/rustfs.ts";
-import { executorOf, placeOf, withSshd } from "../commons/anyfs-ssh/tools/sshd-test.ts";
+} from "../commons/anyfs/s3/src/mod.ts";
+import { rustfsBinary, startRustfs } from "../commons/anyfs/s3/tools/rustfs.ts";
+import { executorOf, placeOf, withSshd } from "../commons/anyfs/ssh/tools/sshd-test.ts";
 import { fs, path, proc } from "../commons/system/src/mod.ts";
 
 const enc = new TextEncoder();

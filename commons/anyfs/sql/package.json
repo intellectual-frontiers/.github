@@ -1,0 +1,46 @@
+{
+  "name": "@intellectual-frontiers/anyfs-sql",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The SQL stores of AnyFS: objects kept in a table of any SQL-speaking database (SQLite by default, PostgreSQL and DuckDB too), with a revision on every object, native batches, history and search where the engine has them, and the table layout documented for a catalog.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./physical": "./src/physical/mod.ts",
+    "./sqlite": "./src/physical/adapters/sqlite.ts",
+    "./libsql": "./src/physical/adapters/libsql.ts",
+    "./pg": "./src/physical/adapters/pg.ts",
+    "./pglite": "./src/physical/adapters/pglite.ts",
+    "./duckdb": "./src/physical/adapters/duckdb.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../../tools/mizan-check.ts --root spec-kit && bun ../../libraries/src/check.ts --root spec-kit --level L1 && bun ../../kanon/src/check.ts && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@duckdb/node-api": "2.0.0-r.1",
+    "@electric-sql/pglite": "0.5.16",
+    "@intellectual-frontiers/anyfs": "link:..",
+    "@intellectual-frontiers/anyfs-bridge": "link:../bridge",
+    "@intellectual-frontiers/core": "link:../../core",
+    "@intellectual-frontiers/crypto": "link:../../crypto",
+    "@intellectual-frontiers/kanon": "link:../../kanon",
+    "@intellectual-frontiers/lang-sql": "link:../../lang-sql",
+    "@intellectual-frontiers/libraries": "link:../../libraries",
+    "@intellectual-frontiers/mizan": "link:../../mizan",
+    "@intellectual-frontiers/system": "link:../../system",
+    "@intellectual-frontiers/test": "link:../../test",
+    "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
+    "fast-check": "4.10.2",
+    "pg": "8.23.1",
+    "typescript": "7.0.2"
+  }
+}

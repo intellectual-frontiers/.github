@@ -1,0 +1,65 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-sql-layers FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/layers.test.ts
+0001-sql-layers FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/layers.test.ts
+0002-sql-governance FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/governance.test.ts
+0002-sql-governance FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/governance.test.ts
+0002-sql-governance FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/governance.test.ts
+0002-sql-governance FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/governance.test.ts
+0003-sql-port FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-005	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-006	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-007	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-008	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-009	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0003-sql-port FR-010	check	.github: cd commons/anyfs/sql && bun run verify	suite/port.test.ts
+0005-sql-store FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-005	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-006	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0005-sql-store FR-007	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0006-sql-conformance FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/conformance.test.ts
+0006-sql-conformance FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/conformance.test.ts
+0006-sql-conformance FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/conformance.test.ts
+0006-sql-conformance FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/conformance.test.ts
+0005-sql-store FR-008	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
+0004-sql-schema FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
+0004-sql-schema FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
+0007-sql-merge FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
+0007-sql-merge FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
+0008-sql-dump FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-005	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0008-sql-dump FR-006	check	.github: cd commons/anyfs/sql && bun run verify	suite/dump.test.ts
+0009-sql-compaction FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-005	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-006	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-007	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0009-sql-compaction FR-008	check	.github: cd commons/anyfs/sql && bun run verify	suite/compact.test.ts: the requirement
+0010-sql-dialects FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-005	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-006	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-007	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0010-sql-dialects FR-008	check	.github: cd commons/anyfs/sql && bun run verify	suite/dialects.test.ts
+0011-sql-signing FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/signing.test.ts
+0011-sql-signing FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/signing.test.ts
+0011-sql-signing FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/signing.test.ts
+0011-sql-signing FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/signing.test.ts

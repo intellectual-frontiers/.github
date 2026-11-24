@@ -1,0 +1,19 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-anyfs-gdrive-layers FR-001	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/layers.test.ts
+0001-anyfs-gdrive-layers FR-002	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/layers.test.ts
+0001-anyfs-gdrive-layers FR-003	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/layers.test.ts
+0001-anyfs-gdrive-layers FR-004	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/layers.test.ts
+0002-anyfs-gdrive-store FR-001	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-002	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-003	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-004	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-005	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-006	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-007	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-008	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0002-anyfs-gdrive-store FR-009	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/store.test.ts
+0003-anyfs-gdrive-tests FR-001	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/conformance.test.ts
+0003-anyfs-gdrive-tests FR-002	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/conformance.test.ts
+0003-anyfs-gdrive-tests FR-003	check	.github: cd commons/anyfs/gdrive && bun run verify	suite/conformance.test.ts
