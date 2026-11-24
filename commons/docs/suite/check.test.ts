@@ -9,9 +9,9 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 import { message, report } from "../src/check.ts";
 import { document } from "../src/emit/html.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
-import { brokenLinks, buildSite } from "../src/site.ts";
+import { brokenLinks } from "../src/site.ts";
 import { checkAbout } from "../src/sources.ts";
-import { CONFIG, FIXTURE_PACKAGE, ROOT } from "./helpers.ts";
+import { CONFIG, FIXTURE_PACKAGE, ROOT, siteOnce } from "./helpers.ts";
 
 proves(["0011-documentation FR-005", "0011-documentation FR-018"], "an about that names what is not there is a finding of each kind", () => {
   const found = checkAbout(ROOT, {
@@ -41,8 +41,8 @@ proves(["0011-documentation FR-018"], "a link to a page or an anchor that is not
 });
 
 proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-documentation FR-041", "0001-docs FR-018", "0001-docs FR-019", "0001-docs FR-021"], "the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data", async () => {
-  const one = await buildSite(CONFIG);
-  const two = await buildSite(CONFIG);
+  const one = await siteOnce();
+  const two = await siteOnce();
   assertEquals(report(one.found), []);
   const html = (b: typeof one): string[] => b.pages.map((p) => document(p, { name: "N", repository: "r", pages: b.pages }));
   assertEquals(html(one), html(two));

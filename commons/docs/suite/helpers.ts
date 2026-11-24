@@ -9,6 +9,7 @@ import { assertEquals } from "@intellectual-frontiers/test";
 import { Build } from "../src/build.ts";
 import { type About, type Config, resolveConfig } from "../src/config.ts";
 import { readSpecKits } from "../src/extract/specs.ts";
+import { type Built, buildSite } from "../src/site.ts";
 import type { Area, Package } from "../src/sources.ts";
 
 /** The checkout's root. */
@@ -29,6 +30,10 @@ export function resolved(value: unknown, file: string): Config {
  * that the library keeps no import of a file outside its folder, and the tests that need it are the ones that need a repository to document.
  */
 export const CONFIG: Config = resolved((await import(path.toFileUrl(COMMONS_CONFIG).href) as { config: unknown }).config, COMMONS_CONFIG);
+
+let site: Promise<Built> | undefined;
+/** The site of commons built from CONFIG, made once for every test file of a run (a build of 2,500 pages takes some twenty seconds, and nineteen files each made one); a test copies what it changes. */
+export const siteOnce = (): Promise<Built> => (site ??= buildSite(CONFIG));
 
 /** A build of the checkout, with nothing made yet. */
 export const freshBuild = (): Build => new Build(CONFIG, readSpecKits(ROOT, CONFIG.specKits));

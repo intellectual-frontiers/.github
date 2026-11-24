@@ -8,8 +8,8 @@ import { packagingBlocks } from "../src/pages/packaging.ts";
 import type { Evidence } from "../src/evidence.ts";
 import { NONE } from "../src/evidence.ts";
 import type { PackageReport } from "../src/package.ts";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, freshBuild } from "./helpers.ts";
+
+import { freshBuild, siteOnce } from "./helpers.ts";
 
 const kinds = { compiled: { files: 2, bytes: 3_000_000 }, source: { files: 2, bytes: 4_000_000 }, declaration: { files: 2, bytes: 1_000_000 }, data: { files: 1, bytes: 500_000 }, documentation: { files: 1, bytes: 10_000 }, package: { files: 1, bytes: 5_000 } };
 const report: PackageReport = {
@@ -54,7 +54,7 @@ proves(["0001-docs FR-034"], "without a report nothing is shown as measured and 
 });
 
 proves(["0001-docs FR-034"], "the site of commons has the page under Repo Ops with the strategy of the guide, its generated part and its place in the section's map", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const page = built.pages.find((p) => p.path === "repo-ops/packaging.html");
   assert(page !== undefined && page.section === "repoops", "the page is in the section");
   const text = JSON.stringify(page?.blocks);

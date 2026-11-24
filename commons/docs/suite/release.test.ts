@@ -10,8 +10,8 @@ import { document } from "../src/emit/html.ts";
 import { readEvidence } from "../src/evidence.ts";
 import type { Page } from "../src/model.ts";
 import { compareVersions, parseRegistry, releaseSentence, resolveRelease } from "../src/published.ts";
-import { buildSite } from "../src/site.ts";
-import { CONFIG } from "./helpers.ts";
+
+import { siteOnce } from "./helpers.ts";
 
 const reg = (...v: string[]) => ({ kind: "versions" as const, versions: v.map((version, i) => ({ version, date: `2026-11-${10 + i}` })) });
 
@@ -84,7 +84,7 @@ proves(["0001-docs FR-033"], "an evidence file that says the registry could not 
 });
 
 proves(["0001-docs FR-033"], "the site of commons names its package and has a version", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assert(built.release !== undefined, "the configuration names the package");
   assert(/^\d+\.\d+\.\d+/.test(built.release?.version ?? ""), "a version");
   assert(built.pages.length > 100, "the pages are made");

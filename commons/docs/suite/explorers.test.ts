@@ -8,11 +8,11 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { document } from "../src/emit/html.ts";
 import { releasesLens } from "../src/lens/releases.ts";
 import { traceOf } from "../src/pages/specs.ts";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, freshBuild, ROOT } from "./helpers.ts";
+
+import { freshBuild, ROOT, siteOnce } from "./helpers.ts";
 
 proves(["0011-documentation FR-035"], "a requirement says which tests name it and which files are written to it, and the page of a specification shows them as links", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const page = built.pages.find((p) => p.path === "specs/0033-kanon.html");
   const text = JSON.stringify(page?.blocks);
   assertStringIncludes(text, "Proved by");
@@ -23,7 +23,7 @@ proves(["0011-documentation FR-035"], "a requirement says which tests name it an
 });
 
 proves(["0011-documentation FR-035"], "the page of a library built in layers shows its layers in the order governance, logical, physical", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const text = JSON.stringify(built.pages.find((p) => p.path === "overview/headless.html")?.blocks);
   assert(text.indexOf('"governance"') < text.indexOf('"logical"') && text.indexOf('"logical"') < text.indexOf('"physical"'), "bands in order");
   assertStringIncludes(text, "src/surfaces/cli/");

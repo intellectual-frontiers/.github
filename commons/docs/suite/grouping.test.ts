@@ -4,8 +4,8 @@
  * @module
  */
 import { assertEquals, proves } from "@intellectual-frontiers/test";
-import { CONFIG } from "./helpers.ts";
-import { buildSite } from "../src/site.ts";
+import { CONFIG, siteOnce } from "./helpers.ts";
+
 import { familiesOf, nestLibraries } from "../src/pages/families.ts";
 
 proves(["0001-docs FR-043", "0027-commons-libraries FR-027"], "libraries are listed under the host of their family or the group of their manifest, the host first, and a library of neither is not listed", () => {
@@ -51,7 +51,7 @@ proves(["0001-docs FR-044"], "a family is one folder of the navigation: its host
 });
 
 proves(["0001-docs FR-044"], "in the navigation of the real site no two libraries of one family are flat siblings", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const byKey = new Map<string, string[]>();
   for (const p of CONFIG.packages) {
     const fact = p.about !== undefined && typeof p.about === "object" && p.about.kind === "value" ? p.about.value.facts?.find((f) => f.label === "Family")?.value.replace(/`/g, "") : undefined;

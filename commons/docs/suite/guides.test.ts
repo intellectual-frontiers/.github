@@ -6,10 +6,9 @@
  */
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { SECTIONS } from "../src/emit/html.ts";
-import { buildSite } from "../src/site.ts";
+
 import { guidesLens } from "../src/lens/guides.ts";
-import { freshBuild } from "./helpers.ts";
-import { CONFIG } from "./helpers.ts";
+import { freshBuild, siteOnce } from "./helpers.ts";
 
 proves(["0011-documentation FR-032", "0011-documentation FR-039"], "a guide that cannot be read is a finding, and the sections are in the order of a newcomer's path", async () => {
   const lens = guidesLens({ name: "g", guides: [{ file: "nowhere/none.md", path: "start/index.html", section: "start", group: "Start here", order: 0 }] });
@@ -22,7 +21,7 @@ proves(["0011-documentation FR-032", "0011-documentation FR-039"], "a guide that
 });
 
 proves(["0011-documentation FR-032", "0011-documentation FR-033"], "commons' site has the guides of every section with their citations and links resolved to pages, and a library map that names what each library imports", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   const bySection = (s: string) => built.pages.filter((p) => p.section === s).map((p) => p.path);
   assert(bySection("start").length >= 5 && bySection("concepts").length >= 10 && bySection("howto").length >= 5, "the guides are there");

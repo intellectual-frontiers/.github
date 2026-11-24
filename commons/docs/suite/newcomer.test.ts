@@ -7,8 +7,8 @@
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { markdownOf } from "../src/emit/markdown.ts";
 import { searchIndex } from "../src/emit/search.ts";
-import { buildSite, wordFindings } from "../src/site.ts";
-import { CONFIG } from "./helpers.ts";
+import { wordFindings } from "../src/site.ts";
+import { CONFIG, siteOnce } from "./helpers.ts";
 
 const find = (rows: ReturnType<typeof searchIndex>, query: string): string[] => {
   const words = query.toLowerCase().split(/\s+/);
@@ -19,7 +19,7 @@ const find = (rows: ReturnType<typeof searchIndex>, query: string): string[] => 
 };
 
 proves(["0011-documentation FR-036"], "five questions a newcomer asks are answered from the site alone: what to run first, what a library imports, where a requirement is proved, where a command is described, and how a release is made", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const rows = searchIndex(built.pages);
   const text = (path: string): string => {
     const p = built.pages.find((x) => x.path === path.split("#")[0]);
@@ -51,7 +51,7 @@ proves(["0011-documentation FR-036"], "a page that names a retired library, or a
   const page = { path: "start/x.html", title: "X", description: "d", section: "start" as const, group: "g", order: 0, blocks: [{ kind: "paragraph" as const, inlines: [{ kind: "text" as const, text: "It was formerly the SQL Aide." }] }] };
   const found = wordFindings([page, { ...page, path: "specs/y.html", section: "specs" as const }], ["SQL Aide"], ["formerly"]);
   assertEquals(found.map((f) => `${f.where} ${f.problem.kind}`), ["start/x.html retired-name", "start/x.html forbidden-word", "specs/y.html retired-name"]);
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(wordFindings(built.pages, CONFIG.retired, CONFIG.forbiddenInGuides), []);
   assert(CONFIG.retired.length > 0 && CONFIG.forbiddenInGuides.length > 0, "commons' configuration names them");
 });

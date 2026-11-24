@@ -7,8 +7,8 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, ROOT } from "./helpers.ts";
+
+import { ROOT, siteOnce } from "./helpers.ts";
 
 const PARTS = [
   "mizan-idea",
@@ -36,7 +36,7 @@ function words(x: unknown): number {
 }
 
 proves(["0001-docs FR-045"], "the group Mizan holds the overview and the sixteen parts in order, with no broken link, and the diagrams are Mermaid", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   const group = built.pages.filter((p) => p.section === "concepts" && p.group === "Mizan");
   assertEquals(group.map((p) => p.path), ["concepts/mizan.html", ...PARTS.map((p) => `concepts/${p}.html`)]);

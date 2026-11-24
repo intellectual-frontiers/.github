@@ -9,8 +9,8 @@ import type { Page } from "../src/model.ts";
 import type { LayeredModel } from "../src/layered.ts";
 import { layeredLens } from "../src/lens/layered.ts";
 import { markdownOf } from "../src/emit/markdown.ts";
-import { brokenLinks, buildSite } from "../src/site.ts";
-import { CONFIG, freshBuild, ROOT } from "./helpers.ts";
+import { brokenLinks } from "../src/site.ts";
+import { freshBuild, ROOT, siteOnce } from "./helpers.ts";
 
 const model: LayeredModel = {
   name: "shop",
@@ -102,7 +102,7 @@ proves(["0011-documentation FR-029"], "a file that is told to export models and 
 });
 
 proves(["0011-documentation FR-029"], "commons' own site has the data models: the layers, each model, each concept with its SQL and typed table, the registers and the JSON, with no finding", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found.map((f) => f.problem), []);
   for (const needed of ["models/index.html", "models/layers.html", "models/registers.html", "models/identity-agent/index.html", "models/arca-party/person.html"]) assert(built.pages.some((p) => p.path === needed), `the site has ${needed}`);
   assert(built.files.some((f) => f.path === "models/identity-agent.json") && built.files.some((f) => f.path === "models/index.json"));

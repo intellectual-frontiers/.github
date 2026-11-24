@@ -8,8 +8,8 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 import { kitNameOf } from "../src/pages/specs.ts";
 import { areasOf } from "../src/sources.ts";
 import { moduleComment } from "../src/tsdoc.ts";
-import { buildSite } from "../src/site.ts";
-import { CONFIG } from "./helpers.ts";
+
+import { siteOnce } from "./helpers.ts";
 
 proves(["0011-documentation FR-031"], "a module comment is found after `// Spec:` lines, a kit belongs to the library whose folder holds it, and an area's folder is the one it names", () => {
   assertEquals(moduleComment("// Spec: 0001-core FR-001\n/**\n * What it is.\n *\n * @module\n */\nexport {};\n")?.summary.trim(), "What it is.");
@@ -20,7 +20,7 @@ proves(["0011-documentation FR-031"], "a module comment is found after `// Spec:
 });
 
 proves(["0011-documentation FR-031"], "commons' site has a page and an API for every library, shows each library's specifications on its page, and groups the specifications by the library that keeps them", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   const paths = new Set(built.pages.map((p) => p.path));
   for (const lib of ["core", "data", "headless", "kanon", "repoctl", "integrations"]) {

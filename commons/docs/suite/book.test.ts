@@ -15,7 +15,7 @@ import { type AdocScope, inlinesAdoc, pageAdoc, textAdoc } from "../src/emit/asc
 import type { Block, Page } from "../src/model.ts";
 import { PRESENTATIONS, presentationFiles, staleFiles, writeFiles } from "../src/presentation.ts";
 import { buildSite } from "../src/site.ts";
-import { CONFIG, ROOT } from "./helpers.ts";
+import { CONFIG, ROOT, siteOnce } from "./helpers.ts";
 
 const t = (text: string) => ({ kind: "text" as const, text });
 const page = (path: string, over: Partial<Page> = {}): Page => ({ path, title: path, description: "", section: "howto", group: "G", order: 0, blocks: [], ...over });
@@ -201,7 +201,7 @@ proves(["0001-docs FR-007"], "build --presentation book without a volume is refu
 }, { timeout: 60_000 });
 
 proves(["0011-documentation FR-040"], "commons' five volumes of the Commons Manuals have chapters, anchors that resolve, and no matrix or register, and the same pages give the same files", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const found: Finding[] = [];
   const one = presentationFiles(CONFIG, built, ["book"]);
   const two = presentationFiles(CONFIG, built, ["book"]);

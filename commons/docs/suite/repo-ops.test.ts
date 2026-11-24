@@ -9,8 +9,8 @@ import { path } from "@intellectual-frontiers/system";
 import { SECTIONS, document } from "../src/emit/html.ts";
 import { hrefFor } from "../src/links.ts";
 import { repoOpsLens } from "../src/lens/repo-ops.ts";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, freshBuild, ROOT } from "./helpers.ts";
+
+import { freshBuild, ROOT, siteOnce } from "./helpers.ts";
 
 /** A module of the checkout read by a path built at run time: the library keeps no import of a file outside its folder, and the test needs the definitions the site is made from. */
 const viaRoot = async <T>(file: string): Promise<T> => (await import(path.toFileUrl(path.join(ROOT, file)).href)) as T;
@@ -55,7 +55,7 @@ proves(["0001-docs FR-029"], "a page with no typed facts given says there are no
 });
 
 proves(["0001-docs FR-029"], "the site of commons has the section Repo Ops with every workflow and every verb read from their typed definitions, its links to other pages resolve, and the top bar names it", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   const ops = built.pages.filter((p) => p.section === "repoops").map((p) => p.path).sort();
   assertEquals(ops, ["repo-ops/ci-cd.html", "repo-ops/dev-loop.html", "repo-ops/index.html", "repo-ops/packaging.html", "repo-ops/release.html", "repo-ops/repoctl.html"]);

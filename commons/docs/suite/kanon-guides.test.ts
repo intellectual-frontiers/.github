@@ -6,8 +6,8 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, ROOT } from "./helpers.ts";
+
+import { ROOT, siteOnce } from "./helpers.ts";
 
 const PAGES = [
   "kanon-why",
@@ -34,7 +34,7 @@ async function sources(): Promise<ReadonlyMap<string, string>> {
 }
 
 proves(["0001-docs FR-046"], "the group Kanon holds the overview and twelve pages in order, with no broken link and at least nine diagrams", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   const group = built.pages.filter((p) => p.section === "concepts" && p.group === "Kanon");
   assertEquals(group.map((p) => p.path), ["concepts/kanon.html", ...PAGES.map((p) => `concepts/${p}.html`)]);

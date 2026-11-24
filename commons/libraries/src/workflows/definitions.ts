@@ -85,6 +85,7 @@ const SHARDED_NODE_TESTS = "bun ../libraries/src/shard.ts --node suite";
 export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
   data: { nodeTests: SHARDED_NODE_TESTS, after: "bun tools/generate-dpv.ts --check", shards: 4 },
   "anyfs-sql": { shards: 3 },
+  docs: { shards: 4 },
   core: node,
   rdf: node,
   terminal: node,

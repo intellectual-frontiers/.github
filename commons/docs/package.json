@@ -23,7 +23,7 @@
     "test": "bun test suite/",
     "site": "bun src/main.ts build --out ../../_site",
     "site:check": "bun src/main.ts check",
-    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun test suite/ && bun src/main.ts check && bun tools/pack.ts --check",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun tools/check.ts && bun ../libraries/src/shard.ts suite && bun ../libraries/src/shard.ts --first bun src/main.ts check && bun ../libraries/src/shard.ts --first bun tools/pack.ts --check",
     "pack": "bun tools/pack.ts"
   },
   "dependencies": {

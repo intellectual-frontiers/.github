@@ -6,8 +6,8 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { buildSite } from "../src/site.ts";
-import { CONFIG, ROOT } from "./helpers.ts";
+
+import { ROOT, siteOnce } from "./helpers.ts";
 
 const GUIDES = path.join(ROOT, "commons/docs/guides");
 const HEADINGS = ["When to use it", "What to give the assistant", "The prompt", "Check the result", "Common mistakes"];
@@ -65,7 +65,7 @@ proves(["0011-documentation FR-038"], "every path, repoctl verb, bun run script 
 });
 
 proves(["0011-documentation FR-038"], "commons' site has a page for each AI guide in the group With an AI assistant", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   assertEquals(built.found, []);
   for (const g of await guides()) {
     const page = built.pages.find((p) => p.path === `how-to/${g.name.replace(/\.md$/, ".html")}`);

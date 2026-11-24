@@ -3,6 +3,7 @@
  * The tests of a library split among the cells of CI (commons 0001-libraries FR-034): a library whose record in `LIBRARY_CI` names `shards: N` runs in N cells, and the cell `k/N` runs the test files
  * of the folder that `shardOf` gives it, so that each file is run by exactly one cell and no cell is left with all the long ones.
  *
+ *     bun shard.ts --first COMMAND...  runs COMMAND in the first shard only (and where IFC_SHARD is empty), for what one cell of the library's cells has to do once: a check of the whole site, the packing
  *     bun shard.ts [--node] DIR      runs the tests of DIR with `bun test`, or with `node --test` where `--node` is given: all the files where IFC_SHARD is empty, and the files of the shard `k/N` where it names one
  *
  * @module
@@ -57,8 +58,17 @@ export function testFilesUnder(dir: string): readonly TestFile[] {
   return out;
 }
 
+/** Whether the cell of this shard does what is done once for the library: the first, and the one of a library that is not split. */
+export const doesOnce = (shard: Shard | undefined): boolean => shard === undefined || shard.k === 1;
+
 if (import.meta.main) {
   const args = process.argv.slice(2);
+  if (args[0] === "--first") {
+    if (!doesOnce(parseShard(process.env["IFC_SHARD"]))) process.exit(0);
+    const [program, ...rest] = args.slice(1);
+    const r = spawnSync(program ?? "true", rest, { stdio: "inherit", shell: false });
+    process.exit(r.status ?? 1);
+  }
   const node = args.includes("--node");
   const dir = args.find((a) => !a.startsWith("--")) ?? "suite";
   const shard = parseShard(process.env["IFC_SHARD"]);

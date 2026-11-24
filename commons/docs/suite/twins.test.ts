@@ -8,8 +8,8 @@ import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { llmsIndex, markdownOf, twinOf } from "../src/emit/markdown.ts";
 import type { Page } from "../src/model.ts";
-import { buildSite, writeSite } from "../src/site.ts";
-import { CONFIG } from "./helpers.ts";
+import { writeSite } from "../src/site.ts";
+import { CONFIG, siteOnce } from "./helpers.ts";
 
 const page: Page = {
   path: "models/arca/person.html",
@@ -64,7 +64,7 @@ proves(["0011-documentation FR-028"], "the index for a program lists every page 
 });
 
 proves(["0011-documentation FR-028"], "a site is written with a .md beside each .html, llms.txt at the root, and the files a lens adds, the same twice", async () => {
-  const built = await buildSite(CONFIG);
+  const built = await siteOnce();
   const withFile = { ...built, files: [{ path: "models/demo.json", text: "{}\n", what: "a model" }] };
   const a = await fs.makeTempDir({ prefix: "ifc-docs-twins-" });
   const b = await fs.makeTempDir({ prefix: "ifc-docs-twins-" });

@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { planOf } from "../src/plan.ts";
-import { parseShard, shardOf, type TestFile } from "../src/shard.ts";
+import { doesOnce, parseShard, shardOf, type TestFile } from "../src/shard.ts";
 
 const files = (sizes: readonly number[]): readonly TestFile[] => sizes.map((bytes, i) => ({ path: `suite/f${String(i).padStart(3, "0")}.test.ts`, bytes }));
 
@@ -43,4 +43,10 @@ proves(["0001-libraries FR-034"], "a library with shards: N has N cells in the p
   assertEquals(data.map((c) => c.pack), [true, false, false, false]);
   assertEquals(data.map((c) => c.name), ["data 1/4", "data 2/4", "data 3/4", "data 4/4"]);
   assertEquals(plan.linux.include.filter((c) => c.folder === "commons/assessment").map((c) => c.shard), [""]);
+});
+
+proves(["0001-libraries FR-034"], "what a library does once is done by its first shard, and by the cell of a library that is not split", () => {
+  assertEquals(doesOnce(undefined), true);
+  assertEquals(doesOnce({ k: 1, n: 4 }), true);
+  assertEquals(doesOnce({ k: 2, n: 4 }), false);
 });
