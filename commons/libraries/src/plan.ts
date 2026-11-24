@@ -46,9 +46,16 @@ export type Plan = { readonly linux: Include; readonly systems: Include };
 /** The plan for these libraries: a cell on Linux for each, and one on each system its record names, in the order of the libraries; the packing is checked in the cells of the libraries named in `packs`. */
 export function planOf(libs: readonly Planned[], packs: ReadonlySet<string> = new Set()): Plan {
   return {
-    linux: { include: libs.map((l) => cellOf(l, undefined, packs.has(l.name))) },
+    linux: { include: libs.flatMap((l) => shardedCells(cellOf(l, undefined, packs.has(l.name)))) },
     systems: { include: libs.flatMap((l) => (LIBRARY_CI[l.name]?.systems ?? []).map((os) => cellOf(l, os, packs.has(l.name)))) },
   };
+}
+
+/** The cell, or the cells that its library's tests are split among (0001-libraries FR-034): `data 1/4` to `data 4/4`, each with its place in `shard`; the packing is checked in the first. */
+function shardedCells(cell: Cell): readonly Cell[] {
+  const n = LIBRARY_CI[cell.name]?.shards ?? 1;
+  if (n <= 1) return [cell];
+  return Array.from({ length: n }, (_, i) => ({ ...cell, name: `${cell.name} ${i + 1}/${n}`, shard: `${i + 1}/${n}`, pack: cell.pack && i === 0 }));
 }
 
 /** The exports of a package.json as one line, the keys in order, so that two of them are the same where the entries are. */

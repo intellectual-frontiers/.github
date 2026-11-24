@@ -40,9 +40,21 @@ export async function sqliteFile(file: string): Promise<SqlPort> {
 export async function pgliteMemory(): Promise<SqlPort & { readonly raw: unknown }> {
   const { PGlite } = await import("@electric-sql/pglite");
   const { pglitePort } = await import("../src/physical/adapters/pglite.ts");
-  const db = new PGlite();
+  // Initialising a PGlite takes about two seconds and starting from the data directory of one that was initialised takes a quarter of that, so the first is made once in this process
+  // and each engine starts from its directory, with a database of its own.
+  template ??= (async () => {
+    const first = new PGlite();
+    await first.waitReady;
+    const dump = await first.dumpDataDir("none");
+    await first.close();
+    return dump;
+  })();
+  const db = new PGlite({ loadDataDir: await template });
+  await db.waitReady;
   return { ...pglitePort(db as never), raw: db };
 }
+
+let template: Promise<Blob | File> | undefined;
 
 /** DuckDB in memory: the real engine. */
 export async function duckdbMemory(): Promise<SqlPort> {

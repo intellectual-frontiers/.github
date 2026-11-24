@@ -71,15 +71,20 @@ export type LibraryCi = {
   readonly after?: string;
   /** The systems besides Linux where `verify` and the tests on Node run too, because the library has code of its own for them. */
   readonly systems?: readonly OtherSystem[];
+  /** The number of cells the tests of the library are split among (0001-libraries FR-034), where one cell takes too long. */
+  readonly shards?: number;
 };
 
 const NODE_TESTS = 'node --test "suite/**/*.test.ts"';
 const ALL_OTHER: readonly OtherSystem[] = ["windows-latest", "macos-latest"];
 const node: LibraryCi = { nodeTests: NODE_TESTS };
+/** The tests of a sharded library, on Node 26: the files of the cell's shard (0001-libraries FR-034). */
+const SHARDED_NODE_TESTS = "bun ../libraries/src/shard.ts --node suite";
 
 /** The facts of CI of the libraries that have more than `verify` on Linux, by the library's name; a library with no record has `verify` on Linux only. */
 export const LIBRARY_CI: Readonly<Record<string, LibraryCi>> = {
-  data: { nodeTests: NODE_TESTS, after: "bun tools/generate-dpv.ts --check" },
+  data: { nodeTests: SHARDED_NODE_TESTS, after: "bun tools/generate-dpv.ts --check", shards: 4 },
+  "anyfs-sql": { shards: 3 },
   core: node,
   rdf: node,
   terminal: node,
@@ -115,6 +120,8 @@ export type Cell = {
   readonly after: string;
   /** Whether the packing is checked in this cell: the library changed its `exports` (or the packer changed), or the run is of everything. A push does not pack otherwise; the release does. */
   readonly pack: boolean;
+  /** The place of this cell among the shards of the library, `k/N`, or the empty string where its tests are not split (0001-libraries FR-034). */
+  readonly shard: string;
   /** The runner, for a cell that is not on Linux. */
   readonly os?: OtherSystem;
 };
@@ -127,6 +134,7 @@ export function cellOf(l: { readonly name: string; readonly folder: string; read
     folder: l.folder,
     verify: l.verify,
     pack,
+    shard: "",
     node: ci?.nodeTests ?? "",
     after: ci?.after ?? "",
     ...(os === undefined ? {} : { os }),
@@ -141,9 +149,9 @@ const cellSteps = (): readonly [Step, ...Step[]] => [
   checkout(),
   bun(),
   tools(expr("matrix.folder"), "The development tools, from bun.lock (the libraries it imports are linked)"),
-  run(expr("matrix.verify"), { name: "verify (its packing is checked where the exports changed, and by the release)", workingDirectory: expr("matrix.folder"), env: { IFC_SKIP_PACK: expr("matrix.pack == false && '1' || ''") } }),
+  run(expr("matrix.verify"), { name: "verify (its packing is checked where the exports changed, and by the release)", workingDirectory: expr("matrix.folder"), env: { IFC_SKIP_PACK: expr("matrix.pack == false && '1' || ''"), IFC_SHARD: expr("matrix.shard") } }),
   run(expr("matrix.after"), { name: "After verify", when: "matrix.after != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
-  run(expr("matrix.node"), { name: "The tests on Node 26", when: "matrix.node != ''", workingDirectory: expr("matrix.folder"), shell: "bash" }),
+  run(expr("matrix.node"), { name: "The tests on Node 26", when: "matrix.node != ''", workingDirectory: expr("matrix.folder"), shell: "bash", env: { IFC_SHARD: expr("matrix.shard") } }),
 ];
 
 /**

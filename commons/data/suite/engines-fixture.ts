@@ -33,6 +33,21 @@ export const DIALECTS = [
 
 const plain = (r: Row): Row => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, typeof v === "bigint" ? Number(v) : v]));
 
+let template: Promise<Blob | File> | undefined;
+/** A PGlite of its own, started from the data directory of one that was initialised once in this process: initialising takes about two seconds, starting from the directory a quarter of one. */
+async function newPglite(): Promise<PGlite> {
+  template ??= (async () => {
+    const first = new PGlite();
+    await first.waitReady;
+    const dump = await first.dumpDataDir("none");
+    await first.close();
+    return dump;
+  })();
+  const db = new PGlite({ loadDataDir: await template });
+  await db.waitReady;
+  return db;
+}
+
 /** Opens an engine in memory. */
 export async function openEngine(name: Engine["name"]): Promise<Engine> {
   switch (name) {
@@ -66,8 +81,7 @@ export async function openEngine(name: Engine["name"]): Promise<Engine> {
       };
     }
     case "postgres": {
-      const db = new PGlite();
-      await db.waitReady;
+      const db = await newPglite();
       return {
         name,
         dialect: postgres,
