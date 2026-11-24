@@ -85,3 +85,12 @@ proves(["0001-docs FR-050"], "the mutation job keeps Stryker's incremental file 
   const tool = readFileSync(join(root, "commons", "docs", "tools", "mutation.ts"), "utf8");
   assert(tool.includes("incrementalFile") && tool.includes('flag("--incremental")'), "the tool passes it to Stryker");
 });
+
+proves(["0001-docs FR-051"], "the generated site workflow gathers what the build reads in one step, the five sources at the same time", () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+  const text = readFileSync(join(root, ".github", "workflows", "site.auto.yml"), "utf8");
+  for (const g of ["reports", "history", "issues", "registry", "package"]) assert(text.includes(`gather_${g}() {`), `${g} is gathered`);
+  assert(text.includes("for g in reports history issues registry package; do (gather_$g"), "each in the background");
+  assert(text.includes("::group::$g"), "and shown in order");
+  assertEquals(text.split("The newest test reports").length - 1, 0, "the five steps are one");
+});

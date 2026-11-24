@@ -50,3 +50,4 @@ requirement	mechanism	by	note
 0001-docs FR-048	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the evidence job runs the tests once with the coverage, in the shards of CI, and the repository's tests in 3 cells
 0001-docs FR-049	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the shards put together equal the evidence of one run of the whole suite
 0001-docs FR-050	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the mutation job keeps Stryker's incremental file between nights; run twice on a library the second run keeps the first's result
+0001-docs FR-051	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the generated site workflow gathers its evidence in one step, the five at the same time

@@ -10,9 +10,10 @@ import { ROOT } from "./helpers.ts";
 proves(["0001-docs FR-039"], "the site workflow keeps the registry and the package report with steps that end green, and may read packages and nothing more", async () => {
   const yml = await fs.readTextFile(path.join(ROOT, ".github/workflows/site.auto.yml"));
   for (const needed of ["_evidence/registry.json", "packages/npm/commons/versions", "package.report.json", "tools/pack.ts --size", "packages: read"]) assertStringIncludes(yml, needed);
-  const registry = yml.slice(yml.indexOf("name: The versions the package registry holds"), yml.indexOf("name: The package, measured"));
-  assert(/continue-on-error: true/.test(registry), "a registry that cannot be read stops nothing");
+  const registry = yml.slice(yml.indexOf("gather_registry() {"), yml.indexOf("gather_package() {"));
   assertStringIncludes(registry, '"error"');
+  const gathering = yml.slice(yml.indexOf("The evidence the build reads"), yml.indexOf("The site, built"));
+  assert(/continue-on-error: true/.test(gathering), "a registry that cannot be read stops nothing");
   const site = yml.slice(yml.indexOf("\n  site:\n"), yml.indexOf("\n  publish:\n"));
   assert(!/packages: write|contents: write/.test(site), "the job that makes the site writes nothing");
 });
