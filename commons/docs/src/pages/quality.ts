@@ -11,6 +11,7 @@ import { type Finding, message } from "../check.ts";
 import { percent } from "../coverage.ts";
 import { scoreOf } from "../mutation.ts";
 import { type Evidence, isOpen, type LibraryResults, standing, testsFor, type TestResult, type Ticket, type TypedIssue, type WorkflowRun } from "../evidence.ts";
+import { BUILD_TIME_TARGETS, overTarget, timeOf } from "../ci-timing.ts";
 import { sparkText } from "../emit/html.ts";
 import { movementsOf, runsOf } from "../history.ts";
 import { specPage } from "../links.ts";
@@ -691,6 +692,30 @@ function ciPage(b: Build): void {
         return [[text(w.name)], [text(String(done.length))], [text(done.length === 0 ? "" : `${Math.round((passed / done.length) * 100)}%`)], [text(median(mins))], [text(recoveries.length === 0 ? "" : `${median(recoveries)} min`)]];
       }),
     });
+    const times = ev.workflows.map((w) => timeOf(w));
+    if (times.some((x) => x.runs > 0)) {
+      const secs = (s: number): string => (s >= 120 ? `${(s / 60).toFixed(1)} min` : `${s} s`);
+      blocks.push({ kind: "heading", level: 2, id: "build-time", text: [text("Build time")] });
+      blocks.push({ kind: "paragraph", inlines: [text("How long each workflow takes, from its runs on main that passed: the median and the 90th percentile of the wall time, held against the targets of the site. A target that is missed is a finding on this page and never fails a build.")] });
+      const over = overTarget(times);
+      if (over.length > 0) blocks.push({ kind: "callout", tone: "warn", title: "Over target", blocks: [{ kind: "paragraph", inlines: [text(over.map((o) => `${o.workflow}: median ${secs(o.medianSeconds)}, target ${secs(o.targetSeconds)}`).join("; ") + ". A finding, not a failure.")] }] });
+      blocks.push({
+        kind: "table",
+        head: th("Workflow", "Runs", "Median", "90th percentile", "Target", "Status"),
+        rows: times.map((x) => {
+          const target = BUILD_TIME_TARGETS.find((g) => g.workflow === x.name);
+          return [[text(x.name)], [text(String(x.runs))], [text(x.runs === 0 ? "" : secs(x.medianSeconds))], [text(x.runs === 0 ? "" : secs(x.p90Seconds))], [text(target === undefined ? "" : secs(target.medianSeconds))], [text(target === undefined || x.runs === 0 ? "" : x.medianSeconds > target.medianSeconds ? "over target" : "within target")]];
+        }),
+      });
+      for (const x of times.filter((y) => y.jobs.length > 0)) {
+        blocks.push({ kind: "heading", level: 3, id: `build-time-${slugOf(x.name)}`, text: [text(`${x.name}: the slowest jobs`)] });
+        blocks.push({
+          kind: "table",
+          head: th("Job", "Runs", "Median", "90th percentile", "Slowest step"),
+          rows: x.jobs.map((j) => [[text(j.name)], [text(String(j.runs))], [text(secs(j.medianSeconds))], [text(secs(j.p90Seconds))], [text(j.slowestStep === "" ? "" : `${j.slowestStep} (${secs(j.slowestStepSeconds)})`)]]),
+        });
+      }
+    }
     const publisher = ev.workflows.find((w) => w.name === "site");
     const dora = publisher === undefined ? undefined : deliveryOf(publisher.runs);
     if (dora !== undefined) {

@@ -13,6 +13,7 @@ const flag = (name: string): string | undefined => (args.includes(name) ? args[a
 const out = flag("--out");
 const per = Number(flag("--per") ?? 30);
 const jobsOf = Number(flag("--jobs") ?? 6);
+const timed = Number(flag("--timing") ?? 6);
 const repo = proc.env.get("GITHUB_REPOSITORY");
 if (out === undefined) {
   console.error("usage: bun tools/ci-runs.ts --out FILE [--per 30] [--jobs 6]");
@@ -51,7 +52,36 @@ try {
         failed.push({ run: run["id"], jobs: [] });
       }
     }
-    out2.push({ name: w["name"], path: w["path"], runs, failed });
+    // how long the jobs and their steps took in the latest runs that passed (docs 0001-docs FR-047): the page of build time reads them
+    const timing: unknown[] = [];
+    const seconds = (a: unknown, b: unknown): number => (typeof a === "string" && typeof b === "string" ? Math.max(0, Math.round((Date.parse(b) - Date.parse(a)) / 1000)) : 0);
+    for (const run of runs.filter((x) => x["conclusion"] === "success").slice(0, timed)) {
+      try {
+        const rows: Record<string, unknown>[] = [];
+        for (let page = 1; page <= 3; page++) {
+          const j = await gh(`repos/${repo}/actions/runs/${String(run["id"])}/jobs?per_page=100&page=${page}`);
+          const got = (isRecord(j) && Array.isArray(j["jobs"]) ? j["jobs"] : []).filter(isRecord);
+          rows.push(...got);
+          if (got.length < 100) break;
+        }
+        timing.push({
+          run: run["id"],
+          jobs: rows
+            .filter((x) => x["conclusion"] === "success" && typeof x["started_at"] === "string")
+            .map((x) => ({
+              name: x["name"],
+              seconds: seconds(x["started_at"], x["completed_at"]),
+              steps: (Array.isArray(x["steps"]) ? x["steps"].filter(isRecord) : [])
+                .map((s) => ({ name: s["name"], seconds: seconds(s["started_at"], s["completed_at"]) }))
+                .sort((a, b) => b.seconds - a.seconds)
+                .slice(0, 3),
+            })),
+        });
+      } catch {
+        // a run whose jobs cannot be read is left out
+      }
+    }
+    out2.push({ name: w["name"], path: w["path"], runs, failed, timing });
   }
   result = { repository: repo, workflows: out2 };
 } catch (thrown) {

@@ -119,6 +119,8 @@ export interface WorkflowRuns {
   readonly path: string;
   readonly runs: readonly WorkflowRun[];
   readonly failed: readonly { readonly run: number; readonly jobs: readonly { readonly name: string; readonly url: string; readonly step: string | undefined }[] }[];
+  /** How long the jobs and their slowest steps took in the latest runs that passed (docs 0001-docs FR-047). */
+  readonly timing: readonly { readonly run: number; readonly jobs: readonly { readonly name: string; readonly seconds: number; readonly steps: readonly { readonly name: string; readonly seconds: number }[] }[] }[];
 }
 
 /** Everything the site knows of quality. */
@@ -272,6 +274,14 @@ export function parseRuns(text: string): { readonly workflows: readonly Workflow
     failed: (Array.isArray(w["failed"]) ? w["failed"] : []).filter(isRecord).map((f) => ({
       run: num(f["run"]),
       jobs: (Array.isArray(f["jobs"]) ? f["jobs"] : []).filter(isRecord).map((j) => ({ name: str(j["name"]) ?? "", url: str(j["url"]) ?? "", step: str(j["step"]) })),
+    })),
+    timing: (Array.isArray(w["timing"]) ? w["timing"] : []).filter(isRecord).map((t) => ({
+      run: num(t["run"]),
+      jobs: (Array.isArray(t["jobs"]) ? t["jobs"] : []).filter(isRecord).map((j) => ({
+        name: str(j["name"]) ?? "",
+        seconds: num(j["seconds"]),
+        steps: (Array.isArray(j["steps"]) ? j["steps"] : []).filter(isRecord).map((s) => ({ name: str(s["name"]) ?? "", seconds: num(s["seconds"]) })),
+      })),
     })),
   }));
   return { workflows, error: str(json["error"]) };
