@@ -8,3 +8,4 @@ requirement	mechanism	by	note
 0001-test FR-005	check	.github: cd commons/test && bun test suite/	test.test.ts: a test span and log record with the test.* conventions
 0001-test FR-006	check	.github: cd commons/test && bun test suite/	test.test.ts: the installation record, and a person's name refused
 0001-test FR-007	check	.github: cd commons/test && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball, runs every entry on Node 26 and Bun and type-checks a consumer
+0001-test FR-008	check	.github: cd commons/test && bun test suite/	test.test.ts: reportFindings names each finding on the standard error and never throws

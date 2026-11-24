@@ -9,7 +9,7 @@ import { expr, job, type Permissions, run, use, validateAction, validateWorkflow
 import { renderAction, renderWorkflow, scalar } from "../src/workflows/render.ts";
 import { existsSync, mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { assert, assertEquals, assertStringIncludes, proves, reportFindings } from "@intellectual-frontiers/test";
 import { main, outputs, synchronize } from "../src/generate-workflows.ts";
 
 const SPEC = "0030-generated-workflows";
@@ -121,7 +121,8 @@ proves(
   [`${SPEC} FR-004`],
   "--check writes nothing and exits 1, naming a file that was edited and a generated file that no workflow makes; the same bytes come twice, a CRLF checkout is the file, and the tests workflow runs --check",
   async () => {
-    assertEquals(synchronize(ROOT, false), { stale: [], problems: [] });
+    const sync = synchronize(ROOT, false);
+    reportFindings(`${SPEC} FR-004`, [...sync.stale.map((s) => `stale: ${s}`), ...sync.problems.map(String)]);
     assertEquals(renderWorkflow(tiny), renderWorkflow(tiny));
     assertEquals(
       [

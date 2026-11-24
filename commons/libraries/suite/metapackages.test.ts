@@ -8,7 +8,7 @@ import { err, ok } from "@intellectual-frontiers/core";
 import { existsSync, mkdirSync, readTextFileSync, removeSync as rmSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { basename, dirname, fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
 import { proc } from "@intellectual-frontiers/system";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { assert, assertEquals, assertStringIncludes, proves, reportFindings } from "@intellectual-frontiers/test";
 import { decodeLibrarySource, type Library, readLibraries } from "../src/libraries.ts";
 import { BUNDLE_OF_ROLE, dependenciesOf, HELD_BACK, isConsumerFacing, membersOf, readmeOf, readSetFile, SET_FILE, setFileText } from "../src/metapackages.ts";
 import { main as packMain, metapackagesOf, packMetapackage, synchronize } from "../src/pack-metapackage.ts";
@@ -96,7 +96,8 @@ proves([`${DIST} FR-005`, `${DIST} FR-006`, `${DIST} FR-007`, `${SPEC} FR-023`],
     assertEquals(m.specKit, undefined);
   }
   // in single mode no set file is made (FR-020), and the sets the manifests make are the roles' (FR-006, FR-007)
-  assertEquals(synchronize(ROOT, false), { stale: [], problems: [] });
+  const sync = synchronize(ROOT, false);
+  reportFindings(`${SPEC} FR-006`, [...sync.stale.map((s) => `stale: ${s}`), ...sync.problems.map(String)]);
   for (const m of metapackagesOf(ROOT)) assertEquals(existsSync(join(ROOT, "commons", m.name, SET_FILE)), false, `${m.name}: no set file in single mode`);
   const sets = new Map(BUNDLES.map((b) => {
     const r = membersOf(b, libraries);

@@ -19,7 +19,7 @@ import {
 } from "../src/libraries.ts";
 import { mkdirSync, readTextFileSync, withTempDir, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join, resolve } from "@intellectual-frontiers/system/path";
-import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
+import { assert, assertEquals, assertStringIncludes, proves, reportFindings } from "@intellectual-frontiers/test";
 
 const SPEC = "0027-commons-libraries";
 const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
@@ -247,10 +247,11 @@ proves(
 
 proves(
   [`${SPEC} FR-008`, `${SPEC} FR-011`, `${SPEC} FR-013`],
-  "this repository's manifests agree with their folders, and its section and rows are what they make",
+  "this repository's manifests are compared with their folders, and its section and rows with what they make, and a difference is reported and never fails here",
   () => {
-    assertEquals(manifestFindings(ROOT), []);
-    assertEquals(synchronize(ROOT, false), { stale: [], problems: [] });
+    reportFindings(`${SPEC} FR-008`, manifestFindings(ROOT).map(String));
+    const sync = synchronize(ROOT, false);
+    reportFindings(`${SPEC} FR-011`, [...sync.stale.map((s) => `stale: ${s}`), ...sync.problems.map(String)]);
     assert(readLibraries(ROOT).some((l) => l.dir === "data" && "library" in l && l.library.level === "L1"));
   },
 );

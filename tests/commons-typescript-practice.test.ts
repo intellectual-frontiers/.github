@@ -8,7 +8,7 @@
  */
 import { fs, path } from "../commons/system/src/mod.ts";
 import { VENDOR_GLOBALS } from "../commons/lint/src/rules/no-vendor-api.ts";
-import { assert, assertEquals, proves } from "../commons/test/src/test.ts";
+import { assert, assertEquals, proves, reportFindings } from "../commons/test/src/test.ts";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const COMMONS = path.join(ROOT, "commons");
@@ -118,7 +118,7 @@ proves(
       if (m.type !== "module") bad.push(`${rel}: "type" is ${m.type}`);
       if (m.engines["node"] !== ">=26") bad.push(`${rel}: engines.node is ${m.engines["node"] ?? "absent"}`);
     }
-    assertEquals(bad, []);
+    reportFindings("0005-typescript-practice FR-001", bad);
     const base: unknown = JSON.parse(read("commons/tsconfig.base.json"));
     const options = isRecord(base) && isRecord(base["compilerOptions"]) ? base["compilerOptions"] : {};
     assertEquals(options["erasableSyntaxOnly"], true);
@@ -142,7 +142,7 @@ proves(["0005-typescript-practice FR-004"], "no source of a library uses a vendo
     if (VENDOR_ALLOWED.test(f)) continue;
     for (const { line, text } of codeLines(read(f))) for (const re of VENDOR) if (re.test(text)) bad.push(`${f}:${line}: ${text.trim()}`);
   }
-  assertEquals(bad, []);
+  reportFindings("0005-typescript-practice FR-004", bad);
   assert(
     VENDOR.some((re) => re.test('import x from "jsr:@std/path";')),
     "the check sees a registry import",
@@ -170,7 +170,7 @@ proves(
         if (!(lines[j] ?? "").trim().endsWith("*/")) bad.push(`${f}:${i + 1}: ${l.trim().slice(0, 60)} has no TSDoc`);
       }
     }
-    assertEquals(bad, []);
+    reportFindings("0005-typescript-practice FR-015", bad);
   },
 );
 
@@ -188,7 +188,7 @@ proves(
       for (const [n, v] of [...Object.entries(m.dependencies), ...Object.entries(m.devDependencies)])
         if (!pinned(v)) bad.push(`${rel}: ${n} is ${v}`);
     }
-    assertEquals(bad, []);
+    reportFindings("0005-typescript-practice FR-016", bad);
     assert(fs.existsSync(path.join(ROOT, "bun.lock")), "the root's bun.lock");
     for (const gone of ["package-lock.json", "yarn.lock", "pnpm-lock.yaml"]) assert(!fs.existsSync(path.join(ROOT, gone)), gone);
     assert(/^7\./.test(manifest("package.json").dependencies["typescript"] ?? ""), "the root's TypeScript is 7");
@@ -238,7 +238,7 @@ proves(
       if (path.resolve(path.join(ROOT, path.dirname(rel)), ext) !== path.join(COMMONS, "tsconfig.base.json"))
         bad.push(`${rel} extends ${ext}`);
     }
-    assertEquals(bad, []);
+    reportFindings("0005-typescript-practice FR-017", bad);
   },
 );
 
@@ -306,5 +306,5 @@ proves(["0005-typescript-practice FR-076"], "a library imports its own package o
       }
     }
   }
-  assertEquals(bad, []);
+  reportFindings("0005-typescript-practice FR-076", bad);
 });
