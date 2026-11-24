@@ -241,13 +241,20 @@ jobs:
           IFC_STEP_SCRIPT: bun install --frozen-lockfile
         working-directory: commons/docs
         continue-on-error: true
-      - name: "The mutation run, kept as a small report"
-        id: the-mutation-run-kept-as-a-small-report-5
+      - name: "What the run before learned of this library's mutants, kept between nights (docs 0001-docs FR-050)"
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/mutation-incremental
+          key: mutation-${{ matrix.library }}-${{ github.run_id }}
+          restore-keys: mutation-${{ matrix.library }}-
+        continue-on-error: true
+      - name: "The mutation run, kept as a small report: only the changes that a change since the night before reaches are tried again"
+        id: the-mutation-run-kept-as-a-small-report--6
         shell: bash
         run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-mutation-run-kept-as-a-small-report-5 --job "mutation" --module "${{ matrix.library }}" --tool exit-status --timeout 36 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
+          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-mutation-run-kept-as-a-small-report--6 --job "mutation" --module "${{ matrix.library }}" --tool exit-status --timeout 36 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
         env:
-          IFC_STEP_SCRIPT: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\""
+          IFC_STEP_SCRIPT: "bun commons/docs/tools/mutation.ts --library \"${{ matrix.library }}\" --out \"$RUNNER_TEMP/evidence\" --incremental \"$RUNNER_TEMP/mutation-incremental/${{ matrix.library }}.json\""
         continue-on-error: true
       - name: "The score, kept for the site"
         if: "always()"

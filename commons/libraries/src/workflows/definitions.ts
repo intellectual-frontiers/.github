@@ -416,7 +416,11 @@ const evidence: Workflow = {
         bun(),
         { ...tools(expr("format('commons/{0}', matrix.library)"), "The development tools, from bun.lock (the libraries it imports are linked)"), continueOnError: true },
         { ...tools("commons/docs", "The packages of the tool that keeps the report (commons docs)"), continueOnError: true },
-        run('bun commons/docs/tools/mutation.ts --library "${{ matrix.library }}" --out "$RUNNER_TEMP/evidence"', { name: "The mutation run, kept as a small report", continueOnError: true, shell: "bash" }),
+        use(PIN.cache, {
+          name: "What the run before learned of this library's mutants, kept between nights (docs 0001-docs FR-050)",
+          with: { path: "${{ runner.temp }}/mutation-incremental", key: "mutation-${{ matrix.library }}-${{ github.run_id }}", "restore-keys": "mutation-${{ matrix.library }}-" },
+        }),
+        run('bun commons/docs/tools/mutation.ts --library "${{ matrix.library }}" --out "$RUNNER_TEMP/evidence" --incremental "$RUNNER_TEMP/mutation-incremental/${{ matrix.library }}.json"', { name: "The mutation run, kept as a small report: only the changes that a change since the night before reaches are tried again", continueOnError: true, shell: "bash" }),
         use(PIN.uploadArtifact, { name: "The score, kept for the site", when: "always()", with: { name: "evidence-mutation-${{ matrix.library }}", path: "${{ runner.temp }}/evidence/*.mutation.json", "if-no-files-found": "ignore", "retention-days": 7 } }),
       ],
     }),

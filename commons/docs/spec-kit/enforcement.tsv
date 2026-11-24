@@ -49,3 +49,4 @@ requirement	mechanism	by	note
 0001-docs FR-047	check	.github: cd commons/docs && bun run verify	ci-timing.test.ts: the median and the 90th percentile, the slowest jobs and steps, and a workflow over its target as a finding
 0001-docs FR-048	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the evidence job runs the tests once with the coverage, in the shards of CI, and the repository's tests in 3 cells
 0001-docs FR-049	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the shards put together equal the evidence of one run of the whole suite
+0001-docs FR-050	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the mutation job keeps Stryker's incremental file between nights; run twice on a library the second run keeps the first's result

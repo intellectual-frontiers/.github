@@ -1,8 +1,9 @@
-// Spec: 0001-docs FR-027
+// Spec: 0001-docs FR-027, FR-050
 /**
  * Leaves the mutation run of a library where the site reads it (docs 0001-docs FR-027): `bun tools/mutation.ts --library data [--out DIR] [--suite suite]` installs Stryker into a temporary folder, runs the library's suite against
  * each change it makes to the library's `src/` (in place, the files being put back after), and keeps the report in the small form as `<DIR>/<library>.mutation.json`. A run is slow (the suite once for each change), so CI runs it
- * for a few small libraries by the day, not by the hour. What cannot be done exits 2; a failing suite is not a failure of the tool.
+ * for a few small libraries by the day, not by the hour. What cannot be done exits 2; a failing suite is not a failure of the tool. With `--incremental FILE` the run reads what a run before it kept in FILE and keeps what it learned there
+ * again (Stryker's incremental mode, docs 0001-docs FR-050): a change it made that no change to the library's files or its tests reaches is not tried again, its result is the earlier one, so that the night costs what changed.
  *
  * @module
  */
@@ -20,6 +21,8 @@ if (library === undefined) {
 }
 const out = path.resolve(flag("--out") ?? path.join(ROOT, "_evidence"));
 const folder = path.join(ROOT, libraryDir(ROOT, library));
+const incrementalGiven = flag("--incremental");
+const incremental = incrementalGiven === undefined ? undefined : path.resolve(incrementalGiven);
 const suite = flag("--suite") ?? "suite";
 if (!fs.existsSync(path.join(folder, suite)) || !fs.existsSync(path.join(folder, "src"))) {
   console.error(`mutation: ${library} has no src/ and ${suite}/ to run`);
@@ -47,6 +50,7 @@ try {
     timeoutMS: 20000,
     disableTypeChecks: true,
     inPlace: true,
+    ...(incremental === undefined ? {} : { incremental: true, incrementalFile: incremental }),
   };
   await fs.writeTextFile(path.join(work, "stryker.conf.json"), JSON.stringify(config));
   const r = await proc.run(["node", path.join(work, "node_modules/.bin/stryker"), "run", path.join(work, "stryker.conf.json")], { cwd: folder });

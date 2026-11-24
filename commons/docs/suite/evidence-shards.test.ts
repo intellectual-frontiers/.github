@@ -75,3 +75,13 @@ proves(["0001-docs FR-048"], "the generated evidence workflow runs the tests onc
   const runs = text.split("evidence.ts --library").length - 1;
   assertEquals(runs, 2, "one run of the tool for a library's cell and one for the repository's");
 });
+
+proves(["0001-docs FR-050"], "the mutation job keeps Stryker's incremental file between nights and gives it to the tool", () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+  const text = readFileSync(join(root, ".github", "workflows", "evidence.auto.yml"), "utf8");
+  assert(text.includes("mutation-${{ matrix.library }}-${{ github.run_id }}"), "the file is kept under a key of the run");
+  assert(text.includes("restore-keys: mutation-${{ matrix.library }}-"), "and the night after restores the latest");
+  assert(text.includes("--incremental") && text.includes("mutation-incremental/${{ matrix.library }}.json"), "the tool is given the file");
+  const tool = readFileSync(join(root, "commons", "docs", "tools", "mutation.ts"), "utf8");
+  assert(tool.includes("incrementalFile") && tool.includes('flag("--incremental")'), "the tool passes it to Stryker");
+});
