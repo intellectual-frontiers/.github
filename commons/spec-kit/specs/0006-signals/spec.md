@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** IFC TypeScript (0005-typescript-practice) made OpenTelemetry-native: traces, logs and metrics as OpenTelemetry defines them, written in the kernel from the specification itself (no `@opentelemetry/*` package, no runtime's built-in telemetry), sent over OTLP/HTTP with JSON, and the terminal treated as one more consumer of the same signals. What a person reads in a terminal is a rendering of signals that were also recorded or exported, never a separate `console.log`, so that what a run showed and what it recorded cannot disagree. `erga` (its specification 249) and `stolos` (its specifications 049 and 092) each need it; this specification gives them one implementation that runs on Bun, Node and in a browser.
+**Input:** IFC TypeScript (0005-typescript-practice) made OpenTelemetry-native: traces, logs and metrics as OpenTelemetry defines them, written in the kernel from the specification itself (no `@opentelemetry/*` package, no runtime's built-in telemetry), sent over OTLP/HTTP with JSON, and the terminal treated as one more consumer of the same signals. What a person reads in a terminal is a rendering of signals that were also recorded or exported, never a separate `console.log`, so that what a run showed and what it recorded cannot disagree. A harness needs it; this specification gives one implementation that runs on Bun, Node and in a browser.
 
 ## The data model (kernel)
 
@@ -50,7 +50,7 @@
 
 - OTLP over gRPC or protobuf: JSON over HTTP is what a collector accepts and what the kernel can write with no dependency; protobuf may follow if a collector without JSON must be served.
 - Profiles, exemplars and exponential histograms.
-- What `erga` and `stolos` declare as their signals: each harness's own registry, made with `defineSignals`.
+- What `erga` declares as its signals: each harness's own registry, made with `defineSignals`.
 
 ## Edge cases
 

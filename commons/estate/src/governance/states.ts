@@ -43,7 +43,7 @@ export function reasonNotOffered(state: AssetState, capability: Capability, orig
   return state === "managed" ? INHERITED_PROVISION : REASON[state];
 }
 
-/** The moves between states that are allowed (Stolos 067-adopt): a discovered asset is adopted, an adopted asset is released back to discovered or managed (taken over, with an approval), and a managed asset is never moved: it was installed as managed or taken over, and leaves by being retired. */
+/** The moves between states that are allowed: a discovered asset is adopted, an adopted asset is released back to discovered or managed (taken over, with an approval), and a managed asset is never moved: it was installed as managed or taken over, and leaves by being retired. */
 export const TRANSITIONS: readonly (readonly [AssetState, AssetState])[] = [
   ["discovered", "adopted"],
   ["adopted", "discovered"],

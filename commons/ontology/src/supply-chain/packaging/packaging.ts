@@ -511,7 +511,7 @@ export const properties = [
     domain: pm.Command,
     range: xsd.string,
     definition: en(
-      "Where the command comes from: upt, archon (what the retired Stolos engine ran, before commons/archon replaced it), memory (written from knowledge, unverified) or upt+memory.",
+      "Where the command comes from: upt, archon (the commands the fleet engine runs), memory (written from knowledge, unverified) or upt+memory.",
     ),
   }),
   DatatypeProperty.make(pm.verifiedOn, {

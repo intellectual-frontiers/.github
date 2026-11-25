@@ -3,7 +3,7 @@
  * Files and folders (commons 0001-system FR-002), on `node:fs` alone, so the same code runs on Bun and Node. The functions
  * have short, plain names and shapes (`readTextFile`, `writeTextFile`, `remove`, `mkdir`, `stat`, `readDir`,
  * `makeTempDir`, ...); every failure is thrown as an error of `./errors.ts` (`NotFound`, `AlreadyExists`, ...).
- * The helpers Stolos wrote over them (`exists`, `readTextOr`, `ensureDir`, `writeIfChanged`, `listDirs`, `listFiles`, `walkFiles`) and the
+ * The helpers over them (`exists`, `readTextOr`, `ensureDir`, `writeIfChanged`, `listDirs`, `listFiles`, `walkFiles`) and the
  * setup's `sha256File` are here too.
  *
  * `readDir` is an async iterable, with `chown` and `symlinkSync` (FR-048); `open` and `openSync` give an `FsFile`

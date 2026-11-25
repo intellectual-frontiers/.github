@@ -20,4 +20,4 @@ Each kind of drift from [Why: the drift problem](mizan-why.md) has a control tha
 
 ## The warn-first discipline
 
-A new rule never fails what a harness already holds. It starts as a warning, with a baseline file listing today's findings. A new finding fails; a baseline line that is not found any more also fails, so the baseline can only shrink, and you cannot "fix" a check by adding a line. This is the same mechanism `stolos` already uses for its trace and layer checks.
+A new rule never fails what a harness already holds. It starts as a warning, with a baseline file listing today's findings. A new finding fails; a baseline line that is not found any more also fails, so the baseline can only shrink, and you cannot "fix" a check by adding a line.

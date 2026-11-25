@@ -3,8 +3,7 @@
  * One run at a time (commons 0001-system FR-015): a lock file made only where none exists (`O_EXCL`, which every file system
  * and operating system gives atomically, where `flock` has no `node:` form), holding who holds it (process id, command, since when). A
  * waiting run polls until it is free, says once who it waits for, and takes over a lock whose holder's process no longer runs. A child of
- * a holder can inherit the lock through an environment variable instead of waiting for its own parent. Taken from Stolos's
- * `src/archon/core/lock.ts`, which locked through the runtime's own file lock.
+ * a holder can inherit the lock through an environment variable instead of waiting for its own parent.
  *
  * @example
  * ```ts

@@ -6,8 +6,7 @@
  * request (FR-069), backoff on 429 and 503 that honours `Retry-After`, a JSON read decoded at the boundary with typed failures (a denied
  * call is told apart, so a caller can record a gap instead of failing), and every item of a list that pages by `Link: rel="next"` or by a
  * cursor in the body. A request that carries a credential is refused before it is sent unless the transport is made to allow it, so a
- * harness whose proxy injects credentials never sends one by mistake. Taken from erga's `lib/ts/http-client` and Stolos's connector SDK
- * (`src/archon/connect/sdk.ts`, `connector.ts`).
+ * harness whose proxy injects credentials never sends one by mistake.
  *
  * @example
  * ```ts

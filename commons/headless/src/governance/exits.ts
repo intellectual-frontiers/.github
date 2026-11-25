@@ -7,7 +7,7 @@
  * already know; a signal is 128 plus its number.
  *
  * @remarks
- * Sources reconciled here: the first program returned 0 to 3; erga's launcher gave its startup failures 4 to 11; stolos returned 0 or 1 and never made
+ * Sources reconciled here: the first program returned 0 to 3; erga's launcher gave its startup failures 4 to 11; a third returned 0 or 1 and never made
  * `pending` a status. The run's verdicts keep the numbers of the first program (a script that tests `$? -eq 1` for findings keeps working), the launcher's
  * failures move above 63 so that 4 is free for `Pending`, and nothing below 64 but 0 to 4 is used.
  *

@@ -5,8 +5,7 @@
  * recipient's RSA public key with RSAES-OAEP, SHA-256 and MGF1 with SHA-256 (RFC 8017, RFC 4055), named by the issuer and serial number of
  * the recipient's X.509 certificate (RFC 5280). The holder of a private key opens it again. PEM is read and written, and a certificate is
  * read for what encryption needs (issuer, serial, key, addresses, validity, key usage). The content key and nonce come from the caller
- * (`cmsKeys` with a source of random bytes), so the kernel has no effect. Taken from Stolos's `src/archon/export/smime.ts` (emailed
- * exports); opening, PEM writing and typed errors are new, and the mail headers stay in Stolos.
+ * (`cmsKeys` with a source of random bytes), so the kernel has no effect. Errors are typed values and PEM is read and written.
  *
  * @example
  * ```ts

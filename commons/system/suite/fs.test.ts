@@ -1,6 +1,6 @@
 /**
  * Tests of `runtime/fs.ts` and `runtime/errors.ts`: the calls on a real temporary folder, each failure thrown as its typed error,
- * and Stolos's helpers over them.
+ * and the helpers over them.
  *
  * @module
  */
@@ -140,7 +140,7 @@ proves([FR], "temporary folders and files, rename, copy, chmod, links, realPath,
 
 proves(
   [FR],
-  "Stolos's helpers: readTextOr, ensureDir, writeIfChanged, listDirs, listFiles, walkFiles, sha256File, withTempDir",
+  "the helpers: readTextOr, ensureDir, writeIfChanged, listDirs, listFiles, walkFiles, sha256File, withTempDir",
   async () => {
     let kept = "";
     await fs.withTempDir(async (dir) => {

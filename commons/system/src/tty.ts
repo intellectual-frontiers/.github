@@ -1,7 +1,6 @@
 // Spec: 0001-system FR-018
 /**
- * The terminal (commons 0001-system FR-018): whether a stream is one, its size, raw mode, and the choice of colour and emoji the
- * three `ui` modules each made (Stolos's `core/ui.ts`, the setup's `ui.ts`, erga's console). The choice is a pure function of the
+ * The terminal (commons 0001-system FR-018): whether a stream is one, its size, raw mode, and the choice of colour and emoji. The choice is a pure function of the
  * environment and the facts about the terminal (`lookOf`), so it is tested without one; `currentLook` reads them from the host.
  *
  * Rules: colour only where `NO_COLOR` is unset or empty, and only at a terminal unless `FORCE_COLOR` is set; a terminal whose `TERM` is

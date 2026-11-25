@@ -1,6 +1,6 @@
 /**
  * Tests of `surfaces/cli/state.ts` and of the store that binds it to the file system: where the state is kept, the run log and its pruning after 30 days, the newest
- * log, and the memory of hints (commons headless 0004-headless-cli FR-007, FR-008, FR-014). The pruning is the behaviour of stolos's 019-output FR-002; it is run on
+ * log, and the memory of hints (commons headless 0004-headless-cli FR-007, FR-008, FR-014). The pruning is run on
  * a real folder here as well as on the store in memory.
  *
  * @module

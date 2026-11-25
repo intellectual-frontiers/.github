@@ -2,7 +2,7 @@
 /**
  * Base64 and base64url (RFC 4648 §4 and §5), both ways, on bytes (commons 0001-formats FR-008): what DSSE envelopes, JWTs, data
  * URLs, PEM and signed URLs carry. Decoding refuses what is not base64 of the alphabet asked for, rather than skipping it; base64url is
- * written without padding and read with or without it. Taken from the helpers Stolos wrote in `src/archon/export/intoto.ts` and S/MIME.
+ * written without padding and read with or without it.
  *
  * @example
  * ```ts

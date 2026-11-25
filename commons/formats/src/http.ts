@@ -3,8 +3,7 @@
  * Pure HTTP helpers that API clients and servers keep rewriting (commons 0001-formats FR-019): the `Link` header (RFC 8288) read into its
  * links so a client follows `rel="next"` pages, `Retry-After` (RFC 9110 §10.2.3) read as a wait whether it is seconds or a date, and which
  * methods are safe (RFC 9110 §9.2.1) so a read-only client can refuse the rest, and the entity-tag conditions of `If-Match` and
- * `If-None-Match` (RFC 9110 §13.1) a server answers with 412 or 304. Taken from Stolos's connector SDK (`src/archon/connect/sdk.ts`,
- * `connector.ts`), which matched `rel="next"` with a regular expression in two places, and erga's `lib/ts/http` (on `@std/http/etag`).
+ * `If-None-Match` (RFC 9110 §13.1) a server answers with 412 or 304.
  *
  * @example
  * ```ts

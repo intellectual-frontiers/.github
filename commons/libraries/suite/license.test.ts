@@ -146,6 +146,6 @@ proves([`${SPEC} FR-001`, `${SPEC} FR-005`, `${SPEC} FR-007`, `${SPEC} FR-011`],
   assertStringIncludes(read("package.json"), `"license": "${DEFAULT_LICENSE}"`);
   const contributing = read("CONTRIBUTING.md");
   for (const w of ["git commit -s", "Refs #N", "commercial licenses"]) assertStringIncludes(contributing, w);
-  for (const f of ["NOTICE", "LICENSING.md", "CONTRIBUTING.md"]) for (const n of ["Mizan", "Kanon", "Archon", "Stolos"]) assertStringIncludes(read(f), n);
+  for (const f of ["NOTICE", "LICENSING.md", "CONTRIBUTING.md"]) for (const n of ["Mizan", "Kanon", "Archon"]) assertStringIncludes(read(f), n);
   assertStringIncludes(read("COMMERCIAL.md"), "TO BE COMPLETED BY THE OWNER");
 });

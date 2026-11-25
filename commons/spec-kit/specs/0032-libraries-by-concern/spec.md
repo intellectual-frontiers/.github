@@ -50,7 +50,7 @@
 
 - **FR-010**: Each library MUST specify and prove its own requirements in its own spec kit (`commons/<name>/spec-kit/`), numbered from 0001, and the requirements of the specifications of commons as a whole that a library holds MUST be kept by that library: the register names the library's requirement for each (`review`, by this requirement). Where two libraries would need one another, the module is in the lower one and a library of a lower layer holds a port that a higher one installs (`proc.setProcessTracer` is the port that the telemetry installs when its module is loaded, so that `system` does not depend on `telemetry`).
 
-- **FR-011**: A consumer of the libraries, `erga` and `stolos`, MUST import a library by its package name from a registry (0036-distribution) and MUST NOT take a file of this repository by any other way.
+- **FR-011**: A consumer of the libraries (`erga`, a fleet repository) MUST import a library by its package name from a registry (0036-distribution) and MUST NOT take a file of this repository by any other way.
 - **FR-012**: A move of modules from one library to another MUST rewrite, in the same commit, every importer of them in this repository to the package name of their library, MUST add the dependency to each package that imports it, and MUST leave no re-export of the moved modules behind.
 
 ## Typing

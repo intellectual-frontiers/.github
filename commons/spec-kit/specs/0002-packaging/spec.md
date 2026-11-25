@@ -8,7 +8,7 @@
 
 **Input:** The packaging ontology of the software supply chain capability (0001-software-supply-chain): the package managers and system families of every computer a harness may meet, the
 commands that drive each manager, the package each family calls a program, what a harness must never run, and how far each family has been tried. It is seeded from the tables of `upt`
-(a universal package-management tool) and from what the retired Stolos engine ran (its tables are the origin `archon`; the name `archon` is now the commons library of 0034-archon); a tool generates from it the TOML table a harness reads, the shell fragment a script carries and the TypeScript module a harness's setup reads. It exists so that
+(a universal package-management tool) and from the commands a fleet engine runs (their origin is `archon`, the commons library of 0034-archon); a tool generates from it the TOML table a harness reads, the shell fragment a script carries and the TypeScript module a harness's setup reads. It exists so that
 the harnesses (`archon`, `toolchain`) and `erga` read one set of facts, and so that a new family is a change to data and a run on a real computer, not new branches in two languages.
 
 ## The ontology
@@ -19,7 +19,7 @@ the harnesses (`archon`, `toolchain`) and `erga` read one set of facts, and so t
 - **FR-002**: The data MUST hold every package manager and every operating-system row of the tables of `upt`, whatever the platform (Linux, the BSDs, macOS, Windows, Android and Haiku), so that
   a future harness is not limited to the families the retired engine ran on. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
 - **FR-003**: The data seeded from `upt` MUST say so, with its licence (MIT or Apache-2.0) and the identifier it leaves out (`oubes`, which is not an `os-release` ID). A command MUST say where it
-  comes from (`pm:origin`: `upt`, `archon` (the commands the retired Stolos engine ran, before `commons/archon` of 0034-archon replaced it), `memory` (written from knowledge) or `upt+memory` where the non-interactive form was written from knowledge), and a command, a family or a flag run on a real computer MUST say where and
+  comes from (`pm:origin`: `upt`, `archon` (the commands the fleet engine runs, 0034-archon), `memory` (written from knowledge) or `upt+memory` where the non-interactive form was written from knowledge), and a command, a family or a flag run on a real computer MUST say where and
   when (`pm:verifiedOn`); one with none is unverified (0001-software-supply-chain FR-006).
 - **FR-004**: A family MUST be `supported` where a harness acts on it and `catalogued` where it is only known, and MUST have an assurance: `verified`, `stand-in`, `untested` or `none`. A supported
   family that installs packages MUST have a preferred manager whose install command has a non-interactive form that comes from a harness (origin `archon`), a command that says whether a package

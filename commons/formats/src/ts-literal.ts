@@ -3,7 +3,7 @@
  * Data as TypeScript object literals, for files a program writes for people to read and edit (keys bare where they are identifiers, strings
  * in double quotes, two-space indentation and trailing commas), and the reader of exactly that subset, which never runs the file, so a past
  * version from `git show` can be read safely (commons 0001-formats FR-006); the writer takes any type shaped as JSON (commons 0001-formats FR-007).
- * Taken from Stolos's `src/archon/core/ts-literal.ts`; the reader returns a `Result` instead of throwing.
+ * The reader returns a `Result` and never throws.
  *
  * @example
  * ```ts

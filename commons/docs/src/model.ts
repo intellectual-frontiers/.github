@@ -162,5 +162,5 @@ export function slugOf(t: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-/** A name as a possessive: `commons'`, `Stolos'`, `Erga's`. */
+/** A name as a possessive: `commons'`, `Erga's`. */
 export const possessive = (name: string): string => (name.endsWith("s") ? `${name}'` : `${name}'s`);

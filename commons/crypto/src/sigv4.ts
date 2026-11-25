@@ -5,7 +5,7 @@
  * S3, which signs it as given, encoded once; the query sorted and encoded by RFC 3986; the headers in lower case, trimmed, sorted and
  * signed with `host` and `x-amz-date`; the payload's SHA-256), the string to sign over the credential scope, the key derived from the
  * secret through the day, region, service and `aws4_request`, and the `Authorization` header. The time is the caller's: the kernel reads
- * no clock. Taken from Stolos's `src/archon/connect/aws.ts`; checked against AWS's published examples.
+ * no clock. Checked against AWS's published examples.
  *
  * @example
  * ```ts

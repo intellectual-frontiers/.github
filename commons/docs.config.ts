@@ -431,7 +431,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-identity/spec-kit" },
     { layout: "commons", dir: "commons/planning-query/spec-kit" },
   ],
-  citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "stolos", "thyra"] },
+  citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "thyra"] },
   lenses: [guides, releases, dataModels, programs, repoOps],
   lintRules: "commons/lint/src/rules",
   retired: ["SQL Aide", "sql-aide", "File Aide", "IFRFS"],

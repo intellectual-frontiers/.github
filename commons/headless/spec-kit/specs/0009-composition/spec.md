@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The retirement of Stolos into libraries (issue #11) needs one command, `archon`, whose verbs come from several packages (`archon-server`, `archon-device`, `archon-boot`, and so on) that are installed separately and assembled in a small composition root. Headless had one program tree written in one place. This increment builds one program from a host and the plugins it is given: one tree, so one help, one completion script, one man page, one run log and one tier gate; a typed contract with stable identifiers; conflicts as values; and a conformance suite that a plugin runs on itself.
+**Input:** The fleet engine (issue #11) needs one command, `archon`, whose verbs come from several packages (`archon-server`, `archon-device`, `archon-boot`, and so on) that are installed separately and assembled in a small composition root. Headless had one program tree written in one place. This increment builds one program from a host and the plugins it is given: one tree, so one help, one completion script, one man page, one run log and one tier gate; a typed contract with stable identifiers; conflicts as values; and a conformance suite that a plugin runs on itself.
 
 ## The plugin and its contract
 

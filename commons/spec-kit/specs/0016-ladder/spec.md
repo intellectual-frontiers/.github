@@ -42,7 +42,7 @@
 ## Assumptions
 
 - The ladder is Intellectual Frontiers' own architecture: no consensus standard names it (ISO/IEC/IEEE 42010 describes architecture descriptions and layered architectures are common practice, but neither defines these rungs), so `0018-standards-first` treats it as `unaligned`, with that reason as its justification.
-- Erga and `stolos` each state a ladder today; they become instances of this one when they move to Mizan (issue #10, Phase 6).
+- A harness states its ladder as an instance of this one when it moves to Mizan (issue #10, Phase 6).
 
 ## Open questions
 

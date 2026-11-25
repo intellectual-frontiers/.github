@@ -6,9 +6,8 @@
  * each command is reported as an outcome, and the first failure that matters is a typed error carrying the outcomes until then; a
  * command marked `mayFail` (nothing to unload) never stops the rest. The scheduler, the home folder, the user's id and the program that
  * runs a command are parameters, defaulting to this computer's (`build.os`, `homeDir()`, `uid()`, `run`), so a test plans and installs any
- * scheduler's job in a temporary folder with a fake runner, and no real systemctl, launchctl or schtasks runs. Taken from Stolos's
- * `src/archon/export/schedule.ts` (`installJob`, `uninstallJob`), which took its file and command functions as dependencies and threw;
- * here the files go through `./fs.ts`, the commands through `./proc.ts` or a given runner, and errors are values.
+ * scheduler's job in a temporary folder with a fake runner, and no real systemctl, launchctl or schtasks runs. The files go through `./fs.ts`, the commands through `./proc.ts`
+ * or a given runner, and errors are values.
  *
  * @example
  * ```ts

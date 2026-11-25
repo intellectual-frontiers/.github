@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** What a probe on a machine answers and how it is reached: three read-only requests, the line of `authorized_keys` that restricts a key to the probe (made by the inbound surface of Headless), asking it through an executor of Headless (the ssh target, a container or this machine), and the two scripts (POSIX shell and PowerShell). It is the contract of an adopted machine as Stolos defined it (067-adopt): observed over ssh with a key that may run one read-only script and nothing else, and never changed.
+**Input:** What a probe on a machine answers and how it is reached: three read-only requests, the line of `authorized_keys` that restricts a key to the probe (made by the inbound surface of Headless), asking it through an executor of Headless (the ssh target, a container or this machine), and the two scripts (POSIX shell and PowerShell). It is the contract of an adopted machine: observed over ssh with a key that may run one read-only script and nothing else, and never changed.
 
 ## Requirements
 

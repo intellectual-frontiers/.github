@@ -1,8 +1,7 @@
 // Spec: 0001-core FR-003
 /**
  * Small pure text helpers that more than one codebase wrote: line endings made LF, ANSI escapes removed, and a command line split into its
- * argument vector without a shell (0001-core FR-003). Taken from Stolos's `fsx.ts` and `exec.ts` and the machine
- * setup's `ui.ts`.
+ * argument vector without a shell (0001-core FR-003).
  *
  * @example
  * ```ts

@@ -6,7 +6,7 @@
  *
  * @remarks
  * It is built from the published site alone, for no formal schema was available; where the site is silent the ontology is silent, and the three states of an alignment, which the site does not give, are said in their definitions to come from
- * the estate library and Stolos. An acceptance run specializes `ifqs:TestRun`, and the evidence grade `ifqs:E5` is the same idea in the quality system. Every class has a record of its basis.
+ * the estate library. An acceptance run specializes `ifqs:TestRun`, and the evidence grade `ifqs:E5` is the same idea in the quality system. Every class has a record of its basis.
  *
  * @limits
  * The entities each domain lists are names, not classes: a class is stated only where a library of commons needs one. The properties do not yet carry a basis of their own.
@@ -198,11 +198,11 @@ export const dimensions = codes(classSchema(oto.Dimension, CODE), OTO, {
   FailureModesAndRecovery: { label: en("Failure modes and recovery"), definition: en("How the system fails and recovers: silently or with an alert, gracefully or not.") },
 });
 
-/** The states of an alignment: the site does not give them; they come from the estate library and from Stolos (067-adopt, 117-adopted-in-status). */
+/** The states of an alignment: the site does not give them; they come from the estate library (0003-estate-logical). */
 export const alignmentStates = codes(classSchema(oto.AlignmentState, CODE), OTO, {
   Aligned: { label: en("aligned"), definition: en("What is declared and what is observed agree. Not on the source's site: from the estate library.") },
   Drifted: { label: en("drifted"), definition: en("What is declared and what is observed differ. Not on the source's site: from the estate library.") },
-  NotObserved: { label: en("not observed"), definition: en("Nothing was observed yet: a waiting item, never a failure and never agreement. Not on the source's site: from Stolos 117-adopted-in-status.") },
+  NotObserved: { label: en("not observed"), definition: en("Nothing was observed yet: a waiting item, never a failure and never agreement. Not on the source's site: from the estate library.") },
 });
 
 // ---- the classes and the properties

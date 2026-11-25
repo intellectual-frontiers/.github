@@ -3,7 +3,6 @@
  * SHA-512 crypt (`$6$`), the password hash of glibc's `crypt(3)` that Linux accounts and Ubuntu's installer accept, on Web Crypto alone
  * (commons 0001-crypto FR-003). The algorithm is Ulrich Drepper's "Unix crypt using SHA-256 and SHA-512". The salt is given,
  * so the kernel stays free of effects: a caller makes one from random bytes with `cryptSalt(crypto.getRandomValues(new Uint8Array(16)))`.
- * Taken from Stolos's `src/archon/core/crypt.ts`.
  *
  * @example
  * ```ts
