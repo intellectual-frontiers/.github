@@ -1,0 +1,1082 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45633182390",
+    "workflow": "ci",
+    "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+    "at": "2026-11-25T14:34:44Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45633182390"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 589,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 28973,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 14,
+      "durationMs": 45782,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 184,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 959,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-nist-csf-2",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 959,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 206,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 797,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-nist-sp800",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 797,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 370,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 961,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "catalog-soc2",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 961,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 346,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 202,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 160,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 752,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 752,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 324,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1607,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1607,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 351,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 3714,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3714,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "findings",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 158,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "findings",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1057,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "findings",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1057,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "grc",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 157,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "grc",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4515,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "grc",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3487,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "grc",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3487,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 154,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 285,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-fhir",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 808,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 136,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 191,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-github",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 494,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 206,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1171,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "integrations-identity",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1171,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 322,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 296,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-x12",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 820,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 165,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2056,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1821,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "integrations",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1821,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12270,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14624,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 381,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30351,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30351,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9516,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5077,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 144,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1852,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ontology",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1417,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 900,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 900,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 342,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1638,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1638,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 147,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3268,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3268,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-1289c05a8ed3fe70",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-26ea56fd7e5137e2",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-2705acfa2ed0e0c2",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-findings.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-3609945717c229c1",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-367e813aaf0e3799",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "0307515ec8cfa7af0adc28277210f15f44ae3e8642d9645824e04c63c8754312"
+      },
+      "at": "2026-11-25T14:23:24Z",
+      "code": "test-failed",
+      "file": "suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-36d15410330916f7",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-3c193d9f9caedfca",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-history.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-506bca6811f23cec",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-53439dd8ff5bbf9d",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-findings.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-5e289142e1b54856",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\pack-commons.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-7c38ef029c099442",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-89d0c6f62e926d4e",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-8a5ff888a3ad6334",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail",
+      "key": "0001-libraries FR-029, 0001-libraries FR-030: the packer builds the real files of a small repository into one tarball that passes its own inspection, and each check that matters is shown on a copy made to fail"
+    },
+    {
+      "id": "f-9337ce92a3095da9",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-a9c9206fef4add00",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-history.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one",
+      "key": "0002-libraries-ci-findings FR-007: the program keeps a findings file given on the command line and says so where the file is not one"
+    },
+    {
+      "id": "f-af726f12df004ad8",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-b25bd777d8595107",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line",
+      "key": "0002-libraries-ci-findings FR-003: each parser reads the real output of its tool into findings with the file, the line, the code and a key that is not a line"
+    },
+    {
+      "id": "f-c0f91184103d0837",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout",
+      "key": "0002-libraries-ci-findings FR-004: the wrapper runs a failing test command and exits as a green step with the failure as a finding, runs a command that prints nothing as no-output, one that does not exist as tool-error, and one that does not end as timeout"
+    },
+    {
+      "id": "f-dfff34c91726ce27",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy",
+      "key": "0002-libraries-ci-findings FR-006: the real program ends 0 where cells have failing tests and findings, 2 where a cell that ran left no file, and adds owner-review-due after the day of the release policy"
+    },
+    {
+      "id": "f-e75fdcc326d94385",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\ci-accepted.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-ede1c52af63b5f62",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "868e9b0c06c6ff2ca2c173bb39b36e5597004ef604f0abd90d61c9149d856002"
+      },
+      "at": "2026-11-25T14:24:52Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced",
+      "key": "0002-libraries-ci-findings FR-007: two runs that push at once both land: the one that finds the branch moved retries from the new tip and nothing is forced"
+    },
+    {
+      "id": "f-efe6b4b56064beed",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e58f108bf306350b69b2fe0bdb932ae94f1705ed98bcccc3c7fe60ab1881b1e"
+      },
+      "at": "2026-11-25T14:24:23Z",
+      "code": "test-failed",
+      "file": "suite\\workflows.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none",
+      "key": "0002-libraries-ci-findings FR-009: a good acceptance is read and each rule is found in a real file, naming it; the program ends 1 for a problem and 0 for none"
+    },
+    {
+      "id": "f-ffc5c01fe2f2a103",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45633182390",
+        "commit": "ed9d3068e7d940e3cf9c8d2690aadfbbd369a268",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "0307515ec8cfa7af0adc28277210f15f44ae3e8642d9645824e04c63c8754312"
+      },
+      "at": "2026-11-25T14:23:24Z",
+      "code": "test-failed",
+      "file": "suite/journal.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    }
+  ]
+}
