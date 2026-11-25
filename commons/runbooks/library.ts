@@ -41,6 +41,7 @@ export const library = {
         ],
       },
       { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [
+          { name: "@intellectual-frontiers/anyfs", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/planning", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/runbooks", subpaths: ["governance", "logical"] },
