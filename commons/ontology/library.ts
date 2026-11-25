@@ -24,6 +24,8 @@ export const library = {
     "./oto/oto",
     "./planning",
     "./planning/planning",
+    "./workload",
+    "./workload/workload",
     "./ifr",
     "./ifr/audit",
     "./ifr/ifr",

@@ -39,6 +39,7 @@ import * as ifrOntology from "@intellectual-frontiers/ontology/ifr";
 import * as ifqsOntology from "@intellectual-frontiers/ontology/ifqs";
 import * as otoOntology from "@intellectual-frontiers/ontology/oto";
 import * as planningOntology from "@intellectual-frontiers/ontology/planning";
+import * as workloadOntology from "@intellectual-frontiers/ontology/workload";
 import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
@@ -297,6 +298,40 @@ export const PLANNING: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Workload (commons 0040-workload-pattern), as it is published. */
+export const WORKLOAD: OntologyPublication = {
+  name: "workload",
+  ns: { prefix: "wl", iri: workloadOntology.WORKLOAD.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["wl", workloadOntology.WORKLOAD.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+  ],
+  files: workloadOntology.files,
+  ontology: workloadOntology.workloadOntology,
+  classes: workloadOntology.classes,
+  properties: workloadOntology.properties,
+  terms: workloadOntology.terms,
+  schemas: [workloadOntology.FormSchema, workloadOntology.TriggerSchema],
+  lists: listsOf("wl", [
+    ["Form", workloadOntology.forms],
+    ["Trigger", workloadOntology.triggers],
+  ]),
+  source: "commons/ontology/src/workload/*.ts",
+  run: RUN,
+  shapes: { prefix: "wlsh", iri: "https://www.intellectualfrontiers.com/ontology/workload-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/workload-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/workload-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#" },
+  viewTitle: "Workload Ontology",
+  license: CC0,
+};
+
 /** The ontology of Intellectual Frontiers Releases (commons 0026-works-versioning), as it is published. */
 export const IFR: OntologyPublication = {
   name: "ifr",
@@ -368,7 +403,7 @@ export const KANON: OntologyPublication = {
 };
 
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, IFR, KANON];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, WORKLOAD, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

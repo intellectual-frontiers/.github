@@ -114,7 +114,7 @@ export function readSetFile(text: string): Result<Dependencies, string> {
 const PURPOSE: Readonly<Record<BundleName, string>> = {
   commons: "Every consumer-facing library of Intellectual Frontiers Commons, at the versions of one release.",
   foundation: "The foundation libraries: errors as values and decoders, formats, cryptography, the system, the terminal, telemetry, the network, the test runtime, RDF, the Git host and the lint rules.",
-  patterns: "The pattern libraries: the headless program pattern and the layers of Kanon.",
+  patterns: "The pattern libraries: the headless program pattern, the layers of Kanon and Workload, the pattern of operated work.",
   programs: "The program libraries: the operations program of a repository, workspaces, data, integrations and the rest of the programs.",
   standards: "The standards libraries: Mizan, the ontologies, the quality standards and the standards of integrations.",
 };

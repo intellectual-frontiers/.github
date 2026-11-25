@@ -72,7 +72,7 @@ proves(
     const expected = [
       "generated/mizan-audit-packaging.auto.ttl",
       "generated/mizan-catalog.auto.ttl",
-      ...["mizan", "ifccm", "ifqs", "oto", "planning", "ifr", "kanon"].flatMap((name) => [
+      ...["mizan", "ifccm", "ifqs", "oto", "planning", "workload", "ifr", "kanon"].flatMap((name) => [
         `generated/${name}-code-lists.auto.skos.ttl`,
         `generated/${name}-code-lists.auto.sql`,
         `generated/${name}-mappings.auto.sssom.tsv`,

@@ -19,6 +19,8 @@
     "./oto/oto": "./src/oto/oto.ts",
     "./planning": "./src/planning/mod.ts",
     "./planning/planning": "./src/planning/planning.ts",
+    "./workload": "./src/workload/mod.ts",
+    "./workload/workload": "./src/workload/workload.ts",
     "./ifr": "./src/ifr/mod.ts",
     "./ifr/audit": "./src/ifr/audit.ts",
     "./ifr/ifr": "./src/ifr/ifr.ts",

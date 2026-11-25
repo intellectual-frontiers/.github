@@ -808,3 +808,10 @@ requirement	mechanism	by	note
 0039-content-method FR-018	review	0039-content-method FR-018	no instance exists yet
 0039-content-method FR-019	review	0039-content-method FR-019	the matrix is a table of this specification until the assembly exists
 0011-documentation FR-043	check	.github: bun test ./tests/	agents-md-check.test.ts: a file past the budget in size or in lines is a finding that names the file, its size and the budget, a file within it is none, and the check never throws on a missing file; the real file is reported and never asserted
+0040-workload-pattern FR-001	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the term in the library's terms and definitions (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-002	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the table of the library, held by the shared checker of Kanon (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-003	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the terms and the registries (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-004	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the contract of a form and the two forms (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-005	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the registry of forms (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-006	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the exports of the core (commons-workload-pattern.test.ts)
+0040-workload-pattern FR-007	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the members of the patterns metapackage (commons-workload-pattern.test.ts)

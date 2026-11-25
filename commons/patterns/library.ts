@@ -13,5 +13,5 @@ export const library = {
   distribution: ["github", "npm"],
   exports: ["."],
   bundle: "patterns",
-  summary: "The pattern libraries as one install, each at an exact version. The headless program pattern and the layers of Kanon.",
+  summary: "The pattern libraries as one install, each at an exact version. The headless program pattern, the layers of Kanon and Workload, the pattern of operated work: a governance core, forms as logical modules, executors behind ports and projections as dialects.",
 };
