@@ -1,9 +1,10 @@
-// Spec: 0004-grc-documents FR-005, FR-006, FR-007
+// Spec: 0004-grc-documents FR-005, FR-006, FR-007; 0016-grc-poam FR-002, FR-003, FR-004, FR-005, FR-006
 /**
  * The `oscal` serializer (0004-grc-documents FR-006, FR-007): an assessment written as OSCAL JSON, as `assessment-results`, a `system-security-plan` of what is implemented, or a
  * `plan-of-action-and-milestones` of what is open, by the option `model`. Every `uuid` is a version 5 UUID of the assessment's id and a stable name, so that the same assessment gives the same
  * document. A control is written by its own id (the last part of its URN) with its framework in a property; where the caller names a `framework` option, a crosswalk of `equal` gives the
- * control of that framework.
+ * control of that framework. The `plan-of-action-and-milestones` also writes the planned findings the option `planned` gives (0016-grc-poam): each a risk with the milestones of its remediation as tasks, a finding of each
+ * control it bears on and a poam-item that relates them, with the owners as parties.
  *
  * @limits
  * The structure follows OSCAL 1.2.3's models for the fields written; the output was not run through OSCAL's own validator here. A system's characteristics beyond its name are not invented:
@@ -13,7 +14,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { type Json, mappedControls, parseControlUrn } from "@intellectual-frontiers/grc/governance";
-import { type Assessment, type Result as Outcome, type SerializeContext, type SerializeProblem, type Serializer, uuidOf } from "@intellectual-frontiers/grc/logical";
+import { type Assessment, type PlannedFinding, plannedFindings, type Result as Outcome, type SerializeContext, type SerializeProblem, type Serializer, uuidOf } from "@intellectual-frontiers/grc/logical";
 
 /** The version of OSCAL the documents are written as. */
 export const OSCAL_VERSION = "1.2.3";
@@ -174,7 +175,82 @@ async function ssp(a: Assessment, ctx: SerializeContext): Promise<Obj> {
   };
 }
 
-async function poam(a: Assessment, ctx: SerializeContext): Promise<Obj> {
+/** The OSCAL date and time of a day: the day at 00:00:00 UTC. */
+const dateTimeOf = (day: string): string => `${day}T00:00:00Z`;
+
+/** What a planned finding writes: its risk, the findings of its controls, its poam-item and the owners of its milestones. */
+async function plannedEntries(a: Assessment, ctx: SerializeContext, planned: readonly PlannedFinding[]): Promise<{ readonly risks: readonly Obj[]; readonly findings: readonly Obj[]; readonly items: readonly Obj[]; readonly owners: readonly string[] }> {
+  const sorted = [...planned].sort((x, y) => (x.id < y.id ? -1 : x.id > y.id ? 1 : 0));
+  const owners = new Set<string>();
+  const risks: Obj[] = [];
+  const findings: Obj[] = [];
+  const items: Obj[] = [];
+  for (const p of sorted) {
+    const riskUuid = await uuidOf([a.id, "risk", p.id]);
+    const seen = new Map<string, { readonly id: string; readonly framework: string }>();
+    for (const c of p.controls) {
+      const x = controlOf(c, ctx);
+      seen.set(`${x.framework}\u0000${x.id}`, x);
+    }
+    const controls = [...seen.entries()].sort(([x], [y]) => (x < y ? -1 : 1)).map(([, v]) => v);
+    const milestones = [...p.milestones].sort((x, y) => (x.due ?? "\uffff") + x.id < (y.due ?? "\uffff") + y.id ? -1 : 1);
+    const tasks = await Promise.all(
+      milestones.map(async (m) => {
+        const names = [...new Set(m.owners)].sort();
+        for (const n of names) owners.add(n);
+        return {
+          uuid: await uuidOf([a.id, "milestone", p.id, m.id]),
+          type: "milestone",
+          title: m.title,
+          props: [{ name: "status", ns: NS, value: m.status }, ...(m.completedAt === undefined ? [] : [{ name: "completed", ns: NS, value: m.completedAt }])],
+          ...(m.due === undefined ? {} : { timing: { "on-date": { date: dateTimeOf(m.due) } } }),
+          ...(names.length === 0 ? {} : { "responsible-roles": [{ "role-id": "owner", "party-uuids": await Promise.all(names.map((n) => uuidOf([a.id, "party", n]))) }] }),
+        };
+      }),
+    );
+    const description = p.body === "" ? p.title : p.body;
+    risks.push({
+      uuid: riskUuid,
+      title: p.title,
+      description,
+      statement: `${p.title}${controls.length === 0 ? "" : ` (${controls.map((c) => c.id).join(", ")})`}.`,
+      status: milestones.length === 0 ? "open" : "remediating",
+      props: [{ name: "status", ns: NS, value: p.status }, ...(p.severity === undefined ? [] : [{ name: "severity", ns: NS, value: p.severity }])],
+      ...(p.scheduledCompletion === undefined ? {} : { deadline: dateTimeOf(p.scheduledCompletion) }),
+      ...(milestones.length === 0 ? {} : { remediations: [{ uuid: await uuidOf([a.id, "remediation", p.id]), lifecycle: p.status === "completed" ? "completed" : "planned", title: "Remediation", description, tasks }] }),
+    });
+    const written = await Promise.all(
+      controls.map(async (c) => ({
+        uuid: await uuidOf([a.id, "finding", p.id, c.framework, c.id]),
+        c,
+      })),
+    );
+    // in the order of the controls, whatever order the uuids were made in
+    for (const { uuid, c } of written) {
+      findings.push({
+        uuid,
+        title: c.id,
+        description: `${p.title}: ${c.id} is not satisfied while the plan is open.`,
+        props: [{ name: "framework", ns: NS, value: c.framework }],
+        target: { type: "objective-id", "target-id": c.id, status: { state: "not-satisfied" } },
+        "related-risks": [{ "risk-uuid": riskUuid }],
+      });
+    }
+    const related = written.map(({ uuid }) => ({ "finding-uuid": uuid }));
+    for (const o of p.owners) owners.add(o);
+    items.push({
+      uuid: await uuidOf([a.id, "poam-item", riskUuid]),
+      title: p.title,
+      description,
+      props: [{ name: "status", ns: NS, value: p.status }, ...[...new Set(p.owners)].sort().map((o) => ({ name: "owner", ns: NS, value: o }))],
+      ...(related.length === 0 ? {} : { "related-findings": related }),
+      "related-risks": [{ "risk-uuid": riskUuid }],
+    });
+  }
+  return { risks, findings, items, owners: [...owners].sort() };
+}
+
+async function poam(a: Assessment, ctx: SerializeContext, planned: readonly PlannedFinding[]): Promise<Obj> {
   const open = a.findings.filter((f) => OPEN.has(f.status) && f.exception === undefined).sort((x, y) => (x.id < y.id ? -1 : 1));
   const risks = [
     ...(await Promise.all(
@@ -199,17 +275,24 @@ async function poam(a: Assessment, ctx: SerializeContext): Promise<Obj> {
         })),
       )),
   ];
-  const fixed = risks;
   const items = await Promise.all(
-    fixed.map(async (r) => ({ uuid: await uuidOf([a.id, "poam-item", r.uuid]), title: r.title, description: r.description, "related-risks": [{ "risk-uuid": r.uuid }] })),
+    risks.map(async (r) => ({ uuid: await uuidOf([a.id, "poam-item", r.uuid]), title: r.title, description: r.description, "related-risks": [{ "risk-uuid": r.uuid }] })),
   );
+  const plan = await plannedEntries(a, ctx, planned);
+  const allRisks = [...risks, ...plan.risks];
+  const allItems = [...items, ...plan.items];
+  const meta = await metadata(a, `${a.title}: plan of action and milestones`);
   return {
     "plan-of-action-and-milestones": {
       uuid: await uuidOf([a.id, "plan-of-action-and-milestones"]),
-      metadata: await metadata(a, `${a.title}: plan of action and milestones`),
+      metadata: {
+        ...meta,
+        ...(plan.owners.length === 0 ? {} : { roles: [{ id: "owner", title: "Owner" }], parties: await Promise.all(plan.owners.map(async (name) => ({ uuid: await uuidOf([a.id, "party", name]), type: "person", name }))) }),
+      },
       "import-ssp": { href: `#${await uuidOf([a.id, "system-security-plan"])}` },
-      ...(fixed.length === 0 ? {} : { risks: fixed }),
-      "poam-items": items.length === 0 ? [{ uuid: await uuidOf([a.id, "poam-item", "none"]), title: "Nothing is open", description: "No finding is open and no risk is held." }] : items,
+      ...(allRisks.length === 0 ? {} : { risks: allRisks }),
+      ...(plan.findings.length === 0 ? {} : { findings: plan.findings }),
+      "poam-items": allItems.length === 0 ? [{ uuid: await uuidOf([a.id, "poam-item", "none"]), title: "Nothing is open", description: "No finding is open and no risk is held." }] : allItems,
     },
   };
 }
@@ -222,7 +305,13 @@ export const oscal: Serializer = {
   media: "application/json",
   async serialize(a: Assessment, ctx: SerializeContext): Promise<Result<string, SerializeProblem>> {
     const model: Json | undefined = ctx.options?.["model"];
-    const make = model === undefined || model === "assessment-results" ? assessmentResults : model === "system-security-plan" ? ssp : model === "plan-of-action-and-milestones" ? poam : undefined;
+    if (model === "plan-of-action-and-milestones") {
+      const raw = ctx.options?.["planned"];
+      const planned = raw === undefined ? ok<readonly PlannedFinding[]>([]) : plannedFindings(raw);
+      if (planned.kind === "err") return err({ kind: "invalid", message: `the option planned: ${planned.error}` });
+      return ok(`${JSON.stringify(await poam(a, ctx, planned.value), null, 2)}\n`);
+    }
+    const make = model === undefined || model === "assessment-results" ? assessmentResults : model === "system-security-plan" ? ssp : undefined;
     if (make === undefined) return err({ kind: "unsupported", message: `the OSCAL model ${String(model)} is not written: assessment-results, system-security-plan or plan-of-action-and-milestones` });
     return ok(`${JSON.stringify(await make(a, ctx), null, 2)}\n`);
   },

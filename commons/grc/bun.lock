@@ -12,6 +12,7 @@
         "@intellectual-frontiers/lang-sql": "link:../lang-sql",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/planning": "link:../planning",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/terminal": "link:../terminal",
         "@intellectual-frontiers/test": "link:../test",
@@ -35,6 +36,8 @@
     "@intellectual-frontiers/libraries": ["@intellectual-frontiers/libraries@link:../libraries", {}],
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
+
+    "@intellectual-frontiers/planning": ["@intellectual-frontiers/planning@link:../planning", {}],
 
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 

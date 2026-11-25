@@ -131,3 +131,10 @@ requirement	mechanism	by	note
 0015-grc-query FR-003	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
 0015-grc-query FR-004	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
 0015-grc-query FR-005	check	.github: cd commons/grc && bun run verify	suite/query.test.ts
+0016-grc-poam FR-001	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the decoder gives the planned findings of Planning's view as they are and refuses a bad day, status or control reference naming the member
+0016-grc-poam FR-002	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the risk, the remediation, the findings of the controls and the poam-item with its related findings and risks
+0016-grc-poam FR-003	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the milestones as tasks of type milestone with on-date, the owners as parties and responsible roles, and none where there is no owner
+0016-grc-poam FR-004	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the same bytes for the planned findings in any order, and the uuids are version 5
+0016-grc-poam FR-005	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the controls of two frameworks in one document, the crosswalk to a framework, the findings and risks of the assessment kept, and the empty document
+0016-grc-poam FR-006	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: an option that is not planned findings is an invalid problem and writes nothing, and another model ignores it
+0016-grc-poam FR-007	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the document written with milestones, owners and two frameworks is valid against NIST's published schema where the schema and ajv are at hand
