@@ -1,0 +1,64 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45551460302",
+    "workflow": "ci",
+    "commit": "1d7e8a5a3d570bf70c4724f8030d5d306d5aebc5",
+    "at": "2026-11-25T05:10:24Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45551460302"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 382,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 262,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 134,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 48563,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 48563,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": []
+}
