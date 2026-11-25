@@ -42,7 +42,7 @@ proves(["0003-netboot-logical FR-002"], "a host is armed with a token and stays 
   assert(/^[0-9a-f]{32}$/.test(t) && t !== newToken());
   s = arm(s, "synthetic-server-02", { token: t, at: "2026-11-21T00:00:00Z" });
   assert(isArmed(s, "synthetic-server-02") && !isArmed(s, "synthetic-server-03"));
-  assert(tokenFits(s, "synthetic-server-02", t) && !tokenFits(s, "synthetic-server-02", `${t.slice(0, 31)}0`) && !tokenFits(s, "synthetic-server-02", t.slice(0, 31)) && !tokenFits(s, "synthetic-server-03", t));
+  assert(tokenFits(s, "synthetic-server-02", t) && !tokenFits(s, "synthetic-server-02", `${t.slice(0, 31)}${t.endsWith("0") ? "1" : "0"}`) && !tokenFits(s, "synthetic-server-02", t.slice(0, 31)) && !tokenFits(s, "synthetic-server-03", t));
   assert(!tokenFits(arm(s, "short", { token: "abc", at: "x" }), "short", "abc"), "a short token is no token");
   assertEquals(armedHosts(arm(s, "baker", { token: "b".repeat(32), at: "x" })).map((a) => a.host.name), ["baker", "synthetic-server-02"]);
   s = done(s, "synthetic-server-02", "aa:bb:cc:dd:ee:ff", "2026-11-21T01:00:00Z");
@@ -180,12 +180,17 @@ function tftpGet(port: number, file: string, options: Record<string, string> = {
     const chunks: Uint8Array[] = [];
     let oack: Record<string, string> | undefined;
     let blksize = 512;
+    let done = false;
     const finish = (r: { bytes?: Uint8Array; error?: { code: number; message: string } }): void => {
+      if (done) return;
+      done = true;
       setTimeout(() => s.close(), 100);
       resolve({ ...r, ...(oack === undefined ? {} : { oack }) });
     };
     const rrq = Buffer.concat([Buffer.from([0, 1]), Buffer.from(`${file}\0${mode}\0${Object.entries(options).map(([k, v]) => `${k}\0${v}\0`).join("")}`)]);
+    s.on("error", () => finish({ error: { code: -1, message: "the server went away" } }));
     s.on("message", (m, r) => {
+      if (done) return;
       const op = m.readUInt16BE(0);
       if (op === 6) {
         const parts = m.subarray(2).toString().split("\0");
@@ -248,6 +253,18 @@ proves(["0004-netboot-physical FR-003"], "the TFTP server gives a file with the 
   } finally {
     await server.stop();
   }
+});
+
+proves(["0004-netboot-physical FR-003"], "stopping the TFTP server while a transfer is going ends the transfer without an error", async () => {
+  const big = new Uint8Array(8 * 5000);
+  const events: string[] = [];
+  const server = await tftpServer({ port: 0, hostname: "127.0.0.1", read: async () => big, onTransfer: (e) => events.push(e.outcome) });
+  const got = tftpGet(server.port, "/big", { blksize: "8" });
+  await new Promise((r) => setTimeout(r, 20));
+  await server.stop();
+  await new Promise((r) => setTimeout(r, 2500));
+  assertEquals(events.includes("timed-out"), false, "a transfer cut by stop is not a time-out");
+  assertEquals((await got).bytes, undefined);
 });
 
 const SPEC_BASE = BASE_PLACEHOLDER;
