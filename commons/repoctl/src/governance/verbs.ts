@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "usage" | "ci step" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "usage" | "names" | "ci step" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -124,6 +124,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
   usage: {
     id: "usage",
     summary: "Say what this repository uses of the package @intellectual-frontiers/commons: the libraries it imports, those reached through them and those never touched, with their sizes.",
+    kind: "report",
+    effect: "read",
+    idempotent: true,
+    dryRun: false,
+    check: false,
+    tier: "public",
+    channels: ["local", "mcp"],
+    confirmation: "none",
+    humanOnly: [],
+  },
+  names: {
+    id: "names",
+    summary: "Say which files of a tree hold a name from the names files (tenants, MSPs, retired names): a platform repository is held not to say what only a tenant's repository may, and the names are the data of whoever asks (commons 0015-repoctl-names).",
     kind: "report",
     effect: "read",
     idempotent: true,
@@ -294,5 +307,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "usage", "ci step", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "usage", "names", "ci step", "mcp"];
 }

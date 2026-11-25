@@ -13,3 +13,4 @@ number	slug	state
 0012	repoctl-query	in force
 0013	repoctl-ci	in force
 0014	repoctl-usage	in force
+0015	repoctl-names	in force
