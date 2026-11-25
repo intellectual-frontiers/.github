@@ -41,7 +41,7 @@ export const DATA_CLASSES = ["cui", "fci", "phi", "pii", "pci", "public"] as con
 /** The coding harnesses an estate knows by name (a harness not here is `other`). */
 export const HARNESSES = ["claude-code", "codex", "herdr", "other"] as const;
 
-/** The digest of the typed `agents` policy that bounds what the harnesses of a workstation may do: `sha256:` and 64 hexadecimal digits. */
+/** The digest of the typed `agents` policy that bounds what the harnesses of a workshop may do: `sha256:` and 64 hexadecimal digits. */
 export const AGENTS_POLICY_DIGEST = /^sha256:[0-9a-f]{64}$/;
 
 /** The kinds with attributes. */
@@ -90,9 +90,19 @@ export const KINDS: readonly KindSpec[] = [
   },
   {
     kind: "workstation",
-    summary: "A machine a person or an agent works on; an agent workspace is one whose role is agent-workspace.",
+    summary: "Where the operator, a person or an agent, orchestrates from: the harness client, the operator's identity and keys.",
     attributes: [
-      str("role", "What the machine is for.", { values: ["agent-workspace", "developer", "other"] }),
+      str("role", "What the machine is for.", { values: ["developer", "operator", "other"] }),
+      str("os-family", "The family of the operating system, as observed.", { values: ["arch", "debian", "rhel", "macos", "windows", "other"] }),
+      str("distro", "The distribution, as observed.", { values: ["arch", "ubuntu", "debian", "rocky", "macos", "windows", "other"] }),
+      strs("harnesses", "The client harnesses installed on it: claude-code, codex, herdr or other."),
+    ],
+  },
+  {
+    kind: "workshop",
+    summary: "Where the work happens: a machine, a virtual machine or a container on which coding harnesses work; an agent workspace is one whose role is agent-workspace.",
+    attributes: [
+      str("role", "What the workshop is for.", { values: ["agent-workspace", "build", "test", "other"] }),
       str("disposability", "Whether it may be thrown away and rebuilt.", { values: ["disposable", "persistent"] }),
       str("isolation", "What isolates it from the machine it runs on.", { values: ["container", "vm", "physical"] }),
       str("os-family", "The family of the operating system, as observed.", { values: ["arch", "debian", "rhel", "macos", "windows", "other"] }),
@@ -165,11 +175,11 @@ export function checkAttributes(kind: string, attributes: Readonly<Record<string
     const harness = given["harness"];
     if (harness !== undefined && given["tier"] !== "agent-harness") problems.push("application attribute harness is for the tier agent-harness");
   }
-  if (kind === "workstation") {
+  if (kind === "workshop") {
     const digest = given["agents-policy"];
-    if (typeof digest === "string" && !AGENTS_POLICY_DIGEST.test(digest)) problems.push("workstation attribute agents-policy is not a digest (sha256: and 64 hexadecimal digits)");
-    if (given["omarchy"] === true && given["distro"] !== undefined && given["distro"] !== "arch") problems.push("an Omarchy workstation is distro arch");
-    if (given["omarchy"] === true && given["os-family"] !== undefined && given["os-family"] !== "arch") problems.push("an Omarchy workstation is os-family arch");
+    if (typeof digest === "string" && !AGENTS_POLICY_DIGEST.test(digest)) problems.push("workshop attribute agents-policy is not a digest (sha256: and 64 hexadecimal digits)");
+    if (given["omarchy"] === true && given["distro"] !== undefined && given["distro"] !== "arch") problems.push("an Omarchy workshop is distro arch");
+    if (given["omarchy"] === true && given["os-family"] !== undefined && given["os-family"] !== "arch") problems.push("an Omarchy workshop is os-family arch");
   }
   return problems;
 }
@@ -179,7 +189,7 @@ export type LinkSpec = { readonly kind: string; readonly from: readonly string[]
 
 /** The named kinds of link. A link of a kind that is not here is allowed and unchecked; one of these kinds is refused where an end is not of a kind it may join. */
 export const LINK_KINDS: readonly LinkSpec[] = [
-  { kind: "runs-on", from: ["application", "service"], to: ["server", "workstation", "cloud-resource", "device"], summary: "An application or a service runs on a machine or a cloud resource." },
+  { kind: "runs-on", from: ["application", "service"], to: ["server", "workstation", "workshop", "cloud-resource", "device"], summary: "An application or a service runs on a machine or a cloud resource." },
   { kind: "exposes", from: ["server", "cloud-resource", "application", "service", "device"], to: ["endpoint"], summary: "An asset makes an endpoint reachable." },
   { kind: "depends-on", from: "any", to: "any", summary: "An asset cannot work without another." },
   { kind: "resolves-to", from: ["domain"], to: ["endpoint", "server", "cloud-resource", "device"], summary: "A name leads to an asset." },

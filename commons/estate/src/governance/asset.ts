@@ -17,7 +17,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { CAPABILITIES, parseAssetId, parseAssetKind, parseSystemId, ORIGINS, type AssetId, type AssetKind, type AssetState, type Capability, type Install, type Origin, type SystemId } from "./ids.ts";
 import { checkAttributes, type AttributeValue } from "./kinds.ts";
 import { offers, reasonNotOffered } from "./states.ts";
-import { checkWorkstationOwners } from "./workstation.ts";
+import { checkWorkshopOwners } from "./workshop.ts";
 
 /** What `defineAsset` takes. */
 export type AssetInput = {
@@ -88,6 +88,6 @@ export function defineAsset(input: AssetInput): Result<Asset, readonly string[]>
     if (system.kind === "err") problems.push(`${input.id}: ${system.error}`);
     else lines.push({ capability, offered: true, owner: system.value });
   }
-  if (input.kind === "workstation") for (const m of checkWorkstationOwners(input.owners, input.attributes)) problems.push(`${input.id}: ${m}`);
+  if (input.kind === "workshop") for (const m of checkWorkshopOwners(input.owners, input.attributes)) problems.push(`${input.id}: ${m}`);
   return problems.length > 0 || id.kind === "err" || kind.kind === "err" ? err(problems) : ok({ id: id.value, kind: kind.value, state: input.state, ...(origin === undefined ? {} : { origin }), ...(input.attributes === undefined ? {} : { attributes: input.attributes }), capabilities: lines });
 }

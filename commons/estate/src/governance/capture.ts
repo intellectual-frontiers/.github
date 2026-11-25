@@ -59,8 +59,8 @@ export const DEFAULT_CAPTURE_POLICY: CapturePolicy = {
   sealing: { required: "on-export", key: null },
 };
 
-/** The capture policy for the agent workspaces of an estate (0008-estate-workstations FR-016): an agent workspace is observed every 15 minutes whether adopted or managed, and a disposable one is journaled as changes and a heartbeat. */
-export const AGENT_WORKSPACE_CAPTURE: CapturePolicyInput = {
+/** The capture policy for the workshops of an estate whose role is agent-workspace (0008-estate-workstations FR-016): such a workshop is observed every 15 minutes whether adopted or managed, and a disposable one is journaled as changes and a heartbeat. */
+export const WORKSHOP_CAPTURE: CapturePolicyInput = {
   cadence: { perRole: { "agent-workspace": "PT15M" } },
   journal: { disposable: { granularity: "changes-and-heartbeat", heartbeat: "PT30M" } },
 };
