@@ -1,4 +1,4 @@
-// Spec: 0002-planning-core FR-005
+// Spec: 0002-planning-core FR-005; 0006-planning-poam FR-001
 /**
  * The events of an item (0037-planning FR-003): each one case of the closed union of fourteen types, with an id, the item it is of, a time and an actor, and the data its source wrote. An event is immutable
  * once built (it is frozen), and the library has no operation that changes or removes one: the history of an item is the set of its events, and its state is a fold of them. `makeEvent` is the one way to
@@ -39,6 +39,8 @@ export type Carried = {
   readonly engines?: readonly string[];
   readonly cites?: readonly string[];
   readonly evidence?: readonly string[];
+  /** The day a task is due: the field of its own that the kind `task` adds (0006-planning-poam FR-001). */
+  readonly due?: Day;
 };
 
 /** The opening of an item: its kind, text, labels, assignees and origin, and what the source carried. */
@@ -57,7 +59,7 @@ export type OpenedData = {
 export type EventData =
   | OpenedData
   | { readonly type: "commented"; readonly body: string }
-  | { readonly type: "edited"; readonly title?: string; readonly body?: string }
+  | { readonly type: "edited"; readonly title?: string; readonly body?: string; readonly due?: Day }
   | { readonly type: "labeled"; readonly add: readonly string[]; readonly remove: readonly string[] }
   | { readonly type: "assigned"; readonly add: readonly string[]; readonly remove: readonly string[] }
   | { readonly type: "severity-set"; readonly severity: Severity }
@@ -80,7 +82,8 @@ export type ItemEvent = EventHead & { readonly data: EventData };
 export type EventProblem =
   | { readonly kind: "actor"; readonly problem: ActorProblem }
   | { readonly kind: "confirmed-by-a-non-person"; readonly actor: string }
-  | { readonly kind: "link-to-itself"; readonly item: ItemId };
+  | { readonly kind: "link-to-itself"; readonly item: ItemId }
+  | { readonly kind: "due-on-a-non-task"; readonly itemKind: ItemKind };
 
 /** One sentence for a refusal. */
 export function describeEventProblem(p: EventProblem): string {
@@ -91,6 +94,8 @@ export function describeEventProblem(p: EventProblem): string {
       return `${p.actor} cannot confirm an item: only a person confirms`;
     case "link-to-itself":
       return `the item ${p.item} cannot be linked to itself`;
+    case "due-on-a-non-task":
+      return `an item of kind ${p.itemKind} has no day it is due: only a task has one`;
     default:
       return absurd(p);
   }
@@ -111,6 +116,7 @@ export function makeEvent(head: EventHead, data: EventData): Result<ItemEvent, E
   if (actor.kind === "err") return err({ kind: "actor", problem: actor.error });
   if (data.type === "confirmed" && actor.value.kind !== "person") return err({ kind: "confirmed-by-a-non-person", actor: actor.value.id });
   if (data.type === "linked" && data.to === head.item) return err({ kind: "link-to-itself", item: head.item });
+  if (data.type === "opened" && data.due !== undefined && data.kind !== "task") return err({ kind: "due-on-a-non-task", itemKind: data.kind });
   const external = head.external === undefined ? {} : { external: head.external };
   return ok(freezeDeep(structuredClone({ id: head.id, item: head.item, at: head.at, actor: actor.value, ...external, data })));
 }

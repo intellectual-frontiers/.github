@@ -47,7 +47,7 @@ export const SOURCE_ROWS: readonly SourceRow[] = [
       comments: un("a list item holds no comment"), decisions: un("a list item holds no decision"), events: un("a task list holds no history"), principal: un("a task list holds no actor"),
       sourceSeverity: un("a list item holds no severity"), motivation: un("a list item holds no motivation"), blocker: un("a list item holds no blocker flag"), target: un("a list item holds no target"), source: un("a list item holds no finding source"),
       priority: un("a list item holds no priority"), size: un("a list item holds no size"), goals: un("a list item holds no goals"), engines: un("a list item holds no engines"), cites: un("a list item holds no citation field"),
-      evidence: un("a list item holds no evidence field"), raised: un("a list item holds no day raised"),
+      evidence: un("a list item holds no evidence field"), raised: un("a list item holds no day raised"), due: un("a list item holds no day it is due"),
     },
   },
   {
@@ -58,7 +58,7 @@ export const SOURCE_ROWS: readonly SourceRow[] = [
       state: un("a comment that is there is open and one removed is closed by a derived close; the comment holds no state"), comments: un("a comment holds no comment"), decisions: un("a comment holds no decision"),
       events: un("a comment holds no history"), principal: un("a comment holds no actor"), sourceSeverity: un("a comment holds no severity"), motivation: un("a comment holds no motivation"), blocker: un("a comment holds no blocker flag"),
       target: ca("the file the comment is in"), source: un("a comment holds no finding source"), priority: un("a comment holds no priority"), size: un("a comment holds no size"), goals: un("a comment holds no goals"),
-      engines: un("a comment holds no engines"), cites: un("a comment holds no citation field"), evidence: un("a comment holds no evidence field"), raised: un("a comment holds no day raised"),
+      engines: un("a comment holds no engines"), cites: un("a comment holds no citation field"), evidence: un("a comment holds no evidence field"), raised: un("a comment holds no day raised"), due: un("a comment holds no day it is due"),
     },
   },
   {
@@ -68,7 +68,7 @@ export const SOURCE_ROWS: readonly SourceRow[] = [
       severity: un("an issue has four levels (critical, high, medium, low) and the model three: no level is an exact expression, so the item carries the source's own value"), origin: ca("always declared"), external: ex, links: ca("the links of the issue are in the record as read"), state: ex,
       comments: un("an issue file holds no comment"), decisions: un("an issue file holds no decision"), events: un("an issue file holds a status and not a history: its history is its commits"), principal: un("an issue file holds no actor"),
       sourceSeverity: ex, motivation: un("an issue holds no motivation"), blocker: un("an issue holds no blocker flag"), target: un("an issue holds no target"), source: un("an issue holds no finding source"), priority: ex, size: ex, goals: ex, engines: ex, cites: ex, evidence: ex,
-      raised: ca("the day raised is the time of the opening and is in the record as read"),
+      raised: ca("the day raised is the time of the opening and is in the record as read"), due: un("an issue holds no day it is due"),
     },
   },
   {
@@ -77,7 +77,7 @@ export const SOURCE_ROWS: readonly SourceRow[] = [
       id: ca("the ULID of the file as an external id, and the id of the library made from it"), kind: ca("always an issue"), title: ex, body: ex, labels: ex, assignees: ex, severity: ex, origin: ca("declared, or derived where a tool opened it"), external: ex, links: un("the schema has no event for a link"),
       state: un("open and closed with three reasons: started and deferred are not in the schema"), comments: ex, decisions: ex, events: ex,
       principal: un("the schema has no field for the person an agent acts for (OQ-10 of commons 0037-planning): an event of an agent is not written"), sourceSeverity: un("the severity of the schema is the three of the model"), motivation: ex, blocker: ex, target: ex, source: ex,
-      priority: un("the schema has no priority"), size: un("the schema has no size"), goals: un("the schema has no goals"), engines: un("the schema has no engines"), cites: un("the schema has no citation field"), evidence: un("the schema has no evidence field"), raised: ca("the time of the opening"),
+      priority: un("the schema has no priority"), size: un("the schema has no size"), goals: un("the schema has no goals"), engines: un("the schema has no engines"), cites: un("the schema has no citation field"), evidence: un("the schema has no evidence field"), raised: ca("the time of the opening"), due: un("the schema has no day a task is due"),
     },
   },
   {
@@ -87,7 +87,7 @@ export const SOURCE_ROWS: readonly SourceRow[] = [
       external: ex, links: ex, state: ca("open or closed: the contract holds no close reason, so a closed issue is read as completed"), comments: un("the Git host contract holds no comment"), decisions: un("a Git host issue holds no decision"),
       events: un("the Git host contract holds no event"), principal: un("a Git host issue holds no actor"), sourceSeverity: un("a Git host issue holds no severity"), motivation: un("a Git host issue holds no motivation"), blocker: un("a Git host issue holds no blocker flag"),
       target: un("a Git host issue holds no target"), source: un("a Git host issue holds no finding source"), priority: un("a Git host issue holds no priority"), size: un("a Git host issue holds no size"), goals: un("a Git host issue holds no goals"),
-      engines: un("a Git host issue holds no engines"), cites: un("a Git host issue holds no citation field"), evidence: ca("the commits that name the issue"), raised: un("the Git host contract holds no creation time"),
+      engines: un("a Git host issue holds no engines"), cites: un("a Git host issue holds no citation field"), evidence: ca("the commits that name the issue"), raised: un("the Git host contract holds no creation time"), due: un("the Git host contract holds no day it is due"),
     },
   },
 ];

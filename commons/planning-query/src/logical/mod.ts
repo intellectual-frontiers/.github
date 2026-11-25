@@ -55,6 +55,7 @@ const ISSUE_FILL: Fill<typeof ISSUE_COLUMNS, Item> = {
   engines: (i) => join(i.engines),
   cites: (i) => join(i.cites),
   evidence: (i) => join(i.evidence),
+  due: (i) => i.due ?? "",
 };
 
 type EventRow = { readonly issue: string; readonly event: Item["events"][number] };

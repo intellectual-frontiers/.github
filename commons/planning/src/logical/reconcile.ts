@@ -130,6 +130,7 @@ function openingOf(c: ObservedItem): OpenedData {
     engines: c.engines,
     cites: c.cites,
     evidence: c.evidence,
+    due: c.due,
   });
   return { type: "opened", kind: c.kind, title: c.title, body: c.body, labels: c.labels, assignees: c.assignees, origin: c.origin, ...(c.severity === undefined ? {} : { severity: c.severity }), ...carried };
 }

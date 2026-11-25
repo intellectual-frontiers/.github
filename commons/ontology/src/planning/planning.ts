@@ -133,6 +133,7 @@ export const plan = vocabulary(PLANNING, {
   itemEngines: "owl:DatatypeProperty",
   itemCites: "owl:DatatypeProperty",
   itemEvidence: "owl:DatatypeProperty",
+  itemDue: "owl:DatatypeProperty",
   sourceSeverity: "owl:DatatypeProperty",
 });
 
@@ -412,6 +413,7 @@ export const properties = [
   DatatypeProperty.make(plan.itemEngines, { domain: plan.Item, range: xsd.string, label: en("item engines"), definition: en("The engines the work applies to, or all, as the source names them.") }),
   DatatypeProperty.make(plan.itemCites, { domain: plan.Item, range: xsd.string, label: en("item cites"), definition: en("A requirement the item cites, as written in the source.") }),
   DatatypeProperty.make(plan.itemEvidence, { domain: plan.Item, range: xsd.string, label: en("item evidence"), definition: en("A piece of evidence for the item: a commit, a test, a specification, a file with a line or a review, as the source writes it.") }),
+  DatatypeProperty.make(plan.itemDue, { domain: plan.Item, range: xsd.string, label: en("item due"), definition: en("The day a task is expected to be done, YYYY-MM-DD: the DATE form of the iCalendar to-do property DUE (RFC 5545 section 3.8.2.3); only an item of kind plan:Task has one.") }),
   DatatypeProperty.make(plan.sourceSeverity, { domain: plan.Item, range: xsd.string, label: en("source severity"), definition: en("The severity as the source wrote it, where the source has more levels than the three of plan:Severity; the item keeps this value and the three are not an exact expression of it.") }),
 ] as const;
 

@@ -69,7 +69,7 @@ const rows = (sql: string, includeProposed = false) => {
 proves(["0002-planning-query-relations FR-001"], "issues has a column for each field of the core and the state and the monorepo's columns, and the relations events, links and traces give each event, link and trace", () => {
   const names = ISSUE_COLUMNS.map((c) => c.name);
   for (const monorepo of ["id", "title", "state", "reason", "severity", "blocker", "labels", "assignees", "comments", "opened_at", "updated_at"]) assert(names.includes(monorepo as never), `${monorepo} is a column`);
-  for (const core of ["kind", "body", "origin", "external", "links", "until", "source_severity", "priority", "goals", "cites", "evidence", "motivation"]) assert(names.includes(core as never), `${core} is a column`);
+  for (const core of ["kind", "body", "origin", "external", "links", "until", "source_severity", "priority", "goals", "cites", "evidence", "motivation", "due"]) assert(names.includes(core as never), `${core} is a column`);
   const t = rows("select id, kind, title, state, reason, until, severity, source_severity, blocker, labels, comments, links, goals from issues order by title");
   const byTitle = Object.fromEntries(t.rows.map((r) => [r[2], r]));
   assertEquals(byTitle["second"]?.slice(3, 6), ["closed", "completed", ""]);

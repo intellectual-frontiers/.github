@@ -45,3 +45,11 @@ requirement	mechanism	by	note
 0005-planning-surfaces FR-004	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: the tool server over its real transport with an agent and its principal, human-only options refused and an agent that cannot confirm
 0005-planning-surfaces FR-005	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: only the file at the root, JSON not read, a trust recorded by the person and lost when the file changes
 0005-planning-surfaces FR-006	check	.github: cd commons/planning && bun run verify	suite/planctl.test.ts: planctl render prints the items in the formats and says what Markdown cannot hold
+0006-planning-poam FR-001	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: a task's due day from the opening and from an edited event, the refusal on another kind, and an edit on a non-task that changes nothing
+0006-planning-poam FR-002	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: due round-trips in JSON5 with its key in order, a non-day is an error value, and the matrix has a cell for due in every source
+0006-planning-poam FR-003	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the milestones of a finding are the tasks it is the parent of, and a not-planned one is not part of the plan
+0006-planning-poam FR-004	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the control labels of two regimes are kept as written in the row
+0006-planning-poam FR-005	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the rows, their order, the scheduled completion and the same rows for the items in any order
+0006-planning-poam FR-006	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the statuses open, delayed and completed of a milestone and of a finding, and what is not a milestone or a row
+0006-planning-poam FR-007	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the work orders by the label runbook and the link relates-to, their status and order
+0006-planning-poam FR-008	check	.github: cd commons/planning && bun run verify	suite/typing.test.ts: the logical sources import no system module, read no clock and hold no any, non-null assertion, enum or cast but brand

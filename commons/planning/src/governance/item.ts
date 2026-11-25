@@ -1,7 +1,7 @@
 // Spec: 0002-planning-core FR-002
 /**
  * An item and what is folded from its events (0037-planning FR-001, FR-004): a sum of the kinds of item over one shared core, a state that is never stored as a fact, the links, the comments, the decisions
- * and the changes that wait. A kind MAY add fields of its own and none removes a field of the core; today every kind is the core.
+ * and the changes that wait. A kind MAY add fields of its own and none removes a field of the core; the kind `task` adds `due`, the day it is due (0006-planning-poam FR-001), carried with the other fields a source carries.
  *
  * @example
  * ```ts

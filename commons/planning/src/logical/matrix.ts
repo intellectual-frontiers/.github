@@ -16,7 +16,7 @@ import { absurd } from "@intellectual-frontiers/core";
 /** The fields of an item that a source holds or does not: the core and what a source carries. */
 export const FIELDS = [
   "id", "kind", "title", "body", "labels", "assignees", "severity", "origin", "external", "links", "state", "comments", "decisions", "events", "principal",
-  "sourceSeverity", "motivation", "blocker", "target", "source", "priority", "size", "goals", "engines", "cites", "evidence", "raised",
+  "sourceSeverity", "motivation", "blocker", "target", "source", "priority", "size", "goals", "engines", "cites", "evidence", "raised", "due",
 ] as const;
 /** One field. */
 export type Field = (typeof FIELDS)[number];

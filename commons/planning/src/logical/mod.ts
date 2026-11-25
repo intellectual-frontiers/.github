@@ -16,6 +16,7 @@ export * from "./outbox.ts";
 export * from "./duplicates.ts";
 export * from "./query.ts";
 export * from "./views.ts";
+export * from "./poam.ts";
 export * from "./matrix.ts";
 export * from "./config.ts";
 export * from "./items.ts";

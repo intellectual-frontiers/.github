@@ -1,4 +1,4 @@
-// Spec: 0002-planning-core FR-006
+// Spec: 0002-planning-core FR-006; 0006-planning-poam FR-001
 /**
  * The state of an item is the result of `fold`, a pure and total function from the events of the item (0037-planning FR-004): events are taken in the order of their id (a UUID version 7 sorts as text in the
  * order its time and its counter give), the first being the opening, and the same events in any order or with any repeats give the same item. Two events with one id are one event where their content is the
@@ -225,6 +225,9 @@ export function fold(events: readonly ItemEvent[], policy: Policy = DEFAULT_POLI
   for (const e of title.counted) if (e.data.type === "edited" && e.data.title !== undefined) titleValue = e.data.title;
   let bodyValue = opened.body;
   for (const e of body.counted) if (e.data.type === "edited" && e.data.body !== undefined) bodyValue = e.data.body;
+  // the day a task is due: the opening's, then the last edit that sets it; no authority is asked of it (0006-planning-poam FR-001)
+  let dueValue = opened.due;
+  if (opened.kind === "task") for (const e of rest) if (e.data.type === "edited" && e.data.due !== undefined) dueValue = e.data.due;
   let severityValue = opened.severity;
   for (const e of severity.counted) if (e.data.type === "severity-set") severityValue = e.data.severity;
   let blockerValue = opened.blocker;
@@ -273,6 +276,7 @@ export function fold(events: readonly ItemEvent[], policy: Policy = DEFAULT_POLI
     engines: opened.engines,
     cites: opened.cites,
     evidence: opened.evidence,
+    due: dueValue,
   });
   return ok({ ...core, kind: opened.kind });
 }

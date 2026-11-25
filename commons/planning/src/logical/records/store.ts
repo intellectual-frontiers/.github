@@ -16,6 +16,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { formatJson5Error, isJsonObject, type Json, type JsonObject, parseJson5, toJson5 } from "@intellectual-frontiers/formats/json5";
 import {
+  type Day,
   type EventData,
   externalId,
   type ExternalId,
@@ -107,6 +108,13 @@ function optionalText(o: JsonObject, key: string): Result<string | undefined, Co
   return v === undefined ? ok(undefined) : typeof v === "string" ? ok(v) : bad(`${key} is not text`);
 }
 const isTexts = (v: Json | undefined): v is readonly string[] => Array.isArray(v) && v.every((x) => typeof x === "string");
+function optionalDay(o: JsonObject, key: string): Result<Day | undefined, CodecProblem> {
+  const t = optionalText(o, key);
+  if (t.kind === "err" || t.value === undefined) return t.kind === "err" ? t : ok(undefined);
+  const day = parseDay(t.value);
+  return day.kind === "ok" ? ok(day.value) : bad(`${key} is not a day, YYYY-MM-DD`);
+}
+
 function texts(o: JsonObject, key: string): Result<readonly string[], CodecProblem> {
   const v = field(o, key);
   return isTexts(v) ? ok(v) : bad(`${key} is not a list of text`);
@@ -164,10 +172,11 @@ export function eventDataOfJson(type: string, d: JsonObject): Result<EventData, 
       const engines = optionalTexts(d, "engines");
       const cites = optionalTexts(d, "cites");
       const evidence = optionalTexts(d, "evidence");
+      const due = optionalDay(d, "due");
       const target = targetOf(d["target"]);
       const source = sourceOf(d["source"]);
       const blocker = d["blocker"];
-      for (const r of [sourceSeverity, motivation, priority, size, goals, engines, cites, evidence, target, source]) if (r.kind === "err") return r;
+      for (const r of [sourceSeverity, motivation, priority, size, goals, engines, cites, evidence, due, target, source]) if (r.kind === "err") return r;
       if (blocker !== undefined && typeof blocker !== "boolean") return bad("blocker is not true or false");
       return ok({
         type: "opened",
@@ -189,6 +198,7 @@ export function eventDataOfJson(type: string, d: JsonObject): Result<EventData, 
         ...(engines.kind === "ok" && engines.value !== undefined ? { engines: engines.value } : {}),
         ...(cites.kind === "ok" && cites.value !== undefined ? { cites: cites.value } : {}),
         ...(evidence.kind === "ok" && evidence.value !== undefined ? { evidence: evidence.value } : {}),
+        ...(due.kind === "ok" && due.value !== undefined ? { due: due.value } : {}),
       });
     }
     case "commented": {
@@ -198,9 +208,11 @@ export function eventDataOfJson(type: string, d: JsonObject): Result<EventData, 
     case "edited": {
       const title = optionalText(d, "title");
       const body = optionalText(d, "body");
+      const due = optionalDay(d, "due");
       if (title.kind === "err") return title;
       if (body.kind === "err") return body;
-      return ok({ type, ...(title.value === undefined ? {} : { title: title.value }), ...(body.value === undefined ? {} : { body: body.value }) });
+      if (due.kind === "err") return due;
+      return ok({ type, ...(title.value === undefined ? {} : { title: title.value }), ...(body.value === undefined ? {} : { body: body.value }), ...(due.value === undefined ? {} : { due: due.value }) });
     }
     case "labeled":
     case "assigned": {

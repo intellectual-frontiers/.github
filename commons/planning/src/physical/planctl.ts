@@ -42,6 +42,7 @@ import {
   idTime,
   instantOfMs,
   msOfInstant,
+  parseDay,
   parseInstant,
   type CloseReason,
   type RunContext,
@@ -55,8 +56,10 @@ import {
   principalOf,
   type Query,
   requirementMatrix,
+  poam,
   responsibility,
   roadmap,
+  workOrders,
   blockGraph,
   runQuery,
   type Row,
@@ -270,12 +273,12 @@ const queryVerb = (host: Host): Command<typeof QUERY_OPTIONS> =>
     },
   });
 
-const VIEWS_OPTIONS = { ...COMMON, view: value({ help: "roadmap, blocks, requirements or responsibility.", valueName: "VIEW", default: "roadmap" }), known: value({ help: "For requirements: the known requirements, separated by commas.", valueName: "LIST" }) } as const;
+const VIEWS_OPTIONS = { ...COMMON, view: value({ help: "roadmap, blocks, requirements, responsibility, poam or work-orders.", valueName: "VIEW", default: "roadmap" }), today: value({ help: "For poam and work-orders: the day a milestone is held to, YYYY-MM-DD (the day of the run where none is given).", valueName: "DAY" }), known: value({ help: "For requirements: the known requirements, separated by commas.", valueName: "LIST" }) } as const;
 
 const viewsVerb = (host: Host): Command<typeof VIEWS_OPTIONS> =>
   command({
     name: "views",
-    summary: "Show a view of the items: the roadmap (each item after those that block it), the graph of blocks, the matrix of requirement by item, or who is responsible for what their agents did.",
+    summary: "Show a view of the items: the roadmap (each item after those that block it), the graph of blocks, the matrix of requirement by item, who is responsible for what their agents did, the plan of action and milestones (poam) or the work orders.",
     options: VIEWS_OPTIONS,
     examples: [{ args: ["--view", "roadmap"], says: "The counted open items, each after the items that block it." }],
     action: REPORT,
@@ -304,8 +307,19 @@ const viewsVerb = (host: Host): Command<typeof VIEWS_OPTIONS> =>
           const r = responsibility(items);
           return outcomeOf(r, { text: lines(...r.map((p) => `${p.person}: ${p.byAgent.map((a) => `${a.agent} ${a.events} events`).join(", ")}; ${p.proposals.length} waiting`)) });
         }
+        case "poam":
+        case "work-orders": {
+          const parsed = parseDay(args.options.today ?? new Date(host.now()).toISOString().slice(0, 10));
+          if (parsed.kind === "err") return fail("E-USAGE", "--today is a day, YYYY-MM-DD");
+          if (args.options.view === "poam") {
+            const rows = poam(items, parsed.value);
+            return outcomeOf(rows, { text: lines(...rows.map((r) => `${r.status} ${short(r.id)} ${r.title} (${r.milestones.length} milestones, scheduled ${r.scheduledCompletion ?? "-"}, controls ${r.controls.join(",") || "-"})`)) });
+          }
+          const rows = workOrders(items, parsed.value);
+          return outcomeOf(rows, { text: lines(...rows.map((r) => `${r.status} ${short(r.id)} ${r.title} (runs ${r.runbooks.join(",")}, serves ${r.serves.map(short).join(",") || "-"}, due ${r.due ?? "-"})`)) });
+        }
         default:
-          return fail("E-USAGE", `${args.options.view} is not a view: roadmap, blocks, requirements or responsibility`);
+          return fail("E-USAGE", `${args.options.view} is not a view: roadmap, blocks, requirements, responsibility, poam or work-orders`);
       }
     },
   });

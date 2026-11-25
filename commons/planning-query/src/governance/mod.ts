@@ -48,6 +48,7 @@ export const ISSUE_COLUMNS = [
   c("engines", "text", "The engines its source names, joined by a comma."),
   c("cites", "text", "The requirements it cites, joined by a comma."),
   c("evidence", "text", "The evidence its source gives, joined by a comma."),
+  c("due", "text", "The day a task is due, as YYYY-MM-DD; empty where it has none or is not a task."),
 ] as const;
 
 /** The columns of `events`. */
