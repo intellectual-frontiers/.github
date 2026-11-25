@@ -1,0 +1,31 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-workbench-layers FR-001	check	.github: cd commons/workbench && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-workbench-layers FR-002	check	.github: cd commons/workbench && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-workbench-terms FR-001	check	.github: cd commons/workbench && bun run verify	suite/terms.test.ts
+0002-workbench-terms FR-002	check	.github: cd commons/workbench && bun run verify	suite/terms.test.ts
+0002-workbench-terms FR-003	check	.github: cd commons/workbench && bun run verify	suite/terms.test.ts
+0002-workbench-terms FR-004	check	.github: cd commons/workbench && bun run verify	suite/terms.test.ts
+0003-workbench-contract FR-001	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0003-workbench-contract FR-002	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0003-workbench-contract FR-003	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0003-workbench-contract FR-004	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0003-workbench-contract FR-005	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0004-workbench-catalog FR-001	check	.github: cd commons/workbench && bun run verify	suite/catalog.test.ts
+0004-workbench-catalog FR-002	check	.github: cd commons/workbench && bun run verify	suite/catalog.test.ts
+0004-workbench-catalog FR-003	check	.github: cd commons/workbench && bun run verify	suite/catalog.test.ts
+0004-workbench-catalog FR-004	check	.github: cd commons/workbench && bun run verify	suite/catalog.test.ts
+0004-workbench-catalog FR-005	check	.github: cd commons/workbench && bun run verify	suite/catalog.test.ts
+0005-workbench-resolution FR-001	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0005-workbench-resolution FR-002	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0005-workbench-resolution FR-003	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0005-workbench-resolution FR-004	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0005-workbench-resolution FR-005	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0005-workbench-resolution FR-006	check	.github: cd commons/workbench && bun run verify	suite/resolution.test.ts
+0006-workbench-dialects FR-001	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0006-workbench-dialects FR-002	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0006-workbench-dialects FR-003	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0006-workbench-dialects FR-004	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0006-workbench-dialects FR-005	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0006-workbench-dialects FR-006	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts

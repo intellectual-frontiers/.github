@@ -1,0 +1,36 @@
+{
+  "name": "@intellectual-frontiers/workbench",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The workbench: what a human or an agent needs to do their job with a repository, declared as a contract made of contributions from the units that need things, checked by one command and projected for each harness and for a human, so that a task installs only what it runs.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts",
+    "./dialects/claude-code": "./src/physical/dialects/claude-code/mod.ts",
+    "./dialects/codex": "./src/physical/dialects/codex/mod.ts",
+    "./dialects/human": "./src/physical/dialects/human/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

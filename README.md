@@ -86,6 +86,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/planning`](https://www.npmjs.com/package/@intellectual-frontiers/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/posture-report`](commons/posture-report) | Pattern | A read-only static report site for a compliance posture | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/tenancy`](commons/tenancy) | Pattern | Tenancy for service providers | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/workbench`](commons/workbench) | Pattern | The workbench: what a human or an agent needs to do their job with a repository | layers | L1 | GitHub |
 | [`@intellectual-frontiers/anyfs-cli`](commons/anyfs/cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
 | [`@intellectual-frontiers/archon-boot`](commons/archon/boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | not released (owner-blocked) |
