@@ -1,7 +1,7 @@
 // Spec: 0008-machine-probe-agent-workspace FR-001
 /**
- * Tests of the probe of an agent workspace (commons machine-probe 0008-machine-probe-agent-workspace FR-001 to FR-005): the section `@agent` as the probe wrote it on a real Omarchy 4.5.0 machine, as it reads, the rules as data, the pack for
- * an agent workspace, `supported-os` of an Omarchy machine, and the real script run on this machine with a variable that looks like a secret. Every name is made up.
+ * Tests of the probe of a workshop (commons machine-probe 0008-machine-probe-agent-workspace FR-001 to FR-005): the section `@agent` as the probe wrote it on a real Omarchy 4.5.0 machine, as it reads, the rules as data, the pack for
+ * a workshop, `supported-os` of an Omarchy machine, and the real script run on this machine with a variable that looks like a secret. Every name is made up.
  *
  * @module
  */
@@ -13,7 +13,7 @@ import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { checkInvariants } from "@intellectual-frontiers/estate/logical";
 import { defineAsset } from "@intellectual-frontiers/estate/governance";
-import { agentWorkspaceRules, compareDotted, evaluate, evaluateAgentWorkspace, evaluateRules, observedState, OPERATORS, parseProbe, toObserved, type Observed, type ProbeRule } from "../src/logical/mod.ts";
+import { workshopRules, compareDotted, evaluate, evaluateWorkshop, evaluateRules, observedState, OPERATORS, parseProbe, toObserved, type Observed, type ProbeRule } from "../src/logical/mod.ts";
 import { posixScriptPath } from "../src/physical/mod.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
@@ -62,10 +62,10 @@ proves(["0008-machine-probe-agent-workspace FR-002"], "each operator is judged, 
 const DECLARED = { harnesses: ["herdr", "claude-code"], isolation: "vm" } as const;
 
 proves(["0008-machine-probe-agent-workspace FR-003", "0008-machine-probe-agent-workspace FR-004"], "the pack judges the real Omarchy observation rule by rule, a workspace set right passes them all, and supported-os of Omarchy is pass", () => {
-  const rules = agentWorkspaceRules(DECLARED);
+  const rules = workshopRules(DECLARED);
   assertEquals(rules.map((r) => r.id), ["agent-no-ambient-secrets", "agent-not-root", "agent-harness-known", "agent-isolation-as-declared"]);
   for (const r of rules) assert(r.controls.length > 0 && r.controls.every((c) => /^[A-Z]{2}-\d{1,2}$/.test(c)) && r.title.length > 5 && r.fix.length > 5, r.id);
-  const real = evaluateAgentWorkspace(parseProbe(OMARCHY), observed(OMARCHY), DECLARED, NOW);
+  const real = evaluateWorkshop(parseProbe(OMARCHY), observed(OMARCHY), DECLARED, NOW);
   const by = Object.fromEntries(real.map((r) => [r.id, r.status]));
   assertEquals(by, {
     "agent-no-ambient-secrets": "pass",
@@ -76,12 +76,12 @@ proves(["0008-machine-probe-agent-workspace FR-003", "0008-machine-probe-agent-w
   });
   assertEquals(Object.fromEntries(evaluate(observed(OMARCHY), NOW).map((r) => [r.id, r.status]))["supported-os"], "pass");
   const good = "@probe\nat=2026-11-22T19:59:00Z\nversion=1\n@os\nfamily=omarchy (arch)\nversion=4.5.0\n@security\nssh_password_auth=no\n@agent\nharnesses=claude-code herdr\nambient-secret-names=\nuid=1000\nvirt=kvm\nisolation=vm\n";
-  const fine = evaluateAgentWorkspace(parseProbe(good), observed(good), DECLARED, NOW);
+  const fine = evaluateWorkshop(parseProbe(good), observed(good), DECLARED, NOW);
   assertEquals(fine.map((r) => r.status), ["pass", "pass", "pass", "pass", "pass"]);
   const bad = good.replace("uid=1000", "uid=0").replace("ambient-secret-names=", "ambient-secret-names=GH_TOKEN").replace("isolation=vm", "isolation=physical");
-  assertEquals(evaluateAgentWorkspace(parseProbe(bad), observed(bad), DECLARED, NOW).map((r) => r.status), ["fail", "fail", "pass", "warn", "pass"]);
+  assertEquals(evaluateWorkshop(parseProbe(bad), observed(bad), DECLARED, NOW).map((r) => r.status), ["fail", "fail", "pass", "warn", "pass"]);
   // an estate judges them and finds every result traceable
-  const box = defineAsset({ id: "agentbox", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" } });
+  const box = defineAsset({ id: "agentbox", kind: "workshop", state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" } });
   assert(box.kind === "ok");
   assertEquals(checkInvariants({ assets: [box.value], observations: [], results: real.map((r) => ({ asset: "agentbox", id: r.id, status: r.status, controls: r.controls })) }), []);
   const supported = (family: string, version: string) => evaluate(observed(`@probe\nat=2026-11-21T00:00:00Z\nversion=1\n@os\nfamily=${family}\nversion=${version}\n`), NOW).find((r) => r.id === "supported-os")?.status;

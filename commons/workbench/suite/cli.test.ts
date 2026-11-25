@@ -4,7 +4,7 @@
  *
  * @module
  */
-import { path } from "@intellectual-frontiers/system";
+import { fs, path } from "@intellectual-frontiers/system";
 import { main } from "@intellectual-frontiers/workbench/physical";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
@@ -54,4 +54,22 @@ proves(["0006-workbench-dialects FR-004"], "project prints the generated files, 
   const code = await main(["ready", "--contract", "no-such.contract.ts"], { cwd: HERE, env: {}, today: "2026-12-01", out: () => undefined, err: (t) => void missing.push(t) });
   assertEquals(code, 3);
   assertStringIncludes(missing.join(""), "is not there");
+});
+
+proves(["0005-workbench-resolution FR-007"], "the contract is found by the flag, else by the package.json of the folder, else by its default name, and a folder with none ends 3", async () => {
+  const dir = await fs.makeTempDir({ prefix: "workbench-cli-" });
+  try {
+    await fs.writeTextFile(path.join(dir, "package.json"), JSON.stringify({ workbench: { contract: path.join(HERE, "fixture.contract.ts") } }));
+    const out: string[] = [];
+    const code = await main(["ready", "--json"], { cwd: dir, env: {}, today: "2026-12-01", out: (t) => void out.push(t), err: () => undefined });
+    assertEquals(code, 0);
+    assertEquals((JSON.parse(out.join("")) as { requirements: string[] }).requirements, ["git", "registry-token"]);
+    const empty = await fs.makeTempDir({ prefix: "workbench-cli-empty-" });
+    const errs: string[] = [];
+    assertEquals(await main(["ready"], { cwd: empty, env: {}, today: "2026-12-01", out: () => undefined, err: (t) => void errs.push(t) }), 3);
+    assertStringIncludes(errs.join(""), "workbench.contract.ts is not there");
+    await fs.remove(empty, { recursive: true });
+  } finally {
+    await fs.remove(dir, { recursive: true }).catch(() => undefined);
+  }
 });

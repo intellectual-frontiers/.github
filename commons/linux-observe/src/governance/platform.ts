@@ -24,7 +24,7 @@ export type Architecture = (typeof ARCHITECTURES)[number];
 /** What is read of a machine: its family, the `ID` and `VERSION_ID` of `/etc/os-release`, and the architecture where it was asked. */
 export type Observed = { readonly family: Family; readonly distro: string; readonly release: string; readonly arch?: Architecture };
 
-/** What the model declares of a machine: the same, with the architecture always said. Whether it is a server or a workstation is the kind of its asset, said once there. */
+/** What the model declares of a machine: the same, with the architecture always said. Whether it is a server, a workstation or a workshop is the kind of its asset, said once there. */
 export type Declared = { readonly family: Family; readonly distro: string; readonly release: string; readonly arch: Architecture };
 
 /** The families by the `ID` of a distribution. The ones a distribution derives from are found by `ID_LIKE` where the `ID` is not here. */

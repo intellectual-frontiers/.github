@@ -1,7 +1,7 @@
 // Spec: 0008-machine-probe-agent-workspace FR-002, FR-003
 /**
  * A policy as data: a `ProbeRule` names the section and the key of the probe's output it reads, a closed operator and the value to compare with, whether a miss fails or warns, the controls of NIST SP 800-53 Rev 5 it gives evidence for and
- * the fix in words, and one small function (`evaluateRules`) judges any rule, so that the pack for a kind of machine is a table a person reads and reviews. The pack for an agent workspace is `agentWorkspaceRules`; the ten policies of the
+ * the fix in words, and one small function (`evaluateRules`) judges any rule, so that the pack for a kind of machine is a table a person reads and reviews. The pack for a workshop is `workshopRules`; the ten policies of the
  * existing pack stay functions (`policies.ts`).
  *
  * @example
@@ -86,14 +86,14 @@ export function evaluateRules(rules: readonly ProbeRule[], out: ProbeOutput): re
   });
 }
 
-/** What an estate states of an agent workspace, which the pack compares with what the probe found: the harnesses it declares and how it is isolated. */
-export type AgentWorkspaceDeclared = {
+/** What an estate states of a workshop, which the pack compares with what the probe found: the harnesses it declares and how it is isolated. */
+export type WorkshopDeclared = {
   readonly harnesses: readonly string[];
   readonly isolation: "container" | "vm" | "physical";
 };
 
-/** The pack for an agent workspace, as data: what an estate states is the value of a rule (0008-machine-probe-agent-workspace FR-003). The harnesses found are compared with the harnesses declared, as sets. */
-export function agentWorkspaceRules(d: AgentWorkspaceDeclared): readonly ProbeRule[] {
+/** The pack for a workshop, as data: what an estate states is the value of a rule (0008-machine-probe-agent-workspace FR-003). The harnesses found are compared with the harnesses declared, as sets. */
+export function workshopRules(d: WorkshopDeclared): readonly ProbeRule[] {
   const at = (key: string) => ({ section: "agent", key });
   return [
     { id: "agent-no-ambient-secrets", title: "No secret is in the environment of the harness's account", controls: ["IA-5", "AC-6"], reads: at("ambient-secret-names"), operator: "absent", miss: "fail", ifMissing: "pass", fix: "remove the variables named from the profile and the environment of the account, and give the harness a token file or a short-lived token" },
@@ -103,8 +103,8 @@ export function agentWorkspaceRules(d: AgentWorkspaceDeclared): readonly ProbeRu
   ];
 }
 
-/** The results of the pack for an agent workspace: the rules, then `ssh-keys-only` of the existing pack. */
-export function evaluateAgentWorkspace(out: ProbeOutput, observed: Observed, declared: AgentWorkspaceDeclared, now: string): readonly PolicyResult[] {
-  const rules = evaluateRules(agentWorkspaceRules(declared), out);
+/** The results of the pack for a workshop: the rules, then `ssh-keys-only` of the existing pack. */
+export function evaluateWorkshop(out: ProbeOutput, observed: Observed, declared: WorkshopDeclared, now: string): readonly PolicyResult[] {
+  const rules = evaluateRules(workshopRules(declared), out);
   return [...rules, ...evaluate(observed, now).filter((r) => r.id === "ssh-keys-only")];
 }

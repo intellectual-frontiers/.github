@@ -48,6 +48,8 @@ export type Contribution = { readonly unit: string; readonly requirements: reado
 /** A contract. */
 export type Contract = {
   readonly name: string;
+  /** The command that runs the workbench in this repository, as the generated files say it (`workbench` where not given). */
+  readonly command?: string;
   /** The day from which the checks are prescriptive; before it every finding but a safety rule is a hint. */
   readonly enforceFrom: string;
   readonly roles: readonly Role[];
@@ -107,6 +109,7 @@ function problemsOf(r: Requirement): readonly string[] {
 export function defineContract(input: Contract): Result<Contract, readonly string[]> {
   const problems: string[] = [];
   if (!ID.test(input.name)) problems.push(`${JSON.stringify(input.name)} is not a contract name`);
+  if (input.command !== undefined && !/^[A-Za-z0-9_./ -]+$/u.test(input.command)) problems.push("command is words and a path with no shell syntax in it");
   if (!DAY.test(input.enforceFrom)) problems.push(`enforceFrom ${JSON.stringify(input.enforceFrom)} is not a day (YYYY-MM-DD)`);
   const all = [...input.base, ...input.contributions.flatMap((c) => c.requirements)];
   // two units may need the same thing and say so: an id may be stated again where it asks for exactly the same (its words aside), and is used twice where it does not

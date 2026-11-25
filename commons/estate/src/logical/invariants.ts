@@ -3,8 +3,8 @@
 /**
  * The invariants of the Operational Truth Ontology (commons ontology 0002-oto FR-003) that an estate can check: no unowned responsibilities (every capability an asset offers has an owning system), no evidence without attribution
  * (every observation names its source) and no compliance without traceability (every policy result names the controls it gives evidence for). A violation is a system error, not an audit finding. The other three invariants
- * need policies and the criticality of controls, which an estate does not hold, and are named here as not checked, except `NoAuthorityWithoutScope`, which is checked for the kind `workstation` and for no other: the harnesses of a workstation are
- * an authority, and the digest of the typed `agents` policy that bounds them is its scope. For an agent workspace the estate also checks that a persistent one is managed only with an approval record, that it is observed within its freshness window
+ * need policies and the criticality of controls, which an estate does not hold, and are named here as not checked, except `NoAuthorityWithoutScope`, which is checked for the kind `workshop` and for no other: the harnesses of a workshop are
+ * an authority, and the digest of the typed `agents` policy that bounds them is its scope. For a workshop whose role is `agent-workspace` the estate also checks that a persistent one is managed only with an approval record, that it is observed within its freshness window
  * and that what is observed of its secrets is their names, never a value.
  *
  * @example
@@ -23,8 +23,8 @@ import type { PolicyOutcome } from "./risk.ts";
 /** The invariants of OTO, by their names in the ontology. */
 export type InvariantName = "NoOrphanPolicies" | "NoUnownedResponsibilities" | "NoUnenforcedCriticalControls" | "NoEvidenceWithoutAttribution" | "NoAuthorityWithoutScope" | "NoComplianceWithoutTraceability";
 
-/** The invariants an estate adds for its workstations, beside those of OTO. */
-export type EstateInvariantName = "PersistentAgentWorkspaceApproved" | "AgentWorkspaceObserved" | "NoSecretValuesObserved";
+/** The invariants an estate adds for its workshops, beside those of OTO. */
+export type EstateInvariantName = "PersistentWorkshopApproved" | "WorkshopObserved" | "NoSecretValuesObserved";
 
 /** Whether an estate checks an invariant: `checked`, or `not checked` where it needs what an estate does not hold. */
 export const INVARIANT_COVERAGE: Readonly<Record<InvariantName, "checked" | "not checked">> = {
@@ -44,9 +44,9 @@ export type InvariantInput = {
   readonly assets: readonly Asset[];
   readonly observations: readonly { readonly asset: string; readonly observation: Observation }[];
   readonly results: readonly (PolicyOutcome & { readonly asset: string })[];
-  /** The approvals of the managed assets (the person and the hash of the plan), by asset: a persistent agent workspace is managed only with one. */
+  /** The approvals of the managed assets (the person and the hash of the plan), by asset: a persistent workshop whose role is agent-workspace is managed only with one. */
   readonly approvals?: readonly { readonly asset: string; readonly by: string; readonly planHash: string }[];
-  /** The instant now and the capture policy, for the freshness of the observations of the agent workspaces; without it freshness is not checked. */
+  /** The instant now and the capture policy, for the freshness of the observations of the workshops; without it freshness is not checked. */
   readonly freshness?: { readonly now: string; readonly policy: CapturePolicy };
 };
 
@@ -61,7 +61,7 @@ export function checkInvariants(i: InvariantInput): readonly Violation[] {
       if (line.offered && String(line.owner).trim() === "") out.push({ invariant: "NoUnownedResponsibilities", subject: `${a.id} ${line.capability}`, message: "an offered capability has no owning system" });
     }
   }
-  for (const a of i.assets) if (a.kind === "workstation") out.push(...workstationViolations(a, i));
+  for (const a of i.assets) if (a.kind === "workshop") out.push(...workshopViolations(a, i));
   for (const o of i.observations) {
     if (o.observation.source.trim() === "") out.push({ invariant: "NoEvidenceWithoutAttribution", subject: o.asset, message: `the observation of ${o.observation.at} names no source` });
   }
@@ -71,7 +71,7 @@ export function checkInvariants(i: InvariantInput): readonly Violation[] {
   return out;
 }
 
-function workstationViolations(a: Asset, i: InvariantInput): readonly Violation[] {
+function workshopViolations(a: Asset, i: InvariantInput): readonly Violation[] {
   const out: Violation[] = [];
   const at = a.attributes ?? {};
   const harnesses = at["harnesses"];
@@ -79,11 +79,11 @@ function workstationViolations(a: Asset, i: InvariantInput): readonly Violation[
   const agent = at["role"] === "agent-workspace";
   const policy = at["agents-policy"];
   if ((agent || hasHarnesses) && !(typeof policy === "string" && AGENTS_POLICY_DIGEST.test(policy))) {
-    out.push({ invariant: "NoAuthorityWithoutScope", subject: a.id, message: `${agent ? "an agent workspace" : "a workstation that holds harnesses"} states no agents-policy (the digest of the typed policy that bounds what its harnesses may do), and an authority without a scope is refused` });
+    out.push({ invariant: "NoAuthorityWithoutScope", subject: a.id, message: `${agent ? "an agent workspace" : "a workshop that holds harnesses"} states no agents-policy (the digest of the typed policy that bounds what its harnesses may do), and an authority without a scope is refused` });
   }
   if (agent && at["disposability"] === "persistent" && a.state === "managed") {
     const approved = (i.approvals ?? []).some((x) => x.asset === a.id && x.by.trim() !== "" && PLAN_HASH.test(x.planHash));
-    if (!approved) out.push({ invariant: "PersistentAgentWorkspaceApproved", subject: a.id, message: "a persistent agent workspace is managed only with an approval record: the person and the hash of the plan they approved" });
+    if (!approved) out.push({ invariant: "PersistentWorkshopApproved", subject: a.id, message: "a persistent agent workspace (a workshop) is managed only with an approval record: the person and the hash of the plan they approved" });
   }
   const observations = i.observations.filter((o) => o.asset === a.id);
   if (agent && a.state !== "discovered" && i.freshness !== undefined) {
@@ -93,8 +93,8 @@ function workstationViolations(a: Asset, i: InvariantInput): readonly Violation[
     const now = Date.parse(i.freshness.now);
     if (ms !== undefined && ms.kind === "ok" && !Number.isNaN(now)) {
       const window = freshnessWindowMs(ms.value);
-      if (latest === undefined) out.push({ invariant: "AgentWorkspaceObserved", subject: a.id, message: "an agent workspace was never observed" });
-      else if (now - latest > window) out.push({ invariant: "AgentWorkspaceObserved", subject: a.id, message: `the last observation is older than its freshness window (${Math.round(window / 60_000)} minutes)` });
+      if (latest === undefined) out.push({ invariant: "WorkshopObserved", subject: a.id, message: "an agent workspace was never observed" });
+      else if (now - latest > window) out.push({ invariant: "WorkshopObserved", subject: a.id, message: `the last observation is older than its freshness window (${Math.round(window / 60_000)} minutes)` });
     }
   }
   for (const o of observations) {

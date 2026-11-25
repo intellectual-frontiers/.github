@@ -73,6 +73,14 @@ const generators: readonly GeneratorInput[] = [
     outputs: ["commons/generated/mizan-register.auto.oscal.json", "commons/generated/mizan-register-results.auto.oscal.json"],
   },
   {
+    id: "workbench",
+    summary: "The catalog of errors, the set-up pages for a person, Claude Code and Codex, and the block of AGENTS.md, from the code of the library workbench.",
+    command: ["bun", "commons/workbench/tools/pages.ts"],
+    inputs: ["commons/workbench/src/**", "commons/workbench/tools/**", "commons/*/library.ts", "commons/*/*/library.ts"],
+    outputs: ["commons/docs/guides/workbench-*.auto.md", "AGENTS.md"],
+    mixed: ["AGENTS.md"],
+  },
+  {
     id: "readme",
     summary: "The table of the libraries in README.md, from the manifests and the summaries of their about.ts.",
     command: ["bun", "commons/libraries/src/readme.ts"],

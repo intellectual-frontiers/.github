@@ -14,7 +14,7 @@ const OWNED = { observe: "archon", verify: "archon" } as const;
 const endpoint = (attributes: Record<string, string | number | boolean | readonly string[]>) => defineAsset({ id: "api-public", kind: "endpoint", state: "discovered", owners: {}, attributes });
 
 proves(["0007-estate-kinds FR-001"], "the catalog names the kinds with attributes, each attribute has a type, and the lists of values are not empty", () => {
-  assertEquals(KINDS.map((k) => k.kind), ["cloud-resource", "endpoint", "application", "workstation", "mobile-app", "service", "domain", "certificate"]);
+  assertEquals(KINDS.map((k) => k.kind), ["cloud-resource", "endpoint", "application", "workstation", "workshop", "mobile-app", "service", "domain", "certificate"]);
   for (const k of KINDS) {
     assert(k.summary !== "" && k.attributes.length > 0, k.kind);
     for (const a of k.attributes) {

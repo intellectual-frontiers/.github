@@ -16,6 +16,9 @@ import { CONCEPTS, DEFINITIONS, type Contract, type Requirement } from "@intelle
 /** The marks between which the generated block of `AGENTS.md` is kept. */
 export const AGENTS_MARKS = { begin: "<!-- workbench:begin -->", end: "<!-- workbench:end -->" } as const;
 
+/** The command that runs the workbench in the repository the contract is of. */
+export const commandOf = (c: Contract): string => c.command ?? "workbench";
+
 const quote = (a: string): string => (/^[A-Za-z0-9_@%+=:,./-]+$/u.test(a) ? a : `'${a.replace(/'/gu, "'\\''")}'`);
 const baseWithInstall = (c: Contract): readonly (Requirement & { readonly install: readonly string[] })[] =>
   c.base.filter((r): r is Requirement & { readonly install: readonly string[] } => (r.kind === "program" || r.kind === "install") && r.install !== undefined && r.install.length > 0).sort((a, b) => (a.id < b.id ? -1 : 1));
@@ -23,7 +26,7 @@ const baseWithInstall = (c: Contract): readonly (Requirement & { readonly instal
 /** The setup script of a workshop: each program of the base that is missing is installed by its declared argument vector, once. Idempotent; installs nothing else. */
 export function setupScript(contract: Contract): string {
   const lines = baseWithInstall(contract).map((r) => (r.kind === "program" ? `command -v ${quote(r.name)} >/dev/null 2>&1 || ${r.install.map(quote).join(" ")}` : `${r.install.map(quote).join(" ")}`));
-  return ["#!/bin/sh", `# Generated from the workbench contract ${contract.name}: the base only. What a task needs beyond it is obtained when the task runs: workbench ready --for TASK --ensure.`, "set -eu", ...lines, ""].join("\n");
+  return ["#!/bin/sh", `# Generated from the workbench contract ${contract.name}: the base only. What a task needs beyond it is obtained when the task runs: ${commandOf(contract)} ready --for TASK --ensure.`, "set -eu", ...lines, ""].join("\n");
 }
 
 /** The Containerfile of a workshop: a small base image and the base's installs, one layer each. */
@@ -44,7 +47,7 @@ export function agentsBlock(contract: Contract): string {
     "",
     `Generated from the workbench contract \`${contract.name}\`; do not edit between the marks. Until ${contract.enforceFrom} every finding but a safety rule is a hint: it says what to do and never stops you.`,
     "",
-    "**Before you start, run `workbench ready`. For the task you are about to do, run `workbench ready --for TASK --ensure`: it installs only what that task needs.**",
+    `**Before you start, run \`${commandOf(contract)} ready\`. For the task you are about to do, run \`${commandOf(contract)} ready --for TASK --ensure\`: it installs only what that task needs.**`,
     "",
     ...CONCEPTS.map((c) => `- **${c}**: ${DEFINITIONS[c]}`),
     "",

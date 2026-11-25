@@ -10,4 +10,5 @@ The ideas the repository is built on, each in a page you can read in a few minut
 - [The quality system (IFQS)](concept-ifqs.md): what is true is what the system reports when it runs.
 - [Capabilities configuration (IFCCM)](concept-ifccm.md): how change is controlled.
 - [Lenses](concept-lenses.md): how this site documents layered models and programs.
+- [The workbench](concept-workbench.md): what a person or an agent needs to do their job, declared once and prepared for each harness.
 - [The release loop](concept-release-loop.md): how versions are raised, tagged and published.

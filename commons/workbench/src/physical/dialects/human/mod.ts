@@ -29,7 +29,7 @@ export function render(contract: Contract): readonly RenderedFile[] {
     "",
     ...base.map((r) => `- [ ] ${r.summary} (\`${r.id}\`)`),
     "",
-    "Then run `workbench ready`. For the work you are about to do, `workbench ready --for TASK --ensure` installs only what that task needs.",
+    `Then run \`${contract.command ?? "workbench"} ready\`. For the work you are about to do, \`${contract.command ?? "workbench"} ready --for TASK --ensure\` installs only what that task needs.`,
     "",
     "## Stages and how far an agent goes",
     "",
