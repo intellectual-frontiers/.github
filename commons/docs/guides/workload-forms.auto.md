@@ -13,7 +13,7 @@ A workload here is a unit of operated work, not running software. Two axes are o
 
 A form is built where a second concrete user needs it. A reserved form is a named slot with no code:
 
-- `graph`: Build it where a second concrete user, besides the generated GitHub workflows, needs the same graph of jobs with freshness; the first consumer is CI/CD.
-- `campaign`: Build it where two concrete users need a collection over a period with sampling (an audit period is one candidate) and neither can be said as a runbook with a schedule trigger.
+- `graph`: A second concrete user, besides CI/CD and its generated GitHub workflows (the first consumer), needs the same graph of jobs with freshness for an external executor.
+- `campaign`: A second concrete user, besides the first, needs a collection over a period with sampling that cannot be said as a runbook with a schedule trigger.
 
 The triggers are `manual`, `schedule`, `event`, `alert`. A drill or a game day is a runbook with a schedule trigger and an expected outcome.

@@ -257,6 +257,7 @@ const guides = guidesLens({
     { file: "commons/docs/guides/concept-release-loop.md", path: "concepts/release-loop.html", section: "concepts", group: "Concepts", order: 9 },
     { file: "commons/docs/guides/concept-workbench.md", path: "concepts/workbench.html", section: "concepts", group: "Concepts", order: 11 },
     { file: "commons/docs/guides/proof-by-blast-radius.md", path: "concepts/proof-by-blast-radius.html", section: "concepts", group: "Concepts", order: 10 },
+    { file: "commons/docs/guides/concept-workload.md", path: "concepts/workload.html", section: "concepts", group: "Concepts", order: 13 },
     { file: "commons/docs/guides/how-to-index.md", path: "how-to/index.html", section: "howto", group: "How-to", order: 0 },
     { file: "commons/docs/guides/where-does-x-live.md", path: "how-to/where-does-x-live.html", section: "howto", group: "How-to", order: 1 },
     { file: "commons/docs/guides/add-a-library.md", path: "how-to/add-a-library.html", section: "howto", group: "How-to", order: 2 },

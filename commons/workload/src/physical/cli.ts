@@ -61,7 +61,7 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2> 
     case "forms": {
       for (const id of FORM_IDS) {
         const f = FORMS[id];
-        io.out(`${id}: ${f.status}: ${f.summary}${f.status === "reserved" ? ` Build it when: ${f.criteria}` : ""}`);
+        io.out(`${id}: ${f.status}: ${f.summary}${f.status === "reserved" ? ` Build it when: ${f.criteria.charAt(0).toLowerCase()}${f.criteria.slice(1)}` : ""}`);
       }
       return 0;
     }

@@ -108,8 +108,8 @@ export type FormEntry =
 export const FORMS: Readonly<Record<FormId, FormEntry>> = {
   runbook: { status: "built", summary: "An ordered algebra of steps: a procedure that a person or an agent orchestrates, with gates, compensations and a record of the run." },
   reconcile: { status: "built", summary: "A loop toward a desired state: observe, diff, plan, approve by plan hash, apply, verify; level-triggered." },
-  graph: { status: "reserved", summary: "A DAG of jobs with freshness, which an external executor runs.", criteria: "Build it where a second concrete user, besides the generated GitHub workflows, needs the same graph of jobs with freshness; the first consumer is CI/CD." },
-  campaign: { status: "reserved", summary: "A collection over a period with sampling.", criteria: "Build it where two concrete users need a collection over a period with sampling (an audit period is one candidate) and neither can be said as a runbook with a schedule trigger." },
+  graph: { status: "reserved", summary: "A DAG of jobs with freshness, which an external executor runs.", criteria: "A second concrete user, besides CI/CD and its generated GitHub workflows (the first consumer), needs the same graph of jobs with freshness for an external executor." },
+  campaign: { status: "reserved", summary: "A collection over a period with sampling.", criteria: "A second concrete user, besides the first, needs a collection over a period with sampling that cannot be said as a runbook with a schedule trigger." },
 };
 
 /** Whether a text names a form of the registry. */
