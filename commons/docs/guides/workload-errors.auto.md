@@ -12,7 +12,7 @@ Every problem the static check of a workload finds has one code in a closed cata
 
 | Code | What happened | Who fixes it | What it says | The fix |
 |---|---|---|---|---|
-| `E-WL-WORKLOAD-UNKNOWN-FORM` | The form is not a form that has code | person | The workload names a form that is reserved or is none: a reserved form is a named slot and has no code. | use a form that is built (runbook or reconcile), or build the reserved form where its criteria are met |
+| `E-WL-WORKLOAD-UNKNOWN-FORM` | The form is not a form that has code | person | The workload names a form that is reserved or is none: a reserved form is a named slot and has no code. | use a form that is built (runbook, reconcile or graph), or build the reserved form where its criteria are met |
 | `E-WL-UNKNOWN` | A failure no entry names | person | The failure matches no entry of any catalog. | classify it: add an entry, a check and a test, and document it, in one change |
 
 ### Citation
@@ -83,6 +83,15 @@ Every problem the static check of a workload finds has one code in a closed cata
 | `E-WL-RUNNER-DRIFT` | An artifact is not what the plan makes | ci | The artifact differs from the one regenerated from the plan: it was edited by hand, the plan changed, or it is the artifact of another runner. | regenerate the artifact with the generator and commit it; never edit it by hand |
 | `E-WL-RUNNER-RECEIPT-UNMATCHED` | A receipt names no hand-off | person | The receipt carries a plan hash that no hand-off of the run has, so it is not the result of any plan that was handed off. | check the plan hash of the receipt against the hand-offs of the run |
 | `E-WL-RUNNER-APPROVAL-NOT-PERSON` | An approval was recorded by an agent | person | A receipt carries an approval of a gate and the actor who recorded it is not a person; only a person approves. | have a person record the approval; an agent never approves |
+| `E-WL-RUNNER-ACTION-UNPINNED` | An action is not pinned | agent | A step of a workflow uses an action that is no `./path` and no `owner/name@version` with the version a tag or a full commit, or a command of the pin table that is not a plain word. | pin {node} to a tag or a full commit, or use a plain word for the command |
+| `E-WL-RUNNER-SCHEDULE-NEEDS-INPUT` | A scheduled workload needs an input nobody can give | agent | A run that a schedule starts is given no input, and the workload has an input it requires, so every scheduled run would stop at its first read of it. | make the input {node} optional, or start the workload by hand |
+| `E-WL-RUNNER-RECEIPT-INVALID` | A run result is not a receipt | person | The result of an external run is not finished, has no reference that is the address of a run, a digest that is not 64 lower case hexadecimal digits, a conclusion or a plan hash that is not one, or names a plan other than the one its workflow carries. | pull the result of the finished run again and check its reference, its conclusion and its plan hash |
+
+### Schedule
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-WL-SCHEDULE-SLOT-INVALID` | The slot does not fit the cadence | agent | A field of the slot is out of its range (minute 0 to 59, hour 0 to 23, weekday 0 to 6, day 1 to 28, month 1 to 12, or 1 to 3 of a quarter) or is one that the cadence does not have. | give the schedule of {node} a slot that its cadence has, each field in its range |
 
 ## The catalog of the runbook form, `E-RB-`
 
@@ -131,3 +140,36 @@ Every problem the static check of a workload finds has one code in a closed cata
 | Code | What happened | Who fixes it | What it says | The fix |
 |---|---|---|---|---|
 | `E-RC-VERIFY-MISSING` | A loop applies and never verifies | agent | An apply is not followed by a verify node, so nothing says the state converged. | add a verify node after {node} |
+
+## The catalog of the graph form, `E-GR-`
+
+### Graph
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-GR-GRAPH-MALFORMED` | The graph is not well formed | agent | A value is not of the type the graph declares, an id is used twice, a gate guards a node that is no job, or a result names no job. | correct the graph where the message says: {node} |
+
+### Needs
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-GR-NEEDS-UNKNOWN` | A node comes after a node that is not there | agent | The `after` of a node names an id that is no job of the graph (a gate is not one), or the node itself. | name a job of the graph in the `after` of {node} |
+
+### Edge
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-GR-EDGE-CYCLE` | The edges make a cycle | agent | The nodes come after each other in a circle, so none of them can be first and the graph is no directed acyclic graph. | break the cycle {node} by removing one of its edges |
+
+### Node
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-GR-NODE-UNREACHABLE` | No result depends on the node | agent | The node is none of the results of the graph and no result comes after it, so its work is done and nothing is decided by it. | make {node} an ancestor of a result, or a result, or remove it |
+| `E-GR-NODE-EFFECT-OVER-LIMIT` | An effect is above the limit of the graph | person | The node declares a mode of effect greater than the limit the graph gives itself. | lower the effect of {node} to the limit, or have a person raise the limit of the graph |
+
+### Permission
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-GR-PERMISSION-EXCESS` | A node asks for write access its effects do not need | agent | The node asks for a scope with `write` and every effect it declares only reads (a check has none), so the token it is given has more than the work needs. | ask for `read` in the permissions of {node} |

@@ -15,5 +15,6 @@ export * from "./harness.ts";
 export * from "./runner.ts";
 export * from "./handoff.ts";
 export * from "./emit.ts";
+export * from "./schedule.ts";
 export * from "./proposal.ts";
 export * from "./projection.ts";

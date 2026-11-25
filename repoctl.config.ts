@@ -89,10 +89,10 @@ const generators: readonly GeneratorInput[] = [
   },
   {
     id: "workload-runners",
-    summary: "The artifacts of the integration runners (a Bash and a PowerShell script) for the fixture synthetic-bootstrap-01, from the code of the library workload; a hand-edited artifact is drift.",
+    summary: "The artifacts of the integration runners (a Bash and a PowerShell script, a GitHub Actions workflow) for the fixtures, and the files that start a scheduled fixture (a cron line, a systemd timer and its service), from the code of the library workload; a hand-edited artifact is drift.",
     command: ["bun", "commons/workload/tools/runners.ts"],
     inputs: ["commons/workload/src/**", "commons/workload/tools/**"],
-    outputs: ["commons/workload/artifacts/*"],
+    outputs: ["commons/workload/artifacts/**"],
   },
   {
     id: "readme",

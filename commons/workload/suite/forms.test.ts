@@ -86,14 +86,13 @@ proves(["0003-workload-forms FR-003"], "a form imports nothing from another form
 
 proves(["0003-workload-forms FR-004"], "the forms are a closed registry in the core: those that have code and those reserved, a reserved form has no code and says when to build it", () => {
   assertEquals(FORM_IDS, ["runbook", "reconcile", "graph", "campaign"]);
-  assertEquals(BUILT_FORM_IDS, ["runbook", "reconcile"]);
+  assertEquals(BUILT_FORM_IDS, ["runbook", "reconcile", "graph"]);
   for (const id of FORM_IDS) assertEquals(FORMS[id].status === "built", isBuiltForm(id));
-  for (const id of ["graph", "campaign"] as const) {
-    const f = FORMS[id];
-    assert(f.status === "reserved" && f.criteria.includes("second") || f.status === "reserved" && f.criteria.includes("two"), id);
-  }
-  assertEquals(isBuiltForm("graph"), false);
-  for (const form of ["graph", "campaign", "teleport", undefined]) {
+  const campaign = FORMS["campaign"];
+  assert(campaign.status === "reserved" && campaign.criteria.includes("second"), "campaign");
+  assertEquals(isBuiltForm("campaign"), false);
+  assertEquals(FORMS["graph"].status, "built");
+  for (const form of ["campaign", "teleport", undefined]) {
     const r = decodeWorkload({ form });
     assert(r.kind === "err" && r.error[0]?.code === "E-WL-WORKLOAD-UNKNOWN-FORM", String(form));
   }
@@ -103,9 +102,9 @@ proves(["0003-workload-forms FR-004"], "the forms are a closed registry in the c
 
 proves(["0003-workload-forms FR-005"], "a trigger is a field of every workload, a closed sum of manual, schedule with a cadence, event and alert, and never a form", () => {
   assertEquals(TRIGGER_KINDS, ["manual", "schedule", "event", "alert"]);
-  assertEquals(CADENCES, ["daily", "weekly", "monthly", "quarterly", "yearly"]);
-  for (const t of [{ kind: "manual" }, { kind: "schedule", cadence: "quarterly" }, { kind: "event", name: "synthetic-event-01" }, { kind: "alert", name: "synthetic-alert-01" }]) assertEquals(trigger(t).kind, "ok");
-  for (const t of [{ kind: "cron" }, { kind: "schedule" }, { kind: "schedule", cadence: "hourly" }, { kind: "event" }]) assertEquals(trigger(t).kind, "err");
+  assertEquals(CADENCES, ["hourly", "daily", "weekly", "monthly", "quarterly", "yearly"]);
+  for (const t of [{ kind: "manual" }, { kind: "schedule", cadence: "quarterly" }, { kind: "schedule", cadence: "hourly", at: { minute: 43 } }, { kind: "schedule", cadence: "weekly", at: { minute: 17, hour: 3, weekday: 1 } }, { kind: "event", name: "synthetic-event-01" }, { kind: "alert", name: "synthetic-alert-01" }]) assertEquals(trigger(t).kind, "ok");
+  for (const t of [{ kind: "cron" }, { kind: "schedule" }, { kind: "schedule", cadence: "minutely" }, { kind: "schedule", cadence: "daily", at: { minute: "7" } }, { kind: "event" }]) assertEquals(trigger(t).kind, "err");
   assertEquals(FORM_IDS.filter((f) => (TRIGGER_KINDS as readonly string[]).includes(f)), []);
   assertEquals(RESTORE_DRILL.trigger.kind, "schedule");
   assertEquals(CONVERGE_SETTINGS.trigger.kind, "schedule");
@@ -128,34 +127,16 @@ proves(["0003-workload-forms FR-006"], "a workload may say the outcome a run is 
   assertEquals(decodeRunbook({ ...JSON.parse(JSON.stringify(RESTORE_DRILL)), expect: { outcome: "explodes" } }).kind, "err");
 });
 
-proves(["0003-workload-forms FR-007"], "the forms graph and campaign are specified as named slots with the criterion for building each, and have no code: no folder, no entry and no source names them but the registry", async () => {
-  for (const id of ["graph", "campaign"] as const) {
-    const f = FORMS[id];
-    assert(f.status === "reserved" && f.criteria.length > 40 && f.summary.length > 10, id);
-    assertEquals(await fs.exists(path.join(ROOT, "src", "logical", "forms", id)), false, `${id} has no folder in the logical layer`);
-    assertEquals(await fs.exists(path.join(ROOT, "src", "physical", "forms", id)), false, `${id} has no folder in the physical layer`);
-    assertEquals(library.exports.some((e) => e.includes(id)), false);
-  }
-  const graph = FORMS["graph"];
-  assert(graph.status === "reserved" && graph.criteria.includes("CI/CD") && graph.criteria.includes("workflows"));
+proves(["0003-workload-forms FR-007"], "the form campaign is a named slot with the criterion for building it and has no code: no folder, no entry and no source names it but the registry; the form graph was built by the decision of 0013-form-graph", async () => {
   const campaign = FORMS["campaign"];
-  assert(campaign.status === "reserved" && campaign.criteria.includes("sampling"));
+  assert(campaign.status === "reserved" && campaign.criteria.length > 40 && campaign.summary.length > 10 && campaign.criteria.includes("sampling"));
+  assertEquals(await fs.exists(path.join(ROOT, "src", "logical", "forms", "campaign")), false, "campaign has no folder in the logical layer");
+  assertEquals(await fs.exists(path.join(ROOT, "src", "physical", "forms", "campaign")), false, "campaign has no folder in the physical layer");
+  assertEquals(library.exports.some((e) => e.includes("campaign")), false);
   const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0003-workload-forms", "spec.md"));
-  for (const word of ["`graph`", "`campaign`", "second concrete user", "generated GitHub workflows", "typed definitions", "an integration runner", "sampling"]) assert(spec.includes(word), word);
+  for (const word of ["`graph`", "`campaign`", "second concrete user", "0013-form-graph", "sampling"]) assert(spec.includes(word), word);
   for (const dir of ["src/governance", "src/logical", "src/physical"]) {
-    for (const i of await importsOf(dir)) assert(!/forms\/(graph|campaign)/u.test(i.spec), `${i.file} imports ${i.spec}`);
+    for (const i of await importsOf(dir)) assert(!/forms\/campaign/u.test(i.spec), `${i.file} imports ${i.spec}`);
   }
 });
 
-proves(["0013-form-graph FR-001"], "the form graph stays a reserved slot with its criterion, and the specification that reserves it names the integration runner and has no code", async () => {
-  const graph = FORMS["graph"];
-  assert(graph.status === "reserved" && graph.criteria.includes("CI/CD") && graph.criteria.includes("integration runner"));
-  assertEquals(BUILT_FORM_IDS.includes("graph" as never), false);
-  assertEquals(await fs.exists(path.join(ROOT, "src", "logical", "forms", "graph")), false);
-  assertEquals(await fs.exists(path.join(ROOT, "src", "physical", "forms", "graph")), false);
-  for (const dir of ["src/governance", "src/logical", "src/physical"]) {
-    for (const i of await importsOf(dir)) assert(!/forms\/graph/u.test(i.spec), `${i.file} imports ${i.spec}`);
-  }
-  const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0013-form-graph", "spec.md"));
-  for (const word of ["reserved slot", "no code", "integration runner", "0010-workload-runners"]) assert(spec.includes(word), word);
-});

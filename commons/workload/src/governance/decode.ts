@@ -19,6 +19,7 @@ import {
   type Decoder,
   describe,
   err,
+  integer,
   literal,
   object,
   ok,
@@ -33,7 +34,7 @@ import { decodeContribution, type Requirement } from "@intellectual-frontiers/wo
 import type { StoreDecl } from "./effect.ts";
 import { nodeId, parseCite, type SpecCite, storeRef, workloadId } from "./ids.ts";
 import type { Effect } from "./effect.ts";
-import type { Expectation, FieldType, InputValue, Inputs, OutputSchema, Trigger } from "./node.ts";
+import type { Expectation, FieldType, InputValue, Inputs, OutputSchema, ScheduleSlot, Trigger } from "./node.ts";
 import { CADENCES, MODES, OUTCOMES, STORE_CLASSES } from "./terms.ts";
 import { INPUT_TYPES, type InputSpec } from "./verbs.ts";
 
@@ -106,10 +107,13 @@ export const nodeHead = { id: viaId(nodeId), title: string, spec: array(cite) } 
 /** What a node may have besides: controls and needs. */
 export const nodeOptional = { controls: array(control), needs } as const;
 
+/** The slot of a schedule: the minute and the fields of the cadence that has them, integers whose range is checked against the cadence by the schedule. */
+export const slot: Decoder<ScheduleSlot> = object({ minute: integer }, { hour: integer, weekday: integer, day: integer, month: integer });
+
 /** The trigger of a workload: a closed sum. */
 export const trigger: Decoder<Trigger> = tagged({
   manual: object({ kind: literal("manual") }),
-  schedule: object({ kind: literal("schedule"), cadence: literal(...CADENCES) }),
+  schedule: object({ kind: literal("schedule"), cadence: literal(...CADENCES) }, { at: slot }),
   event: object({ kind: literal("event"), name: string }),
   alert: object({ kind: literal("alert"), name: string }),
 });

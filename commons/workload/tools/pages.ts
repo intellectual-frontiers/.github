@@ -8,7 +8,9 @@
 import { type Catalog, type CatalogEntry, DIALECTS, FORM_IDS, FORMS, RUNNER_CAPABILITIES, RUNNERS, TRIGGER_KINDS } from "../src/governance/mod.ts";
 import { checklist, lacksOf, projectAll, rulesOf, scenario, skillMd, statements } from "../src/logical/mod.ts";
 import { bootstrapFleet, FIXTURES } from "../src/logical/forms/runbook/mod.ts";
-import { CATALOGS, DIALECT_IMPLS, emitWorkload, runnerNeedsOfWorkload, STARTERS, viewOfWorkload } from "../src/physical/mod.ts";
+import { graphFleet, SYNTHETIC_GRAPH_01, SYNTHETIC_GRAPH_02 } from "../src/logical/forms/graph/mod.ts";
+import { authored, runnerId } from "../src/governance/mod.ts";
+import { CATALOGS, DIALECT_IMPLS, emitSchedule, emitWorkload, runnerNeedsOfWorkload, STARTERS, viewOfWorkload } from "../src/physical/mod.ts";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "..", "..");
@@ -132,7 +134,11 @@ const CAPABILITIES: Readonly<Record<(typeof RUNNER_CAPABILITIES)[number], string
 
 async function runners(): Promise<string> {
   const known = [...STARTERS, ...FIXTURES];
-  const artifacts = await Promise.all(FIXTURES.flatMap((w) => RUNNERS.list().filter((r) => r.kind === "integration").map(async (r) => ({ w, r, made: await emitWorkload(w, r.id, { fleet: bootstrapFleet }) }))));
+  const input = { fleet: (over: "tenants" | "hosts" | "fleets", source: string) => bootstrapFleet(over, source) ?? graphFleet(over, source) };
+  const github = RUNNERS.get("github-actions");
+  const pairs = [...FIXTURES.flatMap((w) => RUNNERS.list().filter((r) => r.kind === "integration").map((r) => ({ w, r }))), ...(github === undefined ? [] : [{ w: SYNTHETIC_GRAPH_01, r: github }])];
+  const artifacts = await Promise.all(pairs.map(async ({ w, r }) => ({ w, r, made: await emitWorkload(w, r.id, input) })));
+  const schedules = await Promise.all(["bash", "pwsh"].map(async (r) => ({ made: await emitSchedule(SYNTHETIC_GRAPH_02, authored(runnerId(r)), input) })));
   return [
     "# Runners: how a plan is carried out",
     "",
@@ -163,9 +169,18 @@ async function runners(): Promise<string> {
     "",
     "## What an artifact is",
     "",
-    "An artifact obeys the thin emit rule: it is only a sequence of calls to the pinned verb command by verb id, a loop over a fixed list and the order of the steps. It holds no expression, no inline logic, no `eval`, no command built from a string and no secret; a credential is only a name, and the verb command reads it from the environment. All meaning stays in typed TypeScript. The emitters target only Bash 5 or later and PowerShell 7 or later. The artifact carries the hash of its plan, the same for both emitters, and writes one receipt line when it ends; ingest pulls the receipt and the library records it as a `receipt` event beside the `handoff` event that carried the same plan hash. `bun commons/workload/tools/runners.ts --check` regenerates the artifacts and compares: a hand-edited artifact is `E-WL-RUNNER-DRIFT`.",
+    "An artifact obeys the thin emit rule: it is only a sequence of calls to the pinned verb command by verb id, a loop over a fixed list and the order of the steps. It holds no expression, no inline logic, no `eval`, no command built from a string and no secret; a credential is only a name, and the verb command reads it from the environment. All meaning stays in typed TypeScript. The emitters target only Bash 5 or later, PowerShell 7 or later and the workflow of GitHub Actions. The artifact carries the hash of its plan, the same for every emitter, and writes one receipt line when it ends; ingest pulls the receipt and the library records it as a `receipt` event beside the `handoff` event that carried the same plan hash. `bun commons/workload/tools/runners.ts --check` regenerates the artifacts and compares: a hand-edited artifact is `E-WL-RUNNER-DRIFT`.",
     "",
-    ...artifacts.flatMap(({ w, r, made }) => (made.kind === "ok" ? [`## The artifact of \`${w.id}\` for \`${r.id}\``, "", ...fence(r.id === "bash" ? "bash" : "powershell", made.value.text)] : [])),
+    ...artifacts.flatMap(({ w, r, made }) => (made.kind === "ok" ? [`## The artifact of \`${w.id}\` for \`${r.id}\``, "", ...fence(r.id === "bash" ? "bash" : r.id === "pwsh" ? "powershell" : "yaml", made.value.text)] : [])),
+    "## GitHub Actions: a graph, a gate and a receipt",
+    "",
+    "The runner `github-actions` writes a graph (the form of nodes with edges, `after`, which the platform calls `needs`) as a workflow whose jobs GitHub runs. Each step is one call of a pinned command by verb id; the workflow holds only what GitHub requires to wire the jobs (`needs`, a matrix over a fixed list, `permissions` that are the least the node asks for, `concurrency`, and references to the inputs and to the names of secrets), every action is pinned to a tag or a commit, and a node that a gate guards runs in a GitHub environment that a person approves. The library hands the workflow off with the hash of its plan and ingests what the run did, as a pure function of the result a caller pulled: the run, its conclusion, the conclusion of each job and the digest of its log become a `receipt` event matched to the hand-off by the plan hash, and an approval counts only where a person gave it and a person records it. The repository's own workflows are not made this way yet, and `commons/spec-kit/specs/0030-generated-workflows` keeps them byte for byte (the workload specification `0016-ci-on-graph` says why).",
+    "",
+    "## Schedules",
+    "",
+    "A trigger of kind `schedule` is a cadence (`hourly` to `yearly`) and a slot in UTC. For GitHub it is `on.schedule` inside the workflow. For `bash` and `pwsh` it is a cron line and a systemd timer with its service, for Linux, which only start the same artifact by its path; Windows Task Scheduler is not supported yet and a Scheduled Job is not in PowerShell 7, so a target of Windows is `E-WL-RUNNER-EMIT-UNSUPPORTED`. A trigger of kind `event` or `alert` is not realized by any runner: it is a statement of the specification.",
+    "",
+    ...schedules.flatMap(({ made }) => (made.kind === "ok" ? made.value.files.flatMap((f) => [`### \`${f.path}\` for \`synthetic-graph-02\``, "", ...fence(f.path.endsWith(".cron") ? "text" : "ini", f.text)]) : [])),
   ].join("\n");
 }
 
@@ -175,7 +190,7 @@ export async function outputs(): Promise<Readonly<Record<string, string>>> {
     [`${GUIDES}/workload-runners.auto.md`]: await runners(),
     [`${GUIDES}/workload-forms.auto.md`]: forms(),
     [`${GUIDES}/workload-errors.auto.md`]: errors(),
-    ...Object.fromEntries(STARTERS.map((w, i) => [`${GUIDES}/workload-${w.id}.auto.md`, starter(i)])),
+    ...Object.fromEntries(STARTERS.flatMap((w, i) => (w.id.startsWith("synthetic-") ? [] : [[`${GUIDES}/workload-${w.id}.auto.md`, starter(i)] as const]))),
     [`${GUIDES}/workload-harness.auto.md`]: harness(),
   };
 }

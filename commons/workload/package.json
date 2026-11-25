@@ -14,11 +14,13 @@
     "./physical": "./src/physical/mod.ts",
     "./forms/runbook": "./src/logical/forms/runbook/mod.ts",
     "./forms/reconcile": "./src/logical/forms/reconcile/mod.ts",
+    "./forms/graph": "./src/logical/forms/graph/mod.ts",
     "./dialects/claude-code": "./src/physical/dialects/claude-code/mod.ts",
     "./dialects/codex": "./src/physical/dialects/codex/mod.ts",
     "./dialects/human": "./src/physical/dialects/human/mod.ts",
     "./runners/bash": "./src/physical/runners/bash/mod.ts",
-    "./runners/pwsh": "./src/physical/runners/pwsh/mod.ts"
+    "./runners/pwsh": "./src/physical/runners/pwsh/mod.ts",
+    "./runners/github-actions": "./src/physical/runners/github-actions/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

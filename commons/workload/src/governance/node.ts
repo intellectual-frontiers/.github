@@ -51,10 +51,16 @@ export type NodeHead = {
   readonly needs?: readonly Requirement[];
 };
 
+/**
+ * The slot of a schedule in UTC: the minute, and as far as the cadence reaches the hour, the weekday (0 is Sunday), the day of the month (1 to 28) and the month (of the year for a yearly cadence, of the quarter, 1 to 3, for a quarterly one). A field a cadence
+ * does not have is refused (`E-WL-SCHEDULE-SLOT-INVALID`); none given is the default slot of the cadence (0015-schedule-realization FR-002: minute 17, hour 3, Monday, the first).
+ */
+export type ScheduleSlot = { readonly minute: number; readonly hour?: number; readonly weekday?: number; readonly day?: number; readonly month?: number };
+
 /** What starts a workload: a closed sum. A trigger is a field of a workload and never a form. */
 export type Trigger =
   | { readonly kind: "manual" }
-  | { readonly kind: "schedule"; readonly cadence: Cadence }
+  | { readonly kind: "schedule"; readonly cadence: Cadence; readonly at?: ScheduleSlot }
   | { readonly kind: "event"; readonly name: string }
   | { readonly kind: "alert"; readonly name: string };
 

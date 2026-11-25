@@ -6,8 +6,8 @@
 
 | Standard | What the library takes from it | Read |
 | --- | --- | --- |
-| GitHub Actions workflow syntax (named from practice) | A workflow is jobs with `needs` order that a platform executes from YAML | Not read in this session, so no section is cited |
+| GitHub Actions workflow syntax (JSON Schema of SchemaStore, the copy of commons/libraries) | Jobs with `needs`, `environment`, `permissions`, a matrix and `concurrency` | The schema validates the emitted files; the documentation pages were not fetched |
 
 ## What is built and what is reused
 
-Nothing is built: this is a reserved slot. It reuses the registry of forms of 0003-workload-forms and the runner axis of 0010-workload-runners.
+Reused: the nodes, effects, autonomy table, gates, verbs registry and the checks of the shared logical layer; the plan of calls, the plan hash, the hand-off and the receipt of 0010-workload-runners. New: the logical form (`src/logical/forms/graph`: nodes, order, cycle and reachability, checks, catalog, lowering to jobs, events and view), its native runner (`src/physical/forms/graph`) and its starters.

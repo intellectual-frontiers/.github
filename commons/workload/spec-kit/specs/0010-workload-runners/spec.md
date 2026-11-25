@@ -9,9 +9,9 @@
 
 ## Requirements
 
-- **FR-001**: The runners MUST be a registry typed in the core, each with an id, a kind of the closed list `native` and `integration`, a title and the capabilities it declares from the closed list `calls`, `fan-out`, `interactive`, `judge`, `approval`, `logic`, `compensate` and `destroy`; a runner MUST be added by registering one entry (and, for an integration runner, one emitter), with no change to any workload. The runners of the commons are `native`, `bash` and `pwsh`.
+- **FR-001**: The runners MUST be a registry typed in the core, each with an id, a kind of the closed list `native` and `integration`, a title and the capabilities it declares from the closed list `calls`, `fan-out`, `interactive`, `judge`, `approval`, `logic`, `compensate` and `destroy`; a runner MUST be added by registering one entry (and, for an integration runner, one emitter), with no change to any workload. The runners of the commons are `native`, `bash`, `pwsh` and `github-actions`.
 - **FR-002**: The native runner MUST be the port a form's run goes through, the former executor renamed and its behavior kept: one `NativeRunner` for each form that has code, which interprets the plan of the workload, holds each node to its derived autonomy, parks for a person, attaches and detaches stores, compensates and records every fact as an event of the run. The native runner MUST declare every capability, and it MUST be the default of every policy.
-- **FR-003**: An integration runner MUST compile the plan of a workload into an artifact that a foreign system runs, and MUST hand it off: the library keeps the plan, the policy and the evidence, and keeps none of the run. An integration runner MUST declare only what its artifact can carry; the emitters of the commons are `bash` (0011-runner-bash) and `pwsh` (0012-runner-powershell), and GitHub Actions is a later emitter that this specification does not build.
+- **FR-003**: An integration runner MUST compile the plan of a workload into an artifact that a foreign system runs, and MUST hand it off: the library keeps the plan, the policy and the evidence, and keeps none of the run. An integration runner MUST declare only what its artifact can carry; the emitters of the commons are `bash` (0011-runner-bash), `pwsh` (0012-runner-powershell) and `github-actions` (0014-runner-github-actions).
 - **FR-004**: A form MUST say what its workload needs of a runner, as a list of needs each from the closed list of capabilities and each naming the node that has it, derived from the nodes and never declared: a call of a verb or a check needs `calls`; an `each` needs `fan-out`; an `ask` needs `interactive`; a `judge` needs `judge`; a `gate` or an approval needs `approval`; a `branch`, a diff or a plan needs `logic`; an `undo` needs `compensate`; a destroy on a durable, git or external store needs `destroy` unless a gate or an approval guards it, and then needs `approval`; and any other node that is `human-only` once the gates are applied and that no gate guards needs `interactive`. A workload that needs `interactive`, `judge`, `logic`, `compensate` or `destroy` MUST be run by the native runner.
 - **FR-005**: A `RunnerPolicy` MUST be typed data a fleet owns with a `default` runner (`native` unless the fleet says another), a `perWorkload` choice (by the id of a workload), a `perForm` choice (by a form that has code) and a `perOperator` preference of a person, MUST be decoded at the boundary into that type or refused with every reason, and a workload and a node MUST NOT name a runner.
 - **FR-006**: The choice of a runner for a run MUST resolve in this order: the explicit choice made at run time, then the operator's preference, then the choice for the workload, then the choice for its form, then the default of the policy; the first that names a runner decides, and the default is always present, so a run always has a runner.
@@ -49,14 +49,14 @@
 
 ## Out of scope
 
-- The GitHub Actions emitter (a later slice), and the form `graph` (0013-form-graph).
+- The GitHub Actions emitter and the form `graph`: they are 0014-runner-github-actions and 0013-form-graph.
 - Running an artifact: a foreign system does, and the library only compiles it, hands it off and ingests its receipt.
 - Any POSIX `sh` subset, Windows PowerShell 5.1 and any legacy or backward compatibility: the emitters target modern Bash 5 and PowerShell 7.
 
 ## Edge cases
 
 - A workload with a judge or an ask is never handed off; it is run by the native runner, and a policy that names an integration runner for it is refused with `E-WL-RUNNER-UNSUITABLE`, per FR-007.
-- A gate can be mapped to the approval of a platform only by a runner that declares `approval` and only where the approval comes back as evidence recorded by a person, per FR-004 and FR-010; no runner of the commons declares it today.
+- A gate can be mapped to the approval of a platform only by a runner that declares `approval` and only where the approval comes back as evidence recorded by a person, per FR-004 and FR-010; `github-actions` declares it, and its gates are the environments of the jobs (0014-runner-github-actions FR-009).
 - A receipt that arrives before its hand-off is kept in the fold and matched when the hand-off arrives, because the fold orders the events by their ids, per FR-010.
 - An `each` with an empty list is a loop over nothing, and it is a list the caller gave, per FR-012.
 

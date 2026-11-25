@@ -1,4 +1,4 @@
-// Spec: 0011-runner-bash FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007
+// Spec: 0011-runner-bash FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007; 0015-schedule-realization FR-004, FR-005, FR-006
 /**
  * The emitter of the runner `bash`: it renders a plan of calls as a script of modern Bash, version 5 or later, and nothing else. The script fails fast under an older Bash, sets `set -Eeuo pipefail` and
  * `shopt -s inherit_errexit`, and is only calls to the pinned verb command by verb id (through one function that takes an array, never a string), a loop over an array literal of a fixed list, and the order of the steps. Every
@@ -14,7 +14,7 @@
  * @module
  */
 import { type Call, type CallArg, type CallPlan, RUNNERS } from "@intellectual-frontiers/workload/governance";
-import { type EmitterImpl, inputVariable } from "@intellectual-frontiers/workload/logical";
+import { type EmitterImpl, inputVariable, linuxSchedule } from "@intellectual-frontiers/workload/logical";
 
 const runner = RUNNERS.get("bash");
 if (runner === undefined) throw new Error("the runner bash is registered by the core");
@@ -75,5 +75,5 @@ const render = (plan: CallPlan, hash: string, options: { readonly cli: string })
   return lines.join("\n");
 };
 
-/** The emitter. */
-export const emitter: EmitterImpl = { runner, extension: "sh", render };
+/** The emitter. A schedule is a cron line and a systemd timer with its service, which only start the script by its path; Windows has none. */
+export const emitter: EmitterImpl = { runner, extension: "sh", render, schedule: (plan, hash, trigger, options) => linuxSchedule("bash", "sh", (path) => ["/usr/bin/env", "bash", path], plan, hash, trigger, options.schedule ?? {}) };

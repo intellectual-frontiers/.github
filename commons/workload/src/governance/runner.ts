@@ -56,12 +56,13 @@ const named = (text: string): RunnerId => {
 /** The id of the native runner, the default of every policy. */
 export const NATIVE_RUNNER: RunnerId = named("native");
 
-/** The runners of the commons: the native runner, and the integration runners that emit a script of modern Bash and of modern PowerShell. */
+/** The runners of the commons: the native runner, and the integration runners that emit a script of modern Bash and of modern PowerShell and the workflow of GitHub Actions. */
 export const RUNNERS: RunnerRegistry = (() => {
   const made = createRunnerRegistry([
     { id: NATIVE_RUNNER, kind: "native", title: "Native: the TypeScript of the library", capabilities: RUNNER_CAPABILITIES },
     { id: named("bash"), kind: "integration", title: "Bash 5 or later", capabilities: ["calls", "fan-out"] },
     { id: named("pwsh"), kind: "integration", title: "PowerShell 7 or later", capabilities: ["calls", "fan-out"] },
+    { id: named("github-actions"), kind: "integration", title: "GitHub Actions: a workflow of jobs that GitHub executes", capabilities: ["calls", "fan-out", "approval"] },
   ]);
   if (made.kind === "err") throw new Error(made.error);
   return made.value;
@@ -138,6 +139,21 @@ export type Fan = { readonly kind: "each"; readonly step: string; readonly over:
 /** One step of a plan of calls: the closed subset an artifact is made from. */
 export type PlanStep = Call | Fan;
 
+/** The permissions of one job of a plan, by scope: each `read` or `write`. A scope not named is none. */
+export type PlanPermissions = Readonly<Record<string, "read" | "write">>;
+
+/** One job of a graph, as an integration runner of a platform that has jobs carries it: the node, the jobs it comes after, the one call or loop it makes, the permissions it asks for (least privilege), the gate that guards it as the name of the environment a person approves, the credentials it reads by name and the time it may take. */
+export type PlanJob = {
+  readonly id: string;
+  readonly title: string;
+  readonly needs: readonly string[];
+  readonly step: PlanStep;
+  readonly permissions: PlanPermissions;
+  readonly environment?: string;
+  readonly credentials: readonly string[];
+  readonly timeoutMinutes?: number;
+};
+
 /** The plan of calls of a workload: what an artifact says and nothing else. */
 export type CallPlan = {
   readonly workload: string;
@@ -148,6 +164,8 @@ export type CallPlan = {
   /** The names of the credentials the workload needs, sorted: names only, read from the environment by the verb. */
   readonly credentials: readonly string[];
   readonly steps: readonly PlanStep[];
+  /** The jobs of a graph with their edges, in an order in which every job comes after the jobs it needs; `steps` is the same calls in that order, for a runner that has no jobs. A form that is no graph gives none. */
+  readonly jobs?: readonly PlanJob[];
 };
 
 /** The calls of a plan in the order a script makes them: a loop's body once for each member. Two artifacts of one plan make the same list. */

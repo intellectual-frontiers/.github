@@ -11,6 +11,7 @@ export * from "./agent-runner.ts";
 export * from "./stores.ts";
 export * from "./forms/runbook/run.ts";
 export * from "./forms/reconcile/run.ts";
+export * from "./forms/graph/run.ts";
 export * from "./dialects.ts";
 export * from "./runners.ts";
 export * from "./workloads.ts";

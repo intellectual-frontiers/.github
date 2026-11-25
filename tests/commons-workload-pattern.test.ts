@@ -12,6 +12,7 @@ import { readLibraries } from "../commons/libraries/src/libraries.ts";
 import { dependenciesOf, membersOf } from "../commons/libraries/src/metapackages.ts";
 import * as governance from "../commons/workload/src/governance/mod.ts";
 import { RECONCILE_FORM } from "../commons/workload/src/logical/forms/reconcile/mod.ts";
+import { GRAPH_FORM } from "../commons/workload/src/logical/forms/graph/mod.ts";
 import { RUNBOOK_FORM } from "../commons/workload/src/logical/forms/runbook/mod.ts";
 
 const REPO = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
@@ -55,16 +56,17 @@ proves(["0040-workload-pattern FR-003"], "the form, the dialect, the trigger and
   assert(governance.DEFINITIONS.dialect.includes("never a form") && governance.DEFINITIONS.trigger.includes("never a form"));
 });
 
-proves(["0040-workload-pattern FR-004"], "a form is declared by one tiny contract: the two forms with code have exactly its keys", () => {
+proves(["0040-workload-pattern FR-004"], "a form is declared by one tiny contract: the three forms with code have exactly its keys", () => {
   const keys = ["fold", "id", "nodeKinds", "plan", "validate"];
   assertEquals(Object.keys(RUNBOOK_FORM).sort(), keys);
   assertEquals(Object.keys(RECONCILE_FORM).sort(), keys);
-  assert(RUNBOOK_FORM.nodeKinds.length === 8 && RECONCILE_FORM.nodeKinds.length === 6);
+  assertEquals(Object.keys(GRAPH_FORM).sort(), keys);
+  assert(RUNBOOK_FORM.nodeKinds.length === 8 && RECONCILE_FORM.nodeKinds.length === 6 && GRAPH_FORM.nodeKinds.length === 4);
 });
 
-proves(["0040-workload-pattern FR-005"], "two forms have code and two are reserved with the criterion for building them", () => {
-  assertEquals(governance.BUILT_FORM_IDS, ["runbook", "reconcile"]);
-  for (const id of ["graph", "campaign"] as const) {
+proves(["0040-workload-pattern FR-005"], "three forms have code and one is reserved with the criterion for building it", () => {
+  assertEquals(governance.BUILT_FORM_IDS, ["runbook", "reconcile", "graph"]);
+  for (const id of ["campaign"] as const) {
     const f = governance.FORMS[id];
     assert(f.status === "reserved" && f.criteria.includes("second") || f.status === "reserved" && f.criteria.includes("two"), id);
   }

@@ -1,4 +1,4 @@
-// Spec: 0012-runner-powershell FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008
+// Spec: 0012-runner-powershell FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-007, FR-008; 0015-schedule-realization FR-004, FR-005, FR-006
 /**
  * The emitter of the runner `pwsh`: it renders a plan of calls as a script of modern PowerShell, version 7 or later, and nothing else. The script requires 7.0, sets strict mode and `$ErrorActionPreference = 'Stop'`, and is
  * only calls to the pinned verb command by verb id (through one function that gives the native command an array of arguments and checks `$LASTEXITCODE` after it), a `foreach` over an array literal of a fixed list and the
@@ -14,7 +14,7 @@
  * @module
  */
 import { type Call, type CallArg, type CallPlan, RUNNERS } from "@intellectual-frontiers/workload/governance";
-import { type EmitterImpl, inputVariable } from "@intellectual-frontiers/workload/logical";
+import { type EmitterImpl, inputVariable, linuxSchedule } from "@intellectual-frontiers/workload/logical";
 
 const runner = RUNNERS.get("pwsh");
 if (runner === undefined) throw new Error("the runner pwsh is registered by the core");
@@ -87,5 +87,5 @@ const render = (plan: CallPlan, hash: string, options: { readonly cli: string })
   return lines.join("\n");
 };
 
-/** The emitter. */
-export const emitter: EmitterImpl = { runner, extension: "ps1", render };
+/** The emitter. A schedule is a cron line and a systemd timer with its service on Linux only: PowerShell 7 has no Scheduled Job, and Windows Task Scheduler is not supported yet (`E-WL-RUNNER-EMIT-UNSUPPORTED`). */
+export const emitter: EmitterImpl = { runner, extension: "ps1", render, schedule: (plan, hash, trigger, options) => linuxSchedule("pwsh", "ps1", (path) => ["/usr/bin/env", "pwsh", "-NoProfile", "-NonInteractive", "-File", path], plan, hash, trigger, options.schedule ?? {}) };

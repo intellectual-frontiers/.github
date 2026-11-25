@@ -13,7 +13,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./dialects/claude-code", "./dialects/codex", "./dialects/human", "./runners/bash", "./runners/pwsh"],
+  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./forms/graph", "./dialects/claude-code", "./dialects/codex", "./dialects/human", "./runners/bash", "./runners/pwsh", "./runners/github-actions"],
   summary: "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and runners behind ports.",
   kanon: {
     package: "@intellectual-frontiers/workload",
@@ -68,6 +68,7 @@ export const library = {
         instances: true,
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/libraries", subpaths: ["workflows/model", "workflows/render"] },
           { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical"] },
         ],
       },
@@ -82,7 +83,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: "any" },
           { name: "@intellectual-frontiers/workbench", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
-          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human", "runners/bash", "runners/pwsh"] },
+          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "forms/reconcile", "forms/graph", "dialects/claude-code", "dialects/codex", "dialects/human", "runners/bash", "runners/pwsh", "runners/github-actions"] },
         ],
       },
       { folder: "src/", own: true },

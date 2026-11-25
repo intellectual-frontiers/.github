@@ -8,12 +8,11 @@ A workload here is a unit of operated work, not running software. Two axes are o
 |---|---|---|
 | `runbook` | built | An ordered algebra of steps: a procedure that a person or an agent orchestrates, with gates, compensations and a record of the run. |
 | `reconcile` | built | A loop toward a desired state: observe, diff, plan, approve by plan hash, apply, verify; level-triggered. |
-| `graph` | reserved | A DAG of jobs with freshness, which an integration runner carries. |
+| `graph` | built | A directed acyclic graph of nodes with edges (after), the same nodes and effects as the other forms, which an integration runner such as GitHub Actions carries. |
 | `campaign` | reserved | A collection over a period with sampling. |
 
 A form is built where a second concrete user needs it. A reserved form is a named slot with no code:
 
-- `graph`: A second concrete user, besides CI/CD and its generated GitHub workflows (the first consumer), needs the same graph of jobs with freshness for an integration runner.
 - `campaign`: A second concrete user, besides the first, needs a collection over a period with sampling that cannot be said as a runbook with a schedule trigger.
 
 The triggers are `manual`, `schedule`, `event`, `alert`. A drill or a game day is a runbook with a schedule trigger and an expected outcome.

@@ -40,7 +40,7 @@ proves(["0005-workload-runs FR-002"], "every run event is a planning comment wit
   assertEquals(decodeEnvelope(`${EVENT_PREFIX}not json`).kind, "err");
   assertEquals(decodeEnvelope(`${EVENT_PREFIX}[1]`).kind, "err");
   assertEquals(decodeEnvelope(`${EVENT_PREFIX}{"kind":"started"}`).kind, "err");
-  assertEquals(decodeEnvelope(`${EVENT_PREFIX}{"form":"graph","kind":"started"}`).kind, "err");
+  assertEquals(decodeEnvelope(`${EVENT_PREFIX}{"form":"campaign","kind":"started"}`).kind, "err");
   const event = must(makeWorkloadEvent({ id: eventId(1), item: ITEM, at: ev(1, AGENT, ALL[0] as RunEvent).at, actor: AGENT }, "runbook", { kind: "step-started", step: "claim-order" }));
   assert(event.data.type === "commented" && event.data.body === body);
 });

@@ -61,7 +61,7 @@ export function makeFinding(e: CatalogEntry, node: string, message: string, vars
 }
 
 /** The concepts a problem of the core belongs to: a closed list. */
-export const PROBLEM_CONCEPTS = ["workload", "citation", "verb", "effect", "external", "gate", "check", "need", "harness", "judge", "runner"] as const;
+export const PROBLEM_CONCEPTS = ["workload", "citation", "verb", "effect", "external", "gate", "check", "need", "harness", "judge", "runner", "schedule"] as const;
 
 /** The codes of the core catalog. */
 export type CatalogCode =
@@ -82,6 +82,10 @@ export type CatalogCode =
   | "E-WL-RUNNER-DRIFT"
   | "E-WL-RUNNER-RECEIPT-UNMATCHED"
   | "E-WL-RUNNER-APPROVAL-NOT-PERSON"
+  | "E-WL-RUNNER-ACTION-UNPINNED"
+  | "E-WL-RUNNER-SCHEDULE-NEEDS-INPUT"
+  | "E-WL-RUNNER-RECEIPT-INVALID"
+  | "E-WL-SCHEDULE-SLOT-INVALID"
   | "E-WL-JUDGE-EFFECT"
   | "E-WL-JUDGE-APPLIED"
   | "E-WL-WORKLOAD-UNKNOWN-FORM"
@@ -106,9 +110,13 @@ export const CATALOG: Readonly<Record<CatalogCode, CatalogEntry<CatalogCode>>> =
   "E-WL-RUNNER-DRIFT": entry("E-WL-RUNNER-DRIFT", "runner", "drift", "An artifact is not what the plan makes", "The artifact differs from the one regenerated from the plan: it was edited by hand, the plan changed, or it is the artifact of another runner.", "ci", "regenerate the artifact with the generator and commit it; never edit it by hand"),
   "E-WL-RUNNER-RECEIPT-UNMATCHED": entry("E-WL-RUNNER-RECEIPT-UNMATCHED", "runner", "receipt-unmatched", "A receipt names no hand-off", "The receipt carries a plan hash that no hand-off of the run has, so it is not the result of any plan that was handed off.", "person", "check the plan hash of the receipt against the hand-offs of the run"),
   "E-WL-RUNNER-APPROVAL-NOT-PERSON": entry("E-WL-RUNNER-APPROVAL-NOT-PERSON", "runner", "approval-not-person", "An approval was recorded by an agent", "A receipt carries an approval of a gate and the actor who recorded it is not a person; only a person approves.", "person", "have a person record the approval; an agent never approves", true),
+  "E-WL-RUNNER-ACTION-UNPINNED": entry("E-WL-RUNNER-ACTION-UNPINNED", "runner", "action-unpinned", "An action is not pinned", "A step of a workflow uses an action that is no `./path` and no `owner/name@version` with the version a tag or a full commit, or a command of the pin table that is not a plain word.", "agent", "pin {node} to a tag or a full commit, or use a plain word for the command"),
+  "E-WL-RUNNER-SCHEDULE-NEEDS-INPUT": entry("E-WL-RUNNER-SCHEDULE-NEEDS-INPUT", "runner", "schedule-needs-input", "A scheduled workload needs an input nobody can give", "A run that a schedule starts is given no input, and the workload has an input it requires, so every scheduled run would stop at its first read of it.", "agent", "make the input {node} optional, or start the workload by hand"),
+  "E-WL-RUNNER-RECEIPT-INVALID": entry("E-WL-RUNNER-RECEIPT-INVALID", "runner", "receipt-invalid", "A run result is not a receipt", "The result of an external run is not finished, has no reference that is the address of a run, a digest that is not 64 lower case hexadecimal digits, a conclusion or a plan hash that is not one, or names a plan other than the one its workflow carries.", "person", "pull the result of the finished run again and check its reference, its conclusion and its plan hash"),
+  "E-WL-SCHEDULE-SLOT-INVALID": entry("E-WL-SCHEDULE-SLOT-INVALID", "schedule", "slot-invalid", "The slot does not fit the cadence", "A field of the slot is out of its range (minute 0 to 59, hour 0 to 23, weekday 0 to 6, day 1 to 28, month 1 to 12, or 1 to 3 of a quarter) or is one that the cadence does not have.", "agent", "give the schedule of {node} a slot that its cadence has, each field in its range"),
   "E-WL-JUDGE-EFFECT": entry("E-WL-JUDGE-EFFECT", "judge", "effect", "A judge has an effect", "A judge node carries an effect. A judge only proposes: its output is typed and it applies nothing.", "agent", "remove the effect from {node} and apply the proposal with a verb node behind a gate", true),
   "E-WL-JUDGE-APPLIED": entry("E-WL-JUDGE-APPLIED", "judge", "applied", "The proposal of a judge is applied with no person between", "A verb node above the level agent-proposes uses the output of a judge, and no gate or ask stands between them.", "person", "put a gate or an ask between the judge and {node}", true),
-  "E-WL-WORKLOAD-UNKNOWN-FORM": entry("E-WL-WORKLOAD-UNKNOWN-FORM", "workload", "unknown-form", "The form is not a form that has code", "The workload names a form that is reserved or is none: a reserved form is a named slot and has no code.", "person", "use a form that is built (runbook or reconcile), or build the reserved form where its criteria are met"),
+  "E-WL-WORKLOAD-UNKNOWN-FORM": entry("E-WL-WORKLOAD-UNKNOWN-FORM", "workload", "unknown-form", "The form is not a form that has code", "The workload names a form that is reserved or is none: a reserved form is a named slot and has no code.", "person", "use a form that is built (runbook, reconcile or graph), or build the reserved form where its criteria are met"),
   "E-WL-UNKNOWN": entry("E-WL-UNKNOWN", "workload", "unknown", "A failure no entry names", "The failure matches no entry of any catalog.", "person", "classify it: add an entry, a check and a test, and document it, in one change"),
 };
 

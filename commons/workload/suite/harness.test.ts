@@ -42,7 +42,8 @@ proves(["0007-workload-harness FR-002"], "a policy is typed data decoded at the 
   assertEquals(decodePolicy({}).kind, "err");
   assertEquals(decodePolicy("claude-code").kind, "err");
   assertEquals(decodePolicy({ default: "codex", perWorkload: { a: 3 } }).kind, "err");
-  assertEquals(decodePolicy({ default: "codex", perForm: { graph: "human" } }).kind, "err");
+  assertEquals(decodePolicy({ default: "codex", perForm: { campaign: "human" } }).kind, "err");
+  assertEquals(decodePolicy({ default: "codex", perForm: { graph: "human" } }).kind, "ok");
   assertEquals(decodePolicy({ default: "mystery" }, WITH_MINIMAL).kind, "err");
   assertEquals(decodePolicy({ default: "minimal-harness" }, WITH_MINIMAL).kind, "ok");
 });

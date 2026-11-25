@@ -1,7 +1,7 @@
 // Spec: 0001-workload-layers FR-006
 /**
  * The command `workload`: `check` (the static check of the starter workloads, whatever their form), `plan ID` (the nodes and the autonomy derived for each), `project [--dialect D]` (the files of every registered dialect,
- * or one), `forms` (the forms, built and reserved), `runners` (the runners and what each can carry), `needs ID` (what a workload needs of a runner and which runner can carry it), `emit ID RUNNER` (the artifact of an integration runner, to the output) and `explain CODE` (across the catalogs of the core and of each form) and `verb ID`, which checks the id against the registry: an id that is not registered is refused with its
+ * or one), `forms` (the forms, built and reserved), `runners` (the runners and what each can carry), `needs ID` (what a workload needs of a runner and which runner can carry it), `emit ID RUNNER` (the artifact of an integration runner, to the output), `schedule ID RUNNER` (the files that start a scheduled workload, or where its schedule is) and `explain CODE` (across the catalogs of the core and of each form) and `verb ID`, which checks the id against the registry: an id that is not registered is refused with its
  * code, and a registered one says that the host that has the pinned package binds it, and exits non-zero until it does. Every refusal prints its code and its fix. It reads nothing and writes nothing.
  *
  * @example
@@ -14,12 +14,14 @@
  */
 import { authored, describeFinding, explainIn, FORM_IDS, FORMS, finding, runnerId, RUNNERS, VERBS } from "@intellectual-frontiers/workload/governance";
 import { lacksOf, projectAll } from "@intellectual-frontiers/workload/logical";
+import { graphFleet } from "@intellectual-frontiers/workload/forms/graph";
 import { bootstrapFleet, FIXTURES } from "@intellectual-frontiers/workload/forms/runbook";
 import { DIALECT_IMPLS } from "./dialects.ts";
-import { emitWorkload } from "./runners.ts";
+import { emitSchedule, emitWorkload } from "./runners.ts";
 import { type AnyWorkload, CATALOGS, checkWorkload, levelsOfWorkload, runnerNeedsOfWorkload, STARTERS, viewOfWorkload } from "./workloads.ts";
 
 const KNOWN: readonly AnyWorkload[] = [...STARTERS, ...FIXTURES];
+const FLEET = { fleet: (over: "tenants" | "hosts" | "fleets", source: string) => bootstrapFleet(over, source) ?? graphFleet(over, source) };
 
 /** Where the command writes. */
 export type Io = { readonly out: (text: string) => void; readonly err: (text: string) => void };
@@ -94,12 +96,29 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2> 
         io.err(`usage: workload emit ID RUNNER; the workloads are ${KNOWN.map((x) => x.id).join(", ")} and the runners ${RUNNERS.list().map((r) => r.id).join(", ")}`);
         return 1;
       }
-      const made = await emitWorkload(w, authored(runnerId(runner)), { fleet: bootstrapFleet });
+      const made = await emitWorkload(w, authored(runnerId(runner)), FLEET);
       if (made.kind === "err") {
         for (const f of made.error) io.err(describeFinding(f));
         return 1;
       }
       io.out(made.value.text);
+      return 0;
+    }
+    case "schedule": {
+      const w = KNOWN.find((x) => x.id === arg);
+      const runner = argv[2];
+      if (w === undefined || runner === undefined || !RUNNERS.has(runner)) {
+        io.err(`usage: workload schedule ID RUNNER; the workloads are ${KNOWN.map((x) => x.id).join(", ")} and the runners ${RUNNERS.list().map((r) => r.id).join(", ")}`);
+        return 1;
+      }
+      const made = await emitSchedule(w, authored(runnerId(runner)), FLEET);
+      if (made.kind === "err") {
+        for (const f of made.error) io.err(describeFinding(f));
+        return 1;
+      }
+      if (made.value.where === "none") io.out(`${w.id} is started by hand: it has no schedule`);
+      else if (made.value.where === "workflow") io.out(`${w.id}: the schedule of ${runner} is in its workflow (on.schedule): emit it with: workload emit ${w.id} ${runner}`);
+      else for (const f of made.value.files) io.out(`=== ${f.path}\n${f.text}`);
       return 0;
     }
     case "explain": {
@@ -117,7 +136,7 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2> 
       return 2;
     }
     default:
-      io.err("usage: workload check | plan ID | project [--dialect D] | forms | runners | needs ID | emit ID RUNNER | explain CODE | verb ID");
+      io.err("usage: workload check | plan ID | project [--dialect D] | forms | runners | needs ID | emit ID RUNNER | schedule ID RUNNER | explain CODE | verb ID");
       return 1;
   }
 }

@@ -36,15 +36,15 @@ const gate = (guards: string[], demands: "agent-proposes" | "human-only" = "agen
 const caps = (steps: readonly Step[]) => runnerNeedsOf(runbook(steps)).map((n) => `${n.capability}:${n.node}`);
 
 proves(["0010-workload-runners FR-001"], "the runners are a registry typed in the core with an id, a kind and the capabilities each declares, and a runner added later is one entry that changes no workload", () => {
-  assertEquals(RUNNERS.list().map((x) => x.id), ["bash", "native", "pwsh"]);
+  assertEquals(RUNNERS.list().map((x) => x.id), ["bash", "github-actions", "native", "pwsh"]);
   assertEquals([...RUNNER_KINDS], ["native", "integration"]);
   assertEquals([...RUNNER_CAPABILITIES], ["calls", "fan-out", "interactive", "judge", "approval", "logic", "compensate", "destroy"]);
-  assertEquals(RUNNERS.list().map((x) => `${x.id}:${x.kind}`), ["bash:integration", "native:native", "pwsh:integration"]);
+  assertEquals(RUNNERS.list().map((x) => `${x.id}:${x.kind}`), ["bash:integration", "github-actions:integration", "native:native", "pwsh:integration"]);
   assertEquals(createRunnerRegistry([...RUNNERS.list(), RUNNERS.list()[0] as Runner]).kind, "err");
   const before = JSON.stringify([SYNTHETIC_BOOTSTRAP_01, RESTORE_DRILL, CONVERGE_SETTINGS]);
   const mine: Runner = { id: r("minimal-runner"), kind: "integration", title: "A minimal runner", capabilities: ["calls"] };
   const more = must(createRunnerRegistry([...RUNNERS.list(), mine]));
-  assertEquals(more.list().length, 4);
+  assertEquals(more.list().length, 5);
   assertEquals(decodeRunnerPolicy({ default: "minimal-runner" }, more).kind, "ok");
   assertEquals(decodeRunnerPolicy({ default: "minimal-runner" }).kind, "err");
   assertEquals(JSON.stringify([SYNTHETIC_BOOTSTRAP_01, RESTORE_DRILL, CONVERGE_SETTINGS]), before);
@@ -64,7 +64,7 @@ proves(["0010-workload-runners FR-002"], "the native runner is the former execut
 
 proves(["0010-workload-runners FR-003"], "an integration runner declares only what its artifact can carry, and every capability that only the native runner has is one no integration runner declares", () => {
   for (const x of RUNNERS.list().filter((y) => y.kind === "integration")) {
-    assertEquals(x.capabilities, ["calls", "fan-out"], x.id);
+    assertEquals(x.capabilities, x.id === "github-actions" ? ["calls", "fan-out", "approval"] : ["calls", "fan-out"], x.id);
     for (const c of NATIVE_ONLY) assertEquals(x.capabilities.includes(c), false, `${x.id} ${c}`);
   }
   assertEquals(forcesNative(runnerNeedsOf(RESTORE_DRILL)), true);
@@ -104,7 +104,8 @@ proves(["0010-workload-runners FR-005"], "a runner policy is typed data decoded 
   assertEquals(decodeRunnerPolicy("bash").kind, "err");
   assertEquals(decodeRunnerPolicy({ default: 3 }).kind, "err");
   assertEquals(decodeRunnerPolicy({ perWorkload: { a: 3 } }).kind, "err");
-  assertEquals(decodeRunnerPolicy({ perForm: { graph: "bash" } }).kind, "err");
+  assertEquals(decodeRunnerPolicy({ perForm: { campaign: "bash" } }).kind, "err");
+  assertEquals(decodeRunnerPolicy({ perForm: { graph: "github-actions" } }).kind, "ok");
   for (const w of [...STARTERS, SYNTHETIC_BOOTSTRAP_01]) {
     const text = JSON.stringify(w);
     for (const x of RUNNERS.list()) if (x.id !== "native") assert(!text.includes(`"${x.id}"`), `${w.id} names ${x.id}`);
@@ -167,7 +168,8 @@ proves(["0010-workload-runners FR-008"], "the autonomy derived for each node is 
   assertEquals(JSON.stringify(all), before);
   const gated = [gate(["wipe"], "human-only"), wipe("wipe")];
   assertEquals(caps(gated), ["approval:approve", "calls:wipe", "approval:wipe"]);
-  assertEquals(forcesNative(runnerNeedsOf(runbook(gated))), true);
+  assertEquals(forcesNative(runnerNeedsOf(runbook(gated))), false, "github-actions declares approval");
+  assertEquals(RUNNERS.list().filter((x) => x.kind === "integration" && lacksOf(runnerNeedsOf(runbook(gated)), x).length === 0).map((x) => x.id), ["github-actions"]);
 });
 
 const handoff = (k: number, over: Partial<Extract<RunnerEvent, { kind: "handoff" }>> = {}, form: "runbook" | "reconcile" = "runbook"): ItemEvent => must(makeRunnerEvent({ id: eventId(k), item: ITEM, at: AT, actor: PERSON }, form, { kind: "handoff", runner: "bash", plan: A, ...over }));
@@ -238,7 +240,7 @@ proves(["0010-workload-runners FR-010"], "the state of a hand-off is a fold: the
 proves(["0010-workload-runners FR-015"], "the catalog holds the codes of the concept runner, closed, each with its fixer and its fix, and the approval of an agent is a safety rule", () => {
   assertEquals(catalogProblems(CORE_CATALOG), []);
   const codes = Object.keys(CORE_CATALOG.entries).filter((c) => c.startsWith("E-WL-RUNNER-")).sort();
-  assertEquals(codes, ["E-WL-RUNNER-APPROVAL-NOT-PERSON", "E-WL-RUNNER-DRIFT", "E-WL-RUNNER-EACH-UNLISTED", "E-WL-RUNNER-EMIT-UNSUPPORTED", "E-WL-RUNNER-RECEIPT-UNMATCHED", "E-WL-RUNNER-UNSUITABLE", "E-WL-RUNNER-VALUE-UNSAFE"]);
+  assertEquals(codes, ["E-WL-RUNNER-ACTION-UNPINNED", "E-WL-RUNNER-APPROVAL-NOT-PERSON", "E-WL-RUNNER-DRIFT", "E-WL-RUNNER-EACH-UNLISTED", "E-WL-RUNNER-EMIT-UNSUPPORTED", "E-WL-RUNNER-RECEIPT-INVALID", "E-WL-RUNNER-RECEIPT-UNMATCHED", "E-WL-RUNNER-SCHEDULE-NEEDS-INPUT", "E-WL-RUNNER-UNSUITABLE", "E-WL-RUNNER-VALUE-UNSAFE"]);
   for (const c of codes) assertEquals(explain(c).concept, "runner");
   assertEquals(explain("E-WL-RUNNER-UNSUITABLE").fixer, "person");
   assertEquals(explain("E-WL-RUNNER-APPROVAL-NOT-PERSON").safety, true);

@@ -13,23 +13,23 @@
 - **FR-002**: The core (the governance entry and the shared logical entry) MUST import nothing from a form: no source of either MUST name a form by a path or by the entry of a form, and the table of the manifest MUST give the core no row that lets it import a unit of the forms.
 - **FR-003**: A form MUST import nothing from another form: each form MUST be an instance of the unit of the forms, so that the shared checker finds `instances/sibling` where one imports another, and the native runners of two forms MUST NOT import each other.
 - **FR-004**: The forms MUST be a closed registry of the core, one entry for each, with the status `built` (it has code) or `reserved` (a named slot with no code and the criteria for building it); a workload that names a form that is reserved or is none MUST be refused with `E-WL-WORKLOAD-UNKNOWN-FORM`.
-- **FR-005**: A workload MUST have a trigger, a field of its head and never a form: one of `manual`, `schedule` (with a cadence of `daily`, `weekly`, `monthly`, `quarterly` or `yearly`), `event` (a name) or `alert` (a name), a closed sum decoded at the boundary; the trigger MUST NOT change what a form does, so that the same workload is started by any trigger.
+- **FR-005**: A workload MUST have a trigger, a field of its head and never a form: one of `manual`, `schedule` (with a cadence of `hourly`, `daily`, `weekly`, `monthly`, `quarterly` or `yearly` and an optional slot in UTC, 0015-schedule-realization FR-001), `event` (a name) or `alert` (a name), a closed sum decoded at the boundary; the trigger MUST NOT change what a form does, so that the same workload is started by any trigger.
 - **FR-006**: A workload MAY say the outcome a run is expected to have, one of `completes`, `parks` and `fails`, so that a drill or a game day is a workload with a schedule trigger and an expected outcome and not a form of its own; each form MUST say what its run finished with in those three words (the runbook's `succeeded`, `parked` and `failed`; the reconcile form's `converged`, `parked` and `failed`) so that a run can be judged against the expectation.
-- **FR-007**: The forms `graph` and `campaign` MUST be specified here as named slots and MUST have no code. `graph` is a directed acyclic graph of jobs with freshness, a projection to an external runner (an integration runner, 0010-workload-runners); its first consumer will be CI/CD and the generated GitHub workflows, which GitHub executes from YAML and which today are generated from typed definitions (`commons/libraries/src/workflows/definitions.ts`) and stay so until a second concrete user needs the same graph of jobs. `campaign` is a collection over a period with sampling. Each MUST be built only where a second concrete user needs it, and the criterion for building it MUST be in the registry of the core; no folder, no entry of the package and no source MAY name a reserved form but the registry.
+- **FR-007**: The form `campaign` MUST be specified here as a named slot and MUST have no code: it is a collection over a period with sampling, built only where a second concrete user needs it, with the criterion in the registry of the core, and no folder, no entry of the package and no source MAY name it but the registry. The form `graph`, which was a slot of this kind (a directed acyclic graph of jobs for an integration runner, whose first consumer is CI/CD and the generated GitHub workflows), was built by the decision of the owner on ticket 29 and is specified in 0013-form-graph, which replaces the rule of two for it.
 
 ## Acceptance scenarios
 
 1. **Given** the starter runbook's form, **When** its keys are read, **Then** they are its id, its kinds of node, `validate`, `plan` and `fold`, and its native runner names the same form, per FR-001.
 2. **Given** the sources of the core and the table, **When** they are read, **Then** no source names a form and the core has no row that imports one, per FR-002.
 3. **Given** the sources of each form, **When** their imports are read, **Then** none is of another form, per FR-003.
-4. **Given** the registry, **When** it is read, **Then** the runbook and the reconcile form are built, the graph and the campaign are reserved with their criteria, per FR-004.
+4. **Given** the registry, **When** it is read, **Then** the runbook, the reconcile form and the graph are built and the campaign is reserved with its criterion, per FR-004.
 5. **Given** a trigger of each kind and a trigger that is none, **When** they are decoded, **Then** the four are workloads' triggers and the others are refused, and no form is a trigger, per FR-005.
 6. **Given** the starter drill, **When** it is read, **Then** it has a schedule trigger and an expected outcome, and a run is judged against it in the three words every form shares, per FR-006.
-7. **Given** the reserved forms, **When** the registry, the folders and the spec are read, **Then** each has its criterion and none has code, per FR-007.
+7. **Given** the reserved form, **When** the registry, the folders and the spec are read, **Then** the campaign has its criterion and no code, and the graph is the form of 0013-form-graph, per FR-007.
 
 ## Out of scope
 
-- Code for the forms `graph` and `campaign`: they are specified here as slots and built when their criteria are met.
+- Code for the form `campaign`: it is specified here as a slot and built when its criterion is met.
 
 ## Edge cases
 

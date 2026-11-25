@@ -12,3 +12,6 @@ number	slug	state
 0011	runner-bash	in force
 0012	runner-powershell	in force
 0013	form-graph	in force
+0014	runner-github-actions	in force
+0015	schedule-realization	in force
+0016	ci-on-graph	in force
