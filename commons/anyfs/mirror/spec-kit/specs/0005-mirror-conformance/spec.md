@@ -20,7 +20,7 @@
 
 ## Out of scope
 
-- The run against a Git host (`tools/acceptance-github.ts`: a branch on GitHub as the primary, a SQLite file as the secondary): it needs a network and a token, so a person or an agent runs it and keeps its result as evidence in a tenant repository; `verify` does not.
+- The run against a Git host (`tools/acceptance-github.ts`: a branch on GitHub as the primary, through its API or through Git, and a SQLite file as the secondary): it needs a network and a token, so a person or an agent runs it and keeps its result as evidence in a tenant repository; `verify` does not.
 
 ## Edge cases
 
