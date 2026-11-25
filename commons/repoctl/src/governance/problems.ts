@@ -26,6 +26,7 @@ export type ProblemCode =
   | "E-MIZAN-RULE"
   | "E-VERSIONS"
   | "E-ACCEPTANCE"
+  | "E-AGENTS-SIZE"
   | "E-TYPES"
   | "E-VERSION-CONSTANT"
   | "E-UNDECLARED-DEPENDENCY"
@@ -85,6 +86,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-MIZAN-RULE",
   "E-VERSIONS",
   "E-ACCEPTANCE",
+  "E-AGENTS-SIZE",
   "E-TYPES",
   "E-VERSION-CONSTANT",
   "E-UNDECLARED-DEPENDENCY",
@@ -189,6 +191,12 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "A typed file of accepted findings (commons/spec-kit/accepted-findings) has no reason, an end that is not a day or is more than 366 days ahead, an approver who is not on the list, a name that is not its finding's id, or accepts a finding twice.",
     why: "An acceptance is a person's word that a risk has been seen until a day (commons 0038-build-policy FR-008), and a file that breaks its rules would say it for no one.",
     fix: "run the command named in the finding and read its output",
+  },
+  "E-AGENTS-SIZE": {
+    title: "AGENTS.md is past its budget",
+    what: "The file AGENTS.md of the repository is more than 8 KiB or more than 80 lines (commons 0011-documentation FR-043).",
+    why: "The agents that read the file document limits (the guidance of Claude Code is under 200 lines, the default cap of Codex is 32 KiB), and a long file is truncated or ignored in part; the rules belong in the specifications, and the file is their index.",
+    fix: "State each rule in one or two sentences and point to the requirement, guide or generated page that states it in full; move the text to where it belongs first",
   },
   "E-TYPES": {
     title: "TypeScript 7 finds a type error",

@@ -25,3 +25,17 @@ A run is red only for a fault of the pipeline's own scripting or configuration (
 ## How a release is made
 
 - **`release`** is run by hand from `main` after `repoctl release apply` has been committed and pushed: see [the release](ops-release.md).
+
+## What runs before a merge
+
+`bun run repoctl check` runs the checks of the repository that are not a compiler, a linter or a test, in one report with a code for each finding, and `bun run repoctl sync --check` runs the generators' checks and writes nothing. They are the release's whole check, and you run them by hand only where your change touches them. The rest, which `.github/workflows/tests.auto.yml` runs on every push and pull request:
+
+- at the root `bun x tsc -p tests/tsconfig.json` and `bun x tsc -p commons/tools/tsconfig.json` (which `repoctl check` runs), `bun fmt --check commons/tools tests`, and the linter as the workflow runs it;
+- `bun test ./tests/*.test.ts` and `node --test "tests/*.test.ts"` (`tests/release/` is the release's);
+- `bun commons/tools/generate-packaging.ts --check`;
+- `bun commons/libraries/src/affected.ts --base origin/main`, which names the libraries a change affects, read from each library's package and imports ([commons 0027-commons-libraries FR-019 to FR-022](../../spec-kit/specs/0027-commons-libraries/spec.md));
+- `bun commons/libraries/src/generate-workflows.ts --check` (the workflows are TypeScript values in `commons/ts/githost/workflows/`, `.github/workflows/*.auto.yml` is made from them and never edited; [0030-generated-workflows](../../spec-kit/specs/0030-generated-workflows/spec.md)) and `bun commons/libraries/src/generate-ontology.ts --check`;
+- `bun commons/libraries/src/check.ts`, the rules Mizan adds, held by `commons/spec-kit/mizan.baseline.txt`, which only shrinks (`--level L0` to `L3` runs the rules of a conformance level, L3 where none is given, and `--all` also runs every library's `verify`);
+- `bun commons/libraries/src/libraries.ts --check` and `bun commons/tools/mizan-check.ts`.
+
+A test fails if a new top-level entry appears in the repository. The size of `AGENTS.md` is checked by `agents-md` in `repoctl check` and is reported as a finding ([0011-documentation FR-043](../../spec-kit/specs/0011-documentation/spec.md)).

@@ -24,3 +24,7 @@ A verb is a governance action with an effect (`read`, `mutate` or `destructive`)
 repoctl explain          # the codes it can explain
 repoctl explain <code>   # what one finding means, and the command that fixes it
 ```
+
+## A generic host
+
+`repoctl` knows every fact it has of a repository from `repoctl.config.ts` at its root: the generators of its generated files, its checks, the commit identity and trailers, the hygiene policy and the optional verbs ([repoctl 0009-repoctl-config](../../repoctl/spec-kit/specs/0009-repoctl-config/spec.md), [0010-repoctl-host](../../repoctl/spec-kit/specs/0010-repoctl-host/spec.md)). A generator or a check is added there and nowhere else; the same package, installed from npm, operates any other repository with its own configuration. A generator that is added to the repository is added to its table of generators (`commons/repoctl/src/governance/generators.ts`), and `repoctl` never makes the logic of `commons/libraries` or `commons/tools` again: it calls those programs. A library whose sources say their own version in a constant (`CORE_VERSION`) names it in `versionConstants` in its manifest, so that the release writes it and `repoctl check` finds it where it disagrees. A verb is a governance action with a reach policy and an audience tier (`public`, `contributor`, `releaser`, fixed by `REPOCTL_TIER`, `contributor` where it says nothing); `release publish` is a destruction of the releaser tier that needs a preview, `--yes` and the phrase the preview printed.

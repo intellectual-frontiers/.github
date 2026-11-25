@@ -145,6 +145,7 @@ export default defineConfig({
     { id: "accepted-findings", summary: "The accepted risks of the build's findings: a reason, an end within 366 days, an approver of the list, a name that is the finding's id (commons 0038-build-policy FR-008).", command: ["bun", "commons/libraries/src/ci/accepted.ts"], code: "E-ACCEPTANCE" },
     { id: "versions", summary: "The version records: a record that is wrong, an identity that changed and a version that went back.", command: ["bun", "commons/libraries/src/versions.ts", "check"], code: "E-VERSIONS" },
     { id: "types", summary: "TypeScript 7 on the tests of the root.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "tests/tsconfig.json"], code: "E-TYPES" },
+    { id: "agents-md", summary: "The size of AGENTS.md: an index within 8 KiB and 80 lines, reported as a finding (commons 0011-documentation FR-043).", command: ["bun", "commons/tools/agents-md-check.ts"], code: "E-AGENTS-SIZE" },
     { id: "tools-types", summary: "TypeScript 7 on the tools of commons.", command: ["bun", "node_modules/typescript/bin/tsc", "-p", "commons/tools/tsconfig.json"], code: "E-TYPES" },
   ],
   capabilities: { release: true, newLibrary: true, status: true, prove: true, query: true, ci: true },

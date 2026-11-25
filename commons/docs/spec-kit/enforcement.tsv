@@ -51,3 +51,4 @@ requirement	mechanism	by	note
 0001-docs FR-049	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the shards put together equal the evidence of one run of the whole suite
 0001-docs FR-050	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the mutation job keeps Stryker's incremental file between nights; run twice on a library the second run keeps the first's result
 0001-docs FR-051	check	.github: cd commons/docs && bun run verify	evidence-shards.test.ts: the generated site workflow gathers its evidence in one step, the five at the same time
+0001-docs FR-052	check	.github: cd commons/docs && bun run verify	agents-guides.test.ts: both pages are in the start section in order, their links resolve, each has a diagram and at least 1,500 words, the quoted examples equal their source lines, every source entry has a date or says undated, and no page has a long dash

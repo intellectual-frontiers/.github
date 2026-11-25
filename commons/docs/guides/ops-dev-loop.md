@@ -26,3 +26,17 @@ Once, `bun install`. Then `bun run dev:check` at the root finds the libraries yo
 ## The environment
 
 The cloud environment should have Node 26 next to Bun (`node --version` is `v26.x`; the pin is `NODE_VERSION` in `commons/libraries/src/workflows/definitions.ts`): `node --test` on an older Node fails on what Node 26 added.
+
+The setup-script lines that install Node 26 where the environment has none are `curl -fsSL https://nodejs.org/dist/v26.13.1/node-v26.13.1-linux-x64.tar.xz | tar -xJ -C /usr/local --strip-components=1` and `node --version`; `nodejs.org` must be an allowed host of the environment, and the version in the line stays in step with `NODE_VERSION`. The commons' `engines` field says `>=26`.
+
+## Push small steps
+
+A fork or a person commits and pushes small steps to `main` as soon as `dev:check` passes, so that work meets in small merges and CI proves each step while the next is written. Run `bun run repoctl merge origin/main` first: it makes a generated file that conflicts again and never leaves one to be merged by hand. Never force-push. `bun run repoctl commit -m "Subject" --refs N` makes the commit (the identity, the trailers, no `.claude/`, no `node_modules`, no secret and no stale generated file), and `git push origin HEAD:main` pushes it. The release (versions, register, packing, publishing) is a separate, rarer act and is not done per push; see [the release](ops-release.md).
+
+## Set your identity before you pull
+
+A `git pull --no-rebase` or `git merge` makes a merge commit with the checkout's own `user.name` and `user.email`, and where they are not set the history credits another name ([repoctl 0007-repoctl-hygiene FR-007](../../repoctl/spec-kit/specs/0007-repoctl-hygiene/spec.md)). Before the first pull of a session run `git config user.name "Shahid Shah"` and `git config user.email "47497+shah@users.noreply.github.com"`, or merge with `bun run repoctl merge origin/main`, which uses the identity of `repoctl.config.ts`. `bun run repoctl hygiene` reports a merge by another identity as `E-HYGIENE-IDENTITY`; the merges made before the check are held by hash in `commit.heldMerges`, and history is never rewritten.
+
+## Who makes a commit
+
+Every commit is made by `bun run repoctl commit -m "Subject" --refs N`. Its author and committer is Shahid Shah with the GitHub no-reply address, given to Git with `-c user.name` and `-c user.email` and never another address, unless a person expressly authorizes an agent to be the author of that commit in its message. Its message includes `Refs #N` and the agent credit in `Co-Authored-By`; use `--co-author` when the configured default does not identify the agent. The standing authorization under which agents commit, and what it leaves to the owner, is recorded in [the Decision on the attribution of agent work](../../spec-kit/audits/2026-11-agent-attribution.md).

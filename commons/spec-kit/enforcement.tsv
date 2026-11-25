@@ -806,3 +806,4 @@ requirement	mechanism	by	note
 0039-content-method FR-017	review	0039-content-method FR-017	no instance exists yet
 0039-content-method FR-018	review	0039-content-method FR-018	no instance exists yet
 0039-content-method FR-019	review	0039-content-method FR-019	the matrix is a table of this specification until the assembly exists
+0011-documentation FR-043	check	.github: bun test ./tests/	agents-md-check.test.ts: a file past the budget in size or in lines is a finding that names the file, its size and the budget, a file within it is none, and the check never throws on a missing file; the real file is reported and never asserted

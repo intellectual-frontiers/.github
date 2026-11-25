@@ -206,6 +206,8 @@ const guides = guidesLens({
     { file: "commons/docs/guides/workbench-setup-codex.auto.md", path: "start/workbench-codex.html", section: "start", group: "Set up your workbench", order: 3 },
     { file: "commons/docs/guides/workbench-errors.auto.md", path: "start/workbench-errors.html", section: "start", group: "Set up your workbench", order: 4 },
     { file: "commons/docs/guides/auditor.md", path: "start/auditor.html", section: "start", group: "Start here", order: 4 },
+    { file: "commons/docs/guides/agents-md.md", path: "start/agents-md.html", section: "start", group: "Start here", order: 5 },
+    { file: "commons/docs/guides/why-not-memory-md.md", path: "start/why-not-memory-md.html", section: "start", group: "Start here", order: 6 },
     { file: "LICENSING.md", path: "start/licensing.html", section: "start", group: "Licensing", order: 0 },
     { file: "COMMERCIAL.md", path: "start/commercial.html", section: "start", group: "Licensing", order: 1 },
     { file: "THIRD_PARTY_NOTICES.md", path: "start/third-party-notices.html", section: "start", group: "Licensing", order: 2 },
