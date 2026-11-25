@@ -255,6 +255,6 @@ The code is public to read and is licensed by Intellectual Frontiers LLC under t
 - **Needs a commercial license**: any commercial use, hosting, embedding, reselling and building a competing product. Open an issue titled **Commercial license** at <https://github.com/intellectual-frontiers/.github/issues>.
 - **Where to read more**: [`LICENSING.md`](LICENSING.md) (in plain words), [`COMMERCIAL.md`](COMMERCIAL.md) (what a commercial license covers), [`NOTICE`](NOTICE), [`CONTRIBUTING.md`](CONTRIBUTING.md) (contributions are licensed to the LLC under the public and commercial licenses; sign off with `git commit -s`) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Mizan, Kanon, Archon and Stolos and the logos are not licensed beyond saying what the software is.
+Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Mizan, Kanon and Archon and the logos are not licensed beyond saying what the software is.
 
 Nothing here claims compliance with any regulation; it records evidence.

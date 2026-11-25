@@ -445,11 +445,11 @@ proves(["0001-telemetry FR-025"], "pending is ⏳ and an action is ⚡: neither 
   for (const mode of ["plain", "quiet"] as const) {
     const h = harness(mode);
     h.telemetry.log("later", { text: "a certificate is not issued yet" });
-    h.telemetry.log("yours", { text: "send the change: bun run stolos apply" });
+    h.telemetry.log("yours", { text: "send the change: bun run fleetctl apply" });
     const out = h.output();
     if (mode === "plain") assert(out.includes("\u{23f3} a certificate is not issued yet"), out);
     else assert(!out.includes("certificate"), "quiet leaves out what is only pending");
-    assert(out.includes("\u{26a1} send the change: bun run stolos apply"), out);
+    assert(out.includes("\u{26a1} send the change: bun run fleetctl apply"), out);
     assert(!out.includes("\u{26a0}\u{fe0f} send") && !out.includes("\u{274c}"), "never marked as a warning or an error");
   }
 });

@@ -58,7 +58,7 @@ proves(["0011-documentation FR-011"], "a link to a file goes to its page, a spec
 
 const plainIndex: LinkIndex = {
   specs: new Map([["004-install", new Set(["FR-015"])], ["005-first-boot", new Set(["FR-001"])], ["096-bun-runtime", new Set(["FR-001", "FR-005a"])]]),
-  citations: { prefix: "stolos", digits: 3, linked: [{ repo: "commons", site: "https://example.org/commons/", digits: 4 }], text: ["erga"] },
+  citations: { prefix: "fleet", digits: 3, linked: [{ repo: "commons", site: "https://example.org/commons/", digits: 4 }], text: ["erga"] },
   files: new Map(),
   exports: new Map([["a", new Map([["one", { path: "api/a/x.html", anchor: "one" }]])], ["b", new Map([["two", { path: "api/b/y.html", anchor: "two" }]])], ["c", new Map([["two", { path: "api/c/z.html", anchor: "two" }]])]]),
   blob: (p) => `https://github.example/${p}`,

@@ -4,8 +4,7 @@
  * and `node:os`, the same on Bun and on Node 26. The names are short and plain (`env.get`, `args`, `exit`, `cwd`, `build.os`, `build.target`,
  * `ppid`, `output`, `spawn`, `unrefTimer`); `selfCommand` gives the argument vector for a program that runs itself again, from a script or
  * from a compiled binary. A program is always run by its argument
- * vector, never through a shell; one that cannot be found throws `NotFound`, and a non-zero exit is an outcome, not an error. Taken
- * from erga's `lib/ts/process`, Stolos's `src/archon/core/exec.ts` and the setup's `proc.ts`.
+ * vector, never through a shell; one that cannot be found throws `NotFound`, and a non-zero exit is an outcome, not an error.
  *
  * @example
  * ```ts

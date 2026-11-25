@@ -61,7 +61,7 @@
 
 - OTLP over gRPC or protobuf: JSON over HTTP is what a collector accepts and what the kernel can write with no dependency; protobuf may follow if a collector without JSON must be served.
 - Profiles, exemplars and exponential histograms.
-- What `erga` and `stolos` declare as their signals: each harness's own registry, made with `defineSignals`.
+- What `erga` declares as its signals: each harness's own registry, made with `defineSignals`.
 
 ## Edge cases
 

@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** `archon-mcp` is generated from governance (issue #11): the tools an agent sees are the verbs of the program that its tier may see, and the machine's rules of governance (it cannot be asked, takes no flag for a confirmation, may not do what is for a person) hold whatever the agent says. Stolos served the Model Context Protocol over standard input and output, forced over SSH to a tier limit; this is that surface as a library, with the tools made from the program's own model instead of a table kept beside it, and the runner a port, so that the surface imports no other surface. The reach policy already named `mcp` as a channel (0005-reach-and-targets); this makes it a surface.
+**Input:** `archon-mcp` is generated from governance (issue #11): the tools an agent sees are the verbs of the program that its tier may see, and the machine's rules of governance (it cannot be asked, takes no flag for a confirmation, may not do what is for a person) hold whatever the agent says. The surface serves the Model Context Protocol over standard input and output, forced over SSH to a tier limit, with the tools made from the program's own model instead of a table kept beside it, and the runner a port, so that the surface imports no other surface. The reach policy already named `mcp` as a channel (0005-reach-and-targets); this makes it a surface.
 
 ## Tools from governance
 

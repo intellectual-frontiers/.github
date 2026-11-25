@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The policy pack that judges an observation of a machine that is observed and not managed (Stolos 067-adopt): disk encryption, the firewall, automatic updates, updates waiting, a supported operating system, keys rather than passwords for ssh, anti-malware, few administrators, osquery, and how recent the observation is. Each policy names the NIST SP 800-53 Rev 5 controls it gives evidence for and how to make it pass on the machine's system.
+**Input:** The policy pack that judges an observation of a machine that is observed and not managed: disk encryption, the firewall, automatic updates, updates waiting, a supported operating system, keys rather than passwords for ssh, anti-malware, few administrators, osquery, and how recent the observation is. Each policy names the NIST SP 800-53 Rev 5 controls it gives evidence for and how to make it pass on the machine's system.
 
 ## Requirements
 

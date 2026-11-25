@@ -37,7 +37,7 @@
 
 ## Assumptions
 
-- Seven days is the longest interval of continuous validation of FedRAMP 20x, as Stolos 073-freshness took it.
+- Seven days is the longest interval of continuous validation of FedRAMP 20x.
 
 ## Open questions
 

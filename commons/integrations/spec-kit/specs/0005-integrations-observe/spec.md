@@ -31,7 +31,7 @@
 
 ## Out of scope
 
-- Planned: the stolos connectors (31) as plugin packages; the fixtures of a registry entry run at load.
+- Planned: the connectors of a fleet as plugin packages; the fixtures of a registry entry run at load.
 - The reference connector `integrations-github` is its own package.
 
 ## Edge cases

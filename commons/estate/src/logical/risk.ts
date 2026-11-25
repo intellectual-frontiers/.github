@@ -1,6 +1,6 @@
 // Spec: 0003-estate-logical FR-005, FR-006
 /**
- * Accepted risk and the status of a policy (Stolos 067-adopt FR-013, 117-adopted-in-status): a person accepts a failing policy of a machine with a reason and a date at most a year away, the policy then shows as
+ * Accepted risk and the status of a policy (0003-estate-logical FR-005, FR-006): a person accepts a failing policy of a machine with a reason and a date at most a year away, the policy then shows as
  * accepted and never as passing, and after the date it fails again, saying so. A machine never observed, and a policy that could not tell, are waiting: never a failure and never a warning.
  *
  * @example

@@ -6,7 +6,7 @@
 
 The audit classifies every class, property and code list of an ontology by its basis (`0018-standards-first` FR-003): `adopts`, `specializes`, `maps` or `unaligned`.
 
-- **Commons** (`commons/ontology/supply-chain/packaging/`) and **`stolos`** (`ontology/stolos/`) are public and are read term by term here.
+- **Commons** (`commons/ontology/supply-chain/packaging/`) is public and is read term by term here.
 - **Other harnesses' ontologies** are not described here: this repository is public, and a private harness's own ontology is not added to it. The same method was run on `erga`'s ontology and its figures are kept with `erga`; the owner has them.
 - The counts come from scripts that read the TypeScript (declarations of `vocabulary(...)`, `OwlClass.make(...)`, `subClassOf`, `skos:*Match`). They are counts of declarations, not a judgement of fitness: a term that is `unaligned` may still be right, and the audit says only that no standard backs it today.
 - Candidate standards below are **candidates**. Each needs its version, license and redistribution terms confirmed before an import (`0019-mizan-integrations` FR-005, FR-006).
@@ -32,21 +32,6 @@ Candidates to examine for the 11 `unaligned` classes and the properties (none co
 | `pm:Platform`, `pm:operatingSystem`, `pm:processor` | `schema:operatingSystem`, `schema:processorRequirements` | Possible `maps` |
 | `pm:Rule`, `pm:Prohibition`, `pm:RecordField`, `pm:Tier`, `pm:Assurance`, `pm:SupportStatus`, `pm:ManagerKind`, `pm:Operation` | none found yet | Likely stay `unaligned` with a recorded justification |
 
-## `stolos`: the fleet engine (`stolos:`)
-
-| Kind | Count | Basis today |
-|---|---|---|
-| Classes | 24 (`Fleet`, `Host`, `Controller`, `Signer`, `Finding`, `Decision` and the rest) | `unaligned`, apart from one subclass of another `stolos:` class |
-| Properties | 7 | `unaligned` |
-| Code lists | 9 in `codes.ts` | `unaligned` |
-| Rungs | 8 (`stolos:Rung`) | the ladder; becomes an instance of `0016-ladder` |
-
-What `stolos` already does that this plan wants everywhere:
-
-- **Vendor, pin, generate.** `tools/fedramp-gen.ts` writes TypeScript from FedRAMP's own machine-readable consolidated rules, vendored under `vendor/fedramp/<release>/` and pinned by commit and SHA-256 (release `2026.11.02.01`); `tools/ocsf-gen.ts` does the same for OCSF. This is the pattern `0019-mizan-integrations` generalizes, and `stolos` is the first thing to re-express through it.
-- **Standards where it matters.** Findings are "written as OCSF", with SCF controls; its checks are traced to specifications.
-- **Its own `stolos:Decision`** class overlaps with the `Decision` this plan puts in commons (`0018-standards-first` FR-005); the two must be reconciled in Phase 2, not duplicated.
-
 ## Commons' kernel: standards already in TypeScript
 
 The kernel already has typed vocabularies for RDF, RDFS, OWL, XSD, SKOS, Dublin Core terms, PROV-O and SHACL, and modules for OSCAL (writing OSCAL version `1.2.3`, per its `OSCAL_VERSION`), OCSF, OpenTelemetry and GRC primitives. These are the base the integrations module builds on, and are the first things to re-import through it so that hand-written copies become generated ones (issue #10, Phase 4).
@@ -68,7 +53,7 @@ Included at the owner's decision. Its text is U.S. law (`0018` FR-001); its auth
 ### Federal security: NIST and FedRAMP
 
 - **OSCAL.** Verified 2026-11-17 against the repository's tags (`raw.githubusercontent.com/usnistgov/OSCAL`): `v1.2.3` and `v1.2.2` exist, and `v1.2.4`, `v1.2.5` and `v1.3.0` do not, so `1.2.3` is the newest release found and is the value commons' kernel writes (`OSCAL_VERSION`). A web search had found only 1.2.2, which was a stale result. The repository's license file says the work is in the public domain in the United States as a work of the U.S. government, and is also dedicated worldwide under CC0 1.0, so it may be redistributed. The machine-readable JSON Schemas are not at a fixed path in the Git tree (a request for `json/schema/oscal_catalog_schema.json` at that tag returned 404); they ship with the release artifacts, so the first OSCAL importer must find them there and pin their SHA-256.
-- **FedRAMP.** The 2026 consolidated rules and Key Security Indicators (KSIs) are published by FedRAMP as machine-readable data; `stolos` already vendors release `2026.11.02.01`. Secondary sources describe an OSCAL requirement for new Rev5 packages from 30 September 2026, but their details conflict; read fedramp.gov before a requirement cites a date or count.
+- **FedRAMP.** The 2026 consolidated rules and Key Security Indicators (KSIs) are published by FedRAMP as machine-readable data. Vendoring a release means pinning it by commit and SHA-256 (the pattern of `0019-mizan-integrations`), and release `2026.11.02.01` is the one read. Secondary sources describe an OSCAL requirement for new Rev5 packages from 30 September 2026, but their details conflict; read fedramp.gov before a requirement cites a date or count.
 - **NIST SP 800-53** and its OSCAL catalog are the control source; only the controls a specification cites are imported (`0019` FR-005).
 
 ## Candidate importers (to confirm before use)
@@ -76,7 +61,7 @@ Included at the owner's decision. Its text is U.S. law (`0018` FR-001); its auth
 | Source | Format | Why | License and terms: to verify |
 |---|---|---|---|
 | OSCAL (NIST) | JSON Schema, catalogs | the proof register and controls | Public domain (U.S. Government work) and CC0 1.0, confirmed from the repository's license file at `v1.2.3` |
-| FedRAMP rules | JSON | KSIs, baselines | already vendored by `stolos`; confirm terms |
+| FedRAMP rules | JSON | KSIs, baselines | a vendored, pinned release; confirm terms |
 | schema.org | Turtle, JSON-LD | already specialized by commons | CC BY-SA 3.0; a slice was imported and read on 2026-11-17 (17,515 triples agree with rdflib); the attribution and share-alike duty applies to a vendored copy |
 | PROV-O, SKOS, SHACL | Turtle | already typed in the kernel | W3C document license |
 | DPV | Turtle | privacy terms | confirm |
@@ -93,11 +78,10 @@ Proposal, for the Phase 1 specification: each requirement maps to an OSCAL `impl
 
 ## Findings
 
-1. **Commons and `stolos` are small and mostly honest about their bases**, but nothing records the basis: the first baseline is the counts above, and is `unaligned` for everything not already `specializes`.
+1. **Commons is small and mostly honest about its bases**, but nothing records the basis: the first baseline is the counts above, and is `unaligned` for everything not already `specializes`.
 2. **Commons: 11 of 16 classes and all 45 properties are unaligned**; several have plausible standard counterparts (checksums, versions, names, platforms, package names).
-3. **`stolos` has the best precedent** for importing: vendored, pinned, hashed, generated. Phase 4 starts there.
-4. **Two `Decision` classes** (commons' planned one, `stolos:Decision`) must be reconciled.
-5. **The `Authority` and `Standard` classes, `basis` and the baseline are the missing machinery**; none of them exists yet.
+3. **Importing** follows one pattern: vendored, pinned, hashed, generated.
+4. **The `Authority` and `Standard` classes, `basis` and the baseline are the missing machinery**; none of them exists yet.
 
 ## Open items for later phases
 

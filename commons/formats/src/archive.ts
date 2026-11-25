@@ -6,7 +6,7 @@
  * a zip of deflated entries (`zipDeflated`, through the web standard `CompressionStream`), the same bytes for the same files on one runtime
  * and the same files unzipped on every runtime. Reading: a tar (ustar, pax and GNU long names), a gzip and a zip whose
  * entries are stored or deflated (through the web standard `DecompressionStream`), each checked (header checksums, CRC-32) and every path
- * refused that would leave the folder it is unpacked into. This is what lets Stolos drop `fflate` and unpack a verified copy of its engine.
+ * refused that would leave the folder it is unpacked into.
  * A tar, gzipped or not, is also read as a stream (`untarStream`, `readTarStream`), an entry at a time with each entry's bytes a stream of
  * their own, with the same checks, so that an archive larger than memory can be read (FR-059).
  *

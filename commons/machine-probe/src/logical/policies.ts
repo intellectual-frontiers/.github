@@ -1,7 +1,7 @@
 // Spec: 0004-machine-probe-policies FR-001, FR-002, FR-003, FR-004
 // Spec: 0008-machine-probe-agent-workspace FR-004
 /**
- * The policy pack for a machine that is observed and not managed (Stolos 067-adopt): each policy reads an observation and says pass, fail, warn or unknown, with the fix in words for the machine's operating system, and names the controls of NIST SP 800-53 Rev 5 (the public anchor, by identifier) it gives evidence for, so that no result is without a control. A policy that does not apply to what was observed gives no result.
+ * The policy pack for a machine that is observed and not managed: each policy reads an observation and says pass, fail, warn or unknown, with the fix in words for the machine's operating system, and names the controls of NIST SP 800-53 Rev 5 (the public anchor, by identifier) it gives evidence for, so that no result is without a control. A policy that does not apply to what was observed gives no result.
  *
  * @example
  * ```ts

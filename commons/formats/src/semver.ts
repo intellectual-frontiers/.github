@@ -2,8 +2,7 @@
 /**
  * Versions: semantic versions by the rules of semver.org 2.0.0 (parsed, printed, ordered and bumped), and the looser dotted versions that
  * programs print (`2.9.8`, `1.4.4`, `26.13.1`), compared part by part (commons 0001-formats FR-015); and npm's ranges, read and
- * satisfied as node-semver reads them (commons 0001-formats FR-014). Taken from erga's kernel (`semver.ts`) and toolchain (`atLeast`), Stolos's
- * `tools/version.ts` and the machine setup.
+ * satisfied as node-semver reads them (commons 0001-formats FR-014).
  *
  * @example
  * ```ts

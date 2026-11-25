@@ -11,7 +11,7 @@
 
 - **FR-001**: Every program, library, tool and test of commons MUST be TypeScript 7 or later, MUST run on Bun, the default runtime, and on Node 26, the backup and the least Node that commons supports, and each package MUST say `"type": "module"` and `"engines": { "node": ">=26" }`; the sources MUST be erasable TypeScript only, so that Node 26 runs the `.ts` files of this repository as they are, by stripping their types, and a library installed from npm runs from its compiled modules.
 - **FR-004**: No code of commons MUST name a member of a vendor's global (`Bun.*` and the others the lint rule `no-vendor-api` lists), import from `jsr:`, `npm:`, `@std/` or a URL, or depend on a package at run time that is not a library of commons or a package a library declares. With `types: ["node"]`, a reference to a vendor's global is also a compile error.
-- **FR-015**: Every file of a library's `src/`, and every file of its `suite/`, MUST begin with a TSDoc block that says `@module`, and every declaration a file of `src/` exports MUST carry TSDoc, so that a harness that requires documentation (Stolos) can take the code as it is.
+- **FR-015**: Every file of a library's `src/`, and every file of its `suite/`, MUST begin with a TSDoc block that says `@module`, and every declaration a file of `src/` exports MUST carry TSDoc, so that a harness that requires documentation can take the code as it is.
 
 ## The tools and their settings
 
@@ -31,7 +31,7 @@
 
 - What a library does: its own specification, in its own `spec-kit/`.
 - How a library reaches another repository: 0036-distribution.
-- Foreign functions (Stolos's PAM binding): they stay in the harness behind its own interface.
+- Foreign functions (a binding to a system library such as PAM): they stay in the harness behind its own interface.
 
 ## Edge cases
 

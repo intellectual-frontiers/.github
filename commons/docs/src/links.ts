@@ -2,7 +2,7 @@
 /**
  * Where the words of documentation link to (commons 0011-documentation FR-011, FR-012, FR-025): a citation of a specification of the
  * repository (its prefix and an id, as `commons 0009-example`; a bare id of its own form, as `0009-example` in commons or
- * `096-bun-runtime` in Stolos; a number of its digits after `spec` or before a requirement, as `spec 004` or `038 FR-014`, where a
+ * `096-bun-runtime` in a repository of three digits; a number of its digits after `spec` or before a requirement, as `spec 004` or `038 FR-014`, where a
  * specification has that number; `FR-026` after any of these; or a bare `FR-045` in an area, which names a requirement of the area's
  * specification) becomes a link to the specification's page and the requirement's anchor; a citation of a repository the configuration
  * lists as linked goes to that repository's site; one of any other repository (`erga 009-machine-bootstrap`) stays text; a Markdown link

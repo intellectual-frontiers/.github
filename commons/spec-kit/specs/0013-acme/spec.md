@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A harness that serves HTTPS on a host of its own (`stolos` first) needs a certificate from Let's Encrypt, or any CA that speaks ACME (RFC 8555), without a web server answering HTTP-01 and without a program such as certbot or lego to install, pin and keep: a host behind a firewall, or a wildcard name, proves control of its names by DNS-01. IFC TypeScript's runtime (0005-typescript-practice) gets the certificate itself, with `fetch` and Web Crypto alone: the account, the order, the TXT records at the DNS host (Cloudflare first, any other behind one small interface), the challenges, a certificate signing request built with the kernel's ASN.1 DER, and the certificate. It renews by reading the certificate's own validity. Nothing is added to the package's dependencies.
+**Input:** A harness that serves HTTPS on a host of its own needs a certificate from Let's Encrypt, or any CA that speaks ACME (RFC 8555), without a web server answering HTTP-01 and without a program such as certbot or lego to install, pin and keep: a host behind a firewall, or a wildcard name, proves control of its names by DNS-01. IFC TypeScript's runtime (0005-typescript-practice) gets the certificate itself, with `fetch` and Web Crypto alone: the account, the order, the TXT records at the DNS host (Cloudflare first, any other behind one small interface), the challenges, a certificate signing request built with the kernel's ASN.1 DER, and the certificate. It renews by reading the certificate's own validity. Nothing is added to the package's dependencies.
 
 ## The client (runtime)
 
@@ -25,7 +25,7 @@
 
 - HTTP-01 and TLS-ALPN-01, External Account Binding, revocation, key rollover, account deactivation and ACME Renewal Information (RFC 9773): commons may add them when a harness needs one.
 - Keys other than ES256 for the account or the certificate.
-- Where a certificate and its keys are kept, and when a harness runs `issue`: the harness's (`stolos`), with the secret store it already has.
+- Where a certificate and its keys are kept, and when a harness runs `issue`: the harness's, with the secret store it already has.
 - Waiting for a record to be seen by the DNS: the caller's `propagationWait`, which can ask the zone's own servers with `runtime/dns.ts`.
 
 ## Edge cases

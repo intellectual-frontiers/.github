@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** RDF as algebraically typed values, in a package of its own that depends on nothing but Core: a harness states its ontology as TypeScript with branded IRIs, namespaces, typed vocabularies, class schemas and code lists, and every RDF form of it is written from that, the same bytes every time. The requirements are those that `commons 0012-ontology` made of the kernel's RDF (FR-001 to FR-007), moved here with the modules (commons 0032-libraries-by-concern FR-010); the ontology that commons states with it stays in `commons 0012-ontology`. It is generalized from what `erga` (its ontology DSL, `erga 248-ontology-in-typescript`) and `stolos` (its PROV export) each wrote for themselves, and keeps none of their vocabularies.
+**Input:** RDF as algebraically typed values, in a package of its own that depends on nothing but Core: a harness states its ontology as TypeScript with branded IRIs, namespaces, typed vocabularies, class schemas and code lists, and every RDF form of it is written from that, the same bytes every time. The requirements are those that `commons 0012-ontology` made of the kernel's RDF (FR-001 to FR-007), moved here with the modules (commons 0032-libraries-by-concern FR-010); the ontology that commons states with it stays in `commons 0012-ontology`. It is generalized from `erga`'s ontology DSL (`erga 248-ontology-in-typescript`) and keeps none of its vocabularies.
 
 ## The RDF
 

@@ -8,7 +8,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { defineAsset, installOf, ownerOf, type Asset } from "../src/governance/mod.ts";
 import { moveCapability, moveState, operationalTruth, unexpectedAssets, type AcceptanceRecord } from "../src/logical/mod.ts";
 
-const ALL = { provision: "stolos", identity: "stolos", plan: "stolos", converge: "stolos", verify: "archon", observe: "archon", update: "stolos", access: "archon", backup: "stolos", retire: "stolos" } as const;
+const ALL = { provision: "fleetctl", identity: "fleetctl", plan: "fleetctl", converge: "fleetctl", verify: "archon", observe: "archon", update: "fleetctl", access: "archon", backup: "fleetctl", retire: "fleetctl" } as const;
 
 function asset(state: "discovered" | "adopted" | "managed", owners: Record<string, string>): Asset {
   const a = defineAsset({ id: "olympia", kind: "server", state, owners });
@@ -69,7 +69,7 @@ proves(["0003-estate-logical FR-002"], "a capability moves to another system onl
     assert(r.kind === "err" && r.error[0]?.includes("acceptance record is for") === true);
   }
   const moved = moveCapability(managed, "converge", "archon", record);
-  assert(moved.kind === "ok" && ownerOf(moved.value, "converge") === "archon" && ownerOf(moved.value, "update") === "stolos");
+  assert(moved.kind === "ok" && ownerOf(moved.value, "converge") === "archon" && ownerOf(moved.value, "update") === "fleetctl");
   const same = moveCapability(moved.kind === "ok" ? moved.value : managed, "converge", "archon", record);
   assert(same.kind === "err" && same.error[0]?.includes("already owned") === true);
   const adopted = asset("adopted", { observe: "archon", verify: "archon" });

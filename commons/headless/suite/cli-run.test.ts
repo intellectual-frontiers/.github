@@ -1,8 +1,7 @@
 /**
  * Tests of the run boundary `run(program, argv, io)`: the golden outputs of a run in each state (nothing to do, a warning, something pending, a failure, `--quiet`,
  * `--verbose`, a report, `--json`), the streams, the refusals and usage errors, the prompts, the signals, a nested run, and the log and hints a run keeps
- * (commons headless 0004-headless-cli FR-003, FR-004, FR-006, FR-007, FR-008, FR-009, FR-011, FR-012). The invariants are those of the golden tests of stolos
- * (105-calm-output FR-003 to FR-007, FR-018): a failure once, ONE next line, a code on every problem line, and a verdict that never says "all well".
+ * (commons headless 0004-headless-cli FR-003, FR-004, FR-006, FR-007, FR-008, FR-009, FR-011, FR-012). The invariants: a failure once, ONE next line, a code on every problem line, and a verdict that never says "all well".
  *
  * @module
  */
@@ -19,7 +18,7 @@ import { fakeSignals, memoryStore, sample, world } from "./world.ts";
 const p = sample();
 const go = (argv: readonly string[], o: Parameters<typeof world>[0] = {}) => run(p, argv, world(o));
 
-/** What a run's default output must never hold (the invariants of stolos's golden tests, 105-calm-output FR-003, FR-004, FR-006, FR-007). */
+/** What a run's default output must never hold (a failure once, one next line, a code on every problem line). */
 function invariants(err: string, what: string): void {
   const lines = err.split("\n");
   assert(!lines.some((l) => /^\[ok\] \S+ {3,}/.test(l)), `${what}: a green step line\n${err}`);

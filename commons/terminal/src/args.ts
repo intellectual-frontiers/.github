@@ -3,8 +3,8 @@
  * A typed command-line parser (commons 0001-terminal FR-001): a command's options are declared once as data (`flag`, `value`,
  * `many`), the type of what `parseArgs` gives is inferred from that declaration, and a command line that does not fit is a `UsageError`,
  * a union told apart by `kind` that `formatUsageError` says in one sentence; `helpText` writes the help from the same declaration. It
- * unifies the parsers of two harnesses: erga's `@erga/agent` `args.ts` (declared options, an undeclared option refused with a "did you mean", help that
- * wins over everything and runs nothing: erga 247-ergactl FR-006 and FR-007) and Stolos's `parseArgs` (short letters, required options, defaults, repeatable options). It is pure: the
+ * has short letters, required options, defaults and repeatable options, refuses an undeclared option with a "did you mean", and lets help
+ * win over everything and run nothing (erga 247-ergactl FR-006 and FR-007). It is pure: the
  * caller passes the words, `proc.args` from `runtime/proc.ts`.
  *
  * The grammar: `--name VALUE` and `--name=VALUE`; `-x VALUE`; bundled short flags `-abc`, whose last letter may take the next word as its

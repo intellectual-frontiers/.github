@@ -46,7 +46,7 @@ requirement	mechanism	by	note
 0003-mizan FR-021	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the control ids, the properties, the passing, accepted and gap observations, and the evidence of a proof
 0003-mizan FR-022	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the same bytes on two runs and whatever order the tests come in, a changed requirement or proof changes the version and nothing else does
 0003-mizan FR-023	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the files are current, --check names a stale one with exit 1, and each validates against the pinned official schema (jsonschema)
-0003-mizan FR-040	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a harness folder with its own audit is held: a term with no record fails, a missing decision is held by the baseline, an overdue one fails, a specification naming an undefined term is found; stolos runs it on itself
+0003-mizan FR-040	check	.github: cd commons/mizan && bun test suite/	mizan.test.ts: a harness folder with its own audit is held: a term with no record fails, a missing decision is held by the baseline, an overdue one fails, a specification naming an undefined term is found
 0003-mizan FR-041	check	.github: bun test ./tests/	commons-mizan-harness.test.ts: a folder of three-digit specifications is clean, a gap is told with three digits, a bare citation is read at the folder's width, a number of two or five digits and a folder named so are named, and a folder of four digits reads as before
 0003-mizan FR-042	check	.github: bun test ./tests/	commons-mizan-harness.test.ts: the registers and the baseline are read from the folder --register names, by check(root, { register }) and as programs, and a stale baseline line is named there; a missing --register value is refused
 0003-mizan FR-043	check	.github: cd commons/mizan && bun test suite/	mizan-harness-requests.test.ts: the proof register is read from a path given as an option, with Windows line ends, and the two OSCAL documents are the same bytes as from enforcement.tsv beside the specifications; a path that is not there is an error
@@ -601,7 +601,7 @@ requirement	mechanism	by	note
 0032-libraries-by-concern FR-008	review	0032-libraries-by-concern FR-008	a reviewer checks that the ontology of a library is in its folder
 0032-libraries-by-concern FR-009	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the release workflow skips a version already on a registry and tags the version, from main
 0032-libraries-by-concern FR-010	review	0032-libraries-by-concern FR-010	a reviewer checks that the requirements of a lifted library are in its spec kit and that 0005 points at it
-0032-libraries-by-concern FR-011	review	0032-libraries-by-concern FR-011	a reviewer checks the importers of erga and stolos
+0032-libraries-by-concern FR-011	review	0032-libraries-by-concern FR-011	a reviewer checks the importers of erga and of the fleet repositories
 0032-libraries-by-concern FR-012	check	.github: bun test ./tests/	the compiler fails on any importer of a moved path; commons-lift.test.ts finds no import of a moved module's old path
 0032-libraries-by-concern FR-013	check	.github: bun test ./tests/release/	tests/release/commons-packages.test.ts: every npm library is packed, its tarball inspected, installed and a consumer of every entry type-checked with tsc 7 under nodenext
 0011-documentation FR-028	check	.github: cd commons/docs && bun run verify	twins.test.ts: every block and inline has a Markdown form, links go to twins, the same page gives the same text; the index for a program; a site is written with a .md beside each .html and llms.txt
@@ -642,7 +642,7 @@ requirement	mechanism	by	note
 0033-kanon FR-034	review	0033-kanon FR-034	a reviewer checks that no check of Kanon fails a build by itself; the policy is the host's typed value, and the library content has not been made
 0033-kanon FR-035	check	.github: cd commons/libraries && bun test suite/	library-dir.test.ts: the host's extensions are in the host's folder
 0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending
-0034-archon FR-001	review	0034-archon FR-001	a reviewer checks that no package, folder or command of commons is named stolos and that what the retired engine did that is general is done by a library
+0034-archon FR-001	review	0034-archon FR-001	a reviewer checks that no package, folder or command of commons is the name of one fleet's product and that what is general to a fleet is done by a library
 0034-archon FR-002	review	0034-archon FR-002	a reviewer checks that no library carries a shim, re-export or migration path for the retired engine
 0034-archon FR-003	review	0034-archon FR-003	a reviewer checks that a fleet repository names its libraries by package at exact versions and holds its own data and composition root
 0034-archon FR-004	review	0034-archon FR-004	a reviewer checks the manifest and the Kanon table of archon: governance, logical and physical hold what FR-004 says

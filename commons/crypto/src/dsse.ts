@@ -8,10 +8,8 @@
  * RSASSA-PKCS1-v1_5 with the key's hash. Verification returns the payload, or an error that says why it was refused: an envelope that is
  * malformed, a payload type not the one expected, a key not usable, or too few valid signatures.
  *
- * Taken from Stolos's `src/archon/export/intoto.ts`, which built a statement and an envelope for a signature callback but never verified
- * one. What changed: the statement is generic in its predicate; the subject's digest is any map of algorithms; signing takes keys rather
- * than a callback; verification, the envelope's decoder and the ECDSA signature form are new. Stolos's evidence bundle predicate (its
- * predicate type, the manifest's summary and the subject list of a bundle's items) is Stolos's own domain and stays there.
+ * The statement is generic in its predicate and the subject's digest is any map of algorithms. Signing takes keys, and verification, the
+ * envelope's decoder and the ECDSA signature form are here too. A predicate (its type and its content) belongs to the harness that makes it.
  *
  * @example
  * ```ts

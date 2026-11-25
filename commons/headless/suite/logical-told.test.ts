@@ -1,7 +1,6 @@
 /**
  * Tests of what the logical layer tells: the one JSON document and SARIF, `explain` and `translate`, the cadence of hints, a run nested in a run, and the
- * redaction of an outcome (commons headless 0003-headless-output FR-006 to FR-011). The cases of `translate` and of the pending and exit rules are those
- * of the golden tests of stolos (052-self-describing, 105-calm-output).
+ * redaction of an outcome (commons headless 0003-headless-output FR-006 to FR-011).
  *
  * @module
  */
@@ -66,10 +65,10 @@ proves(["0003-headless-output FR-007"], "SARIF 2.1.0 holds the findings returned
   assert(sarifText({ program: "t", outcome: own }).endsWith("}\n"));
 });
 
-/** The explanations and patterns of the golden cases of stolos 052-self-describing (their codes and patterns, a fixture here). */
+/** The explanations and patterns of a fixture catalogue. */
 const CATALOGUE: Catalogue = {
-  "E047-HOST-KEY": { title: "A host key changed", what: "The host's key is not the one remembered.", why: "The host was reinstalled.", fix: "stolos fleet trust alpha", doc: "fleet-trust" },
-  "E004-SSH-KEY": { title: "The key was refused", what: "The server did not take the key.", why: "It is not authorized.", fix: "stolos keys push" },
+  "E047-HOST-KEY": { title: "A host key changed", what: "The host's key is not the one remembered.", why: "The host was reinstalled.", fix: "fleetctl fleet trust alpha", doc: "fleet-trust" },
+  "E004-SSH-KEY": { title: "The key was refused", what: "The server did not take the key.", why: "It is not authorized.", fix: "fleetctl keys push" },
   "E009-DNS": { title: "A name did not resolve", what: "A name found no address.", why: "The network is down.", fix: "check the network" },
   "E009-APT-BUSY": { title: "apt is busy", what: "Another apt holds the lock.", why: "An upgrade is running.", fix: "wait, then run it again" },
   "E009-DPKG-DAMAGED": { title: "dpkg is damaged", what: "Its database is broken.", why: "An upgrade was interrupted.", fix: "sudo dpkg --configure -a" },
@@ -93,23 +92,23 @@ proves(["0003-headless-output FR-008"], "a raw error of another tool is given it
     ["dpkg-query: error: fgets gave an empty string from '/var/lib/dpkg/triggers/Unincorp'", "E009-DPKG-DAMAGED"],
   ];
   for (const [raw, code] of cases) assertEquals(translate(raw)?.code, code, raw);
-  assertEquals(translate("alpha: Host key verification failed.")?.fix, "stolos fleet trust alpha");
+  assertEquals(translate("alpha: Host key verification failed.")?.fix, "fleetctl fleet trust alpha");
   assertEquals(translate("everything is fine"), undefined);
   // the first match wins
   assertEquals(translator(CATALOGUE, [[/x/, "E004-SSH-KEY"], [/x/, "E009-DNS"]])("x")?.code, "E004-SSH-KEY");
 });
 
 proves(["0003-headless-output FR-008"], "explain gives one explanation for a code in either case, the list without one, and names the nearest for one that is not there", () => {
-  const ctx = { program: "stolos", guide: (doc: string) => ({ ref: `bun run stolos docs ${doc}`, url: `https://docs.example/${doc}` }) };
+  const ctx = { program: "fleetctl", guide: (doc: string) => ({ ref: `bun run fleetctl docs ${doc}`, url: `https://docs.example/${doc}` }) };
   const one = explainText(CATALOGUE, ctx, "e047-host-key");
-  for (const want of ["E047-HOST-KEY: A host key changed", "What happened  The host's key", "Likely cause   The host was reinstalled.", "Fix            stolos fleet trust alpha", "More           bun run stolos docs fleet-trust   (online: https://docs.example/fleet-trust)"]) {
+  for (const want of ["E047-HOST-KEY: A host key changed", "What happened  The host's key", "Likely cause   The host was reinstalled.", "Fix            fleetctl fleet trust alpha", "More           bun run fleetctl docs fleet-trust   (online: https://docs.example/fleet-trust)"]) {
     assertStringIncludes(one, want);
   }
-  assert(!explainText(CATALOGUE, { program: "stolos" }, "E004-SSH-KEY").includes("More"));
+  assert(!explainText(CATALOGUE, { program: "fleetctl" }, "E004-SSH-KEY").includes("More"));
   const list = explainText(CATALOGUE, ctx);
-  assertStringIncludes(list, "Every problem stolos explains (stolos explain <code>):");
+  assertStringIncludes(list, "Every problem fleetctl explains (fleetctl explain <code>):");
   for (const code of Object.keys(CATALOGUE)) assertStringIncludes(list, code);
-  assertEquals(explainText(CATALOGUE, ctx, "E047-HOST-KY"), "no explanation named E047-HOST-KY; did you mean E047-HOST-KEY? stolos explain lists them");
+  assertEquals(explainText(CATALOGUE, ctx, "E047-HOST-KY"), "no explanation named E047-HOST-KY; did you mean E047-HOST-KEY? fleetctl explain lists them");
   assertStringIncludes(explainText(CATALOGUE, ctx, "zzzzzzzz"), "no explanation named zzzzzzzz");
 });
 

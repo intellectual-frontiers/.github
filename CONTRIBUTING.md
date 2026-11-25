@@ -21,4 +21,4 @@ By contributing, you agree that:
 
 ## Names
 
-The names Mizan, Kanon, Archon and Stolos and the logos are not licensed by contributing; see [`NOTICE`](NOTICE).
+The names Mizan, Kanon and Archon and the logos are not licensed by contributing; see [`NOTICE`](NOTICE).

@@ -1,6 +1,6 @@
 /**
  * Tests of the ssh coverage: the families of options, the verb of first contact, files copied with scp, a session with piped streams (against a stand-in client that answers its
- * input), the typed key tools, the two files of known hosts, and the table of the ways stolos calls ssh (commons headless 0007-ssh-coverage FR-001 to FR-007).
+ * input), the typed key tools, the two files of known hosts, and the table of the ways a fleet program calls ssh (commons headless 0007-ssh-coverage FR-001 to FR-007).
  *
  * @module
  */
@@ -265,7 +265,7 @@ proves(["0007-ssh-coverage FR-005"], "the key tools have typed argument vectors,
   assertEquals(removeHostArgv(t, "/repo/known_hosts"), ["ssh-keygen", "-R", "alpha.example", "-f", "/repo/known_hosts"]);
   assertEquals(removeHostArgv(p, "/repo/known_hosts"), ["ssh-keygen", "-R", "[beta.example]:2222", "-f", "/repo/known_hosts"]);
   assertEquals(findPrincipalsArgv("/repo/allowed_signers", "/tmp/sig"), ["ssh-keygen", "-Y", "find-principals", "-s", "/tmp/sig", "-f", "/repo/allowed_signers"]);
-  assertEquals(keygenArgv({ type: "ed25519", comment: "stolos-probe@fleet", file: "/tmp/k" }), ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "stolos-probe@fleet", "-f", "/tmp/k"]);
+  assertEquals(keygenArgv({ type: "ed25519", comment: "synthetic-probe@fleet", file: "/tmp/k" }), ["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "synthetic-probe@fleet", "-f", "/tmp/k"]);
   assertEquals(keygenArgv({ type: "rsa", comment: "root@h", file: "/tmp/k" }).slice(2, 6), ["-t", "rsa", "-b", "3072"]);
   assertEquals(knownHostName(t) + " " + knownHostName(T("g", { port: 22 })) + " " + knownHostName(p), "alpha.example g.example [beta.example]:2222");
   assertEquals(pinnedKnownHosts(p, parseScan(KEYSCAN).slice(0, 2)), "[beta.example]:2222 ssh-ed25519 AAAAED\n[beta.example]:2222 ssh-ed25519 AAAAED2\n");
@@ -287,7 +287,7 @@ proves(["0007-ssh-coverage FR-006"], "the known hosts are two files in one optio
   assert(isErr(sshArgv(t, [t], { ...BASE, family: "pinned", knownHostsRepository: "/tmp/a b" }, "x")));
 });
 
-proves(["0007-ssh-coverage FR-007"], "every way stolos calls ssh, in a table, is built, with the options its shape needs and never accept-new", async () => {
+proves(["0007-ssh-coverage FR-007"], "every way a fleet program calls ssh, in a table, is built, with the options its shape needs and never accept-new", async () => {
   const alpha = T("alpha", { user: "admin" });
   const pinnedHost = T("pin", { user: "ops", port: 2222, address: "10.0.0.7", credential: "probe" });
   const shapes: readonly { shape: string; argv: readonly string[]; has: readonly string[]; lacks: readonly string[] }[] = [

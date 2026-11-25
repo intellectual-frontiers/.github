@@ -39,11 +39,9 @@
  * cannot carry (a control character but tab and line feed, a carriage return, which XML reads as a line feed, or a lone surrogate) is
  * refused.
  *
- * Taken from Stolos's `src/archon/export/schedule.ts` (spec 092), which built the jobs of `stolos export schedule` from an export job and
- * a fleet. What changed: the job is generic (an argument vector, a working folder, an environment, an optional log) and named by the
- * caller's owner instead of Stolos's; the schedule is a discriminated union, with every N minutes added; the files are relative to the
- * home folder; the plist is built as an XML tree; quoting follows each format's rules in full and refuses what it cannot hold, where Stolos
- * quoted a few characters; and errors are values.
+ * The job is generic (an argument vector, a working folder, an environment, an optional log) and named by the caller's owner; the
+ * schedule is a discriminated union, with every N minutes; the files are relative to the home folder; the plist is built as an XML tree;
+ * quoting follows each format's rules in full and refuses what it cannot hold; and errors are values.
  *
  * @example
  * ```ts

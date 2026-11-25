@@ -4,7 +4,7 @@
  * and its content, as bytes; enough to build CMS structures (RFC 5652) and read the fields of an X.509 certificate (RFC 5280). Encoders
  * give the one DER form (minimal lengths and integers, a SET OF sorted); a malformed input to an encoder (an OID that is not dotted
  * numbers) is a programming error and throws a `RangeError`. Readers return a `Result`: what is not DER this reader knows is an error
- * saying where. Taken from Stolos's `src/archon/export/der.ts` (S/MIME for emailed exports), with negative integers and integers read.
+ * saying where. Negative integers and integers are read.
  *
  * @example
  * ```ts

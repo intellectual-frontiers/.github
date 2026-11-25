@@ -3,7 +3,7 @@
  * RDF terms as typed values (commons 0012-ontology FR-001, FR-002): an IRI branded once checked, a namespace that pairs a prefix with
  * its IRI, a named node branded with the classes its term is an individual of, blank nodes, literals typed by their language or their
  * datatype, and triples and quads of them. A vocabulary is a typed value made from a namespace and the local names of its terms, so a
- * term it does not list does not compile. Generalized from erga's ontology DSL (`erga 248-ontology-in-typescript`) and stolos' RDF export.
+ * term it does not list does not compile. Generalized from erga's ontology DSL (`erga 248-ontology-in-typescript`).
  *
  * @example
  * ```ts

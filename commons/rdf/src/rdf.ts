@@ -8,7 +8,7 @@
  *
  * @remarks
  * Generalized from erga's ontology DSL (`erga 248-ontology-in-typescript`), whose references are branded by class and whose Turtle is
- * written in one canonical form, and from stolos' PROV export, which wrote Turtle by hand. None of their vocabularies is here: a harness
+ * written in one canonical form, None of their vocabularies is here: a harness
  * keeps its own, made with `vocabulary`.
  *
  * @limits

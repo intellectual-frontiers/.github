@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The primitives of governance, risk and compliance as code, pulled up into IFC TypeScript (0005-typescript-practice) from what `erga` and `stolos` each built in their own shape: `erga` around OSCAL, with control maps, a hash-chained evidence ledger and dispositions; `stolos` around the Secure Controls Framework as its hub, with typed controls, waivers, freshness, drift, change-impact gates and OCSF, OSCAL, CycloneDX and in-toto output. One kernel of types and pure functions (catalogs, controls, verdicts, findings, waivers, evidence, assessment and the standard formats) and a thin runtime of signers, Git readers and loaders, so that each harness keeps only its connectors, its data and its catalogs' content. Every check run is a span and every finding a log record (0006-signals), so compliance is observed the way everything else is.
+**Input:** The primitives of governance, risk and compliance as code, in IFC TypeScript (0005-typescript-practice): control maps around OSCAL, a hash-chained evidence ledger and dispositions, the Secure Controls Framework as a hub, typed controls, waivers, freshness, drift, change-impact gates and OCSF, OSCAL, CycloneDX and in-toto output. One kernel of types and pure functions (catalogs, controls, verdicts, findings, waivers, evidence, assessment and the standard formats) and a thin runtime of signers, Git readers and loaders, so that each harness keeps only its connectors, its data and its catalogs' content. Every check run is a span and every finding a log record (0006-signals), so compliance is observed the way everything else is.
 
 ## Catalogs, controls and verdicts (kernel)
 
@@ -47,7 +47,7 @@
 ## Out of scope
 
 - The content of catalogs (the Secure Controls Framework, NIST SP 800-53, FedRAMP's key security indicators): its licences are each harness's to check, so it stays in the harness that uses it.
-- Connectors to clouds and services, `stolos`'s SQLite estate, `erga`'s spec-kit grammar and ontology terms.
+- Connectors to clouds and services, a harness's SQLite estate, `erga`'s spec-kit grammar and ontology terms.
 - Sigstore and transparency logs.
 
 ## Edge cases
@@ -69,7 +69,7 @@
 
 ## Assumptions
 
-- OCSF 1.9.0, OSCAL 1.2.3 and CycloneDX 1.6 are the versions the harnesses write today (`stolos` writes these OCSF classes and OSCAL documents already). From OSCAL 1.1.2 to 1.2.3 the members of the four documents written did not change; 1.2 widened enumerations (component types, the `discovery` observation type, CVSS v4), made an SSP's `users` optional and added the mapping model, which is not written.
+- OCSF 1.9.0, OSCAL 1.2.3 and CycloneDX 1.6 are the versions the harnesses write today. From OSCAL 1.1.2 to 1.2.3 the members of the four documents written did not change; 1.2 widened enumerations (component types, the `discovery` observation type, CVSS v4), made an SSP's `users` optional and added the mapping model, which is not written.
 - A role is enough to say who approved a waiver or owns a risk in this public repository; a harness that must name people adds them in its own records.
 
 ## Open questions
@@ -87,7 +87,7 @@
 
 ## Success criteria
 
-- **SC-001**: `erga` and `stolos` keep no type of their own for a control, a verdict, a finding, a waiver or a ledger entry.
+- **SC-001**: A harness keeps no type of its own for a control, a verdict, a finding, a waiver or a ledger entry.
 - **SC-002**: The same findings give the same OCSF, OSCAL and CycloneDX on Bun and Node.
 
 ## Review & acceptance checklist

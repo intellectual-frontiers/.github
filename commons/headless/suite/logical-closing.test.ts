@@ -1,7 +1,6 @@
 /**
  * Tests of `logical/closing.ts` and `fix.ts`: the order of the closing block, its verdict and its one next command, and the splitting of a fix into its command and
- * its words (commons headless 0003-headless-output FR-004, FR-005). The cases of `fixSplitter` are those of the golden tests of stolos (105-calm-output FR-011), which
- * is where the behaviour was taken from; the closing block is held to the invariants of its calm output.
+ * its words (commons headless 0003-headless-output FR-004, FR-005). The closing block is held to the invariants of its calm output.
  *
  * @module
  */
@@ -12,20 +11,20 @@ import { closingOf, type ClosingLine } from "../src/logical/closing.ts";
 import { fixSplitter } from "../src/logical/fix.ts";
 import { outcomeOf } from "../src/logical/outcome.ts";
 
-/** The commands stolos's fixes call. */
-const STOLOS = { commands: ["bun run stolos", "stolos", "archon", "git", "gh", "sudo", "ssh", "bun"], own: ["bun run stolos", "archon", "stolos"] };
-const split = fixSplitter(STOLOS);
+/** The commands a fleet program's fixes call. */
+const FLEET = { commands: ["bun run fleetctl", "fleetctl", "archon", "git", "gh", "sudo", "ssh", "bun"], own: ["bun run fleetctl", "archon", "fleetctl"] };
+const split = fixSplitter(FLEET);
 const FIX = { commands: ["tool", "git"], own: ["tool"] };
 
-proves(["0003-headless-output FR-005"], "a fix is split into its one command and the words around it (the golden cases of stolos)", () => {
-  assertEquals(split("bun run stolos vault backup, then move the ZIP somewhere safe"), { cmd: "bun run stolos vault backup", say: "Move the ZIP somewhere safe" });
-  assertEquals(split("bun run stolos apply"), { cmd: "bun run stolos apply" });
-  assertEquals(split("bun run stolos apply (it lists those commits)"), { cmd: "bun run stolos apply", say: "It lists those commits" });
+proves(["0003-headless-output FR-005"], "a fix is split into its one command and the words around it", () => {
+  assertEquals(split("bun run fleetctl vault backup, then move the ZIP somewhere safe"), { cmd: "bun run fleetctl vault backup", say: "Move the ZIP somewhere safe" });
+  assertEquals(split("bun run fleetctl apply"), { cmd: "bun run fleetctl apply" });
+  assertEquals(split("bun run fleetctl apply (it lists those commits)"), { cmd: "bun run fleetctl apply", say: "It lists those commits" });
   assertEquals(split("check the network, then run this again"), { say: "check the network, then run this again" });
   assertEquals(split(undefined), {});
   assertEquals(split(""), {});
   assertEquals(split("sudo systemctl restart x"), { cmd: "sudo systemctl restart x" });
-  assertEquals(split("fix it with: stolos fleet trust"), { cmd: "stolos fleet trust", say: "Fix it with" });
+  assertEquals(split("fix it with: fleetctl fleet trust"), { cmd: "fleetctl fleet trust", say: "Fix it with" });
   // a program that names no command splits nothing
   assertEquals(fixSplitter({ commands: [], own: [] })("tool sync"), { say: "tool sync" });
   // a program's name with a character a pattern would read is read as it is
@@ -82,9 +81,9 @@ proves(["0003-headless-output FR-004"], "where nothing failed the verdict states
   assertEquals([sentence.next, sentence.rootSay], [undefined, "check the network, then run this again"]);
 });
 
-proves(["0003-headless-output FR-004"], "pending is never a failure and shows its next step (the case of stolos 052)", () => {
-  const c = closingOf(outcomeOf(null, { problems: [problem("pending", "no relay token yet", { fix: "bun run stolos boot mail-push alpha", code: "P027-MAIL-TOKEN" })] }), { fix: STOLOS, shownHints: [] });
-  assertEquals(c.lines, [{ kind: "problem", level: "pending", message: "no relay token yet", code: "P027-MAIL-TOKEN", command: { label: "run", command: "bun run stolos boot mail-push alpha" } }]);
+proves(["0003-headless-output FR-004"], "pending is never a failure and shows its next step", () => {
+  const c = closingOf(outcomeOf(null, { problems: [problem("pending", "no relay token yet", { fix: "bun run fleetctl boot mail-push alpha", code: "P027-MAIL-TOKEN" })] }), { fix: FLEET, shownHints: [] });
+  assertEquals(c.lines, [{ kind: "problem", level: "pending", message: "no relay token yet", code: "P027-MAIL-TOKEN", command: { label: "run", command: "bun run fleetctl boot mail-push alpha" } }]);
   assertEquals(c.verdict, { level: "ok", text: "Up to date · 1 waiting" });
 });
 

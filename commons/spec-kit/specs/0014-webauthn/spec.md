@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A harness that signs people in on the web (`stolos` first) should use passkeys, not passwords: WebAuthn (Web Authentication Level 3), where the browser and an authenticator do the cryptography and the relying party checks what they answer. IFC TypeScript's kernel (0005-typescript-practice) does the relying party's part, pure, with Web Crypto and no package: the options a browser takes, and the verification of a registration and an authentication, in the JSON shapes the browser's `toJSON()` gives. It needs CBOR (RFC 8949) to read attestation objects and COSE (RFC 9052, RFC 9053) for the keys, which the kernel gives as modules of their own.
+**Input:** A harness that signs people in on the web should use passkeys, not passwords: WebAuthn (Web Authentication Level 3), where the browser and an authenticator do the cryptography and the relying party checks what they answer. IFC TypeScript's kernel (0005-typescript-practice) does the relying party's part, pure, with Web Crypto and no package: the options a browser takes, and the verification of a registration and an authentication, in the JSON shapes the browser's `toJSON()` gives. It needs CBOR (RFC 8949) to read attestation objects and COSE (RFC 9052, RFC 9053) for the keys, which the kernel gives as modules of their own.
 
 ## CBOR and COSE (kernel)
 
