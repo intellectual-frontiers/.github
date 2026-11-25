@@ -16,3 +16,9 @@ requirement	mechanism	by	note
 0002-guide FR-007	check	.github: cd commons/terminal && bun test suite/	guide-driver.test.ts: an abort while waiting, while asking and in full, the terminal restored and status 130
 0002-guide FR-008	check	.github: cd commons/terminal && bun test suite/	guide-screen.test.ts: the layout on the emulator of vt, no row scrolls, a resize redrawn, the fallback to ansi and back
 0002-guide FR-009	check	.github: cd commons/terminal && bun run verify	guide-process.test.ts runs one script under Bun and under Node 26 with piped input of CRLF lines; tests/commons-packages.test.ts installs the packed entry
+0002-guide FR-010	check	.github: cd commons/terminal && bun test suite/	guide-render.test.ts: a UUID kept whole at 41 and 60 columns, a longer token cut, CRLF text and narrow widths
+0002-guide FR-011	check	.github: cd commons/terminal && bun test suite/	guide-resume.test.ts: the count as a position that never falls, a resumed run ticked from the first frame, [x] [>] [ ] [!], a long plan scrolled
+0002-guide FR-012	check	.github: cd commons/terminal && bun test suite/	guide-resume.test.ts: the status line for a question, an acknowledgement, a confirmation, a verb at work and the end
+0002-guide FR-013	check	.github: cd commons/terminal && bun test suite/	guide-resume.test.ts: a 24-row screen with a long step keeps the summary on top, the prompt at the bottom and a (more marker
+0002-guide FR-014	check	.github: cd commons/terminal && bun test suite/	guide-resume.test.ts: a step given again is shown once in plain and in full, and the pane holds the current step only
+0002-guide FR-015	check	.github: cd commons/terminal && bun test suite/	guide-resume.test.ts: one transcript after the screen is left, a failure once, reported on every error

@@ -28,7 +28,7 @@
 import { err, ok, type DecodeError, type Result } from "@intellectual-frontiers/core";
 import { atMost, FULL_MIN_COLUMNS, FULL_MIN_ROWS, type GuideCaps } from "./guide-caps.ts";
 import { type AskField, decodeStep, type DoneStep, type GuideStep } from "./guide-model.ts";
-import { clean, renderPrompt, renderResult, renderStep } from "./guide-render.ts";
+import { clean, renderPrompt, renderResult, renderStep, renderStepParts } from "./guide-render.ts";
 import { drawScreen, ENTER, frameOf, LEAVE, layoutOf, type PlanItem } from "./guide-screen.ts";
 import { paint } from "./palette.ts";
 
@@ -66,8 +66,14 @@ export type GuideRunResult = { readonly summary: string; readonly lines?: readon
 /** What the driver hands the caller to carry out: the step and the answers the person gave (empty for a `run`). */
 export type GuideCall = { readonly step: GuideStep; readonly answers: Readonly<Record<string, string>>; readonly signal: AbortSignal | undefined };
 
-/** The typed ends of a guide that did not finish; each has `message`, a sentence for a person. */
-export type GuideError =
+/**
+ * The typed ends of a guide that did not finish; each has `message`, a sentence for a person, and `reported: true`: the driver has already
+ * shown it to the person once (on the screen the person keeps), so the caller prints nothing more about it, only the exit status (FR-015).
+ */
+export type GuideError = GuideErrorBody & { readonly reported: true };
+
+/** The ends of a guide, before the driver has shown them. */
+export type GuideErrorBody =
   | { readonly code: "E-GUIDE-NEEDS-PERSON"; readonly step: GuideStep; readonly reason: "input-not-interactive" | "input-ended"; readonly message: string }
   | { readonly code: "E-GUIDE-SECRET-FIELD"; readonly step: GuideStep; readonly field: string; readonly message: string }
   | { readonly code: "E-GUIDE-ABORTED"; readonly exitCode: 130; readonly message: string }
@@ -110,8 +116,13 @@ export type GuideOptions = {
   readonly in: GuideIn;
   readonly caps: GuideCaps;
   readonly signal?: AbortSignal | undefined;
-  /** The steps of the plan, for the left column of the full screen. */
+  /** The steps of the plan, for the left column of the full screen; the count of the title is the position of the current step in it. */
   readonly plan?: readonly PlanItem[];
+  /**
+   * The ids of the steps of `plan` that were done before this run, for a flow that is resumed in a new process: they are ticked `[x]` from
+   * the first frame (FR-011). An id that is not in the plan is ignored; the current step is never ticked until it is done.
+   */
+  readonly done?: readonly string[];
   /** The title of the full screen (default "Guide"). */
   readonly title?: string;
   readonly clock?: GuideClock;
@@ -224,6 +235,9 @@ export function exitCodeOf(result: Result<GuideFinished, GuideError>): number {
 
 type Block = (caps: GuideCaps) => readonly string[];
 
+/** One block of what the person sees: the step itself, a prompt (and what was typed), or the result of something. */
+type Entry = { readonly role: "step" | "prompt" | "result"; readonly block: Block; readonly step?: GuideStep };
+
 /** Runs a guided flow to its end, or to the typed error that ended it (FR-004 to FR-008). */
 export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, GuideError>> {
   const clock = o.clock ?? systemClock;
@@ -234,8 +248,15 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
   const stopped = (): boolean => signal?.aborted === true;
   const plan = o.plan ?? [];
   const title = o.title ?? "Guide";
-  const done = new Set<string>();
-  const blocks: Block[] = [];
+  const done = new Set<string>(o.done ?? []);
+  const failed = new Set<string>();
+  /** Everything shown, in order: the transcript the person keeps. The full screen's pane draws only the group of the current step. */
+  const entries: Entry[] = [];
+  /** Where the group of the current step starts in `entries`. */
+  let groupStart = 0;
+  /** The last step shown, to see that the same one is asked again. */
+  let lastKey = "";
+  let position = 0;
   let status = "";
   let keys = "";
   let typing = false;
@@ -261,7 +282,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
       if (inAlt) {
         inAlt = false;
         o.out.write(LEAVE);
-        for (const b of blocks) writeLines(b(c));
+        for (const e of entries) writeLines(e.block(c));
       }
       return;
     }
@@ -270,18 +291,51 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
       o.out.write(ENTER);
     }
     const paneCols = Math.max(10, layoutOf(c.columns, c.rows, plan).pane);
-    const pane = blocks.flatMap((b) => b({ ...c, columns: paneCols }));
-    o.out.write(frameOf(drawScreen({ title, plan, done, current, pane, status, keys, typing }, size(), c)));
+    const pc = { ...c, columns: paneCols };
+    const group = entries.slice(groupStart);
+    const lead = group[0]?.step === undefined ? undefined : renderStepParts(group[0].step, pc);
+    const foot = group.slice(lead === undefined ? 0 : 1).flatMap((e) => e.block(pc));
+    const pane = [...(lead?.head ?? []), ...(lead?.body ?? []), ...foot];
+    o.out.write(
+      frameOf(drawScreen({ title, plan, done, failed, position, pinned: lead?.head.length ?? 0, keep: foot.length, current, pane, status, keys, typing }, size(), c)),
+    );
   };
   const writeLines = (lines: readonly string[]): void => {
     if (lines.length > 0) o.out.write(`${lines.join("\n")}\n`);
   };
   /** Shows a block: printed at `plain` and `ansi`, drawn on the screen at `full`. */
-  const show = (b: Block): void => {
-    blocks.push(b);
+  const show = (b: Block, role: Entry["role"] = "result", step?: GuideStep): void => {
+    entries.push(step === undefined ? { role, block: b } : { role, block: b, step });
     const c = capsNow();
     if (c.level === "full") redraw();
     else writeLines(b(c));
+  };
+  /** Removes the prompts (and what was typed) shown since `from`: the same question asked again is shown once. */
+  const dropPrompts = (from: number): void => {
+    for (let k = entries.length - 1; k >= from; k--) if (entries[k]?.role === "prompt") entries.splice(k, 1);
+  };
+  /**
+   * Shows a step and makes it the current one. The same step asked for again (the caller's state did not change, so `next` gave it once
+   * more) is not shown a second time: what was asked and typed of it is dropped, what came of it stays, and the person is asked again.
+   * Returns whether it was shown anew.
+   */
+  const showStep = (s: GuideStep): boolean => {
+    current = s.id;
+    done.delete(s.id);
+    failed.delete(s.id);
+    const idx = plan.findIndex((p) => p.id === s.id);
+    position =
+      idx >= 0 ? Math.max(position, idx + 1) : Math.max(position, Math.min(plan.length, plan.filter((p) => done.has(p.id)).length + 1));
+    const key = JSON.stringify(s);
+    if (key === lastKey && entries.length > groupStart) {
+      dropPrompts(groupStart);
+      if (capsNow().level === "full") redraw();
+      return false;
+    }
+    lastKey = key;
+    groupStart = entries.length;
+    show((c) => renderStep(s, c), "step", s);
+    return true;
   };
   const setStatus = (s: string, k = keys): void => {
     status = s;
@@ -296,14 +350,17 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
       o.out.write(LEAVE);
     } else if (o.caps.level !== "plain") o.out.write(`${ESC}[0m${ESC}[?25h`);
   };
-  const failure = <E extends GuideError>(e: E): Result<never, GuideError> => {
+  const failure = <E extends GuideErrorBody>(e: E): Result<never, GuideError> => {
+    if ((e.code === "E-GUIDE-RUN-FAILED" || e.code === "E-GUIDE-ANSWER-INVALID" || e.code === "E-GUIDE-WAIT-TIMEOUT") && plan.some((p) => p.id === e.step.id)) {
+      failed.add(e.step.id);
+    }
     show((c) => renderResult(false, e.message, [], c));
-    return err(e);
+    return err({ ...e, reported: true } as GuideError);
   };
   const abort = (): Result<never, GuideError> => {
     const message = "Stopped.";
     show((c) => renderResult(false, message, [], c));
-    return err({ code: "E-GUIDE-ABORTED", exitCode: 130, message });
+    return err({ code: "E-GUIDE-ABORTED", exitCode: 130, message, reported: true });
   };
 
   const secret = (step: GuideStep): Result<never, GuideError> | undefined => {
@@ -327,22 +384,25 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     const answers: Record<string, string> = {};
     for (const f of fields) {
       let reason = "";
+      const fieldStart = entries.length;
       for (let attempt = 1; ; attempt++) {
         if (stopped()) return abort();
+        if (attempt > 1) dropPrompts(fieldStart);
         const prompt = renderPrompt(f, capsNow());
         const lead = prompt.slice(0, -1);
         const last = prompt.at(-1) ?? "  > ";
-        if (lead.length > 0) show(() => lead);
-        blocks.push(() => [last]);
+        if (lead.length > 0) show(() => lead, "prompt");
+        entries.push({ role: "prompt", block: () => [last] });
         typing = true;
         if (capsNow().level === "full") {
-          setStatus(`waiting for you: ${f.field}`, "Enter send   Ctrl+C stop");
+          if (acceptEmpty) setStatus("press Enter to continue", "Enter continue   Ctrl+C stop");
+          else setStatus(`your turn: type ${f.field} and press Enter`, "Enter send   Ctrl+C stop");
         } else o.out.write(last);
         const read = await o.in.readLine(signal);
         typing = false;
         if (read.kind === "aborted" || stopped()) return abort();
         if (read.kind === "end") {
-          blocks[blocks.length - 1] = () => ["  > (the input ended)"];
+          entries[entries.length - 1] = { role: "prompt", block: () => ["  > (the input ended)"] };
           return failure({
             code: "E-GUIDE-NEEDS-PERSON",
             step,
@@ -352,7 +412,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
         }
         if (read.text.includes(CTRL_C)) return abort();
         const text = clean(read.text).trim();
-        blocks[blocks.length - 1] = () => [`  > ${text}`];
+        entries[entries.length - 1] = { role: "prompt", block: () => [`  > ${text}`] };
         if (capsNow().level !== "full") {
           /* the terminal echoed the typed line; the pipe did not */
           if (!o.in.isTTY) o.out.write(`${text}\n`);
@@ -444,7 +504,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
       }
       const n = await fetch();
       if (n.kind === "err") return n;
-      if (n.value.kind === "wait" && n.value.id !== waiting.id) show((c) => renderStep(n.value, c));
+      if (n.value.kind === "wait" && n.value.id !== waiting.id) showStep(n.value);
       step = n.value;
       delay = Math.min(poll.maxMs, Math.ceil(delay * poll.factor));
     }
@@ -460,12 +520,10 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     }
     for (;;) {
       if (stopped()) return abort();
-      shown++;
-      current = step.id;
       const s = step;
       const refused = secret(s);
       if (refused !== undefined) return refused;
-      show((c) => renderStep(s, c));
+      if (showStep(s)) shown++;
       switch (s.kind) {
         case "done": {
           done.add(s.id);
@@ -482,12 +540,12 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
         }
         case "run": {
           if (o.confirm !== undefined) {
-            setStatus("waiting for your confirmation", "Ctrl+C stop");
+            setStatus(`your turn: confirm to run ${s.verb.id}`, "Ctrl+C stop");
             const yes = await o.confirm(s);
             if (stopped()) return abort();
             if (!yes) return failure({ code: "E-GUIDE-DECLINED", step: s, message: `${s.summary}: not run, it was not confirmed.` });
           }
-          setStatus(`running ${s.verb.id}`, "Ctrl+C stop");
+          setStatus(`working... running ${s.verb.id}`, "Ctrl+C stop");
           const r = await carry(s, {});
           if (r.kind === "err") return r;
           showResult(r.value);
@@ -496,7 +554,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
         case "question": {
           const a = await askFields(s, s.ask);
           if (a.kind === "err") return a;
-          setStatus("working", "Ctrl+C stop");
+          setStatus("working...", "Ctrl+C stop");
           const r = await carry(s, a.value);
           if (r.kind === "err") return r;
           showResult(r.value);
@@ -518,7 +576,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
             !typed,
           );
           if (a.kind === "err") return a;
-          setStatus("working", "Ctrl+C stop");
+          setStatus("working...", "Ctrl+C stop");
           const r = await carry(s, typed ? a.value : {});
           if (r.kind === "err") return r;
           showResult(r.value);
@@ -541,7 +599,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     // A full screen is gone when it is left: what was shown is written once more, on the screen the person keeps.
     if (wasFull) {
       const c = atMost({ ...o.caps, columns: size().columns, rows: size().rows }, "ansi");
-      for (const b of blocks) writeLines(b(c));
+      for (const e of entries) writeLines(e.block(c));
     }
   }
 }

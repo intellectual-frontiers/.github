@@ -38,13 +38,19 @@ export function clean(text: string): string {
     .replace(CONTROLS, "");
 }
 
-/** A text wrapped to `width` columns: paragraphs kept, words kept whole where they fit, a longer word and a wide character cut between graphemes. */
+/**
+ * A text wrapped to `width` columns (FR-010): paragraphs kept, and a word (a token with no space: an identifier, a path, a hash) is never
+ * broken where it can go whole to the next line. A word that fits the width but not the room left by the indent goes whole on a line with
+ * less indent (never cut); only a word wider than the width itself, and a wide character, are cut between graphemes. A first line
+ * that cannot hold the word at all is left with its indent only, and the word starts the next line.
+ */
 export function wrap(text: string, width: number, indent = 0, first = indent): readonly string[] {
   const out: string[] = [];
-  const room = (n: number): number => Math.max(1, width - n);
+  const total = Math.max(1, width);
   for (const paragraph of clean(text).split("\n")) {
     let line = "";
     let lead = out.length === 0 ? first : indent;
+    const room = (): number => Math.max(1, total - lead);
     const flush = (): void => {
       out.push(" ".repeat(lead) + line);
       line = "";
@@ -56,13 +62,18 @@ export function wrap(text: string, width: number, indent = 0, first = indent): r
       continue;
     }
     for (let word of words) {
-      while (displayWidth(word) > room(lead)) {
-        // A word wider than a line: first what fits after what is already there, else cut it.
+      if (displayWidth(word) > room() && displayWidth(word) <= total) {
+        // It fits the width, not what the indent leaves: it goes whole to its own line, indented as far as it allows.
+        if (line !== "" || out.length === 0) flush();
+        lead = Math.min(lead, Math.max(0, total - displayWidth(word)));
+      }
+      while (displayWidth(word) > room()) {
+        // A word wider than the width itself: what fits after what is already there goes first, else it is cut.
         if (line !== "") {
           flush();
           continue;
         }
-        const { head, tail } = splitAtWidth(word, room(lead));
+        const { head, tail } = splitAtWidth(word, room());
         if (head === "") {
           // A character wider than the line itself: show it alone rather than loop.
           const g = graphemes(word)[0] ?? "";
@@ -76,7 +87,7 @@ export function wrap(text: string, width: number, indent = 0, first = indent): r
       }
       if (word === "") continue;
       const next = line === "" ? word : `${line} ${word}`;
-      if (displayWidth(next) > room(lead)) {
+      if (displayWidth(next) > room()) {
         flush();
         line = word;
       } else line = next;
@@ -116,14 +127,19 @@ function inputsOf(inputs: Readonly<Record<string, unknown>>): string {
  * line fits `caps.columns`; at `plain` there is no escape sequence and the guide's own furniture is ASCII.
  */
 export function renderStep(step: GuideStep, caps: GuideCaps): readonly string[] {
+  const parts = renderStepParts(step, caps);
+  return [...parts.head, ...parts.body];
+}
+
+/** A step as two runs of lines: `head`, the mark and the summary (what the full screen keeps pinned), and `body`, everything after it (FR-013). */
+export function renderStepParts(step: GuideStep, caps: GuideCaps): { readonly head: readonly string[]; readonly body: readonly string[] } {
   const cols = Math.max(20, caps.columns);
   const tag = tagOf(step.kind, caps);
   const lead = displayWidth(tag) + 1;
   const head = wrap(step.summary, cols, lead, lead);
   const lines: string[] = [];
   const roleOf = TAGS[step.kind].role;
-  lines.push(`${paint(roleOf, tag, caps)} ${(head[0] ?? "").slice(lead)}`);
-  for (const l of head.slice(1)) lines.push(l);
+  const headLines = [`${paint(roleOf, tag, caps)} ${(head[0] ?? "").slice(lead)}`, ...head.slice(1)];
   const say = step.say.trim() === "" ? [] : wrap(step.say, cols, 2);
   lines.push(...say);
   const block = (title: string, items: readonly string[]): void => {
@@ -150,7 +166,8 @@ export function renderStep(step: GuideStep, caps: GuideCaps): readonly string[] 
       break;
   }
   if (step.evidence !== undefined && step.evidence.length > 0) block("evidence:", step.evidence);
-  return lines.map((l) => (displayWidth(l) > cols ? cutToWidth(l, cols) : l));
+  const fit = (l: string): string => (displayWidth(l) > cols ? cutToWidth(l, cols) : l);
+  return { head: headLines.map(fit), body: lines.map(fit) };
 }
 
 /** The lines of a prompt for one field: its prompt and hint wrapped, and as the last line the mark of where to type, which is written without a line end. */
@@ -167,6 +184,7 @@ export function renderResult(ok: boolean, summary: string, details: readonly str
   const lead = displayWidth(tag) + 1;
   const head = wrap(summary, cols, lead, lead);
   const lines = [`${paint(ok ? "success" : "failure", tag, caps)} ${(head[0] ?? "").slice(lead)}`, ...head.slice(1)];
-  for (const d of details) lines.push(...wrap(d, cols, 4, 2));
+  // A failure is printed once: a detail that only says the summary again is not shown.
+  for (const d of details) if (clean(d).trim() !== clean(summary).trim()) lines.push(...wrap(d, cols, 4, 2));
   return lines.map((l) => (displayWidth(l) > cols ? cutToWidth(l, cols) : l));
 }

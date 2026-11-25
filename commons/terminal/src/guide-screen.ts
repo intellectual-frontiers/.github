@@ -42,9 +42,20 @@ export type ScreenState = {
   readonly plan: readonly PlanItem[];
   /** The ids of the steps that are done. */
   readonly done: ReadonlySet<string>;
+  /** The ids of the steps that failed (drawn `[!]`); none where omitted. */
+  readonly failed?: ReadonlySet<string> | undefined;
+  /**
+   * The 1-based position of the current step in `plan` for the count of the title (FR-011); where omitted, it is the number of steps done
+   * plus one for the current one.
+   */
+  readonly position?: number | undefined;
+  /** How many of the first lines of `pane` stay at the top whatever the height (the step's summary, FR-013); 0 where omitted. */
+  readonly pinned?: number | undefined;
+  /** How many of the last lines of `pane` stay at the bottom (the prompt and what the person typed); 0 where omitted. */
+  readonly keep?: number | undefined;
   /** The id of the current step. */
   readonly current: string | undefined;
-  /** The lines of the right pane, already wrapped to the pane's width (`layoutOf`); the oldest are dropped where they do not fit. */
+  /** The lines of the right pane, already wrapped to the pane's width (`layoutOf`); where they do not fit, see `fitPane`. */
   readonly pane: readonly string[];
   /** The status line: what is going on now. */
   readonly status: string;
@@ -80,7 +91,26 @@ const pad = (text: string, width: number): string => {
 };
 
 /** The marks of the left column: ASCII, so that a column is a column in every terminal. */
-export const PLAN_MARKS = { done: "[x]", current: "[>]", pending: "[ ]" } as const;
+export const PLAN_MARKS = { done: "[x]", current: "[>]", pending: "[ ]", failed: "[!]" } as const;
+
+/** The marker line that tells that lines of the pane are hidden. */
+export const MORE_MARK = "  (more: make the window taller)";
+
+/**
+ * The lines of the pane that fit `rows` rows (FR-013): the first `pinned` lines always; the last `keep` lines (the tail is cut first where
+ * even those do not fit); between them the details from their start, and where some are hidden a line that says `(more` so the
+ * person knows. With neither `pinned` nor `keep` it is the last `rows` lines, as before.
+ */
+export function fitPane(pane: readonly string[], rows: number, pinned = 0, keep = 0): readonly string[] {
+  if (pane.length <= rows) return pane;
+  const top = Math.min(pinned, pane.length, Math.max(0, rows - 1));
+  if (top === 0 && keep === 0) return pane.slice(pane.length - rows);
+  const rest = pane.slice(top);
+  const foot = Math.min(keep, rest.length, Math.max(1, rows - top - 2));
+  const details = rest.slice(0, rest.length - foot);
+  const room = Math.max(0, rows - top - foot - 1);
+  return [...pane.slice(0, top), ...details.slice(0, room), MORE_MARK, ...rest.slice(rest.length - foot)].slice(0, rows);
+}
 
 /** The result of drawing: every row, and where the cursor goes (where the person types) or undefined. */
 export type Drawn = { readonly lines: readonly string[]; readonly cursor: { readonly row: number; readonly col: number } | undefined };
@@ -95,22 +125,27 @@ export function drawScreen(state: ScreenState, size: { readonly columns: number;
   const role = (r: Role, t: string): string => paint(r, t, caps);
   const lines: string[] = [];
   const doneCount = state.plan.filter((p) => state.done.has(p.id)).length;
-  const count = state.plan.length === 0 ? "" : `step ${Math.min(state.plan.length, doneCount + (state.current !== undefined && !state.done.has(state.current) ? 1 : 0))} of ${state.plan.length}`;
+  const fallback = doneCount + (state.current !== undefined && !state.done.has(state.current) ? 1 : 0);
+  const count = state.plan.length === 0 ? "" : `step ${Math.max(1, Math.min(state.plan.length, state.position ?? fallback))} of ${state.plan.length}`;
   const gap = Math.max(1, columns - displayWidth(state.title) - displayWidth(count) - 2);
   lines.push(role("accent", pad(` ${state.title}${" ".repeat(gap)}${count}`, columns)));
-  const shown = state.pane.slice(Math.max(0, state.pane.length - lay.body));
+  const shown = fitPane(state.pane, lay.body, state.pinned ?? 0, state.keep ?? 0);
   let cursor: Drawn["cursor"];
+  // A plan longer than the body scrolls so that the current step stays in view.
+  const at = state.plan.findIndex((p) => p.id === state.current);
+  const first = state.plan.length <= lay.body ? 0 : Math.max(0, Math.min(state.plan.length - lay.body, (at < 0 ? 0 : at) - Math.floor(lay.body / 2)));
   for (let i = 0; i < lay.body; i++) {
-    const item = state.plan[i];
+    const item = state.plan[first + i];
     let l = "";
     if (lay.left > 0) {
       if (item === undefined) l = pad("", lay.left) + " | ";
       else {
-        const isDone = state.done.has(item.id);
+        const isFailed = state.failed?.has(item.id) === true;
+        const isDone = state.done.has(item.id) && !isFailed;
         const isCurrent = item.id === state.current && !isDone;
-        const mark = isDone ? PLAN_MARKS.done : isCurrent ? PLAN_MARKS.current : PLAN_MARKS.pending;
+        const mark = isFailed ? PLAN_MARKS.failed : isDone ? PLAN_MARKS.done : isCurrent ? PLAN_MARKS.current : PLAN_MARKS.pending;
         const text = pad(`${mark} ${item.title}`, lay.left);
-        l = role(isDone ? "success" : isCurrent ? "accent" : "dim", text) + " | ";
+        l = role(isFailed ? "failure" : isDone ? "success" : isCurrent ? "accent" : "dim", text) + " | ";
       }
     }
     const paneLine = shown[i] ?? "";

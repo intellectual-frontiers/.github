@@ -151,3 +151,49 @@ proves([FR], "a decoded step renders as it was written (the steps are the ones t
     assertEquals(renderStep(d.value, capsOf("plain", 40)), renderStep(s, capsOf("plain", 40)));
   }
 });
+
+const UUID = "00000000-0000-4000-8000-000000000001";
+
+proves(["0002-guide FR-010"], "a token that fits the width is never broken: an order id stays whole at 41 and 60 columns, indented less where it must", () => {
+  for (const columns of [41, 60]) {
+    const c = capsOf("plain", columns);
+    const lines = renderStep(
+      { id: "synthetic-step-06", kind: "done", summary: "The synthetic order is open", say: "", evidence: [`order: ${UUID}`, `started: false`] },
+      c,
+    );
+    assert(lines.some((l) => l.includes(UUID)), `${columns} columns: the id is on one line, whole\n${lines.join("\n")}`);
+    for (const l of lines) assert(displayWidth(l) <= columns);
+  }
+  const narrow = wrap(`Command: opsfolio work run ${UUID} --apply`, 41, 2);
+  assertEquals(narrow.filter((l) => l.includes(UUID)).length, 1);
+  for (const l of narrow) assert(displayWidth(l) <= 41);
+});
+
+proves(["0002-guide FR-010"], "a token wider than the width itself is cut, and a wide character wider than the line does not loop", () => {
+  const long = "x".repeat(50);
+  const lines = wrap(long, 40, 4);
+  assertEquals(lines.join("").replaceAll(" ", ""), long);
+  for (const l of lines) assert(displayWidth(l) <= 40);
+  assertEquals(wrap("a", 1).join(""), "a");
+  assertEquals(wrap("\u4e2d\u6587", 1).filter((l) => l !== "").length >= 2, true);
+});
+
+proves(["0002-guide FR-010"], "Windows: CRLF text and a long path are wrapped as LF text, the path kept whole where it fits, at narrow widths", () => {
+  const path = "C:\\Users\\synthetic-user-01\\Documents\\works";
+  const crlf = wrap(`first line\r\nthen ${path} here\r\nlast`, 48, 2);
+  assert(crlf.every((l) => !l.includes("\r")));
+  assertEquals(crlf.filter((l) => l.includes(path)).length, 1);
+  for (const width of [20, 24, 30, 41, 48]) {
+    for (const l of wrap(`step\r\n${path}\r\n${UUID}`, width, 4)) assert(displayWidth(l) <= width, `${width}: ${l}`);
+  }
+  // The same text through the step renderer at the narrowest width (20 columns): every line fits.
+  const c = capsOf("plain", 20);
+  for (const l of renderStep({ id: "synthetic-step-07", kind: "done", summary: `Open ${path}`, say: `see\r\n${path}`, evidence: [UUID] }, c)) {
+    assert(displayWidth(l) <= 20);
+  }
+});
+
+proves(["0002-guide FR-015"], "a failure is printed once: a detail that only repeats the summary is not shown", () => {
+  const lines = renderResult(false, "the run failed", ["the run failed", "cause: synthetic-cause-01"], capsOf("plain", 60));
+  assertEquals(lines, ["[failed] the run failed", "  cause: synthetic-cause-01"]);
+});
