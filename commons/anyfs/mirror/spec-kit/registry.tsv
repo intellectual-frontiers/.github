@@ -1,0 +1,6 @@
+number	slug	state
+0001	mirror-layers	in force
+0002	mirror-governance	in force
+0003	mirror-logical	in force
+0004	mirror-store	in force
+0005	mirror-conformance	in force

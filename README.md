@@ -59,6 +59,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/anyfs-gdrive`](commons/anyfs/gdrive) | Foundation | The Google Drive backend of AnyFS | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-git`](commons/anyfs/git) | Foundation | A branch of a Git repository and a Git working tree, each kept as an AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-githost`](commons/anyfs/githost) | Foundation | The Git host backend of AnyFS | layers, extension | L1 | not released (unfinished) |
+| [`@intellectual-frontiers/anyfs-mirror`](commons/anyfs/mirror) | Foundation | A primary store and one or more secondaries, of any AnyFS backends, kept in step as one store | layers, extension | L1 | GitHub |
 | [`@intellectual-frontiers/anyfs-onedrive`](commons/anyfs/onedrive) | Foundation | The OneDrive backend of AnyFS | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-posix`](commons/anyfs/posix) | Foundation | The POSIX view of any AnyFS store | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/anyfs-query`](commons/anyfs/query) | Foundation | Read-only SQL over the files, places, revisions and content of any AnyFS store | layers, extension | L1 | not released (unfinished) |
