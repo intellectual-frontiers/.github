@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { arm, emptyState, isArmed } from "./arming.ts";
- * isArmed(arm(emptyState(), "athens", { token: "t", at: "2026-11-21T00:00:00Z" }), "athens"); // true
+ * isArmed(arm(emptyState(), "synthetic-server-02", { token: "t", at: "2026-11-21T00:00:00Z" }), "synthetic-server-02"); // true
  * ```
  *
  * @module

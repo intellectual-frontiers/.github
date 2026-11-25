@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { importListening } from "./listening.ts";
- * importListening("athens.txt", "athens", "tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:*\n").assets.length; // 1
+ * importListening("synthetic-server-02.txt", "synthetic-server-02", "tcp LISTEN 0 128 0.0.0.0:22 0.0.0.0:*\n").assets.length; // 1
  * ```
  *
  * @module

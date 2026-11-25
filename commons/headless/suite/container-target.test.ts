@@ -13,22 +13,22 @@ const ok: Output = { code: 0, success: true, signal: null, stdout: new TextEncod
 proves(["0005-reach-and-targets FR-011"], "exec, put and get are the runtime's exec and cp as argument vectors, input, environment and folder are passed as the runtime takes them, and a bad name or an empty command is a call not made", async () => {
   const calls: { argv: readonly string[]; opts: unknown }[] = [];
   const run = async (argv: readonly string[], opts?: unknown): Promise<Output> => (calls.push({ argv, opts }), ok);
-  const ex = containerExecutor("docker", "athens", { run });
+  const ex = containerExecutor("docker", "synthetic-server-02", { run });
   assertEquals((await ex.exec(["systemctl", "is-system-running"])).code, 0);
-  assertEquals(calls[0]?.argv, ["docker", "exec", "athens", "systemctl", "is-system-running"]);
+  assertEquals(calls[0]?.argv, ["docker", "exec", "synthetic-server-02", "systemctl", "is-system-running"]);
   await ex.exec(["sh", "-s"], { input: "echo hi", env: { A: "1" }, cwd: "/srv" });
-  assertEquals(calls[1]?.argv, ["docker", "exec", "-i", "-e", "A=1", "-w", "/srv", "athens", "sh", "-s"]);
+  assertEquals(calls[1]?.argv, ["docker", "exec", "-i", "-e", "A=1", "-w", "/srv", "synthetic-server-02", "sh", "-s"]);
   assertEquals(calls[1]?.opts, { input: "echo hi" }, "the input stays with the local call, the environment and the folder go to the runtime");
   await ex.put?.(["/tmp/a.txt", "/tmp/b.txt"], "/opt/x");
   assertEquals(calls.slice(2).map((c) => c.argv), [
-    ["docker", "exec", "athens", "mkdir", "-p", "/opt/x"],
-    ["docker", "cp", "/tmp/a.txt", "athens:/opt/x/a.txt"],
-    ["docker", "cp", "/tmp/b.txt", "athens:/opt/x/b.txt"],
+    ["docker", "exec", "synthetic-server-02", "mkdir", "-p", "/opt/x"],
+    ["docker", "cp", "/tmp/a.txt", "synthetic-server-02:/opt/x/a.txt"],
+    ["docker", "cp", "/tmp/b.txt", "synthetic-server-02:/opt/x/b.txt"],
   ]);
   await ex.get?.("/etc/hostname", "/tmp/h");
-  assertEquals(calls.at(-1)?.argv, ["docker", "cp", "athens:/etc/hostname", "/tmp/h"]);
-  assertEquals((await containerExecutor("podman", "sparta", { run }).exec(["id"])).code, 0);
-  assertEquals(calls.at(-1)?.argv, ["podman", "exec", "sparta", "id"]);
+  assertEquals(calls.at(-1)?.argv, ["docker", "cp", "synthetic-server-02:/etc/hostname", "/tmp/h"]);
+  assertEquals((await containerExecutor("podman", "synthetic-server-03", { run }).exec(["id"])).code, 0);
+  assertEquals(calls.at(-1)?.argv, ["podman", "exec", "synthetic-server-03", "id"]);
 
   const before = calls.length;
   for (const name of ["-v", "a b", "", "x;y"]) {
@@ -45,7 +45,7 @@ proves(["0005-reach-and-targets FR-011"], "exec, put and get are the runtime's e
   assertEquals((await ex.exec([])).code, 255, "a command with no word");
   assertEquals(calls.length, before, "no call was made for any of them");
 
-  const failing = containerExecutor("docker", "athens", { run: async (argv): Promise<Output> => (calls.push({ argv, opts: undefined }), { ...ok, code: 1, success: false }) });
+  const failing = containerExecutor("docker", "synthetic-server-02", { run: async (argv): Promise<Output> => (calls.push({ argv, opts: undefined }), { ...ok, code: 1, success: false }) });
   const stopped = calls.length;
   assertEquals((await failing.put?.(["/a"], "/b"))?.code, 1, "a failed mkdir stops the copy");
   assertEquals(calls.length, stopped + 1);

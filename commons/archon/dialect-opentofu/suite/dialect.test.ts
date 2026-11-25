@@ -17,7 +17,7 @@ function req(id: string, desired: unknown, more: Record<string, unknown> = {}): 
   return r.value;
 }
 const OPTIONS: OpenTofuOptions = {
-  providers: { aws: { source: "hashicorp/aws", version: "5.80.0", config: { region: "us-gov-west-1", profile: "fcr-gov" } } },
+  providers: { aws: { source: "hashicorp/aws", version: "5.80.0", config: { region: "us-gov-west-1", profile: "synthetic-network-01-gov" } } },
   stateDir: "/var/lib/archon/state/govcloud",
 };
 const SUBJECT = (() => {
@@ -30,7 +30,7 @@ function orderOf(requirements: readonly Requirement[]) {
   if (o.kind === "err") throw new Error(JSON.stringify(o.error));
   return o.value;
 }
-const BUCKET = req("bucket.logs", { provider: "aws", type: "aws_s3_bucket", name: "logs", settings: { bucket: "fcr-audit-logs", force_destroy: false, tags: { owner: "fcr" } } });
+const BUCKET = req("bucket.logs", { provider: "aws", type: "aws_s3_bucket", name: "logs", settings: { bucket: "synthetic-network-01-audit-logs", force_destroy: false, tags: { owner: "synthetic-network-01" } } });
 const POLICY = req("bucket.logs.public-block", { provider: "aws", type: "aws_s3_bucket_public_access_block", name: "logs", settings: { bucket: "${aws_s3_bucket.logs.id}", block_public_acls: true, block_public_policy: true } }, { dependsOn: ["bucket.logs"] });
 
 proves(["0002-opentofu-dialect FR-001"], "the data says what the dialect guarantees: the kind, the subject class, a faithful plan, nothing proven by a run of the tool, and that it destroys", () => {
@@ -54,7 +54,7 @@ proves(["0002-opentofu-dialect FR-002"], "the options are refused with every rea
   for (const word of ["local name", "source is namespace/name", "version is exact", "client_secret is a credential", "looks like a secret", "stateDir is an absolute path", "never committed", "remote one", "token is a credential"]) assert(bad.some((m) => m.includes(word)), `${word} in ${bad.join(" | ")}`);
   assert(optionProblems({ ...OPTIONS, stateDir: "/srv/repo/.archon/state" }).some((m) => m.includes("never committed")));
   assert(optionProblems({ ...OPTIONS, stateDir: "/srv/../etc" }).some((m) => m.includes("no ..")));
-  assertEquals(optionProblems({ ...OPTIONS, backend: { type: "s3", config: { bucket: "fcr-tfstate", key: "govcloud.tfstate", region: "us-gov-west-1", encrypt: true } } }), []);
+  assertEquals(optionProblems({ ...OPTIONS, backend: { type: "s3", config: { bucket: "synthetic-network-01-tfstate", key: "govcloud.tfstate", region: "us-gov-west-1", encrypt: true } } }), []);
   const order = orderOf([BUCKET]);
   const r = await opentofu({ ...OPTIONS, stateDir: "relative" }).render(order, planOrder(order, new Map()));
   assert(r.kind === "err" && r.error.some((m) => m.includes("absolute")), "a dialect made with bad options renders nothing");
@@ -92,11 +92,11 @@ proves(["0002-opentofu-dialect FR-004"], "a secret, a reference to a secret, a c
   refused({ nested: { list: ["secret:vault/x"] } }, "settings.nested.list[0]");
   const key = "-----BEGIN" + " PRIVATE KEY-----\nabc\n-----END" + " PRIVATE KEY-----";
   refused({ policy: key }, "looks like a secret");
-  assert(settings({ bucket: "fcr", tags: { a: "b" }, versioning: [{ enabled: true }] }).kind === "ok");
+  assert(settings({ bucket: "synthetic-network-01", tags: { a: "b" }, versioning: [{ enabled: true }] }).kind === "ok");
 });
 
 proves(["0002-opentofu-dialect FR-005"], "the render is one generated file in OpenTofu's JSON syntax, the same every time, with exact versions, the provider's settings, the local state outside the repository, the resources and their dependencies, and nothing for a resource that is to be absent", async () => {
-  const order = orderOf([BUCKET, POLICY, req("bucket.old", { provider: "aws", type: "aws_s3_bucket", name: "old", settings: { bucket: "fcr-old" } }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" })]);
+  const order = orderOf([BUCKET, POLICY, req("bucket.old", { provider: "aws", type: "aws_s3_bucket", name: "old", settings: { bucket: "synthetic-network-01-old" } }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" })]);
   const plan = planOrder(order, new Map());
   const a = await opentofu(OPTIONS).render(order, plan);
   const b = await opentofu(OPTIONS).render(order, plan);
@@ -109,14 +109,14 @@ proves(["0002-opentofu-dialect FR-005"], "the render is one generated file in Op
   assertEquals(doc["terraform"]["required_version"], "= 1.9.0");
   assertEquals(doc["terraform"]["required_providers"], { aws: { source: "hashicorp/aws", version: "= 5.80.0" } });
   assertEquals(doc["terraform"]["backend"], { local: { path: "/var/lib/archon/state/govcloud/terraform.tfstate" } });
-  assertEquals(doc["provider"], { aws: [{ profile: "fcr-gov", region: "us-gov-west-1" }] });
+  assertEquals(doc["provider"], { aws: [{ profile: "synthetic-network-01-gov", region: "us-gov-west-1" }] });
   assertEquals(Object.keys(doc["resource"]), ["aws_s3_bucket", "aws_s3_bucket_public_access_block"]);
   assertEquals(Object.keys(doc["resource"]["aws_s3_bucket"]), ["logs"], "the bucket that is to be absent is not declared, so OpenTofu removes it");
   assertEquals(doc["resource"]["aws_s3_bucket_public_access_block"]["logs"]["depends_on"], ["aws_s3_bucket.logs"]);
-  assertEquals(doc["resource"]["aws_s3_bucket"]["logs"]["tags"], { owner: "fcr" });
+  assertEquals(doc["resource"]["aws_s3_bucket"]["logs"]["tags"], { owner: "synthetic-network-01" });
   for (const bad of ["PRIVATE KEY", "AKIA", "secret:"]) assert(!text.includes(bad), bad);
-  const remote = await opentofu({ ...OPTIONS, backend: { type: "s3", config: { bucket: "fcr-tfstate", key: "gov.tfstate", region: "us-gov-west-1" } } }).render(order, plan);
-  assert(remote.kind === "ok" && JSON.parse(remote.value.files.get("opentofu/main.tf.json") ?? "{}").terraform.backend.s3.bucket === "fcr-tfstate");
+  const remote = await opentofu({ ...OPTIONS, backend: { type: "s3", config: { bucket: "synthetic-network-01-tfstate", key: "gov.tfstate", region: "us-gov-west-1" } } }).render(order, plan);
+  assert(remote.kind === "ok" && JSON.parse(remote.value.files.get("opentofu/main.tf.json") ?? "{}").terraform.backend.s3.bucket === "synthetic-network-01-tfstate");
   const empty = configurationOf([], OPTIONS);
   assertEquals(Object.keys(empty), ["//", "terraform"], "no provider and no resource where nothing is declared");
 });
@@ -152,7 +152,7 @@ proves(["0002-opentofu-dialect FR-006"], "the steps are none where nothing chang
 const SHOW = JSON.stringify({
   format_version: "1.2",
   resource_changes: [
-    { address: "aws_s3_bucket.logs", type: "aws_s3_bucket", name: "logs", change: { actions: ["create"], after: { bucket: "fcr-audit-logs", secret_thing: "hunter2-made-up" } } },
+    { address: "aws_s3_bucket.logs", type: "aws_s3_bucket", name: "logs", change: { actions: ["create"], after: { bucket: "synthetic-network-01-audit-logs", secret_thing: "hunter2-made-up" } } },
     { address: "aws_s3_bucket_public_access_block.logs", change: { actions: ["create"] } },
     { address: "aws_s3_bucket.old", change: { actions: ["delete"] } },
     { address: "aws_kms_key.main", change: { actions: ["no-op"] } },

@@ -9,8 +9,8 @@
  * import { memoryStore } from "@intellectual-frontiers/anyfs/memory";
  * import { posix } from "./posix.ts";
  * const view = posix(memoryStore({ name: "scratch" }));
- * await view.writeFile("/fleet/olympia.json", new TextEncoder().encode("{}"));
- * const listing = await view.readdir("/fleet"); // [{ name: "olympia.json", type: "file", size: 2, ... }]
+ * await view.writeFile("/fleet/synthetic-server-01.json", new TextEncoder().encode("{}"));
+ * const listing = await view.readdir("/fleet"); // [{ name: "synthetic-server-01.json", type: "file", size: 2, ... }]
  * ```
  *
  * @module

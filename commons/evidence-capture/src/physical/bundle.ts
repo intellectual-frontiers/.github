@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { sealPayload } from "./bundle.ts";
- * sealPayload({ fleet: "fcr", branch: "evidence", seq: 3, head: "ab".repeat(32), at: "2026-12-01T10:00:00Z" }).includes("opsfolio-seal/1"); // true
+ * sealPayload({ fleet: "synthetic-network-01", branch: "evidence", seq: 3, head: "ab".repeat(32), at: "2026-12-01T10:00:00Z" }).includes("opsfolio-seal/1"); // true
  * ```
  *
  * @module

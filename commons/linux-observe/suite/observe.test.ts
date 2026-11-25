@@ -94,7 +94,7 @@ const reason = await runtimeUsable("docker");
 
 proves(["0003-linux-observe-observe FR-002"], "on a real machine: what is made as declared is observed equal to what is declared, what differs is observed as it is, and what is missing has no entry", async (t) => {
   if (reason !== undefined) return t.skip(reason);
-  const spec = readMachineSpec({ name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["git"] });
+  const spec = readMachineSpec({ name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["git"] });
   assert(spec.kind === "ok");
   const started = await startMachine(spec.value);
   assert(started.kind === "ok", started.kind === "err" ? started.error : "");

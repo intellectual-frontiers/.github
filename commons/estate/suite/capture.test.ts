@@ -18,21 +18,21 @@ proves(["0004-estate-capture FR-001"], "no input gives the defaults, a left out 
   assertEquals(p, { kind: "ok", value: DEFAULT_CAPTURE_POLICY });
   assertEquals(DEFAULT_CAPTURE_POLICY.cadence, { managed: "PT15M", adopted: "P1D", perRole: {}, perAsset: {} });
   assertEquals([DEFAULT_CAPTURE_POLICY.branch, DEFAULT_CAPTURE_POLICY.collector.runsOn, DEFAULT_CAPTURE_POLICY.push, DEFAULT_CAPTURE_POLICY.sealing.required], ["evidence", "controller", { mode: "never", remote: "origin", every: null }, "on-export"]);
-  const some = defineCapturePolicy({ push: { mode: "after-commit" }, cadence: { perAsset: { olympia: "PT5M" } } });
-  assert(some.kind === "ok" && some.value.push.mode === "after-commit" && some.value.push.remote === "origin" && some.value.cadence.managed === "PT15M" && some.value.cadence.perAsset["olympia"] === "PT5M");
+  const some = defineCapturePolicy({ push: { mode: "after-commit" }, cadence: { perAsset: { "synthetic-server-01": "PT5M" } } });
+  assert(some.kind === "ok" && some.value.push.mode === "after-commit" && some.value.push.remote === "origin" && some.value.cadence.managed === "PT15M" && some.value.cadence.perAsset["synthetic-server-01"] === "PT5M");
   assert(refused({ branch: "main", cadence: { managed: "soon" }, push: { mode: "every" } }).length >= 3, "every reason together");
 });
 
 proves(["0004-estate-capture FR-002"], "the branch is a name of a branch that is not the tenant's own", () => {
   for (const bad of ["main", "master", "HEAD", "trunk", "develop"]) assert(refused({ branch: bad })[0]?.includes("branch of its own") === true, bad);
   for (const bad of ["", "a b", "x..y", "-x", "x.lock", "x//y"]) assertEquals(defineCapturePolicy({ branch: bad }).kind, "err", JSON.stringify(bad));
-  for (const good of ["evidence", "ops/evidence", "evidence-fcr"]) assertEquals(defineCapturePolicy({ branch: good }).kind, "ok", good);
+  for (const good of ["evidence", "ops/evidence", "evidence-synthetic-network-01"]) assertEquals(defineCapturePolicy({ branch: good }).kind, "ok", good);
 });
 
 proves(["0004-estate-capture FR-003"], "the collector runs on the controller or on an asset", () => {
-  assertEquals(defineCapturePolicy({ collector: { runsOn: "olympia" } }).kind, "ok");
+  assertEquals(defineCapturePolicy({ collector: { runsOn: "synthetic-server-01" } }).kind, "ok");
   assertEquals(defineCapturePolicy({ collector: { runsOn: "controller" } }).kind, "ok");
-  assert(refused({ collector: { runsOn: "Olympia" } })[0]?.includes("controller or on an asset") === true);
+  assert(refused({ collector: { runsOn: "Synthetic-Server-01" } })[0]?.includes("controller or on an asset") === true);
 });
 
 proves(["0004-estate-capture FR-004"], "a cadence is a duration above zero and at most seven days, for each kind and each asset named, and the freshness window is twice the cadence capped at seven days", () => {
@@ -40,7 +40,7 @@ proves(["0004-estate-capture FR-004"], "a cadence is a duration above zero and a
   for (const bad of ["P8D", "PT0S", "soon", "P0D", ""]) assertEquals(defineCapturePolicy({ cadence: { adopted: bad } }).kind, "err", JSON.stringify(bad));
   assert(refused({ cadence: { adopted: "P8D" } })[0]?.includes("longer than seven days") === true);
   assert(refused({ cadence: { perAsset: { "Not An Asset": "PT5M" } } }).some((m) => m.includes("is not an asset")));
-  assert(refused({ cadence: { perAsset: { olympia: "P9D" } } })[0]?.includes("olympia") === true);
+  assert(refused({ cadence: { perAsset: { "synthetic-server-01": "P9D" } } })[0]?.includes("synthetic-server-01") === true);
   assertEquals([freshnessWindowMs(900_000), freshnessWindowMs(86_400_000), freshnessWindowMs(5 * 86_400_000), freshnessWindowMs(7 * 86_400_000)], [1_800_000, 172_800_000, 7 * 86_400_000, 7 * 86_400_000]);
 });
 
@@ -76,10 +76,10 @@ proves(["0004-estate-capture FR-007"], "a seal is never, with an export or due e
 });
 
 proves(["0004-estate-capture FR-008"], "the cadence of an asset is its own, else that of its state, and a discovered asset has none", () => {
-  const policy = defineCapturePolicy({ cadence: { perAsset: { olympia: "PT5M" } } });
+  const policy = defineCapturePolicy({ cadence: { perAsset: { "synthetic-server-01": "PT5M" } } });
   assert(policy.kind === "ok");
-  assertEquals(cadenceOf(policy.value, { id: "olympia", state: "managed" }), "PT5M");
-  assertEquals(cadenceOf(policy.value, { id: "athens", state: "managed" }), "PT15M");
-  assertEquals(cadenceOf(policy.value, { id: "sparta", state: "adopted" }), "P1D");
+  assertEquals(cadenceOf(policy.value, { id: "synthetic-server-01", state: "managed" }), "PT5M");
+  assertEquals(cadenceOf(policy.value, { id: "synthetic-server-02", state: "managed" }), "PT15M");
+  assertEquals(cadenceOf(policy.value, { id: "synthetic-server-03", state: "adopted" }), "P1D");
   assertEquals(cadenceOf(policy.value, { id: "printer", state: "discovered" }), undefined);
 });

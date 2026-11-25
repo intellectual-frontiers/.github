@@ -10,21 +10,21 @@ import { defineAsset, type Asset } from "../src/governance/mod.ts";
 import { checkInvariants, INVARIANT_COVERAGE } from "../src/logical/mod.ts";
 
 function adopted(): Asset {
-  const a = defineAsset({ id: "athens", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon" } });
+  const a = defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon" } });
   if (a.kind === "err") throw new Error(a.error.join("; "));
   return a.value;
 }
 
 proves(["0003-estate-logical FR-007"], "an observation with no source and a policy result with no control are violations, an asset with owners and sources is clean, and an unowned capability is one", () => {
   const asset = adopted();
-  const clean = checkInvariants({ assets: [asset], observations: [{ asset: "athens", observation: { at: "2026-12-01T00:00:00Z", source: "probe", state: {} } }], results: [{ asset: "athens", id: "disk-encryption", status: "pass", controls: ["CRY-05"] }] });
+  const clean = checkInvariants({ assets: [asset], observations: [{ asset: "synthetic-server-02", observation: { at: "2026-12-01T00:00:00Z", source: "probe", state: {} } }], results: [{ asset: "synthetic-server-02", id: "disk-encryption", status: "pass", controls: ["CRY-05"] }] });
   assertEquals(clean, []);
-  const bad = checkInvariants({ assets: [asset], observations: [{ asset: "athens", observation: { at: "2026-12-01T00:00:00Z", source: " ", state: {} } }], results: [{ asset: "athens", id: "disk-encryption", status: "pass", controls: [] }] });
+  const bad = checkInvariants({ assets: [asset], observations: [{ asset: "synthetic-server-02", observation: { at: "2026-12-01T00:00:00Z", source: " ", state: {} } }], results: [{ asset: "synthetic-server-02", id: "disk-encryption", status: "pass", controls: [] }] });
   assertEquals(bad.map((v) => v.invariant), ["NoEvidenceWithoutAttribution", "NoComplianceWithoutTraceability"]);
-  assertEquals(bad.map((v) => v.subject), ["athens", "athens disk-encryption"]);
+  assertEquals(bad.map((v) => v.subject), ["synthetic-server-02", "synthetic-server-02 disk-encryption"]);
   const hand: Asset = { ...asset, capabilities: asset.capabilities.map((c) => (c.offered && c.capability === "observe" ? { ...c, owner: " " as typeof c.owner } : c)) };
   const unowned = checkInvariants({ assets: [hand], observations: [], results: [] });
-  assert(unowned.length === 1 && unowned[0]?.invariant === "NoUnownedResponsibilities" && unowned[0].subject === "athens observe");
+  assert(unowned.length === 1 && unowned[0]?.invariant === "NoUnownedResponsibilities" && unowned[0].subject === "synthetic-server-02 observe");
 });
 
 proves(["0003-estate-logical FR-007"], "every invariant of the ontology says whether an estate checks it, and none is missing or invented", () => {

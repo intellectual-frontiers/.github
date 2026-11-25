@@ -19,7 +19,7 @@
 
 ## Acceptance scenarios
 
-1. **Given** the text `Olympia`, **When** it is parsed as an asset id, **Then** it is refused naming the rule, per FR-001.
+1. **Given** the text `Synthetic-Server-01`, **When** it is parsed as an asset id, **Then** it is refused naming the rule, per FR-001.
 2. **Given** a discovered asset, **When** its capabilities are read, **Then** none is offered and each carries the reason, per FR-002 and FR-004.
 3. **Given** an adopted asset that names an owner for `converge`, **When** it is defined, **Then** it is refused, per FR-005.
 4. **Given** a link to an asset that is not in the estate, **When** the estate is written, **Then** the compiler reports it, and `defineEstate` refuses it as data, per FR-006.

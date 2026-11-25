@@ -20,7 +20,7 @@ function req(id: string, kind: string, desired: unknown, more: Record<string, un
 }
 
 const SUBJECT = (() => {
-  const n = parseSubjectName("athens");
+  const n = parseSubjectName("synthetic-server-02");
   if (n.kind === "err") throw new Error(n.error);
   return { name: n.value, class: "machine" as const };
 })();
@@ -115,7 +115,7 @@ const reason = await runtimeUsable("docker");
 
 proves(["0002-ansible-dialect FR-006"], "on a disposable machine with the real ansible-core: check shows the change, apply makes it, a second apply changes nothing, drift is found again, and a removal is carried out", async (t) => {
   if (reason !== undefined) return t.skip(reason);
-  const spec = readMachineSpec({ name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core"] });
+  const spec = readMachineSpec({ name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core"] });
   assert(spec.kind === "ok");
   const started = await startMachine(spec.value);
   assert(started.kind === "ok", started.kind === "err" ? started.error : "");

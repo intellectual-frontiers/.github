@@ -19,16 +19,16 @@ function asset(id: string, state: "discovered" | "adopted" | "managed", more: { 
 
 const NOW = "2026-12-01T00:00:00Z";
 const DATA: EstateData = {
-  assets: [asset("athens", "managed"), asset("sparta", "managed", { origin: "paired" }), asset("corinth", "adopted", { origin: "paired" }), asset("printer", "discovered")],
-  declared: { athens: { platform: { family: "debian", distro: "ubuntu", release: "26.04", arch: "x86_64" }, timezone: "America/New_York", tags: ["db", "prod"], adminPassword: "hunter2" }, sparta: { platform: "not an object" } },
-  observations: [{ asset: "athens", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: { os: { family: "ubuntu", version: "26.04" }, apiToken: "ghp" + "_abcdefghijklmnopqrstuvwxyz0123456789ABCD", ports: [22, 5432] } } }],
-  results: [{ asset: "athens", id: "ssh-root-login", status: "fail", controls: ["AC-6", "IA-2"] }, { asset: "athens", id: "disk-encryption", status: "pass", controls: ["SC-28"] }],
-  acceptances: { athens: [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
-  truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
+  assets: [asset("synthetic-server-02", "managed"), asset("synthetic-server-03", "managed", { origin: "paired" }), asset("synthetic-server-04", "adopted", { origin: "paired" }), asset("printer", "discovered")],
+  declared: { "synthetic-server-02": { platform: { family: "debian", distro: "ubuntu", release: "26.04", arch: "x86_64" }, timezone: "America/New_York", tags: ["db", "prod"], adminPassword: "hunter2" }, "synthetic-server-03": { platform: "not an object" } },
+  observations: [{ asset: "synthetic-server-02", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: { os: { family: "ubuntu", version: "26.04" }, apiToken: "ghp" + "_abcdefghijklmnopqrstuvwxyz0123456789ABCD", ports: [22, 5432] } } }],
+  results: [{ asset: "synthetic-server-02", id: "ssh-root-login", status: "fail", controls: ["AC-6", "IA-2"] }, { asset: "synthetic-server-02", id: "disk-encryption", status: "pass", controls: ["SC-28"] }],
+  acceptances: { "synthetic-server-02": [{ policy: "ssh-root-login", reason: "a break-glass account, reviewed quarterly", by: "Ada", until: "2027-01-15" }] },
+  truths: [{ asset: "synthetic-server-02", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }],
   violations: [{ invariant: "observed-asset-is-declared" as never, subject: "printer", message: "observed and never declared" }],
-  changes: [{ commit: "a1", at: "2026-11-30T10:00:00Z", author: "Ada", subject: "172: take sparta over", refs: "#217", signed: true }, { commit: "b2", at: "2026-11-29T10:00:00Z", author: "Bob", subject: "tweak", refs: "", signed: false }],
-  approvals: [{ asset: "sparta", kind: "manage", by: "Ada", planHash: `sha256:${"a".repeat(64)}`, at: "2026-11-30T10:00:00Z" }],
-  fleets: { athens: "fcr", sparta: "fcr", corinth: "if" },
+  changes: [{ commit: "a1", at: "2026-11-30T10:00:00Z", author: "Ada", subject: "172: take synthetic-server-03 over", refs: "#217", signed: true }, { commit: "b2", at: "2026-11-29T10:00:00Z", author: "Bob", subject: "tweak", refs: "", signed: false }],
+  approvals: [{ asset: "synthetic-server-03", kind: "manage", by: "Ada", planHash: `sha256:${"a".repeat(64)}`, at: "2026-11-30T10:00:00Z" }],
+  fleets: { "synthetic-server-02": "synthetic-network-01", "synthetic-server-03": "synthetic-network-01", "synthetic-server-04": "if" },
   now: NOW,
 };
 
@@ -54,18 +54,18 @@ proves(["0002-estate-query-relations FR-001", "0002-estate-query-relations FR-00
 });
 
 proves(["0002-estate-query-relations FR-002"], "asset and capability say what the estate library says, an inherited asset has no provision and a discovered one has no install, and the platform is read where it is declared", () => {
-  assertEquals(rows("select id, fleet, state, origin, install from asset order by id"), [["athens", "fcr", "managed", "provisioned", "provisioned"], ["corinth", "if", "adopted", "paired", "inherited"], ["printer", "", "discovered", "", ""], ["sparta", "fcr", "managed", "paired", "inherited"]]);
-  assertEquals(rows("select asset, offered, reason from capability where capability = 'provision' and asset in ('athens','sparta') order by asset").map((r) => [r[0], r[1], String(r[2]).includes("installed by someone else")]), [["athens", true, false], ["sparta", false, true]]);
-  assertEquals(rows("select count(*) from capability where asset = 'athens' and offered"), [[10]]);
-  assertEquals(rows("select asset, family, distro, release, arch, ansible from platform"), [["athens", "debian", "ubuntu", "26.04", "x86_64", ""]]);
+  assertEquals(rows("select id, fleet, state, origin, install from asset order by id"), [["printer", "", "discovered", "", ""], ["synthetic-server-02", "synthetic-network-01", "managed", "provisioned", "provisioned"], ["synthetic-server-03", "synthetic-network-01", "managed", "paired", "inherited"], ["synthetic-server-04", "if", "adopted", "paired", "inherited"]]);
+  assertEquals(rows("select asset, offered, reason from capability where capability = 'provision' and asset in ('synthetic-server-02','synthetic-server-03') order by asset").map((r) => [r[0], r[1], String(r[2]).includes("installed by someone else")]), [["synthetic-server-02", true, false], ["synthetic-server-03", false, true]]);
+  assertEquals(rows("select count(*) from capability where asset = 'synthetic-server-02' and offered"), [[10]]);
+  assertEquals(rows("select asset, family, distro, release, arch, ansible from platform"), [["synthetic-server-02", "debian", "ubuntu", "26.04", "x86_64", ""]]);
   for (const a of DATA.assets) assertEquals(rows("select install from asset where id = ?", [String(a.id)])[0]?.[0], a.state === "discovered" ? "" : installOf(a));
 });
 
 proves(["0002-estate-query-relations FR-004"], "declared and observed are one row for each leaf, with a dotted path, and a value that looks like a secret is replaced, by what it is or by the name of its key", () => {
-  const observed = rows("select path, value from observed where asset = 'athens' order by path");
+  const observed = rows("select path, value from observed where asset = 'synthetic-server-02' order by path");
   assertEquals(observed.map((r) => r[0]), ["apiToken", "os.family", "os.version", "ports.0", "ports.1"]);
   assertEquals(Object.fromEntries(observed.map((r) => [r[0], r[1]])), { apiToken: "[redacted: looks like a secret]", "os.family": "ubuntu", "os.version": "26.04", "ports.0": "22", "ports.1": "5432" });
-  const declared = Object.fromEntries(rows("select path, value from declared where asset = 'athens'").map((r) => [r[0], r[1]]));
+  const declared = Object.fromEntries(rows("select path, value from declared where asset = 'synthetic-server-02'").map((r) => [r[0], r[1]]));
   assertEquals(declared["adminPassword"], "[redacted: looks like a secret]");
   assertEquals(declared["timezone"], "America/New_York");
   assertEquals(declared["tags.1"], "prod");
@@ -76,11 +76,11 @@ proves(["0002-estate-query-relations FR-004"], "declared and observed are one ro
 proves(["0002-estate-query-relations FR-003"], "the policies are judged with the risks accepted, the controls and the risks and violations and truths are given, and an estate with nothing observed has no policy rows", () => {
   assertEquals(rows("select policy, status from policy_result order by policy"), [["disk-encryption", "pass"], ["ssh-root-login", "accepted"]]);
   assertEquals(rows("select control from policy_control where policy = 'ssh-root-login' order by control"), [["AC-6"], ["IA-2"]]);
-  assertEquals(rows("select asset, policy, accepted_by, until from risk"), [["athens", "ssh-root-login", "Ada", "2027-01-15"]]);
+  assertEquals(rows("select asset, policy, accepted_by, until from risk"), [["synthetic-server-02", "ssh-root-login", "Ada", "2027-01-15"]]);
   assertEquals(rows("select subject from violation"), [["printer"]]);
   assertEquals(rows("select commit, signed from change where not signed"), [["b2", false]]);
-  assertEquals(rows("select a.asset, a.approved_by, c.refs from approval a join change c on c.at = a.at"), [["sparta", "Ada", "#217"]]);
-  assertEquals(rows("select asset, currency, alignment, agrees from truth"), [["athens", "fresh", "aligned", true]]);
+  assertEquals(rows("select a.asset, a.approved_by, c.refs from approval a join change c on c.at = a.at"), [["synthetic-server-03", "Ada", "#217"]]);
+  assertEquals(rows("select asset, currency, alignment, agrees from truth"), [["synthetic-server-02", "fresh", "aligned", true]]);
   const expired = rows("select status from policy_result where policy = 'ssh-root-login'", [], { ...DATA, now: "2027-02-01T00:00:00Z" });
   assertEquals(expired, [["fail"]], "an acceptance that has ended is a failure again");
   assertEquals(rows("select * from policy_result", [], { assets: DATA.assets, now: NOW }), []);
@@ -109,10 +109,10 @@ proves(["0003-estate-query-run FR-001"], "a text is answered only where it is on
 
 proves(["0003-estate-query-run FR-002"], "a question is run with joins, grouping, a common table expression, a subquery and values given apart, and a value is never put into the text", () => {
   assertEquals(rows("select state, count(*) as n from asset group by state order by n desc, state"), [["managed", 2], ["adopted", 1], ["discovered", 1]]);
-  assertEquals(rows("select a.id, c.owner from asset a join capability c on c.asset = a.id where c.capability = 'converge' and a.state = 'managed' order by a.id"), [["athens", "opsfolio"], ["sparta", "opsfolio"]]);
-  assertEquals(rows("with inherited as (select id from asset where install = 'inherited') select id from inherited order by id"), [["corinth"], ["sparta"]]);
-  assertEquals(rows("select id from asset where id not in (select asset from observation) order by id"), [["corinth"], ["printer"], ["sparta"]]);
-  assertEquals(rows("select id from asset where state = ? and origin = $2", ["managed", "paired"]), [["sparta"]]);
+  assertEquals(rows("select a.id, c.owner from asset a join capability c on c.asset = a.id where c.capability = 'converge' and a.state = 'managed' order by a.id"), [["synthetic-server-02", "opsfolio"], ["synthetic-server-03", "opsfolio"]]);
+  assertEquals(rows("with inherited as (select id from asset where install = 'inherited') select id from inherited order by id"), [["synthetic-server-03"], ["synthetic-server-04"]]);
+  assertEquals(rows("select id from asset where id not in (select asset from observation) order by id"), [["printer"], ["synthetic-server-03"], ["synthetic-server-04"]]);
+  assertEquals(rows("select id from asset where state = ? and origin = $2", ["managed", "paired"]), [["synthetic-server-03"]]);
   assertEquals(rows("select id from asset where id = ?", ["x' or '1'='1"]), [], "a value is a value");
 });
 
@@ -122,7 +122,7 @@ proves(["0003-estate-query-run FR-003"], "a statement larger than allowed is ref
   assert(r.kind === "err" && r.error.kind === "budget" && r.error.message.includes("ask for fewer"), JSON.stringify(r));
   assertEquals(small.query("select id from asset limit 3").kind, "ok");
   const tiny = openEstateQuery(DATA, { maxNodes: 5 });
-  const t = tiny.query("select id, kind, state, origin from asset where id = 'athens' or id = 'sparta' or id = 'corinth'");
+  const t = tiny.query("select id, kind, state, origin from asset where id = 'synthetic-server-02' or id = 'synthetic-server-03' or id = 'synthetic-server-04'");
   assert(t.kind === "err" && t.error.kind === "refused");
 });
 
@@ -139,7 +139,7 @@ proves(["0002-estate-query-relations FR-006"], "the estate of a snapshot of a fl
   const snapshot = { assets: DATA.assets, declared: DATA.declared ?? {}, observations: DATA.observations ?? [], results: DATA.results ?? [], acceptances: DATA.acceptances ?? {}, manifest: { store: "x" }, findings: [], stable: true };
   const data = fromSnapshot(snapshot, NOW, { truths: DATA.truths ?? [], violations: DATA.violations ?? [] });
   assertEquals(rows("select policy, status from policy_result order by policy", [], data), rows("select policy, status from policy_result order by policy"));
-  assertEquals(rows("select asset, currency from truth", [], data), [["athens", "fresh"]]);
+  assertEquals(rows("select asset, currency from truth", [], data), [["synthetic-server-02", "fresh"]]);
   assertEquals(rows("select count(*) from truth", [], fromSnapshot(snapshot, NOW)), [[0]], "no truth where nothing was assessed");
 });
 
@@ -152,14 +152,14 @@ function typed(id: string, kind: string, attributes: Record<string, string | num
 proves(["0002-estate-query-relations FR-007"], "attribute, endpoint, link and service give the typed assets, the links and the services catalog, and a question joins an endpoint to its service and to what exposes it", () => {
   const data: EstateData = {
     assets: [
-      asset("athens", "managed"),
+      asset("synthetic-server-02", "managed"),
       typed("portal", "application", { tier: "web", handles: ["cui", "fci"] }),
       typed("portal-https", "endpoint", { scheme: "https", host: "portal.example.test", exposure: "internet", authentication: "oauth" }),
       typed("db-direct", "endpoint", { scheme: "tcp", host: "10.0.0.5", service: "postgres", exposure: "internet", authentication: "unknown" }),
       typed("legacy-web", "endpoint", { scheme: "http", host: "old.example.test", port: 8080, exposure: "internet" }),
       typed("ftp-box", "endpoint", { scheme: "tcp", host: "10.0.0.9", service: "ftp", exposure: "partner" }),
     ],
-    links: [{ from: "athens", to: "portal-https", kind: "exposes" }, { from: "athens", to: "db-direct", kind: "exposes" }, { from: "portal", to: "athens", kind: "runs-on" }],
+    links: [{ from: "synthetic-server-02", to: "portal-https", kind: "exposes" }, { from: "synthetic-server-02", to: "db-direct", kind: "exposes" }, { from: "portal", to: "synthetic-server-02", kind: "runs-on" }],
     now: NOW,
   };
   assertEquals(rows("select asset, name, value from attribute where asset = 'portal' order by value", [], data), [["portal", "handles", "cui"], ["portal", "handles", "fci"], ["portal", "tier", "web"]]);
@@ -174,6 +174,6 @@ proves(["0002-estate-query-relations FR-007"], "attribute, endpoint, link and se
   assertEquals(rows("select today, in_30_days, in_90_days from clock", [], data), [["2026-12-01", "2026-12-31", "2027-03-01"]]);
   // what a pen test scope or a passive check asks: the endpoints open to the internet that carry data or speak in the clear, and what exposes them
   const exposed = rows("select e.asset, l.from_asset from endpoint e left join link l on l.to_asset = e.asset and l.kind = 'exposes' where e.exposure = 'internet' and (e.class = 'data' or e.cleartext) order by e.asset", [], data);
-  assertEquals(exposed, [["db-direct", "athens"], ["legacy-web", null]]);
+  assertEquals(exposed, [["db-direct", "synthetic-server-02"], ["legacy-web", null]]);
   assertEquals(rows("select count(*) from endpoint", [], { assets: [], now: NOW }), [[0]]);
 });

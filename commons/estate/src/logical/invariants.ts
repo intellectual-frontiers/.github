@@ -10,7 +10,7 @@
  * @example
  * ```ts
  * import { checkInvariants } from "./invariants.ts";
- * checkInvariants({ assets: [], observations: [], results: [{ asset: "athens", id: "disk-encryption", status: "pass", controls: [] }] })[0]?.invariant; // "NoComplianceWithoutTraceability"
+ * checkInvariants({ assets: [], observations: [], results: [{ asset: "synthetic-server-02", id: "disk-encryption", status: "pass", controls: [] }] })[0]?.invariant; // "NoComplianceWithoutTraceability"
  * ```
  *
  * @module

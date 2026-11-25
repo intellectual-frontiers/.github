@@ -29,7 +29,7 @@ async function withJournal<T>(f: (store: GitRefStore, dir: string, states: { tex
     const store = gitRefStore({ repo: dir, branch: "evidence", identity: { name: "collector", email: "collector@localhost" } });
     const states = { text: '{"firewall":"off"}\n' };
     const run = async (now: string) => {
-      const r = await collect({ store, policy, assets: [{ id: "sparta", state: "managed" }, { id: "athens", state: "managed" }], observe: async (a) => ({ kind: "ok", value: { stateText: a.id === "sparta" ? states.text : '{"x":1}\n' } }), now, runtime: path.join(dir, ".git", "opsfolio-evidence") });
+      const r = await collect({ store, policy, assets: [{ id: "synthetic-server-03", state: "managed" }, { id: "synthetic-server-02", state: "managed" }], observe: async (a) => ({ kind: "ok", value: { stateText: a.id === "synthetic-server-03" ? states.text : '{"x":1}\n' } }), now, runtime: path.join(dir, ".git", "opsfolio-evidence") });
       assert(r.kind === "ok", r.kind === "err" ? r.error : "");
     };
     await run("2026-12-01T10:00:00Z");
@@ -55,9 +55,9 @@ proves(["0004-evidence-capture-seal FR-001", "0004-evidence-capture-seal FR-002"
     assert(status.kind === "ok");
     assertEquals([status.value.seals.map((s) => [s.seq, s.ok]), status.value.lastSealedSeq, status.value.unsealed], [[[n, true]], n, 0]);
     // entries after the seal are counted
-    const more = await collect({ store, policy, assets: [{ id: "sparta", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: '{"firewall":"off"}\n' } }), now: "2026-12-01T11:15:00Z", runtime: path.join(dir, ".git", "opsfolio-evidence") });
+    const more = await collect({ store, policy, assets: [{ id: "synthetic-server-03", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: '{"firewall":"off"}\n' } }), now: "2026-12-01T11:15:00Z", runtime: path.join(dir, ".git", "opsfolio-evidence") });
     assert(more.kind === "ok");
-    await collect({ store, policy: { ...policy, journal: { ...policy.journal, commit: { every: "PT1M" } } }, assets: [{ id: "sparta", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: '{"firewall":"off"}\n' } }), now: "2026-12-01T12:30:00Z", runtime: path.join(dir, ".git", "opsfolio-evidence") });
+    await collect({ store, policy: { ...policy, journal: { ...policy.journal, commit: { every: "PT1M" } } }, assets: [{ id: "synthetic-server-03", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: '{"firewall":"off"}\n' } }), now: "2026-12-01T12:30:00Z", runtime: path.join(dir, ".git", "opsfolio-evidence") });
     const later = await sealStatus(store, [k.signer]);
     assert(later.kind === "ok" && later.value.unsealed >= 1, JSON.stringify(later));
     const wrong = await sealStatus(store, [other.signer]);
@@ -65,7 +65,7 @@ proves(["0004-evidence-capture-seal FR-001", "0004-evidence-capture-seal FR-002"
     // a changed journal
     const file = "journal/2026/12/01.jsonl";
     const day = new TextDecoder().decode(await store.read(file)).split("\n");
-    day[0] = (day[0] ?? "").replace("sparta", "athens");
+    day[0] = (day[0] ?? "").replace("synthetic-server-03", "synthetic-server-02");
     await store.commit([{ path: file, bytes: new TextEncoder().encode(day.join("\n")) }], "tamper");
     const broken = await sealStatus(store, [k.signer]);
     assert(broken.kind === "err" && broken.error.includes("does not hold"), JSON.stringify(broken));

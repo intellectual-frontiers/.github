@@ -11,7 +11,7 @@ import { AREAS, BASE_IMAGES, NOT_FAITHFUL } from "../src/governance/mod.ts";
 import { containerfile, readMachineSpec } from "../src/logical/mod.ts";
 import { runtimeUsable, startMachine } from "../src/physical/mod.ts";
 
-const GOOD = { name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: ["rsync", "curl"], timezone: "America/New_York" };
+const GOOD = { name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: ["rsync", "curl"], timezone: "America/New_York" };
 
 proves(["0002-lab-machine FR-001"], "every area has a statement of fidelity with its reason, and the areas a container does not stand in for are listed", () => {
   assertEquals(new Set(AREAS.map((a) => a.area)).size, 13);
@@ -23,10 +23,12 @@ proves(["0002-lab-machine FR-001"], "every area has a statement of fidelity with
 
 proves(["0002-lab-machine FR-002"], "a description is read only where it is well formed, and every reason it is not is given", () => {
   assertEquals(readMachineSpec(GOOD).kind, "ok");
-  const bad = readMachineSpec({ name: "Athens", image: "debian:12", users: [{ name: "root", sudo: true }, { name: "a", sudo: true }, { name: "a", sudo: false }], packages: ["ok", "bad name"], timezone: "somewhere" });
+  const bad = readMachineSpec({ name: "Synthetic-Server-02", image: "debian:12", users: [{ name: "root", sudo: true }, { name: "a", sudo: true }, { name: "a", sudo: false }], packages: ["ok", "bad name"], timezone: "somewhere" });
   assert(bad.kind === "err" && bad.error.length === 6, JSON.stringify(bad));
   assertEquals(readMachineSpec({ ...GOOD, users: [] }).kind, "err");
   assertEquals(readMachineSpec(null).kind, "err");
+  assertEquals(readMachineSpec({ ...GOOD, name: "synthetic-workstation-01" }).kind, "ok", "digits and hyphens are in a name");
+  assertEquals(readMachineSpec({ ...GOOD, name: "1synthetic" }).kind, "err", "a name starts with a letter");
   assertEquals(readMachineSpec({ ...GOOD, timezone: undefined }).kind, "ok");
 });
 

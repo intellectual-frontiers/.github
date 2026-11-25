@@ -38,7 +38,7 @@ async function withRig<T>(f: (r: Rig) => Promise<T>): Promise<T> {
   return fs.withTempDir(async (dir) => {
     await git(dir, "init", "-q", "-b", "main");
     const store = gitRefStore({ repo: dir, branch: "evidence", identity: { name: "collector", email: "collector@localhost" } });
-    const states: Rig["states"] = { sparta: '{"firewall":"off"}\n' };
+    const states: Rig["states"] = { "synthetic-server-03": '{"firewall":"off"}\n' };
     const observe: Observer = async (asset) => {
       const s = states[asset.id];
       if (s === "hang") await new Promise((r) => setTimeout(r, 2000));
@@ -50,7 +50,7 @@ async function withRig<T>(f: (r: Rig) => Promise<T>): Promise<T> {
       store,
       states,
       async run(now, policy = policyOf(), more = {}) {
-        const r = await collect({ store, policy, assets: more.assets ?? [{ id: "sparta", state: "managed" }], observe, now, runtime: path.join(dir, ".git", "opsfolio-evidence"), ...(more.only === undefined ? {} : { only: more.only }), ...(more.limits === undefined ? {} : { limits: more.limits }) });
+        const r = await collect({ store, policy, assets: more.assets ?? [{ id: "synthetic-server-03", state: "managed" }], observe, now, runtime: path.join(dir, ".git", "opsfolio-evidence"), ...(more.only === undefined ? {} : { only: more.only }), ...(more.limits === undefined ? {} : { limits: more.limits }) });
         assert(r.kind === "ok", r.kind === "err" ? r.error : "");
         return r.value;
       },
@@ -65,8 +65,8 @@ proves(["0003-evidence-capture-collect FR-001", "0003-evidence-capture-collect F
   await withRig(async (r) => {
     const first = await r.run("2026-12-01T10:00:00Z");
     assertEquals([first.assets[0]?.outcome, first.assets[0]?.journaled, first.commit !== undefined, first.pending], ["changed", true, true, 0]);
-    assertEquals(text(await r.store.read("state/sparta.json")), '{"firewall":"off"}\n');
-    assertEquals(await git(r.dir, "log", "-1", "--format=%cI|%s", "evidence"), "2026-12-01T10:00:00+00:00|captured 2026-12-01T10:00:00Z: changed sparta; 1 entries");
+    assertEquals(text(await r.store.read("state/synthetic-server-03.json")), '{"firewall":"off"}\n');
+    assertEquals(await git(r.dir, "log", "-1", "--format=%cI|%s", "evidence"), "2026-12-01T10:00:00+00:00|captured 2026-12-01T10:00:00Z: changed synthetic-server-03; 1 entries");
     for (const [i, now] of ["2026-12-01T10:15:00Z", "2026-12-01T10:30:00Z", "2026-12-01T10:45:00Z"].entries()) {
       const run = await r.run(now);
       assertEquals([run.assets[0]?.outcome, run.assets[0]?.journaled, run.commit, run.pending], ["unchanged", true, undefined, i + 1], "no state commit, the entry waits");
@@ -77,17 +77,17 @@ proves(["0003-evidence-capture-collect FR-001", "0003-evidence-capture-collect F
     const batch = await r.run("2026-12-01T11:00:00Z");
     assert(batch.commit !== undefined && batch.pending === 0, "the batch interval of an hour has run");
     assertEquals(await count(r.dir), 2);
-    assertEquals((await r.store.history("state/sparta.json")).length, 1, "the state was committed once");
-    r.states["sparta"] = '{"firewall":"on"}\n';
+    assertEquals((await r.store.history("state/synthetic-server-03.json")).length, 1, "the state was committed once");
+    r.states["synthetic-server-03"] = '{"firewall":"on"}\n';
     const changed = await r.run("2026-12-01T11:15:00Z");
     assertEquals([changed.assets[0]?.outcome, changed.commit !== undefined], ["changed", true]);
-    assertEquals((await r.store.history("state/sparta.json")).map((h) => h.at), ["2026-12-01T11:15:00.000Z", "2026-12-01T10:00:00.000Z"]);
-    assertEquals(text(await r.store.read("state/sparta.json")), '{"firewall":"on"}\n');
+    assertEquals((await r.store.history("state/synthetic-server-03.json")).map((h) => h.at), ["2026-12-01T11:15:00.000Z", "2026-12-01T10:00:00.000Z"]);
+    assertEquals(text(await r.store.read("state/synthetic-server-03.json")), '{"firewall":"on"}\n');
     const journal = await readJournal(r.store);
     assert(journal.kind === "ok");
     assertEquals(journal.value.map((e) => e.type), ["capture.changed", "capture.unchanged", "capture.unchanged", "capture.unchanged", "capture.unchanged", "capture.changed"]);
     assertEquals(journal.value.map((e) => e.createdAt).filter((_, i) => i < 2), ["2026-12-01T10:00:00Z", "2026-12-01T10:15:00Z"]);
-    assert(journal.value.every((e) => e.subject === "sparta"));
+    assert(journal.value.every((e) => e.subject === "synthetic-server-03"));
     assertEquals(await git(r.dir, "status", "--porcelain=v1"), "", "the working tree is untouched");
   });
 }, skip);
@@ -104,18 +104,18 @@ proves(["0003-evidence-capture-collect FR-002"], "with a journal of changes and 
 proves(["0003-evidence-capture-collect FR-003"], "a look that fails is journaled as its kind and leaves the state kept as it was", async () => {
   await withRig(async (r) => {
     await r.run("2026-12-01T10:00:00Z");
-    const kept = text(await r.store.read("state/sparta.json"));
-    r.states["sparta"] = { kind: "unreachable", message: "connection refused" };
+    const kept = text(await r.store.read("state/synthetic-server-03.json"));
+    r.states["synthetic-server-03"] = { kind: "unreachable", message: "connection refused" };
     const a = await r.run("2026-12-01T10:15:00Z");
     assertEquals([a.assets[0]?.outcome, a.assets[0]?.journaled], ["unreachable", true]);
-    r.states["sparta"] = { kind: "refused", message: "only SELECT" };
+    r.states["synthetic-server-03"] = { kind: "refused", message: "only SELECT" };
     assertEquals((await r.run("2026-12-01T10:30:00Z")).assets[0]?.outcome, "refused");
-    r.states["sparta"] = { kind: "unreadable", message: "not facts" };
+    r.states["synthetic-server-03"] = { kind: "unreadable", message: "not facts" };
     assertEquals((await r.run("2026-12-01T10:45:00Z")).assets[0]?.outcome, "unreadable");
-    r.states["sparta"] = "hang";
+    r.states["synthetic-server-03"] = "hang";
     const slow = await r.run("2026-12-01T11:00:00Z", policyOf(), { limits: { concurrency: 1, perHostTimeoutMs: 100 } });
     assertEquals(slow.assets[0]?.outcome, "unreachable", "a look that takes too long");
-    assertEquals(text(await r.store.read("state/sparta.json")), kept, "the state is as it was");
+    assertEquals(text(await r.store.read("state/synthetic-server-03.json")), kept, "the state is as it was");
     const journal = await readJournal(r.store);
     assert(journal.kind === "ok");
     assertEquals(journal.value.map((e) => e.type), ["capture.changed", "capture.unreachable", "capture.refused", "capture.unreadable", "capture.unreachable"]);
@@ -124,14 +124,14 @@ proves(["0003-evidence-capture-collect FR-003"], "a look that fails is journaled
 
 proves(["0003-evidence-capture-collect FR-004"], "only the assets that are due are looked at, those told are looked at whether due or not, and the number at once is limited", async () => {
   await withRig(async (r) => {
-    r.states["athens"] = '{"x":1}\n';
-    const assets: Observed[] = [{ id: "sparta", state: "managed" }, { id: "athens", state: "adopted" }];
+    r.states["synthetic-server-02"] = '{"x":1}\n';
+    const assets: Observed[] = [{ id: "synthetic-server-03", state: "managed" }, { id: "synthetic-server-02", state: "adopted" }];
     const first = await r.run("2026-12-01T10:00:00Z", policyOf(), { assets });
-    assertEquals(first.assets.map((a) => [a.id, a.outcome]), [["athens", "changed"], ["sparta", "changed"]]);
+    assertEquals(first.assets.map((a) => [a.id, a.outcome]), [["synthetic-server-02", "changed"], ["synthetic-server-03", "changed"]]);
     const later = await r.run("2026-12-01T10:15:00Z", policyOf(), { assets });
-    assertEquals(later.assets.map((a) => [a.id, a.outcome]), [["athens", "not-due"], ["sparta", "unchanged"]], "an adopted asset is looked at once a day");
-    const told = await r.run("2026-12-01T10:16:00Z", policyOf(), { assets, only: ["athens"] });
-    assertEquals(told.assets.map((a) => [a.id, a.outcome]), [["athens", "unchanged"], ["sparta", "not-due"]]);
+    assertEquals(later.assets.map((a) => [a.id, a.outcome]), [["synthetic-server-02", "not-due"], ["synthetic-server-03", "unchanged"]], "an adopted asset is looked at once a day");
+    const told = await r.run("2026-12-01T10:16:00Z", policyOf(), { assets, only: ["synthetic-server-02"] });
+    assertEquals(told.assets.map((a) => [a.id, a.outcome]), [["synthetic-server-02", "unchanged"], ["synthetic-server-03", "not-due"]]);
     const none = await r.run("2026-12-01T10:17:00Z", policyOf(), { assets });
     assertEquals(none.assets.map((a) => a.outcome), ["not-due", "not-due"]);
     assertEquals(none.commit, undefined);
@@ -158,7 +158,7 @@ proves(["0003-evidence-capture-collect FR-005"], "a run does not wait for the lo
     const held = await acquireLock(path.join(runtime, "lock"), { wait: false, command: "another run" });
     assert(held !== undefined);
     try {
-      const blocked = await collect({ store: r.store, policy: policyOf(), assets: [{ id: "sparta", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: "{}\n" } }), now: "2026-12-01T10:00:00Z", runtime });
+      const blocked = await collect({ store: r.store, policy: policyOf(), assets: [{ id: "synthetic-server-03", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: "{}\n" } }), now: "2026-12-01T10:00:00Z", runtime });
       assertEquals(blocked, { kind: "err", error: "another collection is running" });
       assertEquals(await r.store.head(), undefined);
     } finally {
@@ -180,7 +180,7 @@ proves(["0003-evidence-capture-collect FR-006"], "the branch alone is pushed as 
       const never = await r.run("2026-12-01T10:00:00Z");
       assertEquals(never.pushed, "not-asked");
       assertEquals(await git(remote, "branch", "--list"), "");
-      r.states["sparta"] = '{"firewall":"on"}\n';
+      r.states["synthetic-server-03"] = '{"firewall":"on"}\n';
       const after = policyOf({ push: { mode: "after-commit" } });
       const pushed = await r.run("2026-12-01T10:15:00Z", after);
       assertEquals(pushed.pushed, "pushed");
@@ -196,7 +196,7 @@ proves(["0003-evidence-capture-collect FR-006"], "the branch alone is pushed as 
       await git(other, "commit", "-q", "-m", "intruder");
       await git(other, "push", "-q", "origin", "evidence");
       const theirs = await git(remote, "rev-parse", "evidence");
-      r.states["sparta"] = '{"firewall":"off"}\n';
+      r.states["synthetic-server-03"] = '{"firewall":"off"}\n';
       const failed = await r.run("2026-12-01T10:45:00Z", after);
       assertEquals([failed.pushed, failed.pending], ["failed", 1], "the failure waits as an entry");
       assertEquals(await git(remote, "rev-parse", "evidence"), theirs, "the remote is as it was");
@@ -229,9 +229,9 @@ proves(["0003-evidence-capture-collect FR-007"], "the journal is read back in or
     // tamper: change the second entry's subject on the branch
     const file = "journal/2026/12/01.jsonl";
     const day = text(await r.store.read(file)) ?? "";
-    const tampered = day.replace('"subject":"sparta"', '"subject":"athens"').replace('"subject":"athens"', '"subject":"athens"');
+    const tampered = day.replace('"subject":"synthetic-server-03"', '"subject":"synthetic-server-02"').replace('"subject":"synthetic-server-02"', '"subject":"synthetic-server-02"');
     const lines = day.split("\n");
-    lines[1] = (lines[1] ?? "").replace("sparta", "elsewhere");
+    lines[1] = (lines[1] ?? "").replace("synthetic-server-03", "elsewhere");
     await r.store.commit([{ path: file, bytes: new TextEncoder().encode(lines.join("\n")) }], "tamper");
     void tampered;
     const broken = await readJournal(r.store);

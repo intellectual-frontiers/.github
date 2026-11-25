@@ -30,13 +30,13 @@ const REQS = [
   req("pkg.git", "package", { name: "git" }),
 ];
 const OPTIONS: CloudInitOptions = {
-  fleet: "labfleet",
-  repository: { url: "https://git.example.test/labfleet.git", branch: "main", renderPath: "fleets/lab/render/athens/ansible" },
+  fleet: "synthetic-fleet-01",
+  repository: { url: "https://git.example.test/synthetic-fleet-01.git", branch: "main", renderPath: "fleets/lab/render/synthetic-server-02/ansible" },
   allowedSigners: `signer@example.test ${KEY}`,
-  base: "http://192.0.2.10:8080/install/athens/tok/",
+  base: "http://192.0.2.10:8080/install/synthetic-server-02/tok/",
 };
 const SUBJECT = (() => {
-  const n = parseSubjectName("athens");
+  const n = parseSubjectName("synthetic-server-02");
   if (n.kind === "err") throw new Error(n.error);
   return { name: n.value, class: "machine" as const };
 })();
@@ -57,7 +57,7 @@ proves(["0002-cloud-init-dialect FR-001"], "the data says what the dialect guara
 proves(["0002-cloud-init-dialect FR-002"], "the facts of an install are taken from the order, and every reason there are not enough is given", () => {
   const ok = installSpecOf(orderOf(REQS), OPTIONS);
   assert(ok.kind === "ok");
-  assertEquals([ok.value.hostname, ok.value.admin, ok.value.timezone, ok.value.locale, ok.value.keyboard, ok.value.packages], ["athens", { user: "adminer", realname: "Ada Admin", sshKeys: [KEY] }, "America/New_York", "en_US.UTF-8", "us", ["git"]]);
+  assertEquals([ok.value.hostname, ok.value.admin, ok.value.timezone, ok.value.locale, ok.value.keyboard, ok.value.packages], ["synthetic-server-02", { user: "adminer", realname: "Ada Admin", sshKeys: [KEY] }, "America/New_York", "en_US.UTF-8", "us", ["git"]]);
   const bad = installSpecOf(orderOf([REQS[0]!, req("fw.x", "firewall-rule", { port: 22 }), req("gone", "package", { name: "x" }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" })]), OPTIONS);
   assert(bad.kind === "err");
   const all = bad.error.join("\n");
@@ -80,7 +80,7 @@ proves(["0002-cloud-init-dialect FR-003", "0002-cloud-init-dialect FR-004"], "th
   for (const bad of ["PRIVATE KEY", "$6$", "$y$", "password: \"$"]) assert(!userData.includes(bad), bad);
   const doc = JSON.parse(userData.split("\n").filter((l) => !l.startsWith("#")).join("\n")) as { autoinstall: Record<string, any> };
   const ai = doc.autoinstall;
-  assertEquals(ai["identity"], { hostname: "athens", username: "adminer", realname: "Ada Admin", password: PASSWORD_PLACEHOLDER });
+  assertEquals(ai["identity"], { hostname: "synthetic-server-02", username: "adminer", realname: "Ada Admin", password: PASSWORD_PLACEHOLDER });
   assertEquals(ai["ssh"], { "install-server": true, "allow-pw": false, "authorized-keys": [KEY] });
   assertEquals(ai["storage"], { layout: { name: "lvm", match: { size: "largest" } } });
   assert(String(ai["early-commands"][0]).includes("guard.sh") && String(ai["early-commands"][0]).includes("poweroff"), "the guard runs first and fails closed");
@@ -89,7 +89,7 @@ proves(["0002-cloud-init-dialect FR-003", "0002-cloud-init-dialect FR-004"], "th
   assertEquals(ai["user-data"]["runcmd"][0], ["/usr/local/sbin/archon-converge"]);
   const paths = ai["user-data"]["write_files"].map((f: { path: string }) => f.path);
   assert(paths.includes("/etc/archon/allowed_signers") && paths.includes("/etc/systemd/system/archon-converge.timer"));
-  assertEquals(metaData({ hostname: "athens" }), "instance-id: archon-athens\nlocal-hostname: athens\n");
+  assertEquals(metaData({ hostname: "synthetic-server-02" }), "instance-id: archon-synthetic-server-02\nlocal-hostname: synthetic-server-02\n");
   const served = autoinstall(installSpecOf(order, OPTIONS).kind === "ok" ? (installSpecOf(order, OPTIONS) as { value: Parameters<typeof autoinstall>[0] }).value : (undefined as never), "$6$made$up");
   assert(served.includes('"password": "$6$made$up"') && !served.includes(PASSWORD_PLACEHOLDER), "the boot server puts the hash in when it serves the file");
 });
@@ -104,7 +104,7 @@ const reason = await runtimeUsable("docker");
 
 proves(["0002-cloud-init-dialect FR-006"], "on a disposable machine the converge script runs nothing from an unsigned tip and runs the playbook of a tip signed by a fleet signer", async (t) => {
   if (reason !== undefined) return t.skip(reason);
-  const spec = readMachineSpec({ name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core", "git", "openssh-client"] });
+  const spec = readMachineSpec({ name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core", "git", "openssh-client"] });
   assert(spec.kind === "ok");
   const started = await startMachine(spec.value);
   assert(started.kind === "ok", started.kind === "err" ? started.error : "");
@@ -124,7 +124,7 @@ proves(["0002-cloud-init-dialect FR-006"], "on a disposable machine the converge
     await ok(["mkdir", "-p", "/etc/archon", "/srv/origin/render"]);
     await ok(["tee", "/etc/archon/allowed_signers"], `signer@example.test ${pub}\n`);
     await ok(["tee", "/srv/origin/render/playbook.yml"], JSON.stringify([{ hosts: "all", gather_facts: false, tasks: [{ "ansible.builtin.copy": { dest: "/srv/proof", content: "converged\n" } }] }]));
-    await ok(["tee", "/srv/origin/render/inventory.yml"], JSON.stringify({ all: { hosts: { athens: { ansible_connection: "local", ansible_python_interpreter: "auto_silent" } } } }));
+    await ok(["tee", "/srv/origin/render/inventory.yml"], JSON.stringify({ all: { hosts: { "synthetic-server-02": { ansible_connection: "local", ansible_python_interpreter: "auto_silent" } } } }));
     await ok(["tee", "/srv/origin/render/ansible.cfg"], "[defaults]\nnocows = True\n");
     await ok(["tee", "/usr/local/sbin/archon-converge"], convergeScript({ repository: { url: "/srv/origin", branch: "main", renderPath: "render" }, base: "http://127.0.0.1:1/" }));
     await ok(["chmod", "755", "/usr/local/sbin/archon-converge"]);
@@ -169,6 +169,6 @@ proves(["0002-cloud-init-dialect FR-007"], "the facts that are not requirements 
   assertEquals(ai["proxy"], "http://proxy.example.test:3128");
   const files = ai["user-data"].write_files as { path: string; content: string }[];
   assert(files.find((f) => f.path === "/etc/archon/boot-events")?.content === `${OPTIONS.base}event\n`);
-  assert(files.find((f) => f.path === "/usr/local/sbin/archon-converge")?.content.includes("fleets/lab/render/athens/ansible"));
+  assert(files.find((f) => f.path === "/usr/local/sbin/archon-converge")?.content.includes("fleets/lab/render/synthetic-server-02/ansible"));
   assert(files.some((f) => f.path === "/etc/archon/proxy.env"));
 });

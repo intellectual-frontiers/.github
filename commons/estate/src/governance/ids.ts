@@ -6,8 +6,8 @@
  * @example
  * ```ts
  * import { parseAssetId } from "./ids.ts";
- * parseAssetId("olympia").kind; // "ok"
- * parseAssetId("Olympia").kind; // "err"
+ * parseAssetId("synthetic-server-01").kind; // "ok"
+ * parseAssetId("Synthetic-Server-01").kind; // "err"
  * ```
  *
  * @module

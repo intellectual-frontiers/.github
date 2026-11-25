@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { mediaTypeOf } from "./media.ts";
- * mediaTypeOf("fleet/olympia/asset.json"); // "application/json"
+ * mediaTypeOf("fleet/synthetic-server-01/asset.json"); // "application/json"
  * mediaTypeOf("README"); // undefined
  * ```
  *

@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { gatherLive } from "./live.ts";
- * // const { tables, status } = await gatherLive({ assets: ["athens"], tables: ["processes"], fetch, now: () => new Date().toISOString() });
+ * // const { tables, status } = await gatherLive({ assets: ["synthetic-server-02"], tables: ["processes"], fetch, now: () => new Date().toISOString() });
  * ```
  *
  * @module

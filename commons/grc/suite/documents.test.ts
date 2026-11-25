@@ -184,7 +184,7 @@ proves(["0004-grc-documents FR-007"], "the system security plan says what the ca
       model: "system-security-plan",
       system: {
         description: "The lab fleet.", sensitivity: "moderate", boundary: "Every machine of the fleet and nothing else.", profile: "https://example.test/profiles/moderate.json",
-        informationTypes: [{ title: "Technical data", description: "What the fleet holds." }], components: [{ name: "athens", type: "software", description: "A server." }], users: [{ title: "Administrator" }],
+        informationTypes: [{ title: "Technical data", description: "What the fleet holds." }], components: [{ name: "synthetic-server-02", type: "software", description: "A server." }], users: [{ title: "Administrator" }],
         responsibilities: { "a-1": "inherited", "b-1": "provider", "a-2": "customer" },
       },
     },
@@ -194,7 +194,7 @@ proves(["0004-grc-documents FR-007"], "the system security plan says what the ca
   assertEquals(ssp["import-profile"].href, "https://example.test/profiles/moderate.json");
   const sc = ssp["system-characteristics"];
   assertEquals([sc.description, sc["security-sensitivity-level"], sc["authorization-boundary"].description, sc["system-information"]["information-types"][0].title], ["The lab fleet.", "moderate", "Every machine of the fleet and nothing else.", "Technical data"]);
-  assertEquals(ssp["system-implementation"].components.map((c: { title: string }) => c.title), ["Q2 posture", "athens"]);
+  assertEquals(ssp["system-implementation"].components.map((c: { title: string }) => c.title), ["Q2 posture", "synthetic-server-02"]);
   assertEquals(ssp["system-implementation"].users[0].title, "Administrator");
   const by = (id: string) => ssp["control-implementation"]["implemented-requirements"].find((r: { "control-id": string }) => r["control-id"] === id)["by-components"][0];
   assert(by("a-1").inherited.length === 1 && by("b-1").satisfied.length === 1 && by("a-2").export.responsibilities.length === 1);

@@ -11,7 +11,7 @@ import { moveCapability, moveState, operationalTruth, unexpectedAssets, type Acc
 const ALL = { provision: "fleetctl", identity: "fleetctl", plan: "fleetctl", converge: "fleetctl", verify: "archon", observe: "archon", update: "fleetctl", access: "archon", backup: "fleetctl", retire: "fleetctl" } as const;
 
 function asset(state: "discovered" | "adopted" | "managed", owners: Record<string, string>): Asset {
-  const a = defineAsset({ id: "olympia", kind: "server", state, owners });
+  const a = defineAsset({ id: "synthetic-server-01", kind: "server", state, owners });
   if (a.kind === "err") throw new Error(a.error.join("; "));
   return a.value;
 }
@@ -24,7 +24,7 @@ proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adop
   assert(adopted.kind === "ok" && ownerOf(adopted.value, "observe") === "archon" && ownerOf(adopted.value, "verify") === "archon");
   const released = moveState(adopted.kind === "ok" ? adopted.value : discovered, "discovered");
   assert(released.kind === "ok" && released.value.capabilities.every((c) => !c.offered), "a released asset offers nothing");
-  const paired = defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const paired = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
   assert(paired.kind === "ok");
   const back = moveState(paired.value, "discovered");
   assert(back.kind === "ok" && back.value.origin === "paired", "where it came from is kept");
@@ -42,7 +42,7 @@ proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adop
 const HASH = `sha256:${"a".repeat(64)}`;
 
 proves(["0003-estate-logical FR-008"], "an adopted asset is taken over only with an approval and an owner for each capability that is new, keeps where it came from, is then inherited and does not offer provision, and cannot go back", () => {
-  const adopted = defineAsset({ id: "defiant", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const adopted = defineAsset({ id: "synthetic-workstation-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
   assert(adopted.kind === "ok");
   const { provision: _p, ...rest } = ALL;
   const noApproval = moveState(adopted.value, "managed", rest);
@@ -61,7 +61,7 @@ proves(["0003-estate-logical FR-008"], "an adopted asset is taken over only with
 
 proves(["0003-estate-logical FR-002"], "a capability moves to another system only with a passed acceptance test for this asset, this capability and that system", () => {
   const managed = asset("managed", ALL);
-  const record: AcceptanceRecord = { asset: "olympia", capability: "converge", system: "archon", test: "FCR-AT-06", passedAt: "2026-12-01T10:00:00Z" };
+  const record: AcceptanceRecord = { asset: "synthetic-server-01", capability: "converge", system: "archon", test: "synthetic-network-01-AT-06", passedAt: "2026-12-01T10:00:00Z" };
   const none = moveCapability(managed, "converge", "archon", undefined);
   assert(none.kind === "err" && none.error[0]?.includes("only when its acceptance test has passed") === true);
   for (const wrong of [{ ...record, asset: "other" }, { ...record, capability: "update" as const }, { ...record, system: "someone" }]) {
@@ -100,6 +100,6 @@ proves(["0003-estate-logical FR-003"], "operational truth tells what differs bet
 });
 
 proves(["0003-estate-logical FR-004"], "the assets seen that nobody declared, and the ones declared and never seen, are told in order", () => {
-  assertEquals(unexpectedAssets(["olympia", "defiant"], ["olympia", "printer", "cam"]), { unexpected: ["cam", "printer"], unseen: ["defiant"] });
+  assertEquals(unexpectedAssets(["synthetic-server-01", "synthetic-workstation-01"], ["synthetic-server-01", "printer", "cam"]), { unexpected: ["cam", "printer"], unseen: ["synthetic-workstation-01"] });
   assertEquals(unexpectedAssets([], []), { unexpected: [], unseen: [] });
 });

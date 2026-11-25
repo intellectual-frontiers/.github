@@ -73,9 +73,9 @@ proves(
         });
         assert(two.kind === "ok", "the second operator opens the same host");
 
-        for (const a of [adopted("olympia"), managed("athens"), adopted("sparta")])
+        for (const a of [adopted("synthetic-server-01"), managed("synthetic-server-02"), adopted("synthetic-server-03")])
           assert((await one.value.putAsset(a, expectAbsent)).kind === "ok");
-        assert((await one.value.declare("olympia", { os: "linux" }, expectAbsent)).kind === "ok");
+        assert((await one.value.declare("synthetic-server-01", { os: "linux" }, expectAbsent)).kind === "ok");
         for (const [m, state] of [
           [0, { os: "linux" }],
           [5, { os: "bsd" }],
@@ -83,7 +83,7 @@ proves(
           assert(
             (
               await one.value.recordObservation({
-                asset: "olympia",
+                asset: "synthetic-server-01",
                 at: at(m),
                 source: "probe",
                 state,
@@ -94,7 +94,7 @@ proves(
         }
         assert(
           (
-            await one.value.acceptRisk("olympia", {
+            await one.value.acceptRisk("synthetic-server-01", {
               policy: "disk-encryption",
               reason: "holds only open-source code",
               by: "an owner",
@@ -105,19 +105,19 @@ proves(
 
         // two operators over the real server: one wins, the other begins again with what the first wrote
         let calls = 0;
-        const raced = await two.value.updateAsset("sparta", async (current) => {
+        const raced = await two.value.updateAsset("synthetic-server-03", async (current) => {
           calls += 1;
           assert(current !== undefined);
           if (calls === 1) {
-            const other = await one.value.updateAsset("sparta", (c) => (c === undefined ? undefined : managed(c.id)));
+            const other = await one.value.updateAsset("synthetic-server-03", (c) => (c === undefined ? undefined : managed(c.id)));
             assert(other.kind === "ok");
           }
           return current;
         });
         assert(raced.kind === "ok" && raced.value.attempts === 2 && calls === 2, "the second operator lost once and began again");
-        const sparta = await two.value.getAsset("sparta");
-        assert(sparta.kind === "ok");
-        assertEquals(sparta.value.value.state, "managed", "what the first operator wrote was kept");
+        const synthetic_server_03 = await two.value.getAsset("synthetic-server-03");
+        assert(synthetic_server_03.kind === "ok");
+        assertEquals(synthetic_server_03.value.value.state, "managed", "what the first operator wrote was kept");
 
         // a settlement is one commit of the branch
         const settled = await one.value.settle();
@@ -132,7 +132,7 @@ proves(
         assertEquals(await gitOut(repo, "rev-list", "--count", "fleet"), "1", "all the documents of a settlement are one commit");
         const files = (await gitOut(repo, "ls-tree", "-r", "--name-only", "fleet")).split("\n");
         assert(
-          files.includes("fleet.json") && files.includes("assets/o/olympia.json") && files.every((f) => !f.startsWith("_mirror-ledger")),
+          files.includes("fleet.json") && files.includes("assets/s/synthetic-server-01.json") && files.every((f) => !f.startsWith("_mirror-ledger")),
           "the documents are in the branch and the ledgers are not",
         );
         assertEquals((await one.value.settle()).kind, "ok");
@@ -164,7 +164,7 @@ proves(
         assert(a.kind === "ok" && b.kind === "ok");
         assertEquals(b.value, a.value, "the estate's truth is unchanged");
         assert(
-          (await survivor.value.putAsset(adopted("corinth"), expectAbsent)).kind === "ok",
+          (await survivor.value.putAsset(adopted("synthetic-server-04"), expectAbsent)).kind === "ok",
           "the survivor takes writes as the new system of record",
         );
         await one.value.close();

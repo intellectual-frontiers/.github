@@ -55,7 +55,7 @@ proves(["0003-machine-probe-observation FR-004"], "an observation is given only 
   const sent: string[] = [];
   await observe(async (r) => (sent.push(r), { code: 0, stdout: FACTS, stderr: "" }));
   assertEquals(sent, ["facts"]);
-  const unreachable = await observe(reply(255, "", "ssh: connect to host sparta port 22: Connection refused\n"));
+  const unreachable = await observe(reply(255, "", "ssh: connect to host synthetic-server-03 port 22: Connection refused\n"));
   assert(unreachable.kind === "err" && unreachable.error.kind === "unreachable" && unreachable.error.message.includes("Connection refused"));
   const thrown = await observe(async () => { throw new Error("no ssh client"); });
   assert(thrown.kind === "err" && thrown.error.kind === "unreachable");

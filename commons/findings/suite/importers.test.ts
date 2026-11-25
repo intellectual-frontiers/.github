@@ -108,7 +108,7 @@ proves(["0003-findings-importers FR-003"], "a Burp report gives a finding for ea
 const NESSUS = `<?xml version="1.0"?>
 <NessusClientData_v2>
   <Report name="weekly">
-    <ReportHost name="athens.example.test">
+    <ReportHost name="synthetic-server-02.example.test">
       <HostProperties><tag name="host-ip">192.0.2.10</tag><tag name="credentials">${SECRET}</tag><tag name="operating-system">Linux</tag></HostProperties>
       <ReportItem port="443" svc_name="www" protocol="tcp" severity="4" pluginID="12345" pluginName="Example Server RCE">
         <synopsis>Remote code execution.</synopsis>
@@ -131,7 +131,7 @@ const NESSUS = `<?xml version="1.0"?>
 proves(["0003-findings-importers FR-004"], "a Nessus export gives a finding for each item of each host with the severity, the port as the place, the CVEs and the weakness, redacted output, and never the properties of the host", () => {
   const r = importNessus("weekly.nessus", NESSUS);
   assertEquals(r.problems, []);
-  assertEquals(r.findings.map((f) => `${f.rule} ${f.severity} ${f.asset} ${f.location ?? "-"}`), ["12345 critical athens.example.test 443/tcp", "19506 info athens.example.test -", "10267 medium athens.example.test 22/tcp"]);
+  assertEquals(r.findings.map((f) => `${f.rule} ${f.severity} ${f.asset} ${f.location ?? "-"}`), ["12345 critical synthetic-server-02.example.test 443/tcp", "19506 info synthetic-server-02.example.test -", "10267 medium synthetic-server-02.example.test 22/tcp"]);
   assertEquals(r.findings[0]?.cve, ["CVE-2024-2222", "CVE-2024-3333"]);
   assertEquals(r.findings[0]?.cwe, ["CWE-94"]);
   assertEquals(r.findings[0]?.solution, "Upgrade to 2.0.");
@@ -158,7 +158,7 @@ proves(["0003-findings-importers FR-007"], "a nuclei JSONL gives a finding for e
 
 const NMAP = `<?xml version="1.0"?>
 <nmaprun scanner="nmap" version="7.95">
-  <host><status state="up"/><address addr="192.0.2.10" addrtype="ipv4"/><hostnames><hostname name="athens.example.test" type="user"/></hostnames>
+  <host><status state="up"/><address addr="192.0.2.10" addrtype="ipv4"/><hostnames><hostname name="synthetic-server-02.example.test" type="user"/></hostnames>
     <ports>
       <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="9.6"/></port>
       <port protocol="tcp" portid="23"><state state="closed"/><service name="telnet"/></port>
@@ -173,8 +173,8 @@ proves(["0003-findings-importers FR-008"], "an nmap report gives an informationa
   const r = importNmap("n.xml", NMAP);
   assertEquals(r.problems, []);
   assertEquals(r.findings.map((f) => `${f.rule} ${f.severity} ${f.asset} ${f.location} ${f.title}`), [
-    "open-port info athens.example.test 22/tcp Open port 22/tcp (ssh)",
-    "open-port info athens.example.test 53/udp Open port 53/udp (domain)",
+    "open-port info synthetic-server-02.example.test 22/tcp Open port 22/tcp (ssh)",
+    "open-port info synthetic-server-02.example.test 53/udp Open port 53/udp (domain)",
     "open-port info 192.0.2.11 443/tcp Open port 443/tcp (https)",
   ]);
   assertEquals(r.findings[0]?.description, "The service is OpenSSH 9.6.");

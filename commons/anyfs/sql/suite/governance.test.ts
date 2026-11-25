@@ -57,7 +57,7 @@ proves(["0002-sql-governance FR-003"], "the layout is documented column by colum
 proves(["0002-sql-governance FR-004"], "the media type of a path is the one its last extension says, none for a name with no known extension, and nothing is read from bytes", () => {
   assertEquals(mediaTypeOf("a/b.json"), "application/json");
   assertEquals(mediaTypeOf("a/b.JSON"), "application/json");
-  assertEquals(mediaTypeOf("fleet/olympia/asset.yaml"), "application/yaml");
+  assertEquals(mediaTypeOf("fleet/synthetic-server-01/asset.yaml"), "application/yaml");
   assertEquals(mediaTypeOf("README"), undefined);
   assertEquals(mediaTypeOf(".json"), undefined);
   assertEquals(mediaTypeOf("a.unknownext"), undefined);

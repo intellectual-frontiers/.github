@@ -28,7 +28,7 @@ export function convergeCommands(config: ConvergePluginConfig): readonly Node[] 
     name: "plan",
     summary: "Observe a managed machine (reading only) and say what the requirements would change, with the hash of the plan to approve. It changes nothing.",
     options: { asset, ...fleet },
-    examples: [{ args: ["--asset", "athens"], says: "Plan athens." }],
+    examples: [{ args: ["--asset", "synthetic-server-02"], says: "Plan synthetic-server-02." }],
     action: { kind: "report", reach: defineReach({ channels: ["local", "ssh", "mcp"], readOnly: true, idempotent: true }) },
     run: async (args) => {
       const o = args.options as Readonly<Record<string, unknown>>;
@@ -50,7 +50,7 @@ export function convergeCommands(config: ConvergePluginConfig): readonly Node[] 
       planHash: value<never>({ help: "The hash that `converge plan` printed.", valueName: "sha256:...", required: true }),
       allowRemoval: value<never>({ help: "Allow a plan that removes something (a destructive plan): `yes`.", valueName: "yes", default: "" }),
     },
-    examples: [{ args: ["--asset", "athens", "--plan-hash", "sha256:..."], says: "Apply the approved plan to athens." }],
+    examples: [{ args: ["--asset", "synthetic-server-02", "--plan-hash", "sha256:..."], says: "Apply the approved plan to synthetic-server-02." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: true, reach: defineReach({ channels: ["local"], idempotent: true }) },
     run: async (args) => {
       const o = args.options as Readonly<Record<string, unknown>>;

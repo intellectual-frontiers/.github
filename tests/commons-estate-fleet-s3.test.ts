@@ -74,12 +74,12 @@ proves(
         clock: ticking(AT),
       });
       assert(fleet.kind === "ok");
-      for (const a of [adopted("olympia"), managed("athens")]) assert((await fleet.value.putAsset(a, expectAbsent)).kind === "ok");
-      assert((await fleet.value.declare("olympia", { os: "linux" }, expectAbsent)).kind === "ok");
+      for (const a of [adopted("synthetic-server-01"), managed("synthetic-server-02")]) assert((await fleet.value.putAsset(a, expectAbsent)).kind === "ok");
+      assert((await fleet.value.declare("synthetic-server-01", { os: "linux" }, expectAbsent)).kind === "ok");
       assert(
         (
           await fleet.value.recordObservation({
-            asset: "olympia",
+            asset: "synthetic-server-01",
             at: new Date(AT).toISOString(),
             source: "probe",
             state: { os: "linux" },

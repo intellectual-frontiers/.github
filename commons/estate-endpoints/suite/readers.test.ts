@@ -163,17 +163,17 @@ tcp   ESTAB  0      0         192.0.2.10:22      192.0.2.99:50000
 `;
 
 proves(["0003-estate-endpoints-readers FR-006"], "the ports of a machine, as ss and osquery give them, are endpoints with their service, the loopback is internal, a wildcard bind says no exposure, and the machine exposes them", () => {
-  const r = importListening("athens-ss.txt", "athens.example.test", SS, "athens");
-  accepted(r, ["athens"]);
+  const r = importListening("synthetic-server-02-ss.txt", "synthetic-server-02.example.test", SS, "synthetic-server-02");
+  accepted(r, ["synthetic-server-02"]);
   assertEquals(r.assets.map((a) => `${a.attributes["scheme"]} ${a.attributes["host"]} ${a.attributes["port"]} ${a.attributes["service"]} ${a.attributes["exposure"]}`), [
-    "tcp athens.example.test 22 ssh undefined",
+    "tcp synthetic-server-02.example.test 22 ssh undefined",
     "tcp 127.0.0.1 5432 postgres internal",
-    "https athens.example.test 443 https undefined",
-    "udp athens.example.test 123 ntp undefined",
+    "https synthetic-server-02.example.test 443 https undefined",
+    "udp synthetic-server-02.example.test 123 ntp undefined",
   ]);
   assertEquals(r.links.length, 4);
-  assert(r.links.every((l) => l.from === "athens" && l.kind === "exposes"));
-  const o = importListening("athens-osquery.json", "athens.example.test", JSON.stringify([{ address: "0.0.0.0", port: 80, protocol: 6, pid: 1 }, { address: "::", port: 53, protocol: 17, pid: 2 }]));
+  assert(r.links.every((l) => l.from === "synthetic-server-02" && l.kind === "exposes"));
+  const o = importListening("synthetic-server-02-osquery.json", "synthetic-server-02.example.test", JSON.stringify([{ address: "0.0.0.0", port: 80, protocol: 6, pid: 1 }, { address: "::", port: 53, protocol: 17, pid: 2 }]));
   accepted(o);
   assertEquals(o.assets.map((a) => `${a.attributes["scheme"]} ${a.attributes["port"]} ${a.attributes["service"]}`), ["http 80 http", "udp 53 dns"]);
   assertEquals(o.links, []);
@@ -186,7 +186,7 @@ proves(["0003-estate-endpoints-readers FR-008"], "the reader is chosen by what i
   assertEquals(detectFormat("f", '{"a":1}'), undefined);
   assertEquals(readText("f.txt", "hello").problems.length, 1);
   assert(readText("ss.txt", SS).problems[0]?.includes("give the machine's name"));
-  assertEquals(readText("ss.txt", SS, { host: "athens" }).assets.length, 4);
+  assertEquals(readText("ss.txt", SS, { host: "synthetic-server-02" }).assets.length, 4);
 });
 
 async function certificate(dir: string, name: string, cn: string, sans: readonly string[]): Promise<string> {

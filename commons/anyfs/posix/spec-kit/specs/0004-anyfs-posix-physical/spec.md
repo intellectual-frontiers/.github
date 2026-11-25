@@ -20,7 +20,7 @@
 
 ## Acceptance scenarios
 
-1. **Given** a store in memory, **When** `/fleet/olympia.json` is written and `/fleet` is read, **Then** the list has `olympia.json` as a file with its size, and the list says it is derived, per FR-002 and FR-001.
+1. **Given** a store in memory, **When** `/fleet/synthetic-server-01.json` is written and `/fleet` is read, **Then** the list has `synthetic-server-01.json` as a file with its size, and the list says it is derived, per FR-002 and FR-001.
 2. **Given** a handle opened to write, **When** it is written, **Then** the store has nothing until the close, per FR-004.
 3. **Given** a store with `cas`, **When** another writer changes an object after it was opened and the handle is closed, **Then** the close is `ESTALE` and the other writer's bytes stay, per FR-004.
 4. **Given** a store with the five core capabilities, **When** a file is renamed, **Then** it is moved by a copy then a delete and the fidelity says it is not one change, per FR-005.

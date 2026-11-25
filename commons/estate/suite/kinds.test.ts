@@ -45,7 +45,7 @@ proves(["0007-estate-kinds FR-002"], "an asset is refused where its attributes a
   assertEquals(cloud.kind, "ok");
   const mobile = defineAsset({ id: "field-app", kind: "mobile-app", state: "discovered", owners: {}, attributes: { platform: "android", "bundle-id": "test.example.field" } });
   assertEquals(mobile.kind, "ok");
-  assertEquals(defineAsset({ id: "olympia", kind: "server", state: "adopted", owners: OWNED }).kind, "ok");
+  assertEquals(defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: OWNED }).kind, "ok");
   assertEquals(defineAsset({ id: "thing", kind: "gizmo", state: "discovered", owners: {}, attributes: { anything: "goes" } }).kind, "ok");
 });
 
@@ -55,14 +55,14 @@ proves(["0007-estate-kinds FR-003"], "a link of a named kind joins only the kind
   assert(checkLink("runs-on", "server", "application").length === 2);
   assertEquals(checkLink("boots", "anything", "else"), []);
   const assets = {
-    olympia: { kind: "server", state: "adopted", owners: OWNED },
+    "synthetic-server-01": { kind: "server", state: "adopted", owners: OWNED },
     portal: { kind: "application", state: "discovered", owners: {}, attributes: { tier: "web" } },
     "portal-https": { kind: "endpoint", state: "discovered", owners: {}, attributes: { scheme: "https", host: "portal.example.test", service: "https" } },
   } as const;
-  const good = defineEstate(assets, [{ from: "portal", to: "olympia", kind: "runs-on" }, { from: "olympia", to: "portal-https", kind: "exposes" }, { from: "portal", to: "olympia", kind: "boots" }]);
+  const good = defineEstate(assets, [{ from: "portal", to: "synthetic-server-01", kind: "runs-on" }, { from: "synthetic-server-01", to: "portal-https", kind: "exposes" }, { from: "portal", to: "synthetic-server-01", kind: "boots" }]);
   assertEquals(good.kind, "ok");
-  const bad = defineEstate(assets, [{ from: "olympia", to: "portal", kind: "runs-on" }]);
-  assert(bad.kind === "err" && bad.error.some((m) => m.includes("olympia to portal") && m.includes("runs-on")), JSON.stringify(bad));
+  const bad = defineEstate(assets, [{ from: "synthetic-server-01", to: "portal", kind: "runs-on" }]);
+  assert(bad.kind === "err" && bad.error.some((m) => m.includes("synthetic-server-01 to portal") && m.includes("runs-on")), JSON.stringify(bad));
 });
 
 proves(["0007-estate-kinds FR-004"], "the services are a catalog by name with a usual port, a class and whether they speak in the clear", () => {
@@ -77,7 +77,7 @@ proves(["0007-estate-kinds FR-004"], "the services are a catalog by name with a 
 });
 
 proves(["0007-estate-kinds FR-005"], "a document written before the attributes existed decodes with none, an asset with attributes is written and read back with them, and a stored attribute that is not right for its kind is refused", () => {
-  const old = assetCodec.decode(bytes(JSON.stringify({ id: "olympia", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" }, $version: 1 })));
+  const old = assetCodec.decode(bytes(JSON.stringify({ id: "synthetic-server-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" }, $version: 1 })));
   assert(old.kind === "ok" && old.value.value.attributes === undefined, JSON.stringify(old));
   const made = endpoint({ scheme: "https", host: "api.example.test", port: 443 });
   assert(made.kind === "ok");

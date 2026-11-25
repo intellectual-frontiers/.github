@@ -5,7 +5,7 @@
  * @example
  * ```ts
  * import { parsePostgres } from "./parse.ts";
- * parsePostgres({ machine: "olympia", version: 18, port: 5432, listen: ["localhost"] }).kind; // "ok"
+ * parsePostgres({ machine: "synthetic-server-01", version: 18, port: 5432, listen: ["localhost"] }).kind; // "ok"
  * ```
  *
  * @module

@@ -62,7 +62,7 @@ export function parseRequest(text: string): Result<ProbeRequest, string> {
  * @example
  * ```ts
  * import type { ProbeReach } from "./requests.ts";
- * const reach: ProbeReach = { address: "sparta.example", user: "admin", credential: "sparta-probe" };
+ * const reach: ProbeReach = { address: "synthetic-server-03.example", user: "admin", credential: "synthetic-server-03-probe" };
  * ```
  */
 export type ProbeReach = { readonly address: string; readonly port?: number; readonly user: string; readonly credential: string };

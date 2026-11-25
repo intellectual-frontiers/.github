@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import type { Posix } from "./posix.ts";
- * // declare const view: Posix; const r = await view.readFile("/fleet/olympia.json"); r.kind === "ok" && r.value.fidelity.kind // "native"
+ * // declare const view: Posix; const r = await view.readFile("/fleet/synthetic-server-01.json"); r.kind === "ok" && r.value.fidelity.kind // "native"
  * ```
  *
  * @module

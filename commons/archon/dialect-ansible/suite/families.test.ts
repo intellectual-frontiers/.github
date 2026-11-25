@@ -20,7 +20,7 @@ function req(id: string, kind: string, desired: unknown, more: Record<string, un
 }
 
 const SUBJECT = (() => {
-  const n = parseSubjectName("athens");
+  const n = parseSubjectName("synthetic-server-02");
   if (n.kind === "err") throw new Error(n.error);
   return { name: n.value, class: "machine" as const };
 })();

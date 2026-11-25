@@ -38,7 +38,7 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
     name: "prepare",
     summary: "Render the install of a managed machine (its autoinstall, with no secret in it) and the playbook it converges itself with, as generated files for you to commit and sign. The machine runs nothing from a repository tip that a signer of the fleet did not sign.",
     options: { asset, ...fleet },
-    examples: [{ args: ["--asset", "athens"], says: "Render athens's install and playbook." }],
+    examples: [{ args: ["--asset", "synthetic-server-02"], says: "Render synthetic-server-02's install and playbook." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: true, reach: defineReach({ channels: ["local"], idempotent: true }) },
     run: async (args) => {
       const o = args.options as Readonly<Record<string, unknown>>;
@@ -55,7 +55,7 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
     name: "arm",
     summary: "Say that the next network boot of the asset may install it: only an armed asset is installed, once. A machine whose disks hold data is stopped unless you arm it with --confirm-destroy yes. It changes nothing on the machine.",
     options: { asset, ...fleet, state: stateOpt, profile: profileOpt, confirmDestroy: value<never>({ help: "Allow the install to erase a disk that holds data: `yes`.", valueName: "yes", default: "" }), mac: value<never>({ help: "The MAC of the machine that will boot, where the fleet does not know it.", valueName: "MAC", default: "" }) },
-    examples: [{ args: ["--asset", "athens"], says: "Arm athens for one install." }, { args: ["--asset", "athens", "--confirm-destroy", "yes"], says: "Arm athens and allow it to erase a disk that holds data." }],
+    examples: [{ args: ["--asset", "synthetic-server-02"], says: "Arm synthetic-server-02 for one install." }, { args: ["--asset", "synthetic-server-02", "--confirm-destroy", "yes"], says: "Arm synthetic-server-02 and allow it to erase a disk that holds data." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: false, reach: defineReach({ channels: ["local"] }) },
     run: async (args, ctx) => {
       const o = args.options as Readonly<Record<string, unknown>>;
@@ -78,7 +78,7 @@ export function bootCommands(config: BootPluginConfig): readonly Node[] {
     name: "disarm",
     summary: "Take an asset out of the armed ones: its next network boot boots its own disk.",
     options: { asset, state: stateOpt },
-    examples: [{ args: ["--asset", "athens"], says: "Disarm athens." }],
+    examples: [{ args: ["--asset", "synthetic-server-02"], says: "Disarm synthetic-server-02." }],
     action: { kind: "action", effect: "mutate", dryRun: false, idempotent: true, reach: defineReach({ channels: ["local"], idempotent: true }) },
     run: async (args, ctx) => {
       const o = args.options as Readonly<Record<string, unknown>>;

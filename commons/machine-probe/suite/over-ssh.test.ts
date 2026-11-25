@@ -22,7 +22,7 @@ proves(
   "on a real sshd the restricted key runs only the probe, opens no shell and forwards no port, a host key that is not pinned is refused, drift is told when an administrator is added, and a stopped machine is unreachable",
   async (t) => {
     if (reason !== undefined) return t.skip(reason);
-    const spec = readMachineSpec({ name: "sparta", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: [] });
+    const spec = readMachineSpec({ name: "synthetic-server-03", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: [] });
     assert(spec.kind === "ok");
     const started = await startMachine(spec.value);
     assert(started.kind === "ok", started.kind === "err" ? started.error : "");
@@ -41,7 +41,7 @@ proves(
       const installed = await m.executor.exec(["sh", "-c", "chmod 755 /home/probe/.local/bin/machine-probe && chown -R probe:probe /home/probe/.local && cat > /home/probe/.ssh/authorized_keys"], { input: `${line.value}\n` });
       assertEquals(installed.code, 0, new TextDecoder().decode(installed.stderr));
 
-      const tgt = target({ id: "sparta", class: "server", address: "127.0.0.1", user: "probe", port: m.port, credential: "probe" });
+      const tgt = target({ id: "synthetic-server-03", class: "server", address: "127.0.0.1", user: "probe", port: m.port, credential: "probe" });
       assert(tgt.kind === "ok");
       const executor = sshExecutor(tgt.value, [tgt.value], { knownHostsRepository: m.knownHostsFile, knownHostsUser: m.knownHostsFile, identityFor: () => probeKey });
       const send = sendVia(executor);
@@ -84,7 +84,7 @@ proves(
       });
 
       await t.step("an estate tells it aligned, and drifted when an administrator is added", async () => {
-        const asset = defineAsset({ id: "sparta", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+        const asset = defineAsset({ id: "synthetic-server-03", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
         assert(asset.kind === "ok");
         const first = await observe(send);
         assert(first.kind === "ok");

@@ -74,10 +74,10 @@ proves(["0002-boot-command FR-002"], "an asset that may not be installed is refu
   await fs.withTempDir(async (dir) => {
     const state = path.join(dir, "state.json");
     const c = config(dir, true);
-    const p = await run(c, ["boot", "prepare", "--asset", "athens"]);
+    const p = await run(c, ["boot", "prepare", "--asset", "synthetic-server-02"]);
     assertEquals(p.code, 1, p.err + p.out);
     assert(p.err.includes("E-NOT-OURS") && p.err.includes("never installed"), p.err);
-    const a = await run(c, ["boot", "arm", "--asset", "athens", "--state", state]);
+    const a = await run(c, ["boot", "arm", "--asset", "synthetic-server-02", "--state", state]);
     assertEquals(a.code, 1);
     assertEquals([await fs.exists(path.join(dir, "render")), await fs.exists(state)], [false, false]);
   });
@@ -86,20 +86,20 @@ proves(["0002-boot-command FR-002"], "an asset that may not be installed is refu
 proves(["0002-boot-command FR-003"], "prepare renders the autoinstall and the playbook with the fleet's two dialects, as generated files with no secret, the same text every time, each dialect taking the requirements it carries", async () => {
   await fs.withTempDir(async (dir) => {
     const c = config(dir);
-    const r = await run(c, ["boot", "prepare", "--asset", "athens", "--fleet", "lab"]);
+    const r = await run(c, ["boot", "prepare", "--asset", "synthetic-server-02", "--fleet", "lab"]);
     assertEquals(r.code, 0, r.err + r.out);
-    const base = path.join(dir, "render", "athens");
+    const base = path.join(dir, "render", "synthetic-server-02");
     const files = ["cloud-init/user-data", "cloud-init/meta-data", "ansible/playbook.yml", "ansible/inventory.yml", "ansible/ansible.cfg"];
     const text: Record<string, string> = {};
     for (const f of files) {
       text[f] = await fs.readTextFile(path.join(base, f));
       assert(isGenerated(text[f] ?? ""), f);
       for (const bad of ["PRIVATE KEY", "$6$", "$y$"]) assert(!(text[f] ?? "").includes(bad), `${f} holds ${bad}`);
-      assert(r.out.includes(`wrote render/athens/${f}`), r.out);
+      assert(r.out.includes(`wrote render/synthetic-server-02/${f}`), r.out);
     }
-    assert((text["cloud-init/user-data"] ?? "").includes("@archon:password-hash@") && (text["cloud-init/user-data"] ?? "").includes('"hostname": "athens"') && !(text["cloud-init/user-data"] ?? "").includes("/srv/lab"), "the install holds what an install can state and not a directory");
+    assert((text["cloud-init/user-data"] ?? "").includes("@archon:password-hash@") && (text["cloud-init/user-data"] ?? "").includes('"hostname": "synthetic-server-02"') && !(text["cloud-init/user-data"] ?? "").includes("/srv/lab"), "the install holds what an install can state and not a directory");
     assert((text["ansible/playbook.yml"] ?? "").includes("ansible.builtin.file") && (text["ansible/playbook.yml"] ?? "").includes("/srv/lab"), "the playbook converges the whole of it");
-    await run(c, ["boot", "prepare", "--asset", "athens", "--fleet", "lab"]);
+    await run(c, ["boot", "prepare", "--asset", "synthetic-server-02", "--fleet", "lab"]);
     assertEquals(await fs.readTextFile(path.join(base, "ansible/playbook.yml")), text["ansible/playbook.yml"], "the same text every time");
   });
 });
@@ -110,15 +110,15 @@ proves(["0002-boot-command FR-004"], "arm, status and disarm keep their state in
     const state = path.join(dir, "s", "state.json");
     const status = () => run(c, ["boot", "status", "--state", state, "--assets", dir]);
     assert((await status()).out.includes("armed: nothing"));
-    const armed = await run(c, ["boot", "arm", "--asset", "athens", "--state", state]);
+    const armed = await run(c, ["boot", "arm", "--asset", "synthetic-server-02", "--state", state]);
     assertEquals(armed.code, 0, armed.err + armed.out);
     assert(armed.out.includes("stopped if a disk holds data"));
-    assert((await status()).out.includes("athens (armed"));
+    assert((await status()).out.includes("synthetic-server-02 (armed"));
     assert(!(await fs.readTextFile(state)).includes("confirmDestroy"));
-    const erase = await run(c, ["boot", "arm", "--asset", "athens", "--state", state, "--confirm-destroy", "yes", "--mac", "aa:bb:cc:dd:ee:ff"]);
+    const erase = await run(c, ["boot", "arm", "--asset", "synthetic-server-02", "--state", state, "--confirm-destroy", "yes", "--mac", "aa:bb:cc:dd:ee:ff"]);
     assert(erase.out.includes("may erase a disk that holds data") && (await fs.readTextFile(state)).includes('"confirmDestroy": true') && (await fs.readTextFile(state)).includes("aa:bb:cc:dd:ee:ff"));
     assertEquals((await fs.stat(state)).mode! & 0o077, 0, "kept for its owner alone");
-    assertEquals((await run(c, ["boot", "disarm", "--asset", "athens", "--state", state])).code, 0);
+    assertEquals((await run(c, ["boot", "disarm", "--asset", "synthetic-server-02", "--state", state])).code, 0);
     assert((await status()).out.includes("armed: nothing"));
   });
 });
@@ -147,11 +147,11 @@ proves(["0002-boot-command FR-006"], "status and serve take the profile of the d
 proves(["0002-boot-command FR-006"], "arm refuses a profile whose installer cannot run the guard unless it is told that a disk may be erased", async () => {
   await fs.withTempDir(async (dir) => {
     const state = path.join(dir, "state.json");
-    const no = await run(config(dir), ["boot", "arm", "--asset", "athens", "--state", state, "--profile", "debian-13"]);
+    const no = await run(config(dir), ["boot", "arm", "--asset", "synthetic-server-02", "--state", state, "--profile", "debian-13"]);
     assertEquals(no.code, 2, no.err + no.out);
     assert(no.err.includes("--confirm-destroy yes") && no.err.includes("E-NO-GUARD"), no.err);
-    const yes = await run(config(dir), ["boot", "arm", "--asset", "athens", "--state", state, "--profile", "debian-13", "--confirm-destroy", "yes"]);
+    const yes = await run(config(dir), ["boot", "arm", "--asset", "synthetic-server-02", "--state", state, "--profile", "debian-13", "--confirm-destroy", "yes"]);
     assertEquals(yes.code, 0, yes.err + yes.out);
-    assert(yes.out.includes("armed athens"), yes.out);
+    assert(yes.out.includes("armed synthetic-server-02"), yes.out);
   });
 });

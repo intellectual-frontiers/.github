@@ -26,27 +26,27 @@ proves(["0002-netboot-pins FR-001", "0002-netboot-pins FR-002"], "the pins name 
 proves(["0003-netboot-logical FR-001"], "the menus boot the local disk for a host that is not armed and for a machine nobody knows, and install only an armed host, by its token and the MAC GRUB reports", () => {
   const base = "http://192.0.2.10:8080/";
   assert(mainMenu().includes("configfile /boot/hosts/${net_default_mac}.cfg"));
-  const off = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, undefined);
+  const off = hostMenu({ name: "synthetic-server-02" }, UBUNTU_26_04_PROFILE, base, undefined);
   assert(off.includes("not armed") && !off.includes("autoinstall"));
-  const on = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, "t".repeat(32));
-  assert(on.includes("autoinstall") && on.includes(`iso-url=${base}iso/${UBUNTU_26_04.iso?.name}`) && on.includes("ds=nocloud-net\\;s=http://192.0.2.10:8080/install/athens/" + "t".repeat(32) + "/${net_default_mac}/"), on);
+  const on = hostMenu({ name: "synthetic-server-02" }, UBUNTU_26_04_PROFILE, base, "t".repeat(32));
+  assert(on.includes("autoinstall") && on.includes(`iso-url=${base}iso/${UBUNTU_26_04.iso?.name}`) && on.includes("ds=nocloud-net\\;s=http://192.0.2.10:8080/install/synthetic-server-02/" + "t".repeat(32) + "/${net_default_mac}/"), on);
   assert(on.includes("erases this machine's disk") && on.includes("boot the local disk instead"));
   assert(chooserMenu([], UBUNTU_26_04_PROFILE, base).includes("nothing armed: boot the local disk"));
-  const pick = chooserMenu([{ host: { name: "athens" }, token: "a".repeat(32) }], UBUNTU_26_04_PROFILE, base);
-  assert(pick.startsWith("# Unknown machine") && pick.indexOf("boot the local disk") < pick.indexOf("Install athens") && pick.includes("set default=0"), "the disk is the first entry and the default");
+  const pick = chooserMenu([{ host: { name: "synthetic-server-02" }, token: "a".repeat(32) }], UBUNTU_26_04_PROFILE, base);
+  assert(pick.startsWith("# Unknown machine") && pick.indexOf("boot the local disk") < pick.indexOf("Install synthetic-server-02") && pick.includes("set default=0"), "the disk is the first entry and the default");
 });
 
 proves(["0003-netboot-logical FR-002"], "a host is armed with a token and stays armed until the installer is done, a token is compared whole, and what installed is remembered by MAC", () => {
   let s = emptyState();
   const t = newToken();
   assert(/^[0-9a-f]{32}$/.test(t) && t !== newToken());
-  s = arm(s, "athens", { token: t, at: "2026-11-21T00:00:00Z" });
-  assert(isArmed(s, "athens") && !isArmed(s, "sparta"));
-  assert(tokenFits(s, "athens", t) && !tokenFits(s, "athens", `${t.slice(0, 31)}0`) && !tokenFits(s, "athens", t.slice(0, 31)) && !tokenFits(s, "sparta", t));
+  s = arm(s, "synthetic-server-02", { token: t, at: "2026-11-21T00:00:00Z" });
+  assert(isArmed(s, "synthetic-server-02") && !isArmed(s, "synthetic-server-03"));
+  assert(tokenFits(s, "synthetic-server-02", t) && !tokenFits(s, "synthetic-server-02", `${t.slice(0, 31)}0`) && !tokenFits(s, "synthetic-server-02", t.slice(0, 31)) && !tokenFits(s, "synthetic-server-03", t));
   assert(!tokenFits(arm(s, "short", { token: "abc", at: "x" }), "short", "abc"), "a short token is no token");
-  assertEquals(armedHosts(arm(s, "baker", { token: "b".repeat(32), at: "x" })).map((a) => a.host.name), ["athens", "baker"]);
-  s = done(s, "athens", "aa:bb:cc:dd:ee:ff", "2026-11-21T01:00:00Z");
-  assertEquals([isArmed(s, "athens"), s.installed["athens"]?.mac], [false, "aa:bb:cc:dd:ee:ff"]);
+  assertEquals(armedHosts(arm(s, "baker", { token: "b".repeat(32), at: "x" })).map((a) => a.host.name), ["baker", "synthetic-server-02"]);
+  s = done(s, "synthetic-server-02", "aa:bb:cc:dd:ee:ff", "2026-11-21T01:00:00Z");
+  assertEquals([isArmed(s, "synthetic-server-02"), s.installed["synthetic-server-02"]?.mac], [false, "aa:bb:cc:dd:ee:ff"]);
   assertEquals(isArmed(disarm(arm(emptyState(), "x", { token: t, at: "x" }), "x"), "x"), false);
   let n = emptyState();
   for (let i = 0; i < 250; i++) n = note(n, { at: String(i), host: "h", level: "info", phase: "p", summary: String(i) });
@@ -57,14 +57,14 @@ proves(["0003-netboot-logical FR-003"], "the guard goes on for blank disks, for 
   const blank = parseFacts("sys_vendor=To Be Filled By O.E.M.\nproduct_name=Test Box\nmem_kib=8388608\ncpus=4\ndisk=sda 500107862016 sata\n");
   assertEquals([blank.vendor, blank.model, blank.disks, blank.signatures], [undefined, "Test Box", [{ name: "sda", bytes: 500107862016, transport: "sata" }], []]);
   assert(describeFacts(blank).includes("Test Box") && describeFacts(blank).includes("sda 500 GB sata"));
-  assertEquals(decide("athens", blank, {}, undefined).go, true);
+  assertEquals(decide("synthetic-server-02", blank, {}, undefined).go, true);
   const used = parseFacts("disk=sda 500107862016 sata\nsignature=/dev/sda gpt\nsignature=/dev/sda2 ext4\n");
-  const stopped = decide("athens", used, {}, "aa:bb:cc:dd:ee:ff");
+  const stopped = decide("synthetic-server-02", used, {}, "aa:bb:cc:dd:ee:ff");
   assert(!stopped.go && stopped.why.includes("not blank") && stopped.fix.includes("confirm-destroy"));
-  assertEquals(decide("athens", used, { confirmDestroy: true }, undefined).go, true);
-  assertEquals(decide("athens", used, { installedMac: "AA:BB:CC:DD:EE:FF" }, "aa:bb:cc:dd:ee:ff").go, true);
-  assertEquals(decide("athens", used, { installedMac: "aa:bb:cc:dd:ee:00" }, "aa:bb:cc:dd:ee:ff").go, false);
-  assertEquals(decide("athens", parseFacts("cpus=2\n"), { confirmDestroy: true }, undefined).go, false, "no disk, no install, whatever was confirmed");
+  assertEquals(decide("synthetic-server-02", used, { confirmDestroy: true }, undefined).go, true);
+  assertEquals(decide("synthetic-server-02", used, { installedMac: "AA:BB:CC:DD:EE:FF" }, "aa:bb:cc:dd:ee:ff").go, true);
+  assertEquals(decide("synthetic-server-02", used, { installedMac: "aa:bb:cc:dd:ee:00" }, "aa:bb:cc:dd:ee:ff").go, false);
+  assertEquals(decide("synthetic-server-02", parseFacts("cpus=2\n"), { confirmDestroy: true }, undefined).go, false, "no disk, no install, whatever was confirmed");
 });
 
 proves(["0003-netboot-logical FR-004"], "a read request is parsed with its options, the options agreed are within bounds, and a path that climbs out of the tree is refused", () => {
@@ -83,11 +83,11 @@ proves(["0003-netboot-logical FR-005"], "a path is a boot file, a menu, the imag
   assertEquals(classify("/boot/initrd"), { kind: "boot-file", name: "initrd" });
   assertEquals(classify("/grub/grub.cfg"), { kind: "main-menu" });
   assertEquals(classify("/boot/hosts/AA-BB-CC-DD-EE-FF.cfg"), { kind: "mac-menu", mac: "aa:bb:cc:dd:ee:ff" });
-  assertEquals(classify("/boot/athens/bootx64.efi"), { kind: "host-boot-file", host: "athens", name: "bootx64.efi" });
+  assertEquals(classify("/boot/synthetic-server-02/bootx64.efi"), { kind: "host-boot-file", host: "synthetic-server-02", name: "bootx64.efi" });
   assertEquals(classify("/iso/x.iso"), { kind: "iso", name: "x.iso" });
   const tok = "ab".repeat(16);
-  assertEquals(classify(`/install/athens/${tok}/aa:bb:cc:dd:ee:ff/user-data`), { kind: "install", host: "athens", token: tok, mac: "aa:bb:cc:dd:ee:ff", file: "user-data" });
-  for (const bad of ["/install/athens/short/aa:bb:cc:dd:ee:ff/user-data", `/install/athens/${tok}/nonsense/user-data`, `/install/athens/${tok}/aa:bb:cc:dd:ee:ff/passwd`, "/etc/passwd", "/boot/hosts/zz.cfg", "/boot/../linux", "/iso/a/b"]) assertEquals(classify(bad).kind, "unknown", bad);
+  assertEquals(classify(`/install/synthetic-server-02/${tok}/aa:bb:cc:dd:ee:ff/user-data`), { kind: "install", host: "synthetic-server-02", token: tok, mac: "aa:bb:cc:dd:ee:ff", file: "user-data" });
+  for (const bad of ["/install/synthetic-server-02/short/aa:bb:cc:dd:ee:ff/user-data", `/install/synthetic-server-02/${tok}/nonsense/user-data`, `/install/synthetic-server-02/${tok}/aa:bb:cc:dd:ee:ff/passwd`, "/etc/passwd", "/boot/hosts/zz.cfg", "/boot/../linux", "/iso/a/b"]) assertEquals(classify(bad).kind, "unknown", bad);
 });
 
 async function scratch<T>(f: (dir: string) => Promise<T>): Promise<T> {
@@ -269,7 +269,7 @@ async function withBoot<T>(f: (c: { dir: string; stateFile: string; url: string;
     const events: string[] = [];
     const server = await startBoot({
       stateFile, assets: pins.iso === undefined ? { files } : { files, iso }, profile, http: { port: 0, hostname: "127.0.0.1" }, tftp: { port: 0, hostname: "127.0.0.1" }, emit: (e) => events.push(`${e.kind}: ${e.detail}`),
-      provider: { hosts: async () => [{ name: "athens", mac: "aa:bb:cc:dd:ee:ff" }, { name: "sparta" }], userData: async () => USER_DATA, metaData: async (h) => `instance-id: ${h}\n`, passwordHash: async () => "$6$made$up", ...provider },
+      provider: { hosts: async () => [{ name: "synthetic-server-02", mac: "aa:bb:cc:dd:ee:ff" }, { name: "synthetic-server-03" }], userData: async () => USER_DATA, metaData: async (h) => `instance-id: ${h}\n`, passwordHash: async () => "$6$made$up", ...provider },
     });
     try {
       const url = `http://127.0.0.1:${server.httpPort}/`;
@@ -285,34 +285,34 @@ proves(["0004-netboot-physical FR-005"], "a host that is not armed boots its own
     const unarmed = await (await c.http("/boot/hosts/aa:bb:cc:dd:ee:ff.cfg")).text();
     assert(unarmed.includes("not armed") && !unarmed.includes("autoinstall"));
     const token = newToken();
-    assertEquals((await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "not armed: nothing is served");
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
+    assertEquals((await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "not armed: nothing is served");
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
     const menu = await (await c.http("/boot/hosts/aa:bb:cc:dd:ee:ff.cfg")).text();
-    assert(menu.includes("autoinstall") && menu.includes(`/install/athens/${token}/`), menu);
+    assert(menu.includes("autoinstall") && menu.includes(`/install/synthetic-server-02/${token}/`), menu);
     const stranger = await (await c.http("/boot/hosts/11:22:33:44:55:66.cfg")).text();
-    assert(stranger.includes("Unknown machine") && stranger.includes("Install athens"), "an unknown machine is offered the armed host, with its own disk first");
-    assertEquals((await c.http(`/install/athens/${"0".repeat(32)}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "a token that is not the one");
-    assertEquals((await c.http(`/install/sparta/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "a token is for one host");
-    const ud = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`);
+    assert(stranger.includes("Unknown machine") && stranger.includes("Install synthetic-server-02"), "an unknown machine is offered the armed host, with its own disk first");
+    assertEquals((await c.http(`/install/synthetic-server-02/${"0".repeat(32)}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "a token that is not the one");
+    assertEquals((await c.http(`/install/synthetic-server-03/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 403, "a token is for one host");
+    const ud = await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/user-data`);
     assertEquals(ud.status, 200);
     const served = (await ud.text()).split("\n")[1] ?? "";
-    assertEquals(JSON.parse(served), { base: `${c.url}install/athens/${token}/aa:bb:cc:dd:ee:ff/`, hash: "$6$made$up" });
-    assertEquals(await (await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/meta-data`)).text(), "instance-id: athens\n");
-    assert((await (await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/guard.sh`)).text()).includes("poweroff -f"));
+    assertEquals(JSON.parse(served), { base: `${c.url}install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/`, hash: "$6$made$up" });
+    assertEquals(await (await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/meta-data`)).text(), "instance-id: synthetic-server-02\n");
+    assert((await (await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/guard.sh`)).text()).includes("poweroff -f"));
     assertEquals(await (await c.http("/linux")).text(), "kernel");
     assertEquals(await (await c.http("/iso/x.iso")).text(), "image");
     assertEquals((await c.http("/iso/other.iso")).status, 404);
     assertEquals(new TextDecoder().decode((await tftpGet(c.tftp, "/boot/linux")).bytes), "kernel", "PXE and HTTP boot get the same files");
     assert(new TextDecoder().decode((await tftpGet(c.tftp, "/grub/grub.cfg")).bytes).includes("configfile"));
-    assert(c.events.some((e) => e.startsWith("install: serving the install data of athens")));
+    assert(c.events.some((e) => e.startsWith("install: serving the install data of synthetic-server-02")));
   });
 });
 
 proves(["0004-netboot-physical FR-005"], "no install data is served where the boot machine has no password hash, and the hash is never in what is kept", async () => {
   await withBoot(async (c) => {
     const token = newToken();
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "x" }), value: 0 }));
-    const r = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`);
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "x" }), value: 0 }));
+    const r = await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/user-data`);
     assertEquals(r.status, 500);
     assert(!(await r.text()).includes("$6$"));
     assert(!(await fs.readTextFile(c.stateFile)).includes("$6$"), "the state holds no secret");
@@ -322,28 +322,28 @@ proves(["0004-netboot-physical FR-005"], "no install data is served where the bo
 proves(["0004-netboot-physical FR-006"], "the guard stops a machine that holds data, lets a blank one and a confirmed one go on, notes progress, and done disarms the host and remembers its MAC", async () => {
   await withBoot(async (c) => {
     const token = newToken();
-    const at = `install/athens/${token}/aa:bb:cc:dd:ee:ff`;
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "x" }), value: 0 }));
+    const at = `install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff`;
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "x" }), value: 0 }));
     const post = (what: string, body: string) => c.http(`/${at}/${what}`, { method: "POST", body });
     const used = "disk=sda 500107862016 sata\nsignature=/dev/sda gpt\n";
     const stop = await (await post("facts", used)).text();
     assert(stop.startsWith("stop: ") && stop.includes("not blank") && stop.includes("confirm-destroy"), stop);
     assert((await (await post("facts", "disk=sda 500107862016 sata\n")).text()).startsWith("ok: every disk is blank"));
     assert((await (await post("facts", "cpus=1\n")).text()).startsWith("stop: the installer sees no disk"));
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "x", confirmDestroy: true }), value: 0 }));
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "x", confirmDestroy: true }), value: 0 }));
     assert((await (await post("facts", used)).text()).startsWith("ok: erasing as confirmed"));
     assertEquals((await post("event", JSON.stringify({ phase: "Install", level: "info", summary: "partitioning" }))).status, 200);
     assertEquals((await post("done", "")).status, 200);
     const s = await readState(c.stateFile);
-    assertEquals([isArmed(s, "athens"), s.installed["athens"]?.mac], [false, "aa:bb:cc:dd:ee:ff"]);
+    assertEquals([isArmed(s, "synthetic-server-02"), s.installed["synthetic-server-02"]?.mac], [false, "aa:bb:cc:dd:ee:ff"]);
     assert(s.progress.some((p) => p.summary === "partitioning") && s.progress.some((p) => p.phase === "Guard" && p.level === "fail") && s.progress.at(-1)?.summary === "the installer is done");
     assertEquals((await c.http(`/${at}/user-data`)).status, 403, "after done nothing is served");
     assert((await (await c.http("/boot/hosts/aa:bb:cc:dd:ee:ff.cfg")).text()).includes("not armed"), "its next network boot does not reinstall it");
     // it may come back: the same MAC is allowed to be reinstalled over its own disk, once armed again
     const t2 = newToken();
-    await updateState(c.stateFile, (st) => ({ state: arm(st, "athens", { token: t2, at: "y" }), value: 0 }));
-    assert((await (await c.http(`/install/athens/${t2}/aa:bb:cc:dd:ee:ff/facts`, { method: "POST", body: used })).text()).startsWith("ok: this machine installed as athens before"));
-    assert((await (await c.http(`/install/athens/${t2}/11:22:33:44:55:66/facts`, { method: "POST", body: used })).text()).startsWith("stop: "), "another machine's disks are not erased");
+    await updateState(c.stateFile, (st) => ({ state: arm(st, "synthetic-server-02", { token: t2, at: "y" }), value: 0 }));
+    assert((await (await c.http(`/install/synthetic-server-02/${t2}/aa:bb:cc:dd:ee:ff/facts`, { method: "POST", body: used })).text()).startsWith("ok: this machine installed as synthetic-server-02 before"));
+    assert((await (await c.http(`/install/synthetic-server-02/${t2}/11:22:33:44:55:66/facts`, { method: "POST", body: used })).text()).startsWith("stop: "), "another machine's disks are not erased");
   });
 });
 
@@ -371,9 +371,9 @@ proves(["0005-netboot-profiles FR-001", "0005-netboot-profiles FR-002", "0005-ne
 proves(["0005-netboot-profiles FR-003"], "a Debian host's menu boots its own kernel and ramdisk with the URL of its preseed, escapes nothing that GRUB would split, and Ubuntu's keeps the escaped semicolon", () => {
   const base = "http://192.0.2.10:8080/";
   const token = "d".repeat(32);
-  const deb = hostMenu({ name: "delphi" }, DEBIAN_13_PROFILE, base, token);
-  assert(deb.includes("linux /boot/linux auto=true priority=critical") && deb.includes(`url=${base}install/delphi/${token}/${"$"}{net_default_mac}/preseed.cfg`) && deb.includes("initrd /boot/initrd.gz") && !deb.includes("iso-url") && deb.includes("Debian 13.8"), deb);
-  const ubu = hostMenu({ name: "athens" }, UBUNTU_26_04_PROFILE, base, token);
+  const deb = hostMenu({ name: "synthetic-server-05" }, DEBIAN_13_PROFILE, base, token);
+  assert(deb.includes("linux /boot/linux auto=true priority=critical") && deb.includes(`url=${base}install/synthetic-server-05/${token}/${"$"}{net_default_mac}/preseed.cfg`) && deb.includes("initrd /boot/initrd.gz") && !deb.includes("iso-url") && deb.includes("Debian 13.8"), deb);
+  const ubu = hostMenu({ name: "synthetic-server-02" }, UBUNTU_26_04_PROFILE, base, token);
   assert(ubu.includes("autoinstall ds=nocloud-net\\;s="), "GRUB would end the command at a bare semicolon");
   assert(!ubu.includes("ip=dhcp ip=dhcp"));
 });
@@ -381,17 +381,17 @@ proves(["0005-netboot-profiles FR-003"], "a Debian host's menu boots its own ker
 proves(["0005-netboot-profiles FR-004"], "a server of the Debian profile serves the preseed as the install document under the token, refuses the user-data Ubuntu reads, and serves no image", async () => {
   await withBoot(async (c) => {
     const token = newToken();
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
-    const ud = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`);
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
+    const ud = await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/user-data`);
     assertEquals(ud.status, 200, "the default profile of the harness is Ubuntu's");
   });
   await withBoot(async (c) => {
     const token = newToken();
-    await updateState(c.stateFile, (s) => ({ state: arm(s, "athens", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
-    const pre = await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/preseed.cfg`);
+    await updateState(c.stateFile, (s) => ({ state: arm(s, "synthetic-server-02", { token, at: "2026-11-21T00:00:00Z" }), value: 0 }));
+    const pre = await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/preseed.cfg`);
     assertEquals(pre.status, 200);
     assert(pre.headers.get("content-type")?.startsWith("text/plain"));
-    assertEquals((await c.http(`/install/athens/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 404, "a Debian install does not read a user-data");
+    assertEquals((await c.http(`/install/synthetic-server-02/${token}/aa:bb:cc:dd:ee:ff/user-data`)).status, 404, "a Debian install does not read a user-data");
     assertEquals((await c.http(`/iso/x.iso`)).status, 404);
   }, {}, DEBIAN_13_PROFILE);
 });
@@ -399,8 +399,8 @@ proves(["0005-netboot-profiles FR-004"], "a server of the Debian profile serves 
 proves(["0005-netboot-profiles FR-003"], "a Rocky host's menu boots its kernel with the URL of its Kickstart and the repository, and a file of a two-folder tree is fetched from its own path", async () => {
   const base = "http://192.0.2.10:8080/";
   const token = "r".repeat(32);
-  const menu = hostMenu({ name: "corinth" }, ROCKY_9_PROFILE, base, token);
-  assert(menu.includes("linux /boot/vmlinuz ip=dhcp inst.repo=https://download.rockylinux.org/") && menu.includes(`inst.ks=${base}install/corinth/${token}/${"$"}{net_default_mac}/ks.cfg`) && menu.includes("initrd /boot/initrd.img") && menu.includes("Rocky Linux 9.9"), menu);
+  const menu = hostMenu({ name: "synthetic-server-04" }, ROCKY_9_PROFILE, base, token);
+  assert(menu.includes("linux /boot/vmlinuz ip=dhcp inst.repo=https://download.rockylinux.org/") && menu.includes(`inst.ks=${base}install/synthetic-server-04/${token}/${"$"}{net_default_mac}/ks.cfg`) && menu.includes("initrd /boot/initrd.img") && menu.includes("Rocky Linux 9.9"), menu);
   const asked: string[] = [];
   const bodies: Record<string, string> = Object.fromEntries(Object.keys(ROCKY_9_PROFILE.pins.files).map((n) => [n, `body of ${n}`]));
   const pins: BootPins = { ...ROCKY_9_PROFILE.pins, files: Object.fromEntries(Object.entries(bodies).map(([n, b]) => [n, sha(b)])) };

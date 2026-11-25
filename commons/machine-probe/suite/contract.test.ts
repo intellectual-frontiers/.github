@@ -36,7 +36,7 @@ proves(["0002-machine-probe-contract FR-002"], "the key line forces the probe an
 });
 
 proves(["0002-machine-probe-contract FR-003"], "a request is sent as the last argument of the ssh target's batch call that checks the host key against the repository's file, and a request that is not one of the three is not sent", async () => {
-  const t = target({ id: "sparta", class: "server", address: "sparta.example", user: "probe", port: 2222, credential: "probe" });
+  const t = target({ id: "synthetic-server-03", class: "server", address: "synthetic-server-03.example", user: "probe", port: 2222, credential: "probe" });
   assert(t.kind === "ok");
   const calls: string[][] = [];
   const run = async (argv: readonly string[]) => (calls.push([...argv]), { code: 0, success: true, signal: null, stdout: new TextEncoder().encode("1\n"), stderr: new Uint8Array() });
@@ -46,7 +46,7 @@ proves(["0002-machine-probe-contract FR-003"], "a request is sent as the last ar
   const a = calls[0] ?? [];
   for (const o of ["-T", "BatchMode=yes", "IdentitiesOnly=yes", "StrictHostKeyChecking=yes", "UserKnownHostsFile=/repo/known_hosts /home/a/.ssh/known_hosts", "PasswordAuthentication=no"]) assert(a.includes(o), `has ${o}`);
   assert(!a.includes("StrictHostKeyChecking=no"));
-  assertEquals(a.slice(-2), ["probe@sparta.example", "version"]);
+  assertEquals(a.slice(-2), ["probe@synthetic-server-03.example", "version"]);
   await send(encodeRequest({ kind: "osquery", sql: "SELECT 1" }));
   assertEquals(calls[1]?.at(-1), `osquery ${btoa("SELECT 1")}`);
   for (const bad of ["id", "facts; id", "osquery !!!"]) {

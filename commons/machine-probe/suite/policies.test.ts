@@ -62,5 +62,5 @@ proves(["0004-machine-probe-policies FR-004"], "the results are policy outcomes 
   assertEquals(judgePolicy({ result: firewall, observed: false, accepted: [], now: NOW }).status, "waiting");
   assertEquals(judgePolicy({ result: firewall, observed: true, accepted: [], now: NOW }).status, "fail");
   assertEquals(judgePolicy({ result: firewall, observed: true, accepted: [{ policy: "firewall", reason: "the router is the firewall", by: "an owner", until: "2027-01-01" }], now: NOW }).status, "accepted");
-  assertEquals(checkInvariants({ assets: [], observations: [], results: results.map((r) => ({ asset: "athens", id: r.id, status: r.status, controls: r.controls })) }), []);
+  assertEquals(checkInvariants({ assets: [], observations: [], results: results.map((r) => ({ asset: "synthetic-server-02", id: r.id, status: r.status, controls: r.controls })) }), []);
 });

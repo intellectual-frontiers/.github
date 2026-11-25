@@ -40,11 +40,11 @@ const refusal = (r: ReturnType<typeof defineAsset>): string => {
 const ws = (id: string, state: "discovered" | "adopted" | "managed", attributes: Record<string, string | boolean | readonly string[]>, owners: Record<string, string>, origin?: "provisioned" | "paired" | "integration" | "self" | "scan") =>
   defineAsset({ id, kind: "workstation", state, ...(origin === undefined ? {} : { origin }), owners, attributes });
 
-proves(["0008-estate-workstations FR-001", "0008-estate-workstations FR-002"], "a workstation is in the catalog with attributes none of which is required, defiant with none is accepted, and Omarchy is a flag on distro arch", () => {
+proves(["0008-estate-workstations FR-001", "0008-estate-workstations FR-002"], "a workstation is in the catalog with attributes none of which is required, synthetic-workstation-01 with none is accepted, and Omarchy is a flag on distro arch", () => {
   const spec = kindSpec("workstation");
   assert(spec !== undefined && spec.attributes.every((a) => a.required !== true));
   assertEquals(spec.attributes.map((a) => a.name), ["role", "disposability", "isolation", "os-family", "distro", "omarchy", "harnesses", "agents-policy"]);
-  made(defineAsset({ id: "defiant", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
+  made(defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
   assertEquals(checkAttributes("workstation", AGENT), []);
   assert(checkAttributes("workstation", { role: "robot" })[0]?.includes("none of agent-workspace, developer, other") === true);
   assert(checkAttributes("workstation", { isolation: "bare" }).length === 1 && checkAttributes("workstation", { role: "bot" }).length === 1 && checkAttributes("workstation", { "os-family": "beos" }).length === 1);
@@ -143,8 +143,8 @@ proves(["0008-estate-workstations FR-013"], "NoAuthorityWithoutScope is checked 
   const holds = made(ws("devbox", "adopted", { role: "developer", harnesses: ["codex"] }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   assert(violations([holds])[0]?.message.includes("holds harnesses") === true);
   assertEquals(violations([made(ws("agentbox", "adopted", AGENT, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
-  assertEquals(violations([made(ws("defiant", "adopted", {}, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired")), made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
-  const server = made(defineAsset({ id: "athens", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
+  assertEquals(violations([made(ws("synthetic-workstation-01", "adopted", {}, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired")), made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
+  const server = made(defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
   assertEquals(violations([server]), []);
 });
 
@@ -184,7 +184,7 @@ proves(["0008-estate-workstations FR-016"], "an agent workspace is due within 15
   const adopted = made(ws("agentbox", "adopted", AGENT, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
   const keep = made(ws("keepbox", "managed", { ...AGENT, disposability: "persistent" }, workstationOwners({ system: "opsfolio", state: "managed", disposability: "persistent" }), "paired"));
   const dev = made(ws("devbox", "adopted", { role: "developer" }, workstationOwners({ system: "opsfolio", state: "adopted" }), "paired"));
-  assertEquals([cadenceOf(p, adopted), cadenceOf(p, keep), cadenceOf(p, dev), cadenceOf(p, { id: "athens", state: "adopted" })], ["PT15M", "PT15M", "P1D", "P1D"]);
+  assertEquals([cadenceOf(p, adopted), cadenceOf(p, keep), cadenceOf(p, dev), cadenceOf(p, { id: "synthetic-server-02", state: "adopted" })], ["PT15M", "PT15M", "P1D", "P1D"]);
   assertEquals(cadenceOf(p, { id: "printer", state: "discovered" }), undefined);
   const own = defineCapturePolicy({ ...AGENT_WORKSPACE_CAPTURE, cadence: { perRole: { "agent-workspace": "PT15M" }, perAsset: { agentbox: "PT20M" } } });
   assert(own.kind === "ok" && cadenceOf(own.value, adopted) === "PT20M" && cadenceOf(own.value, keep) === "PT15M", "an asset's own cadence comes before its role's");

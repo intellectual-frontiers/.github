@@ -30,7 +30,7 @@ proves(["0005-estate-fleet-documents FR-001"], "the physical layer does no input
 
 proves(["0005-estate-fleet-documents FR-002"], "an asset is kept as one document and read back as the same asset, and a stored asset that breaks a rule of the estate is a finding and not an asset", async () => {
   const { fleet, store } = await fleetOf();
-  for (const a of [adopted("olympia"), managed("athens")]) {
+  for (const a of [adopted("synthetic-server-01"), managed("synthetic-server-02")]) {
     const saved = await fleet.putAsset(a, expectAbsent);
     assert(saved.kind === "ok" && saved.value.created, `${a.id} is written`);
     const got = await fleet.getAsset(a.id);
@@ -39,22 +39,22 @@ proves(["0005-estate-fleet-documents FR-002"], "an asset is kept as one document
     assertEquals(inputOf(got.value.value).id, a.id);
   }
   // an adopted asset that names an owner for a capability its state does not offer: written by hand below the layer
-  const broken = JSON.stringify({ id: "sparta", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon", access: "archon", converge: "archon" }, $version: 1 });
-  assert((await store.write(path("assets/s/sparta.json"), bytes(broken), expectAny)).kind === "ok");
+  const broken = JSON.stringify({ id: "synthetic-server-03", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon", access: "archon", converge: "archon" }, $version: 1 });
+  assert((await store.write(path("assets/s/synthetic-server-03.json"), bytes(broken), expectAny)).kind === "ok");
   const listed = await fleet.listAssets();
   assert(listed.kind === "ok");
-  assertEquals(listed.value.docs.map((d) => d.value.id), ["athens", "olympia"]);
-  assertEquals(listed.value.findings.map((f) => `${f.kind} ${f.path}`), ["undecodable assets/s/sparta.json"]);
+  assertEquals(listed.value.docs.map((d) => d.value.id), ["synthetic-server-01", "synthetic-server-02"]);
+  assertEquals(listed.value.findings.map((f) => `${f.kind} ${f.path}`), ["undecodable assets/s/synthetic-server-03.json"]);
 });
 
 proves(["0005-estate-fleet-documents FR-003"], "each type of document is written at version 1 with its version field, and one written at a newer version is refused as a newer version and never read as the current one", async () => {
   for (const [name, codec, value] of [
-    ["asset", assetCodec, adopted("olympia")],
+    ["asset", assetCodec, adopted("synthetic-server-01")],
     ["manifest", manifestCodec, { store: "example", schema: FLEET_SCHEMA, layout: FLEET_LAYOUT, created: AT }],
-    ["declaration", declarationCodec, { asset: "olympia", declared: { os: "linux" }, by: "operator", at: AT }],
-    ["acceptances", acceptancesCodec, { asset: "olympia", risks: [{ policy: "disk-encryption", reason: "holds only open-source code", by: "an owner", until: "2027-03-01" }] }],
-    ["evidence", evidenceCodec, { subject: "olympia", digest: "a".repeat(64), store: "evidence", type: "config", observedAt: AT }],
-    ["observation", observationCodec, { asset: "olympia", at: AT, source: "probe", state: { os: "linux" }, results: [] }],
+    ["declaration", declarationCodec, { asset: "synthetic-server-01", declared: { os: "linux" }, by: "operator", at: AT }],
+    ["acceptances", acceptancesCodec, { asset: "synthetic-server-01", risks: [{ policy: "disk-encryption", reason: "holds only open-source code", by: "an owner", until: "2027-03-01" }] }],
+    ["evidence", evidenceCodec, { subject: "synthetic-server-01", digest: "a".repeat(64), store: "evidence", type: "config", observedAt: AT }],
+    ["observation", observationCodec, { asset: "synthetic-server-01", at: AT, source: "probe", state: { os: "linux" }, results: [] }],
   ] as const) {
     const encoded = (codec as { encode(v: unknown): { kind: string; value?: Uint8Array } }).encode(value);
     assert(encoded.kind === "ok" && encoded.value !== undefined, `${name} encodes`);
@@ -66,15 +66,15 @@ proves(["0005-estate-fleet-documents FR-003"], "each type of document is written
 });
 
 proves(["0005-estate-fleet-documents FR-004"], "the layouts name the documents: the shard is the first character, an observation is named by its instant so that the names sort as the instants do, and every layout gives back the key of each path it makes", () => {
-  const key = parseDocId("olympia");
+  const key = parseDocId("synthetic-server-01");
   assert(key.kind === "ok");
   const p = shardedById.path(key.value);
   assert(p.kind === "ok");
-  assertEquals(p.value, "o/olympia.json");
+  assertEquals(p.value, "s/synthetic-server-01.json");
   const back = shardedById.key(p.value);
   assert(back.kind === "ok");
-  assertEquals(back.value, "olympia");
-  assertEquals(shardedById.key(path("z/olympia.json")).kind, "err", "a file in the wrong shard is not a document");
+  assertEquals(back.value, "synthetic-server-01");
+  assertEquals(shardedById.key(path("z/synthetic-server-01.json")).kind, "err", "a file in the wrong shard is not a document");
   assertEquals(flatById.key(path("a/b.json")).kind, "err", "a file below a folder is not a document of a flat folder");
   const a = observationKey("2026-11-20T09:59:59Z");
   const b = observationKey("2026-11-20T10:00:00Z");
@@ -109,12 +109,12 @@ proves(["0005-estate-fleet-documents FR-005"], "an identity that is a path, a do
 
 proves(["0005-estate-fleet-documents FR-006"], "an observation names a source and a calendar instant and carries its results; one with no source, a false instant or a result that is no status is refused", async () => {
   const { fleet } = await fleetOf();
-  assertEquals((await fleet.recordObservation({ asset: "olympia", at: AT, source: " ", state: {} })).kind, "err", "no source");
-  assertEquals((await fleet.recordObservation({ asset: "olympia", at: "2026-13-40T10:00:00Z", source: "probe", state: {} })).kind, "err", "no such instant");
-  assertEquals((await fleet.recordObservation({ asset: "olympia", at: "yesterday", source: "probe", state: {} })).kind, "err");
-  const good = await fleet.recordObservation({ asset: "olympia", at: AT, source: "probe", state: { os: "linux" }, results: [{ id: "disk-encryption", status: "pass", controls: ["CRY-05"] }] });
+  assertEquals((await fleet.recordObservation({ asset: "synthetic-server-01", at: AT, source: " ", state: {} })).kind, "err", "no source");
+  assertEquals((await fleet.recordObservation({ asset: "synthetic-server-01", at: "2026-13-40T10:00:00Z", source: "probe", state: {} })).kind, "err", "no such instant");
+  assertEquals((await fleet.recordObservation({ asset: "synthetic-server-01", at: "yesterday", source: "probe", state: {} })).kind, "err");
+  const good = await fleet.recordObservation({ asset: "synthetic-server-01", at: AT, source: "probe", state: { os: "linux" }, results: [{ id: "disk-encryption", status: "pass", controls: ["CRY-05"] }] });
   assert(good.kind === "ok" && good.value.created);
-  const latest = await fleet.latestObservation("olympia");
+  const latest = await fleet.latestObservation("synthetic-server-01");
   assert(latest.kind === "ok" && latest.value !== undefined);
   assertEquals(latest.value.results, [{ id: "disk-encryption", status: "pass", controls: ["CRY-05"] }]);
   assertEquals(latest.value.source, "probe");
@@ -122,16 +122,16 @@ proves(["0005-estate-fleet-documents FR-006"], "an observation names a source an
 
 proves(["0005-estate-fleet-documents FR-007"], "a reference to evidence holds the digest, the store, the subject and the type and never the bytes; a digest that is not 64 hexadecimal digits is not a reference, and the manifest holds the fleet, the schema and the layout", async () => {
   const { fleet } = await fleetOf();
-  const ref = { subject: "olympia", digest: "b".repeat(64), store: "evidence", type: "config", observedAt: AT, mediaType: "application/json", size: 12 };
+  const ref = { subject: "synthetic-server-01", digest: "b".repeat(64), store: "evidence", type: "config", observedAt: AT, mediaType: "application/json", size: 12 };
   const first = await fleet.recordEvidence(ref);
   assert(first.kind === "ok" && first.value.created);
-  assertEquals(first.value.path, `evidence/olympia/${"b".repeat(64)}.json`);
+  assertEquals(first.value.path, `evidence/synthetic-server-01/${"b".repeat(64)}.json`);
   const second = await fleet.recordEvidence(ref);
   assert(second.kind === "ok" && !second.value.created, "the same reference again is not made again");
-  const listed = await fleet.evidenceOf("olympia");
+  const listed = await fleet.evidenceOf("synthetic-server-01");
   assert(listed.kind === "ok");
   assertEquals(listed.value.refs, [ref]);
-  const read = await fleet.store.read(path(`evidence/olympia/${"b".repeat(64)}.json`));
+  const read = await fleet.store.read(path(`evidence/synthetic-server-01/${"b".repeat(64)}.json`));
   assert(read.kind === "ok");
   const text = new TextDecoder().decode(read.value.bytes);
   assert(!text.includes('"bytes"') && text.includes(ref.digest), "the document holds the digest and no bytes");
@@ -144,15 +144,15 @@ proves(["0005-estate-fleet-documents FR-007"], "a reference to evidence holds th
 proves(["0005-estate-fleet-documents FR-005", "0005-estate-fleet-documents FR-006"], "a document too deep to be read back is refused when it is written, a large one is kept whole, one the store finds too large is the store's refusal, and nothing is written for any of them", async () => {
   const { fleet, store } = await fleetOf();
   const deep = (n: number): Json => (n === 0 ? "leaf" : { next: deep(n - 1) });
-  const refused = await fleet.recordObservation({ asset: "olympia", at: AT, source: "probe", state: { deep: deep(40) } });
+  const refused = await fleet.recordObservation({ asset: "synthetic-server-01", at: AT, source: "probe", state: { deep: deep(40) } });
   assertEquals(refused.kind, "err", "nested deeper than 32 levels is refused");
-  const fine = await fleet.recordObservation({ asset: "olympia", at: AT, source: "probe", state: { deep: deep(20) } });
+  const fine = await fleet.recordObservation({ asset: "synthetic-server-01", at: AT, source: "probe", state: { deep: deep(20) } });
   assert(fine.kind === "ok" && fine.value.created);
   const big: Record<string, Json> = {};
   for (let i = 0; i < 20_000; i++) big[`key-${i}`] = "x".repeat(40);
-  const kept = await fleet.recordObservation({ asset: "olympia", at: "2026-11-20T11:00:00Z", source: "probe", state: big });
+  const kept = await fleet.recordObservation({ asset: "synthetic-server-01", at: "2026-11-20T11:00:00Z", source: "probe", state: big });
   assert(kept.kind === "ok", "a document of about a megabyte is kept whole");
-  const back = await fleet.latestObservation("olympia");
+  const back = await fleet.latestObservation("synthetic-server-01");
   assert(back.kind === "ok" && back.value !== undefined && Object.keys(back.value.state).length === 20_000);
   // a store that finds a write too large says no, and the fleet store passes the refusal on
   const small = makeStore({
@@ -165,8 +165,8 @@ proves(["0005-estate-fleet-documents FR-005", "0005-estate-fleet-documents FR-00
   });
   const limited = await openFleetStore({ primary: { name: named("record"), store: small }, actor: "operator", clock: ticking(Date.UTC(2026, 10, 20)) });
   assert(limited.kind === "ok");
-  const tooLarge = await limited.value.recordObservation({ asset: "athens", at: AT, source: "probe", state: { text: "y".repeat(1000) } });
+  const tooLarge = await limited.value.recordObservation({ asset: "synthetic-server-02", at: AT, source: "probe", state: { text: "y".repeat(1000) } });
   assert(tooLarge.kind === "err" && tooLarge.error.kind === "documents" && tooLarge.error.problem.kind === "store" && tooLarge.error.problem.problem.kind === "refused");
-  const none = await limited.value.observationsOf("athens");
+  const none = await limited.value.observationsOf("synthetic-server-02");
   assert(none.kind === "ok" && none.value.observations.length === 0, "nothing was written");
 });

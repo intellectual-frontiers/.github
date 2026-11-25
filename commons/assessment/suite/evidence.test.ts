@@ -12,7 +12,7 @@ import { addRecord, readStore } from "../src/physical/mod.ts";
 
 const NOW = "2026-11-21T12:00:00Z";
 const F = "nist-800-171a-r2";
-const ev = (o: Partial<Evidence> & { id: string }): Evidence => ({ framework: F, objective: "3.1.1[a]", method: "test", result: "pass", by: { kind: "tool", name: "probe" }, at: "2026-11-20T00:00:00Z", source: "policy:athens:firewall", determines: false, ...o });
+const ev = (o: Partial<Evidence> & { id: string }): Evidence => ({ framework: F, objective: "3.1.1[a]", method: "test", result: "pass", by: { kind: "tool", name: "probe" }, at: "2026-11-20T00:00:00Z", source: "policy:synthetic-server-02:firewall", determines: false, ...o });
 const person = (o: Partial<Evidence> & { id: string }): Evidence => ev({ method: "examine", by: { kind: "person", name: "Assessor" }, source: "doc:ssp", determines: true, ...o });
 
 proves(["0002-objective-evidence FR-001"], "a record is refused where a tool determines, not-applicable is not a person's word with a reason, the validity does not end after the start, or the source or maker is not named", () => {
@@ -39,7 +39,7 @@ proves(["0002-objective-evidence FR-002", "0002-objective-evidence FR-006"], "an
   assertEquals(standingOf([ev({ id: "x", at: "2026-11-20T00:00:00Z", result: "fail" }), ev({ id: "y", at: "2026-11-20T00:00:00Z", result: "pass" })], NOW), "supported", "the greater id counts at one instant");
   assertEquals(standingOf([person({ id: "n", result: "not-applicable", note: "Out of scope." })], NOW), "not-applicable");
   assertEquals(standingOf([person({ id: "p", determines: false })], NOW), "supported", "a person's record that does not determine only supports");
-  assertEquals(standingOf([ev({ id: "a" }), ev({ id: "b", source: "policy:sparta:firewall", result: "fail" })], NOW), "not-met");
+  assertEquals(standingOf([ev({ id: "a" }), ev({ id: "b", source: "policy:synthetic-server-03:firewall", result: "fail" })], NOW), "not-met");
 });
 
 const OBJECTIVES: readonly Objective[] = [
@@ -77,10 +77,10 @@ proves(["0002-objective-evidence FR-005"], "policy results give a test record by
   const out = evidenceFromPolicies(
     [{ id: "firewall", status: "pass" }, { id: "disk-encryption", status: "fail" }, { id: "antivirus", status: "waiting" }, { id: "few-admins", status: "warn" }, { id: "osquery", status: "accepted" }, { id: "unbound", status: "pass" }],
     { firewall: ["3.13.1[a]", "3.13.1[b]"], "disk-encryption": ["3.13.16"], antivirus: ["3.14.2"], "few-admins": ["3.1.5"], osquery: ["3.3.1"] },
-    { framework: F, at: NOW, tool: "opsfolio-probe", asset: "athens" },
+    { framework: F, at: NOW, tool: "opsfolio-probe", asset: "synthetic-server-02" },
   );
   assertEquals(out.map((e) => [e.objective, e.result]), [["3.13.16", "fail"], ["3.13.1[a]", "pass"], ["3.13.1[b]", "pass"]]);
-  assert(out.every((e) => e.method === "test" && e.by.kind === "tool" && !e.determines && e.source.startsWith("policy:athens:") && problemsOf(e).length === 0));
+  assert(out.every((e) => e.method === "test" && e.by.kind === "tool" && !e.determines && e.source.startsWith("policy:synthetic-server-02:") && problemsOf(e).length === 0));
   assertEquals(evidenceFromPolicies([{ id: "firewall", status: "pass" }], { firewall: ["a"] }, { framework: F, at: NOW, tool: "t", asset: "x", validUntil: "2026-11-22T00:00:00Z" })[0]?.validUntil, "2026-11-22T00:00:00Z");
 });
 

@@ -26,7 +26,7 @@ proves(["0002-scanners-catalog FR-001"], "the scanners are data with the techniq
 });
 
 proves(["0002-scanners-catalog FR-002"], "a target is refused unless it is fit for its kind, and one of the wrong kind is refused", () => {
-  const ok = [{ kind: "endpoint", value: "https://app.example.test:8443/api/v1" }, { kind: "endpoint", value: "http://10.0.0.5" }, { kind: "host", value: "athens.example.test" }, { kind: "host", value: "192.0.2.10" }, { kind: "path", value: "/srv/code/portal" }, { kind: "path", value: "src/my app" }, { kind: "image", value: "registry.example.test/portal:1.4" }, { kind: "image", value: "alpine@sha256:abc123" }] as const;
+  const ok = [{ kind: "endpoint", value: "https://app.example.test:8443/api/v1" }, { kind: "endpoint", value: "http://10.0.0.5" }, { kind: "host", value: "synthetic-server-02.example.test" }, { kind: "host", value: "192.0.2.10" }, { kind: "path", value: "/srv/code/portal" }, { kind: "path", value: "src/my app" }, { kind: "image", value: "registry.example.test/portal:1.4" }, { kind: "image", value: "alpine@sha256:abc123" }] as const;
   for (const t of ok) assertEquals(targetProblem(t), undefined, t.value);
   const bad = [{ kind: "endpoint", value: "https://a.example.test/x;rm -rf" }, { kind: "endpoint", value: "https://user:pw@a.example.test" }, { kind: "endpoint", value: "https://a.example.test/?q=1" }, { kind: "endpoint", value: "ftp://a.example.test" }, { kind: "endpoint", value: "https://a.example.test/a b" }, { kind: "endpoint", value: "-u https://a.example.test" }, { kind: "host", value: "-oX" }, { kind: "host", value: "a;b" }, { kind: "host", value: "a b" }, { kind: "path", value: "-rf" }, { kind: "path", value: "../etc" }, { kind: "path", value: "/a/../b" }, { kind: "path", value: "a\nb" }, { kind: "image", value: "-x" }, { kind: "image", value: "a b" }, { kind: "image", value: "a;b" }] as const;
   for (const t of bad) assert(targetProblem(t) !== undefined, t.value);
@@ -42,11 +42,11 @@ proves(["0002-scanners-catalog FR-003"], "the command line is a list of argument
     const r = argvOf("nuclei", { kind: "endpoint", value: "https://a.example.test" }, { outDir: "/w", ...(rate === undefined ? {} : { rate }) });
     assert(r.kind === "ok" && r.value[r.value.indexOf("-rate-limit") + 1] === want, String(rate));
   }
-  const nmap = argvOf("nmap", { kind: "host", value: "athens.example.test" }, { outDir: "/w" });
-  assert(nmap.kind === "ok" && nmap.value.join(" ") === "-sV -Pn -T3 --top-ports 100 -oX - athens.example.test");
-  const ports = argvOf("nmap", { kind: "host", value: "athens.example.test" }, { outDir: "/w", ports: "22,80,8000-8100" });
+  const nmap = argvOf("nmap", { kind: "host", value: "synthetic-server-02.example.test" }, { outDir: "/w" });
+  assert(nmap.kind === "ok" && nmap.value.join(" ") === "-sV -Pn -T3 --top-ports 100 -oX - synthetic-server-02.example.test");
+  const ports = argvOf("nmap", { kind: "host", value: "synthetic-server-02.example.test" }, { outDir: "/w", ports: "22,80,8000-8100" });
   assert(ports.kind === "ok" && ports.value.includes("22,80,8000-8100"));
-  assert(argvOf("nmap", { kind: "host", value: "athens.example.test" }, { outDir: "/w", ports: "22; id" }).kind === "err");
+  assert(argvOf("nmap", { kind: "host", value: "synthetic-server-02.example.test" }, { outDir: "/w", ports: "22; id" }).kind === "err");
   const trivy = argvOf("trivy", { kind: "path", value: "src/portal" }, { outDir: "/w" });
   assert(trivy.kind === "ok" && trivy.value.join(" ") === "fs --format sarif --quiet ./src/portal");
   assertEquals(args("trivy", { kind: "path", value: "/srv/portal" }, { outDir: "/w" }).at(-1), "/srv/portal");

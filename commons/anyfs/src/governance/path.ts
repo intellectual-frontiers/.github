@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { parsePath, parsePrefix, isUnder } from "./path.ts";
- * const p = parsePath("fleet/olympia/asset.json");
+ * const p = parsePath("fleet/synthetic-server-01/asset.json");
  * const prefix = parsePrefix("fleet");
  * p.kind === "ok" && prefix.kind === "ok" && isUnder(prefix.value, p.value); // true
  * ```

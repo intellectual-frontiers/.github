@@ -105,10 +105,10 @@ const schemaV2 = ok(defineSchema({ current: 2, decoder: assetDecoder, migrations
 const codecV2 = versioned(jsonTree, schemaV2);
 
 proves(["0006-anyfs-documents FR-004"], "a document is written at the current version and read at any older one through the migrations (and said to be stale), and one of a newer version or a bad shape is refused with its reason", () => {
-  const written = ok(codecV2.encode({ name: "olympia", cores: 8 }));
-  assertEquals(new TextDecoder().decode(written), `{\n  "$version": 2,\n  "cores": 8,\n  "name": "olympia"\n}\n`);
+  const written = ok(codecV2.encode({ name: "synthetic-server-01", cores: 8 }));
+  assertEquals(new TextDecoder().decode(written), `{\n  "$version": 2,\n  "cores": 8,\n  "name": "synthetic-server-01"\n}\n`);
   const current = ok(codecV2.decode(written));
-  assertEquals(current.value, { name: "olympia", cores: 8 });
+  assertEquals(current.value, { name: "synthetic-server-01", cores: 8 });
   assertEquals(current.stale, false);
   const old = ok(codecV2.decode(bytes('{ "label": "lab" }')));
   assertEquals(old.value, { name: "lab", cores: 1 });
@@ -141,15 +141,15 @@ proves(["0006-anyfs-documents FR-005"], "an identifier, an extension and a day a
   assertEquals(parseIsoDate("2024-02-29").kind, "ok");
   assertEquals(parseIsoDate("2026-2-3").kind, "err");
   const flat = byId(ext);
-  assertEquals(ok(flat.path(id("olympia"))), "olympia.json");
-  assertEquals(flat.key(p("sub/olympia.json")).kind, "err");
-  assertEquals(flat.key(p("olympia.txt")).kind, "err");
+  assertEquals(ok(flat.path(id("synthetic-server-01"))), "synthetic-server-01.json");
+  assertEquals(flat.key(p("sub/synthetic-server-01.json")).kind, "err");
+  assertEquals(flat.key(p("synthetic-server-01.txt")).kind, "err");
   assertEquals(flat.key(p(".json")).kind, "err");
   const shard = ok(sharded(ext, 2));
-  assertEquals(ok(shard.path(id("olympia"))), "ol/olympia.json");
+  assertEquals(ok(shard.path(id("synthetic-server-01"))), "sy/synthetic-server-01.json");
   assertEquals(shard.path(id("a")).kind, "err");
-  assertEquals(shard.key(p("zz/olympia.json")).kind, "err");
-  assertEquals(shard.key(p("olympia.json")).kind, "err");
+  assertEquals(shard.key(p("zz/synthetic-server-01.json")).kind, "err");
+  assertEquals(shard.key(p("synthetic-server-01.json")).kind, "err");
   assertEquals(sharded(ext, 0).kind, "err");
   assertEquals(sharded(ext, 5).kind, "err");
   const day = byDate(ext);
@@ -179,21 +179,21 @@ const assets = (store: ReturnType<typeof memoryStore>) => collection(store, { pr
 proves(["0006-anyfs-documents FR-007"], "a document is put with what the put expects and read back with the revision it was written at, and a put over what is not as expected is the store's conflict", async () => {
   const store = memoryStore({ name: "fleet" });
   const docs = assets(store);
-  const key = id("olympia");
-  assertEquals(ok(docs.pathOf(key)), "fleet/assets/olympia.json");
-  const created = ok(await docs.put(key, { name: "olympia", cores: 8 }, expectAbsent));
+  const key = id("synthetic-server-01");
+  assertEquals(ok(docs.pathOf(key)), "fleet/assets/synthetic-server-01.json");
+  const created = ok(await docs.put(key, { name: "synthetic-server-01", cores: 8 }, expectAbsent));
   assertEquals(created.created, true);
   const got = ok(await docs.get(key));
-  assertEquals(got.value, { name: "olympia", cores: 8 });
+  assertEquals(got.value, { name: "synthetic-server-01", cores: 8 });
   assertEquals(got.rev, created.rev);
   assertEquals(got.stale, false);
-  const again = await docs.put(key, { name: "olympia", cores: 16 }, expectAbsent);
+  const again = await docs.put(key, { name: "synthetic-server-01", cores: 16 }, expectAbsent);
   assert(again.kind === "err" && again.error.kind === "store" && again.error.problem.kind === "conflict");
-  const moved = ok(await docs.put(key, { name: "olympia", cores: 16 }, expectRev(created.rev)));
+  const moved = ok(await docs.put(key, { name: "synthetic-server-01", cores: 16 }, expectRev(created.rev)));
   assert(moved.rev !== created.rev);
-  const stale = await docs.put(key, { name: "olympia", cores: 4 }, expectRev(created.rev));
+  const stale = await docs.put(key, { name: "synthetic-server-01", cores: 4 }, expectRev(created.rev));
   assert(stale.kind === "err" && stale.error.kind === "store");
-  const same1 = ok(await docs.put(key, { name: "olympia", cores: 16 }, expectAny));
+  const same1 = ok(await docs.put(key, { name: "synthetic-server-01", cores: 16 }, expectAny));
   assertEquals(same1.rev, moved.rev);
   const missing = await docs.get(id("nobody"));
   assert(missing.kind === "err" && missing.error.kind === "store" && missing.error.problem.kind === "missing");
@@ -349,14 +349,14 @@ proves(["0006-anyfs-documents FR-011"], "migrate writes each stale document agai
 });
 
 proves(["0006-anyfs-documents FR-012"], "the codecs of the file formats read a tree from JSON5 and from YAML and write it back, and the document over them has a version like any other", () => {
-  const tree = { name: "olympia", cores: 8, tags: ["a", "b"], nested: { ok: true, none: null } };
+  const tree = { name: "synthetic-server-01", cores: 8, tags: ["a", "b"], nested: { ok: true, none: null } };
   for (const codec of [json5Tree, yamlTree]) {
     const written = ok(codec.encode(tree));
     const read = ok(codec.decode(written));
     assertEquals(canonicalJson(read.value), canonicalJson(tree));
   }
-  const commented = ok(json5Tree.decode(bytes("// the asset\n{ name: 'olympia', cores: 8, }\n")));
-  assertEquals(commented.value, { name: "olympia", cores: 8 });
+  const commented = ok(json5Tree.decode(bytes("// the asset\n{ name: 'synthetic-server-01', cores: 8, }\n")));
+  assertEquals(commented.value, { name: "synthetic-server-01", cores: 8 });
   assertEquals(json5Tree.decode(bytes("{ name: ")).kind, "err");
   assertEquals(yamlTree.decode(bytes("a: [1, 2")).kind, "err");
   const asYaml = versioned(yamlTree, schemaV2);

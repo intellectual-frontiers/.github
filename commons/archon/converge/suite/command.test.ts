@@ -50,17 +50,17 @@ const base = (subject: ConvergePluginConfig["subject"]): ConvergePluginConfig =>
 
 proves(["0002-converge-command FR-001"], "the plugin composes into the command with the verbs plan and apply, and an asset that is not for it to change is refused with the fleet's own code, exit and words, and the options the fleet gave reach its function", async () => {
   const composed = assemble([(() => {
-    const p = convergePlugin(base(async () => err({ message: "athens is adopted", code: "E-NOT-OURS", exit: "findings" })));
+    const p = convergePlugin(base(async () => err({ message: "synthetic-server-02 is adopted", code: "E-NOT-OURS", exit: "findings" })));
     if (p.kind === "err") throw new Error("plugin");
     return p.value;
   })()], "0.1.0");
   assert(composed.kind === "ok");
   assertEquals(verbIds(composed.value.program).filter((v) => v.includes("converge")), ["archon converge apply", "archon converge plan"]);
   const seen: Array<[string, Record<string, string>]> = [];
-  const refused = await run(base(async (asset, o) => (seen.push([asset, { ...o }]), err({ message: "athens is adopted: it is observed and never changed", code: "E-NOT-OURS", exit: "findings" }))), ["converge", "plan", "--asset", "athens", "--fleet", "lab"]);
+  const refused = await run(base(async (asset, o) => (seen.push([asset, { ...o }]), err({ message: "synthetic-server-02 is adopted: it is observed and never changed", code: "E-NOT-OURS", exit: "findings" }))), ["converge", "plan", "--asset", "synthetic-server-02", "--fleet", "lab"]);
   assertEquals(refused.code, 1, refused.err + refused.out);
   assert(refused.err.includes("E-NOT-OURS") && refused.err.includes("never changed"), refused.err);
-  assertEquals(seen, [["athens", { fleet: "lab" }]]);
+  assertEquals(seen, [["synthetic-server-02", { fleet: "lab" }]]);
   assertEquals((await run(base(async () => err({ message: "no such asset", code: "E-ASSET", exit: "usage" })), ["converge", "apply", "--asset", "x", "--plan-hash", "sha256:0"])).code, 2);
 });
 
@@ -68,7 +68,7 @@ const reason = await runtimeUsable("docker");
 
 proves(["0002-converge-command FR-002", "0002-converge-command FR-003", "0002-converge-command FR-004", "0002-converge-command FR-005"], "through the command on a real machine with ansible-core: plan with a hash and what no dialect carries, an apply of another hash refused, the approved plan applied and the plan after it empty, drift found again, and a removal that needs --allow-removal yes", async (t) => {
   if (reason !== undefined) return t.skip(reason);
-  const spec = readMachineSpec({ name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core"] });
+  const spec = readMachineSpec({ name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: ["ansible-core"] });
   assert(spec.kind === "ok");
   const started = await startMachine(spec.value);
   assert(started.kind === "ok", started.kind === "err" ? started.error : "");
@@ -79,7 +79,7 @@ proves(["0002-converge-command FR-002", "0002-converge-command FR-003", "0002-co
     const sh = async (...argv: string[]) => textOf((await m.executor.exec(argv)).stdout);
     let hash = "";
 
-    const plan = await run(config, ["converge", "plan", "--asset", "athens"]);
+    const plan = await run(config, ["converge", "plan", "--asset", "synthetic-server-02"]);
     assertEquals(plan.code, 4, plan.err + plan.out);
     assert(plan.out.includes("4 changes, 0 already as declared") && plan.out.includes("create group.lab") && plan.out.includes("not converged: fw.ssh"), plan.out);
     hash = /(sha256:[0-9a-f]{64})/.exec(plan.out)?.[1] ?? "";
@@ -87,36 +87,36 @@ proves(["0002-converge-command FR-002", "0002-converge-command FR-003", "0002-co
     assertEquals((await m.executor.exec(["getent", "passwd", "labuser"])).code, 2, "the plan changed nothing");
     assertEquals((await m.executor.exec(["test", "-e", "/var/lib/archon-test"])).code, 1, "and wrote nothing on the machine");
 
-    const wrong = await run(config, ["converge", "apply", "--asset", "athens", "--plan-hash", `sha256:${"0".repeat(64)}`]);
+    const wrong = await run(config, ["converge", "apply", "--asset", "synthetic-server-02", "--plan-hash", `sha256:${"0".repeat(64)}`]);
     assertEquals(wrong.code, 1);
     assert(wrong.err.includes("the plan changed"), wrong.err);
     assertEquals((await m.executor.exec(["getent", "passwd", "labuser"])).code, 2);
 
-    const applied = await run(config, ["converge", "apply", "--asset", "athens", "--plan-hash", hash]);
+    const applied = await run(config, ["converge", "apply", "--asset", "synthetic-server-02", "--plan-hash", hash]);
     assertEquals(applied.code, 0, applied.err + applied.out);
     assert(applied.out.includes("applied") && applied.out.includes("the plan after the apply is empty"), applied.out);
     assertEquals((await sh("stat", "-c", "%U %a", "/srv/lab/motd")).trim(), "labuser 640");
-    const again = await run(config, ["converge", "plan", "--asset", "athens"]);
+    const again = await run(config, ["converge", "plan", "--asset", "synthetic-server-02"]);
     assertEquals(again.code, 0, again.err + again.out);
     assert(again.out.includes("0 changes, 4 already as declared") && again.out.includes("the plan is empty"), again.out);
 
     assert((await m.executor.exec(["tee", "/srv/lab/motd"], { input: "changed by hand\n" })).success);
-    const drift = await run(config, ["converge", "plan", "--asset", "athens"]);
+    const drift = await run(config, ["converge", "plan", "--asset", "synthetic-server-02"]);
     assertEquals(drift.code, 4);
     assert(drift.out.includes("1 change, 3 already as declared") && drift.out.includes("update file.lab"), drift.out);
-    assertEquals((await run(config, ["converge", "apply", "--asset", "athens", "--plan-hash", /(sha256:[0-9a-f]{64})/.exec(drift.out)?.[1] ?? ""])).code, 0);
+    assertEquals((await run(config, ["converge", "apply", "--asset", "synthetic-server-02", "--plan-hash", /(sha256:[0-9a-f]{64})/.exec(drift.out)?.[1] ?? ""])).code, 0);
     assertEquals(await sh("cat", "/srv/lab/motd"), "hello\n");
 
     carried = [CARRIED[0]!, CARRIED[1]!, req("file.lab", "file", { path: "/srv/lab/motd" }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" }), CARRIED[2]!];
-    const removal = await run(config, ["converge", "plan", "--asset", "athens"]);
+    const removal = await run(config, ["converge", "plan", "--asset", "synthetic-server-02"]);
     assertEquals(removal.code, 4, removal.err + removal.out);
     assert(removal.out.includes("remove") && removal.out.includes("file.lab"), removal.out);
     const h = /(sha256:[0-9a-f]{64})/.exec(removal.out)?.[1] ?? "";
-    const refused = await run(config, ["converge", "apply", "--asset", "athens", "--plan-hash", h]);
+    const refused = await run(config, ["converge", "apply", "--asset", "synthetic-server-02", "--plan-hash", h]);
     assertEquals(refused.code, 1);
     assert(refused.err.includes("--allow-removal"), refused.err);
     assertEquals((await m.executor.exec(["test", "-f", "/srv/lab/motd"])).success, true, "nothing was removed");
-    assertEquals((await run(config, ["converge", "apply", "--asset", "athens", "--plan-hash", h, "--allow-removal", "yes"])).code, 0);
+    assertEquals((await run(config, ["converge", "apply", "--asset", "synthetic-server-02", "--plan-hash", h, "--allow-removal", "yes"])).code, 0);
     assertEquals((await m.executor.exec(["test", "-f", "/srv/lab/motd"])).success, false, "the file is gone");
   } finally {
     await m.stop();

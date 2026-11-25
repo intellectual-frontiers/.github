@@ -134,7 +134,7 @@ function fakeSsh(home: string): (argv: readonly string[], opts?: RunOptions) => 
 proves(["0004-anyfs-cli-surfaces FR-001", "0004-anyfs-cli-surfaces FR-002"], "a host reached by SSH is a store through the safe executor, and a host that does not answer is a problem of the computer", () =>
   withLab(async (l) => {
     const host = path.join(l.dir, "host");
-    await fill(l.dir, { "host/fleet/olympia.json": '{"name":"olympia"}\n' });
+    await fill(l.dir, { "host/fleet/synthetic-server-01.json": '{"name":"synthetic-server-01"}\n' });
     const run = fakeSsh(path.join(l.dir, "home"));
     await fs.mkdir(path.join(l.dir, "home"), { recursive: true });
     const ran = async (args: readonly string[], runner = run) => {
@@ -146,9 +146,9 @@ proves(["0004-anyfs-cli-surfaces FR-001", "0004-anyfs-cli-surfaces FR-002"], "a 
     };
     const listed = await ran(["ls", `ssh://fleet.example.org${host}/fleet`]);
     assertEquals(listed.code, 0, listed.err);
-    assertEquals(listed.out, "olympia.json");
-    const cat = await ran(["cat", `ssh://fleet.example.org${host}/fleet/olympia.json`]);
-    assertEquals(cat.out, '{"name":"olympia"}');
+    assertEquals(listed.out, "synthetic-server-01.json");
+    const cat = await ran(["cat", `ssh://fleet.example.org${host}/fleet/synthetic-server-01.json`]);
+    assertEquals(cat.out, '{"name":"synthetic-server-01"}');
     const refused = await ran(["ls", `ssh://fleet.example.org${host}/fleet`], () => Promise.resolve({ code: 255, success: false, signal: null, stdout: new Uint8Array(), stderr: new TextEncoder().encode("Host key verification failed.\n") }));
     assertEquals(refused.code, 3);
     assertStringIncludes(refused.err, "E-OPEN");

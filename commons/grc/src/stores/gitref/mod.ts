@@ -8,7 +8,7 @@
  * ```ts
  * import { gitRefStore } from "./mod.ts";
  * // const store = gitRefStore({ repo: ".", branch: "evidence", identity: { name: "collector", email: "collector@localhost" } });
- * // await store.commit([{ path: "state/olympia.json", bytes }], "olympia: state changed");
+ * // await store.commit([{ path: "state/synthetic-server-01.json", bytes }], "synthetic-server-01: state changed");
  * ```
  *
  * @module

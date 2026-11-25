@@ -93,10 +93,10 @@ proves(["0004-scanners-run FR-004"], "a tool is started with a list of arguments
     process.env["OPSFOLIO_TEST_SECRET"] = "hunter2-made-up";
     try {
       const t = await tool(dir, "nmap", `<?xml version="1.0"?><nmaprun version="7.95"><host><address addr="192.0.2.10"/><ports><port protocol="tcp" portid="22"><state state="open"/><service name="ssh"/></port></ports></host></nmaprun>`);
-      const r = await runScanner(input({ scanner: "nmap", target: { kind: "host", value: "athens.example.test" }, pins: await t.pins() }));
+      const r = await runScanner(input({ scanner: "nmap", target: { kind: "host", value: "synthetic-server-02.example.test" }, pins: await t.pins() }));
       assert(r.kind === "ok", JSON.stringify(r));
       const mark = await fs.readTextFile(t.mark);
-      assert(mark.includes("args: -sV -Pn -T3 --top-ports 100 -oX - athens.example.test"), mark);
+      assert(mark.includes("args: -sV -Pn -T3 --top-ports 100 -oX - synthetic-server-02.example.test"), mark);
       assert(mark.includes("secret: none") && !mark.includes("hunter2"), "the caller's environment does not reach the tool");
       assert(mark.includes("path: /usr/local/bin:/usr/bin:/bin"), mark);
       const cwd = /cwd: (.*)/.exec(mark)?.[1] ?? "";

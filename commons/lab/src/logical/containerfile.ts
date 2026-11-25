@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { containerfile, readMachineSpec } from "./containerfile.ts";
- * const spec = readMachineSpec({ name: "athens", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: [] });
+ * const spec = readMachineSpec({ name: "synthetic-server-02", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: [] });
  * spec.kind === "ok" && containerfile(spec.value).startsWith("FROM ubuntu:24.04"); // true
  * ```
  *
@@ -21,7 +21,7 @@ const USER = /^[a-z][a-z0-9_-]{0,31}$/;
 const PACKAGE = /^[a-z0-9][a-z0-9+.-]*$/;
 const ZONE = /^(?:UTC|[A-Za-z_]+(?:\/[A-Za-z_+-]+){1,2})$/;
 
-/** A machine description from data, or every reason it is not one: names that are lower case words, a base image there is, users that are account names, packages that are names of the archive, a time zone of the form area/location. */
+/** A machine description from data, or every reason it is not one: names of a lower case letter then lower case letters, digits and hyphens, a base image there is, users that are account names, packages that are names of the archive, a time zone of the form area/location. */
 export function readMachineSpec(input: unknown): Result<MachineSpec, readonly string[]> {
   const problems: string[] = [];
   const o = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};

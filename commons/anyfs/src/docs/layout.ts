@@ -8,8 +8,8 @@
  * ```ts
  * import { byId, parseDocId, parseExtension } from "./layout.ts";
  * const ext = parseExtension(".json");
- * const id = parseDocId("olympia");
- * if (ext.kind === "ok" && id.kind === "ok") byId(ext.value).path(id.value); // ok "olympia.json"
+ * const id = parseDocId("synthetic-server-01");
+ * if (ext.kind === "ok" && id.kind === "ok") byId(ext.value).path(id.value); // ok "synthetic-server-01.json"
  * ```
  *
  * @module

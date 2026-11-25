@@ -52,7 +52,7 @@ const refusedText = (text: string): string => {
 };
 
 proves(["0002-anyfs-governance FR-001"], "a path is a relative key of segments, refusing the way up, backslashes, control characters, empty segments, long names and lone surrogates, and it is normalized", () => {
-  for (const ok of ["a", "a/b", "fleet/olympia/asset.json", "ünï/çödé", "日本語", "emoji/😀", "with space/x", "a.b/c..d", "..a/b..", ".hidden"]) assertEquals(parsePath(ok).kind, "ok", ok);
+  for (const ok of ["a", "a/b", "fleet/synthetic-server-01/asset.json", "ünï/çödé", "日本語", "emoji/😀", "with space/x", "a.b/c..d", "..a/b..", ".hidden"]) assertEquals(parsePath(ok).kind, "ok", ok);
   for (const bad of ["", "/a", "a/", "a//b", ".", "..", "a/./b", "a/../b", "a\\b", "a\u0000b", "a\u0007b", "a\u007fb", "x".repeat(256), "a/" + "é".repeat(128), "a".repeat(1025), "\ud800"]) {
     assertEquals(parsePath(bad).kind, "err", JSON.stringify(bad).slice(0, 30));
   }
@@ -134,7 +134,7 @@ proves(["0002-anyfs-governance FR-007"], "a place is a typed address that format
     "memory:scratch",
     "file:///var/lib/fleet",
     "file:///C:/data/fleet",
-    "ssh://shah@olympia.example:2222/srv/fleet",
+    "ssh://shah@synthetic-server-01.example:2222/srv/fleet",
     "ssh://host/srv",
     "ssh://[::1]/srv/x",
     "git+file:///work/fleet#main",

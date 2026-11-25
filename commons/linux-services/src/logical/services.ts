@@ -5,7 +5,7 @@
  * @example
  * ```ts
  * import { postgresRequirements } from "./services.ts";
- * const r = postgresRequirements({ machine: "olympia", version: 18, port: 5432, listen: ["localhost"] });
+ * const r = postgresRequirements({ machine: "synthetic-server-01", version: 18, port: 5432, listen: ["localhost"] });
  * r.kind; // "ok"
  * ```
  *

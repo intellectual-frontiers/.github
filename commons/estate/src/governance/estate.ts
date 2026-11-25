@@ -7,7 +7,7 @@
  * ```ts
  * import { defineEstate } from "./estate.ts";
  * const estate = defineEstate(
- *   { olympia: { kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon" } } },
+ *   { synthetic-server-01: { kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon" } } },
  *   [],
  * );
  * estate.kind; // "ok"

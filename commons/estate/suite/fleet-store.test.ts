@@ -68,36 +68,36 @@ proves(["0006-estate-fleet-store FR-002"], "a store kept at a newer schema, in a
 
 proves(["0006-estate-fleet-store FR-003"], "an asset is written with the expectation stated, comes back with its revision, two operators who change it are one winner and one conflict, and an update that lost begins again and wins", async () => {
   const { fleet, store } = await fleetOf();
-  const first = await fleet.putAsset(adopted("olympia"), expectAbsent);
+  const first = await fleet.putAsset(adopted("synthetic-server-01"), expectAbsent);
   assert(first.kind === "ok" && first.value.created);
-  const again = await fleet.putAsset(adopted("olympia"), expectAbsent);
+  const again = await fleet.putAsset(adopted("synthetic-server-01"), expectAbsent);
   assert(again.kind === "err" && again.error.kind === "documents" && again.error.problem.kind === "store" && again.error.problem.problem.kind === "conflict", "writing over an asset that is there is a conflict");
-  const read = await fleet.getAsset("olympia");
+  const read = await fleet.getAsset("synthetic-server-01");
   assert(read.kind === "ok");
   assertEquals(read.value.rev, first.value.rev);
   // two operators on one primary
   const other = await openFleetStore({ primary: { name: named("record"), store }, actor: "second", clock: ticking(AT) });
   assert(other.kind === "ok");
-  const mine = await fleet.getAsset("olympia");
+  const mine = await fleet.getAsset("synthetic-server-01");
   assert(mine.kind === "ok");
-  const theirs = await other.value.putAsset(managed("olympia"), expectRev(mine.value.rev));
+  const theirs = await other.value.putAsset(managed("synthetic-server-01"), expectRev(mine.value.rev));
   assert(theirs.kind === "ok", "the second operator wins with the revision they read");
-  const lost = await fleet.putAsset(adopted("olympia", "workstation"), expectRev(mine.value.rev));
+  const lost = await fleet.putAsset(adopted("synthetic-server-01", "workstation"), expectRev(mine.value.rev));
   assert(lost.kind === "err" && lost.error.kind === "documents" && lost.error.problem.kind === "store" && lost.error.problem.problem.kind === "conflict", "the first is told, and nothing is lost silently");
   // an update that loses once begins again with what the other wrote
   let calls = 0;
-  const updated = await fleet.updateAsset("olympia", async (current) => {
+  const updated = await fleet.updateAsset("synthetic-server-01", async (current) => {
     calls += 1;
     assert(current !== undefined);
     if (calls === 1) {
-      const raced = await other.value.updateAsset("olympia", (c) => (c === undefined ? undefined : defineOwn(c.id, "raced")));
+      const raced = await other.value.updateAsset("synthetic-server-01", (c) => (c === undefined ? undefined : defineOwn(c.id, "raced")));
       assert(raced.kind === "ok");
     }
     return defineOwn(current.id, `${current.kind}-seen`);
   });
   assert(updated.kind === "ok" && updated.value.kind === "put");
   assertEquals(updated.value.attempts, 2);
-  const final = await fleet.getAsset("olympia");
+  const final = await fleet.getAsset("synthetic-server-01");
   assert(final.kind === "ok");
   assertEquals(final.value.value.kind, "raced-seen", "the update was made on what the other operator wrote");
 });
@@ -118,49 +118,49 @@ proves(["0006-estate-fleet-store FR-004"], "an observation is written once, the 
     clock: ticking(AT),
   });
   assert(counted.kind === "ok");
-  for (const m of [3, 1, 2, 0, 4]) assert((await fleet.recordObservation({ asset: "olympia", at: at(m), source: "probe", state: { n: m } })).kind === "ok");
-  const same = await fleet.recordObservation({ asset: "olympia", at: at(2), source: "probe", state: { n: 2 } });
+  for (const m of [3, 1, 2, 0, 4]) assert((await fleet.recordObservation({ asset: "synthetic-server-01", at: at(m), source: "probe", state: { n: m } })).kind === "ok");
+  const same = await fleet.recordObservation({ asset: "synthetic-server-01", at: at(2), source: "probe", state: { n: 2 } });
   assert(same.kind === "ok" && !same.value.created);
-  const different = await fleet.recordObservation({ asset: "olympia", at: at(2), source: "probe", state: { n: 99 } });
+  const different = await fleet.recordObservation({ asset: "synthetic-server-01", at: at(2), source: "probe", state: { n: 99 } });
   assert(different.kind === "err" && different.error.kind === "exists");
-  const all = await fleet.observationsOf("olympia");
+  const all = await fleet.observationsOf("synthetic-server-01");
   assert(all.kind === "ok");
   assertEquals(all.value.observations.map((o) => o.state["n"]), [0, 1, 2, 3, 4]);
-  const some = await fleet.observationsOf("olympia", { from: at(1), to: at(3) });
+  const some = await fleet.observationsOf("synthetic-server-01", { from: at(1), to: at(3) });
   assert(some.kind === "ok");
   assertEquals(some.value.observations.map((o) => o.state["n"]), [1, 2, 3]);
-  const limited = await fleet.observationsOf("olympia", { limit: 2 });
+  const limited = await fleet.observationsOf("synthetic-server-01", { limit: 2 });
   assert(limited.kind === "ok" && limited.value.observations.length === 2);
   reads.length = 0;
-  const latest = await counted.value.latestObservation("olympia");
+  const latest = await counted.value.latestObservation("synthetic-server-01");
   assert(latest.kind === "ok" && latest.value !== undefined);
   assertEquals(latest.value.state["n"], 4);
   assertEquals(reads.length, 1, "one document was read");
-  const none = await fleet.latestObservation("athens");
+  const none = await fleet.latestObservation("synthetic-server-02");
   assert(none.kind === "ok");
   assertEquals(none.value, undefined);
 });
 
 proves(["0006-estate-fleet-store FR-005"], "what is declared is written with the expectation stated, a risk is accepted only as the logical layer allows, one of the same policy replaces the earlier, and two acceptances at once are both kept", async () => {
   const { fleet, store } = await fleetOf();
-  assert((await fleet.declare("olympia", { os: "linux" }, expectAbsent)).kind === "ok");
-  assertEquals((await fleet.declare("olympia", { os: "bsd" }, expectAbsent)).kind, "err", "a second declaration that expects none is a conflict");
-  const d = await fleet.declarationOf("olympia");
+  assert((await fleet.declare("synthetic-server-01", { os: "linux" }, expectAbsent)).kind === "ok");
+  assertEquals((await fleet.declare("synthetic-server-01", { os: "bsd" }, expectAbsent)).kind, "err", "a second declaration that expects none is a conflict");
+  const d = await fleet.declarationOf("synthetic-server-01");
   assert(d.kind === "ok" && d.value !== undefined);
   assertEquals([d.value.value.declared, d.value.value.by], [{ os: "linux" }, "operator"]);
-  assert((await fleet.declare("olympia", { os: "bsd" }, expectRev(d.value.rev))).kind === "ok");
-  const nothing = await fleet.declarationOf("athens");
+  assert((await fleet.declare("synthetic-server-01", { os: "bsd" }, expectRev(d.value.rev))).kind === "ok");
+  const nothing = await fleet.declarationOf("synthetic-server-02");
   assert(nothing.kind === "ok" && nothing.value === undefined);
   const GOOD = { policy: "disk-encryption", reason: "holds only open-source code", by: "an owner", until: "2027-03-01" };
-  assert((await fleet.acceptRisk("olympia", GOOD)).kind === "ok");
+  assert((await fleet.acceptRisk("synthetic-server-01", GOOD)).kind === "ok");
   for (const bad of [{ ...GOOD, until: "2020-01-01" }, { ...GOOD, reason: "no" }, { ...GOOD, until: "2035-01-01" }, { ...GOOD, policy: " " }]) {
-    const r = await fleet.acceptRisk("olympia", bad);
+    const r = await fleet.acceptRisk("synthetic-server-01", bad);
     assert(r.kind === "err" && r.error.kind === "refused" && r.error.reasons.length > 0);
   }
-  const replaced = await fleet.acceptRisk("olympia", { ...GOOD, reason: "holds only open-source code, reviewed" });
+  const replaced = await fleet.acceptRisk("synthetic-server-01", { ...GOOD, reason: "holds only open-source code, reviewed" });
   assert(replaced.kind === "ok" && replaced.value.risks.length === 1);
-  await Promise.all([1, 2, 3].map((n) => fleet.acceptRisk("olympia", { ...GOOD, policy: `policy-${n}` })));
-  const risks = await fleet.risksOf("olympia");
+  await Promise.all([1, 2, 3].map((n) => fleet.acceptRisk("synthetic-server-01", { ...GOOD, policy: `policy-${n}` })));
+  const risks = await fleet.risksOf("synthetic-server-01");
   assert(risks.kind === "ok");
   assertEquals(risks.value.map((r) => r.policy), ["disk-encryption", "policy-1", "policy-2", "policy-3"]);
   assertEquals((await store.list(ROOT, { limit: 100 })).kind, "ok");
@@ -176,28 +176,28 @@ proves(["0006-estate-fleet-store FR-006"], "a snapshot reads the assets, declara
     clock: ticking(AT),
   });
   assert(watched.kind === "ok");
-  assert((await fleet.putAsset(adopted("olympia"), expectAbsent)).kind === "ok");
-  assert((await fleet.declare("olympia", { os: "linux" }, expectAbsent)).kind === "ok");
-  assert((await fleet.recordObservation({ asset: "olympia", at: at(0), source: "probe", state: { os: "linux" }, results: [{ id: "p", status: "pass", controls: ["c"] }] })).kind === "ok");
-  assert((await fleet.recordObservation({ asset: "olympia", at: at(5), source: "probe", state: { os: "linux" }, results: [{ id: "p", status: "fail", controls: ["c"] }] })).kind === "ok");
+  assert((await fleet.putAsset(adopted("synthetic-server-01"), expectAbsent)).kind === "ok");
+  assert((await fleet.declare("synthetic-server-01", { os: "linux" }, expectAbsent)).kind === "ok");
+  assert((await fleet.recordObservation({ asset: "synthetic-server-01", at: at(0), source: "probe", state: { os: "linux" }, results: [{ id: "p", status: "pass", controls: ["c"] }] })).kind === "ok");
+  assert((await fleet.recordObservation({ asset: "synthetic-server-01", at: at(5), source: "probe", state: { os: "linux" }, results: [{ id: "p", status: "fail", controls: ["c"] }] })).kind === "ok");
   const quiet = await watched.value.snapshot();
   assert(quiet.kind === "ok" && quiet.value.stable);
-  assertEquals(quiet.value.assets.map((a) => a.id), ["olympia"]);
-  assertEquals(quiet.value.declared, { olympia: { os: "linux" } });
+  assertEquals(quiet.value.assets.map((a) => a.id), ["synthetic-server-01"]);
+  assertEquals(quiet.value.declared, { "synthetic-server-01": { os: "linux" } });
   assertEquals(quiet.value.observations.length, 1, "the latest of each asset");
-  assertEquals(quiet.value.results, [{ asset: "olympia", id: "p", status: "fail", controls: ["c"] }]);
+  assertEquals(quiet.value.results, [{ asset: "synthetic-server-01", id: "p", status: "fail", controls: ["c"] }]);
   const all = await watched.value.snapshot({ observations: "all" });
   assert(all.kind === "ok" && all.value.observations.length === 2);
   // a document changes while it reads, once: it begins again and ends stable with the new asset
   let lists = 0;
   mutate = async () => {
     lists += 1;
-    if (lists === 2) assert((await fleet.putAsset(adopted("athens"), expectAbsent)).kind === "ok");
+    if (lists === 2) assert((await fleet.putAsset(adopted("synthetic-server-02"), expectAbsent)).kind === "ok");
   };
   const moved = await watched.value.snapshot();
   assert(moved.kind === "ok");
   assert(moved.value.stable, "the second reading was stable");
-  assertEquals(moved.value.assets.map((a) => a.id).sort(), ["athens", "olympia"]);
+  assertEquals(moved.value.assets.map((a) => a.id).sort(), ["synthetic-server-01", "synthetic-server-02"]);
   // a store that never stops changing ends with stable false after the attempts
   let n = 0;
   mutate = async () => {
@@ -273,7 +273,7 @@ proves(["0006-estate-fleet-store FR-008"], "what a fleet store cannot do is one 
     { kind: "other-layout", found: 2, names: 1 },
     { kind: "other-fleet", asked: "a", found: "b" },
     { kind: "refused", reasons: ["one", "two"] },
-    { kind: "exists", path: "observations/olympia/x.json" },
+    { kind: "exists", path: "observations/synthetic-server-01/x.json" },
     { kind: "mirror", problem: { kind: "unknown-replica", name: "z" } },
     { kind: "no-mirror" },
     { kind: "no-history", replica: "copy" },
@@ -286,33 +286,33 @@ proves(["0006-estate-fleet-store FR-008"], "what a fleet store cannot do is one 
 
 proves(["0006-estate-fleet-store FR-009"], "a file no layout names, a document that cannot be decoded and a document of a newer version are findings beside the good documents, and never fail a listing, a snapshot or a query of observations", async () => {
   const { fleet, store } = await fleetOf();
-  assert((await fleet.putAsset(adopted("olympia"), expectAbsent)).kind === "ok");
-  assert((await fleet.recordObservation({ asset: "olympia", at: at(0), source: "probe", state: {} })).kind === "ok");
-  assert((await fleet.recordEvidence({ subject: "olympia", digest: "c".repeat(64), store: "evidence", type: "config", observedAt: at(0) })).kind === "ok");
+  assert((await fleet.putAsset(adopted("synthetic-server-01"), expectAbsent)).kind === "ok");
+  assert((await fleet.recordObservation({ asset: "synthetic-server-01", at: at(0), source: "probe", state: {} })).kind === "ok");
+  assert((await fleet.recordEvidence({ subject: "synthetic-server-01", digest: "c".repeat(64), store: "evidence", type: "config", observedAt: at(0) })).kind === "ok");
   const put = async (p: string, text: string): Promise<void> => void assert((await store.write(path(p), bytes(text), expectAny)).kind === "ok");
   await put("assets/o/readme.txt", "not a document");
   await put("assets/z/zeta.json", "{not json");
   await put("assets/y/yankee.json", '{"id":"yankee","$version":9}');
-  await put("observations/olympia/notes.txt", "a note");
-  await put("observations/olympia/20261120T100100.000Z.json", "[1,2]");
-  await put(`evidence/olympia/${"d".repeat(64)}.json`, '{"subject":"olympia"}');
+  await put("observations/synthetic-server-01/notes.txt", "a note");
+  await put("observations/synthetic-server-01/20261120T100100.000Z.json", "[1,2]");
+  await put(`evidence/synthetic-server-01/${"d".repeat(64)}.json`, '{"subject":"synthetic-server-01"}');
   const listed = await fleet.listAssets();
   assert(listed.kind === "ok");
-  assertEquals(listed.value.docs.map((d) => d.value.id), ["olympia"]);
+  assertEquals(listed.value.docs.map((d) => d.value.id), ["synthetic-server-01"]);
   assertEquals(listed.value.findings.map((f) => f.path).sort(), ["assets/o/readme.txt", "assets/y/yankee.json", "assets/z/zeta.json"]);
-  const observed = await fleet.observationsOf("olympia");
+  const observed = await fleet.observationsOf("synthetic-server-01");
   assert(observed.kind === "ok");
   assertEquals(observed.value.observations.length, 1);
-  assertEquals(observed.value.findings.map((f) => f.path).sort(), ["observations/olympia/20261120T100100.000Z.json", "observations/olympia/notes.txt"]);
-  const evidence = await fleet.evidenceOf("olympia");
+  assertEquals(observed.value.findings.map((f) => f.path).sort(), ["observations/synthetic-server-01/20261120T100100.000Z.json", "observations/synthetic-server-01/notes.txt"]);
+  const evidence = await fleet.evidenceOf("synthetic-server-01");
   assert(evidence.kind === "ok");
   assertEquals(evidence.value.refs.length, 1);
   assertEquals(evidence.value.findings.length, 1);
   const snap = await fleet.snapshot({ evidence: true });
   assert(snap.kind === "ok");
-  assertEquals(snap.value.assets.map((a) => a.id), ["olympia"]);
+  assertEquals(snap.value.assets.map((a) => a.id), ["synthetic-server-01"]);
   assert(snap.value.findings.length >= 6, "every finding is in the snapshot");
-  const latest = await fleet.latestObservation("olympia");
+  const latest = await fleet.latestObservation("synthetic-server-01");
   assert(latest.kind === "ok" && latest.value !== undefined, "the good observation is the latest that can be read");
 });
 
@@ -340,39 +340,39 @@ proves(["0006-estate-fleet-store FR-010"], "with replicas a write goes to the pr
   const fleet = opened.value;
   const events: FleetEvent[] = [];
   const stop = fleet.subscribe((e) => events.push(e));
-  assert((await fleet.putAsset(adopted("olympia"), expectAbsent)).kind === "ok");
+  assert((await fleet.putAsset(adopted("synthetic-server-01"), expectAbsent)).kind === "ok");
   assertEquals((await fleet.status()).map((s) => [s.replica, s.state.kind]), [["copy", "behind"], ["history", "behind"]]);
   const settled = await fleet.settle();
   assert(settled.kind === "ok");
   assertEquals((await fleet.status()).map((s) => s.state.kind), ["in-sync", "in-sync"]);
-  assert((await copy.read(path("assets/o/olympia.json"))).kind === "ok", "the replica holds the document");
+  assert((await copy.read(path("assets/s/synthetic-server-01.json"))).kind === "ok", "the replica holds the document");
   assert((await history.read(path("fleet.json"))).kind === "ok", "the replica holds the manifest");
   // a replica that cannot be reached never fails a write
   down.now = true;
-  assert((await fleet.putAsset(adopted("athens"), expectAbsent)).kind === "ok", "the write is made");
+  assert((await fleet.putAsset(adopted("synthetic-server-02"), expectAbsent)).kind === "ok", "the write is made");
   const during = await fleet.settle("copy");
   assert(during.kind === "ok" && during.value[0]?.reachable === false, "the replica is behind and unreachable");
   down.now = false;
   assert((await fleet.settle()).kind === "ok");
   assertEquals((await fleet.status()).map((s) => s.state.kind), ["in-sync", "in-sync"]);
   // a replica changed by someone else is left as it is
-  assert((await history.write(path("assets/o/olympia.json"), bytes('{"someone":"else"}'), expectAny)).kind === "ok");
-  assert((await fleet.updateAsset("olympia", (c) => (c === undefined ? undefined : defineOwn(c.id, "changed")))).kind === "ok");
+  assert((await history.write(path("assets/s/synthetic-server-01.json"), bytes('{"someone":"else"}'), expectAny)).kind === "ok");
+  assert((await fleet.updateAsset("synthetic-server-01", (c) => (c === undefined ? undefined : defineOwn(c.id, "changed")))).kind === "ok");
   assert((await fleet.settle()).kind === "ok");
   const status = await fleet.status();
   const diverged = status.find((s) => s.replica === "history");
   assert(diverged !== undefined && diverged.state.kind === "diverged");
-  const kept = await history.read(path("assets/o/olympia.json"));
+  const kept = await history.read(path("assets/s/synthetic-server-01.json"));
   assert(kept.kind === "ok");
   assertEquals(new TextDecoder().decode(kept.value.bytes), '{"someone":"else"}', "the replica was left as someone made it");
   // promote the replica that is in sync
   const promoted = await fleet.promote("copy");
   assert(promoted.kind === "ok");
   assertEquals(promoted.value.to, "copy");
-  assert((await fleet.putAsset(adopted("sparta"), expectAbsent)).kind === "ok");
-  assert((await copy.read(path("assets/s/sparta.json"))).kind === "ok", "writes go to the new primary");
-  assertEquals((await fleet.history("olympia", "copy")).kind, "ok", "the replica keeps history");
-  assertEquals((await fleet.history("olympia", "nowhere")).kind, "err");
+  assert((await fleet.putAsset(adopted("synthetic-server-03"), expectAbsent)).kind === "ok");
+  assert((await copy.read(path("assets/s/synthetic-server-03.json"))).kind === "ok", "writes go to the new primary");
+  assertEquals((await fleet.history("synthetic-server-01", "copy")).kind, "ok", "the replica keeps history");
+  assertEquals((await fleet.history("synthetic-server-01", "nowhere")).kind, "err");
   stop();
   const kinds = new Set(events.map((e) => e.kind));
   for (const k of ["asset", "mirror"] as const) assert(kinds.has(k), `an event of ${k} was told`);
@@ -394,11 +394,11 @@ proves(["0006-estate-fleet-store FR-011"], "a fleet store for development is ope
   try {
     const first = await devFleetStore({ kind: "folder", dir: fsPath.join(dir, "fleet") }, { actor: "operator" });
     assert(first.kind === "ok");
-    assert((await first.value.putAsset(adopted("olympia"), expectAbsent)).kind === "ok");
+    assert((await first.value.putAsset(adopted("synthetic-server-01"), expectAbsent)).kind === "ok");
     const second = await devFleetStore({ kind: "folder", dir: fsPath.join(dir, "fleet") }, { actor: "operator" });
     assert(second.kind === "ok");
-    const got = await second.value.getAsset("olympia");
-    assert(got.kind === "ok" && got.value.value.id === "olympia", "the folder kept the asset");
+    const got = await second.value.getAsset("synthetic-server-01");
+    assert(got.kind === "ok" && got.value.value.id === "synthetic-server-01", "the folder kept the asset");
   } finally {
     await fs.remove(dir, { recursive: true });
   }
@@ -412,7 +412,7 @@ proves(["0006-estate-fleet-store FR-012"], "the configuration of the example fle
   const opened = await openFleetStore({ ...config, create: true });
   assert(opened.kind === "ok");
   assertEquals(opened.value.manifest.store, "example-fleet");
-  assert((await opened.value.putAsset(adopted("olympia"), expectAbsent)).kind === "ok");
+  assert((await opened.value.putAsset(adopted("synthetic-server-01"), expectAbsent)).kind === "ok");
   assert((await opened.value.settle()).kind === "ok");
-  assert((await git.read(path("assets/o/olympia.json"))).kind === "ok" && (await cloud.read(path("assets/o/olympia.json"))).kind === "ok", "both replicas hold the asset");
+  assert((await git.read(path("assets/s/synthetic-server-01.json"))).kind === "ok" && (await cloud.read(path("assets/s/synthetic-server-01.json"))).kind === "ok", "both replicas hold the asset");
 });

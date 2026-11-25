@@ -30,13 +30,13 @@ const REQS = [
   req("pkg.git", "package", { name: "htop" }),
 ];
 const OPTIONS: CloudInitOptions = {
-  fleet: "labfleet",
-  repository: { url: "https://git.example.test/labfleet.git", branch: "main", renderPath: "fleets/lab/render/delphi/ansible" },
+  fleet: "synthetic-fleet-01",
+  repository: { url: "https://git.example.test/synthetic-fleet-01.git", branch: "main", renderPath: "fleets/lab/render/synthetic-server-05/ansible" },
   allowedSigners: `signer@example.test ${KEY}`,
-  base: "http://192.0.2.10:8080/install/delphi/tok/",
+  base: "http://192.0.2.10:8080/install/synthetic-server-05/tok/",
 };
 const SUBJECT = (() => {
-  const n = parseSubjectName("delphi");
+  const n = parseSubjectName("synthetic-server-05");
   if (n.kind === "err") throw new Error(n.error);
   return { name: n.value, class: "machine" as const };
 })();
@@ -53,7 +53,7 @@ proves(["0004-kickstart-dialect FR-001"], "the dialect carries the kinds of the 
   assertEquals([d.guarantees.plan, d.guarantees.destroy], ["none", true]);
   assertEquals(d.steps(planOrder(orderOf(REQS), new Map()), { files: new Map(), digest: "" } as never), []);
   const spec = installSpecOf(orderOf(REQS), OPTIONS);
-  assert(spec.kind === "ok" && spec.value.hostname === "delphi" && spec.value.admin.user === "adminer");
+  assert(spec.kind === "ok" && spec.value.hostname === "synthetic-server-05" && spec.value.admin.user === "adminer");
 });
 
 proves(["0004-kickstart-dialect FR-002", "0004-kickstart-dialect FR-003"], "the render is generated and the same every time, sets the machine's facts, holds only the placeholder in place of the password hash, and gives the administrator the key and no password sign-in", async () => {
@@ -70,7 +70,7 @@ proves(["0004-kickstart-dialect FR-002", "0004-kickstart-dialect FR-003"], "the 
     "lang en_GB.UTF-8",
     "keyboard --vckeymap=fr",
     "timezone Europe/Paris --utc",
-    "network --bootproto=dhcp --hostname=delphi",
+    "network --bootproto=dhcp --hostname=synthetic-server-05",
     "rootpw --lock",
     `--iscrypted --password=${PASSWORD_PLACEHOLDER}`,
     `sshkey --username=adminer "${KEY}"`,

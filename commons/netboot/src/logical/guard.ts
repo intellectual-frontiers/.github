@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { parseFacts, decide } from "./guard.ts";
- * decide("athens", parseFacts("disk=sda 100 sata\n"), {}, undefined, undefined).go; // true
+ * decide("synthetic-server-02", parseFacts("disk=sda 100 sata\n"), {}, undefined, undefined).go; // true
  * ```
  *
  * @module

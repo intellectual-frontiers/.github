@@ -28,7 +28,7 @@ proves(["0003-estate-logical FR-009"], "the neighbor table of ip and of arp is r
 
 proves(["0003-estate-logical FR-009"], "the devices seen that no asset declares are found by hardware address or, where none is declared, by address, and the assets declared and not seen are found", () => {
   const seen = parseNeighbors(IP);
-  const r = unexpectedDevices([{ asset: "olympia", mac: "AA:BB:CC:DD:EE:01" }, { asset: "athens", address: "192.0.2.21" }, { asset: "sparta", address: "192.0.2.99" }, { asset: "corinth" }], seen);
+  const r = unexpectedDevices([{ asset: "synthetic-server-01", mac: "AA:BB:CC:DD:EE:01" }, { asset: "synthetic-server-02", address: "192.0.2.21" }, { asset: "synthetic-server-03", address: "192.0.2.99" }, { asset: "synthetic-server-04" }], seen);
   assertEquals(r.unexpected.map((d) => d.mac), ["aa:bb:cc:dd:ee:03"]);
-  assertEquals(r.unseen, ["sparta"], "corinth declares nothing to be seen by");
+  assertEquals(r.unseen, ["synthetic-server-03"], "synthetic-server-04 declares nothing to be seen by");
 });

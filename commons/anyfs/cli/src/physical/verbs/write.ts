@@ -65,7 +65,7 @@ const mkdir = (host: Host): Command =>
     id: "mkdir",
     options: { parents: flag({ short: "p", help: "Make the directories above it too, and no error where it is there." }), ...POSIX_OPTIONS },
     operands: [{ name: "LOCATION", help: "A directory to make.", arity: "many" }],
-    examples: [{ args: ["-p", "fleet:/machines/olympia"], says: "Make the directory; a store of objects keeps it only where it keeps a marker, and says which." }],
+    examples: [{ args: ["-p", "fleet:/machines/synthetic-server-01"], says: "Make the directory; a store of objects keeps it only where it keeps a marker, and says which." }],
     run: async (args, ctx) => {
       if (args.positionals.length === 0) return usage("mkdir needs a directory");
       const bound = await bindAll(host, args.positionals);

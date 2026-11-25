@@ -7,8 +7,8 @@
  * @example
  * ```ts
  * import { pathOfUrl, hrefOf } from "./href.ts";
- * const r = pathOfUrl(new URL("http://127.0.0.1/fleet/olympia%20one.json"), "/", "nfc");
- * hrefOf(r.kind === "ok" ? r.value.path : undefined, false, "/"); // "/fleet/olympia%20one.json"
+ * const r = pathOfUrl(new URL("http://127.0.0.1/fleet/synthetic-server-01%20one.json"), "/", "nfc");
+ * hrefOf(r.kind === "ok" ? r.value.path : undefined, false, "/"); // "/fleet/synthetic-server-01%20one.json"
  * ```
  *
  * @module

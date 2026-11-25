@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { unexpectedAssets } from "./truth.ts";
- * unexpectedAssets(["olympia"], ["olympia", "printer"]); // { unexpected: ["printer"], unseen: [] }
+ * unexpectedAssets(["synthetic-server-01"], ["synthetic-server-01", "printer"]); // { unexpected: ["printer"], unseen: [] }
  * ```
  *
  * @module

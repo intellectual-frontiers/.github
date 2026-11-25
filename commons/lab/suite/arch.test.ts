@@ -13,7 +13,7 @@ import { containerfile, imageTag, readMachineSpec } from "../src/logical/mod.ts"
 import { runtimeUsable, startMachine } from "../src/physical/mod.ts";
 
 const ARCH = "ghcr.io/archlinux/archlinux:latest";
-const GOOD = { name: "corinth", image: ARCH, init: "none", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: [...OMARCHY_TERMINAL_PACKAGES], timezone: "America/New_York" };
+const GOOD = { name: "synthetic-server-04", image: ARCH, init: "none", users: [{ name: "admin", sudo: true }, { name: "probe", sudo: false }], packages: [...OMARCHY_TERMINAL_PACKAGES], timezone: "America/New_York" };
 
 proves(["0003-lab-arch-family FR-001"], "the Arch image is a base image, and every image has a family, the three being debian, rhel and arch", () => {
   assert((BASE_IMAGES as readonly string[]).includes(ARCH));
@@ -28,7 +28,7 @@ proves(["0003-lab-arch-family FR-002"], "the identity of an Arch image holds the
   const a = await imageTag(spec.value, text, "sha256:aaa");
   assertEquals(a, await imageTag(spec.value, text, "sha256:aaa"));
   assert(a !== (await imageTag(spec.value, text, "sha256:bbb")), "a new base is a new image");
-  assert(/^lab-corinth:[0-9a-f]{16}$/.test(a));
+  assert(/^lab-synthetic-server-04:[0-9a-f]{16}$/.test(a));
   const deb = readMachineSpec({ ...GOOD, image: "debian:13", init: undefined });
   assert(deb.kind === "ok");
   assertEquals(await imageTag(deb.value, containerfile(deb.value), "sha256:aaa"), await imageTag(deb.value, containerfile(deb.value), "sha256:bbb"), "the digest is the family arch's alone");

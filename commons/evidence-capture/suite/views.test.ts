@@ -37,7 +37,7 @@ async function withJournal<T>(f: (store: GitRefStore, dir: string) => Promise<T>
     const store = gitRefStore({ repo: dir, branch: "evidence", identity: { name: "collector", email: "collector@localhost" } });
     let firewall = "off";
     const run = async (now: string) => {
-      const r = await collect({ store, policy, assets: [{ id: "sparta", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: `${JSON.stringify({ firewall })}\n` } }), now, runtime: path.join(dir, ".git", "capture-runtime") });
+      const r = await collect({ store, policy, assets: [{ id: "synthetic-server-03", state: "managed" }], observe: async () => ({ kind: "ok", value: { stateText: `${JSON.stringify({ firewall })}\n` } }), now, runtime: path.join(dir, ".git", "capture-runtime") });
       assert(r.kind === "ok", r.kind === "err" ? r.error : "");
     };
     await run("2026-12-01T10:00:00Z");
@@ -58,18 +58,18 @@ proves(["0005-evidence-capture-views FR-001"], "a span is 30m, 7d or ISO 8601, a
 
 proves(["0005-evidence-capture-views FR-002"], "the difference of an asset's state is the last change by default, between two instants or commits, or since a span, and nothing where there is nothing to compare", async () => {
   await withJournal(async (store) => {
-    const last = await diffAsset(store, "evidence", codec, "sparta", { from: "", to: "", since: "", now: "2026-12-01T11:00:00Z" });
+    const last = await diffAsset(store, "evidence", codec, "synthetic-server-03", { from: "", to: "", since: "", now: "2026-12-01T11:00:00Z" });
     assert(last.kind === "ok" && last.value !== undefined);
     assertEquals([last.value.diff, last.value.from.at, last.value.to.at], [{ from: "on", to: "off" }, "2026-12-01T10:30:00.000Z", "2026-12-01T10:45:00.000Z"]);
-    const between = await diffAsset(store, "evidence", codec, "sparta", { from: "2026-12-01T10:00:00Z", to: "2026-12-01T10:30:00Z", since: "", now: "2026-12-01T11:00:00Z" });
+    const between = await diffAsset(store, "evidence", codec, "synthetic-server-03", { from: "2026-12-01T10:00:00Z", to: "2026-12-01T10:30:00Z", since: "", now: "2026-12-01T11:00:00Z" });
     assert(between.kind === "ok" && between.value !== undefined);
     assertEquals(between.value.diff, { from: "off", to: "on" });
-    const since = await diffAsset(store, "evidence", codec, "sparta", { from: "", to: "", since: "20m", now: "2026-12-01T10:50:00Z" });
+    const since = await diffAsset(store, "evidence", codec, "synthetic-server-03", { from: "", to: "", since: "20m", now: "2026-12-01T10:50:00Z" });
     assert(since.kind === "ok" && since.value !== undefined);
     assertEquals(since.value.from.at, "2026-12-01T10:30:00.000Z");
     const unknown = await diffAsset(store, "evidence", codec, "nobody", { from: "", to: "", since: "", now: "2026-12-01T11:00:00Z" });
     assert(unknown.kind === "err" && unknown.error.includes("no state of nobody is kept on the branch evidence"));
-    assertEquals((await diffAsset(store, "evidence", codec, "sparta", { from: "", to: "", since: "1x", now: "2026-12-01T11:00:00Z" })).kind, "err");
+    assertEquals((await diffAsset(store, "evidence", codec, "synthetic-server-03", { from: "", to: "", since: "1x", now: "2026-12-01T11:00:00Z" })).kind, "err");
   });
 });
 
@@ -89,7 +89,7 @@ proves(["0005-evidence-capture-views FR-004"], "what was known at an instant is 
     const k = await knownAt(store, codec, "2026-12-01T10:40:00Z");
     assert(k.kind === "ok" && k.value.commit !== undefined);
     const a = k.value.assets[0];
-    assertEquals([a?.asset, a?.state, a?.lastLookAt, a?.ageMs], ["sparta", { firewall: "on" }, "2026-12-01T10:30:00Z", 600_000]);
+    assertEquals([a?.asset, a?.state, a?.lastLookAt, a?.ageMs], ["synthetic-server-03", { firewall: "on" }, "2026-12-01T10:30:00Z", 600_000]);
     assertEquals((await knownAt(store, codec, "2026-01-01T00:00:00Z")), { kind: "ok", value: { commit: undefined, assets: [] } });
   });
 });
@@ -160,7 +160,7 @@ proves(["0006-evidence-capture-query FR-001", "0006-evidence-capture-query FR-00
       return r.value;
     };
     assertEquals((await asked("SELECT type, count(*) AS n FROM journal GROUP BY type ORDER BY type")).rows, [["capture.changed", 3], ["capture.unchanged", 1]]);
-    assertEquals((await asked("SELECT asset, entries, changes, failures, last_type FROM assets")).rows, [["sparta", 4, 3, 0, "capture.changed"]]);
+    assertEquals((await asked("SELECT asset, entries, changes, failures, last_type FROM assets")).rows, [["synthetic-server-03", 4, 3, 0, "capture.changed"]]);
     assertEquals((await asked("SELECT seq FROM journal WHERE at >= ? ORDER BY seq", { params: ["2026-12-01T10:30:00Z"] })).rows, [[3], [4]]);
     const cut = await asked("SELECT seq FROM journal ORDER BY seq", { limit: 2 });
     assert(cut.rows.length === 2 && cut.truncated, "cut");

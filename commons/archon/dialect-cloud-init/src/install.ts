@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { metaData } from "./install.ts";
- * metaData({ hostname: "olympia" }); // "instance-id: archon-olympia\nlocal-hostname: olympia\n"
+ * metaData({ hostname: "synthetic-server-01" }); // "instance-id: archon-synthetic-server-01\nlocal-hostname: synthetic-server-01\n"
  * ```
  *
  * @module

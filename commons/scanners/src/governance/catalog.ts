@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { argvOf } from "./catalog.ts";
- * argvOf("nmap", { kind: "host", value: "athens.example.test" }, { outDir: "/tmp/x" }); // { kind: "ok", value: ["-sV", ...] }
+ * argvOf("nmap", { kind: "host", value: "synthetic-server-02.example.test" }, { outDir: "/tmp/x" }); // { kind: "ok", value: ["-sV", ...] }
  * ```
  *
  * @module

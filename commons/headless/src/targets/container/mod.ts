@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { containerExecutor } from "@intellectual-frontiers/headless/targets/container";
- * // const out = await containerExecutor("docker", "athens").exec(["systemctl", "is-system-running"]);
+ * // const out = await containerExecutor("docker", "synthetic-server-02").exec(["systemctl", "is-system-running"]);
  * ```
  *
  * @module

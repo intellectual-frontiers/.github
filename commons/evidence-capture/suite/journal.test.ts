@@ -26,12 +26,12 @@ proves(["0002-evidence-capture-journal FR-002"], "a day's file is by the day in 
   let threw = false;
   try { journalPath("yesterday"); } catch { threw = true; }
   assert(threw);
-  assertEquals(statePath("olympia"), "state/olympia.json");
+  assertEquals(statePath("synthetic-server-01"), "state/synthetic-server-01.json");
 });
 
 proves(["0002-evidence-capture-journal FR-003"], "an entry is a line, lines are read back in order, and the line that is not an entry is named", async () => {
-  const e1 = await appendEntry(undefined, { at: "2026-12-01T10:00:00Z", type: "capture.changed", subject: "sparta", evidence: "ab".repeat(32) });
-  const e2 = await appendEntry(e1, { at: "2026-12-01T10:15:00Z", type: "capture.unchanged", subject: "sparta", evidence: "ab".repeat(32) });
+  const e1 = await appendEntry(undefined, { at: "2026-12-01T10:00:00Z", type: "capture.changed", subject: "synthetic-server-03", evidence: "ab".repeat(32) });
+  const e2 = await appendEntry(e1, { at: "2026-12-01T10:15:00Z", type: "capture.unchanged", subject: "synthetic-server-03", evidence: "ab".repeat(32) });
   const text = `${encodeEntry(e1)}\n${encodeEntry(e2)}`;
   assert(encodeEntry(e1).endsWith("}\n") && !encodeEntry(e1).slice(0, -1).includes("\n"));
   assertEquals(decodeEntries(text), { kind: "ok", value: [e1, e2] });
@@ -72,13 +72,13 @@ proves(["0002-evidence-capture-journal FR-004"], "a disposable asset is journale
 });
 
 proves(["0002-evidence-capture-journal FR-005"], "the assets due are those whose cadence has run or never looked at, in order, and a bad instant gives none", () => {
-  const p = policy({ cadence: { perAsset: { olympia: "PT5M" } } });
-  const assets = [{ id: "sparta", state: "adopted" }, { id: "athens", state: "managed" }, { id: "olympia", state: "managed" }] as const;
-  const last: Record<string, string> = { sparta: "2026-12-01T09:45:00Z", athens: "2026-12-01T09:45:00Z", olympia: "2026-12-01T09:56:00Z" };
-  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-01T10:00:00Z"), ["athens"], "15 minutes for managed, a day for adopted, 5 for olympia");
-  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-01T10:01:00Z"), ["athens", "olympia"]);
-  assertEquals(dueAssets(p, assets, () => undefined, "2026-12-01T10:00:00Z"), ["athens", "olympia", "sparta"], "never looked at");
-  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-02T09:45:00Z"), ["athens", "olympia", "sparta"]);
+  const p = policy({ cadence: { perAsset: { "synthetic-server-01": "PT5M" } } });
+  const assets = [{ id: "synthetic-server-03", state: "adopted" }, { id: "synthetic-server-02", state: "managed" }, { id: "synthetic-server-01", state: "managed" }] as const;
+  const last: Record<string, string> = { "synthetic-server-03": "2026-12-01T09:45:00Z", "synthetic-server-02": "2026-12-01T09:45:00Z", "synthetic-server-01": "2026-12-01T09:56:00Z" };
+  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-01T10:00:00Z"), ["synthetic-server-02"], "15 minutes for managed, a day for adopted, 5 for synthetic-server-01");
+  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-01T10:01:00Z"), ["synthetic-server-01", "synthetic-server-02"]);
+  assertEquals(dueAssets(p, assets, () => undefined, "2026-12-01T10:00:00Z"), ["synthetic-server-01", "synthetic-server-02", "synthetic-server-03"], "never looked at");
+  assertEquals(dueAssets(p, assets, (id) => last[id], "2026-12-02T09:45:00Z"), ["synthetic-server-01", "synthetic-server-02", "synthetic-server-03"]);
   assertEquals(dueAssets(p, assets, () => undefined, "now"), []);
   const roles = policy({ cadence: { perRole: { "agent-workspace": "PT15M" } } });
   const boxes = [{ id: "agentbox", state: "adopted", attributes: { role: "agent-workspace" } }, { id: "devbox", state: "adopted", attributes: { role: "developer" } }] as const;

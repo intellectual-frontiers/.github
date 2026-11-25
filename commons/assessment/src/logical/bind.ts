@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { evidenceFromPolicies } from "./bind.ts";
- * evidenceFromPolicies([], {}, { framework: "f", at: "2026-11-21T00:00:00Z", tool: "probe", asset: "athens" }); // []
+ * evidenceFromPolicies([], {}, { framework: "f", at: "2026-11-21T00:00:00Z", tool: "probe", asset: "synthetic-server-02" }); // []
  * ```
  *
  * @module

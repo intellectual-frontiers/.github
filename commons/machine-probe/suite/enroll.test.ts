@@ -15,14 +15,14 @@ import { enrollProbe, observe, parseSsh, probeExecutor, sendVia } from "../src/p
 
 const NOW = "2026-11-21T12:00:00Z";
 const BAD: Observed = {
-  at: NOW, probe: "1", os: { family: "ubuntu", name: "Ubuntu", version: "24.04", kernel: "6.8", arch: "x86_64", hostname: "athens" }, hardware: {},
+  at: NOW, probe: "1", os: { family: "ubuntu", name: "Ubuntu", version: "24.04", kernel: "6.8", arch: "x86_64", hostname: "synthetic-server-02" }, hardware: {},
   security: { diskEncryption: "off", firewall: "on", autoUpdates: "on", sshPasswordAuth: "off", admins: ["ubuntu"] }, software: { pendingUpdates: 0, osquery: "5" }, listening: [22],
 };
 
 proves(["0007-machine-probe-enroll FR-001"], "an address is user@host or user@host:port, and anything else is refused", () => {
-  assertEquals(parseSsh("admin@sparta.example:2222"), { kind: "ok", value: { user: "admin", address: "sparta.example", port: 2222 } });
+  assertEquals(parseSsh("admin@synthetic-server-03.example:2222"), { kind: "ok", value: { user: "admin", address: "synthetic-server-03.example", port: 2222 } });
   assertEquals(parseSsh("admin@10.0.0.5"), { kind: "ok", value: { user: "admin", address: "10.0.0.5" } });
-  for (const bad of ["sparta", "admin@", "@host", "admin@host:0", "admin@host:70000", "a b@host", "-x@host"]) assertEquals(parseSsh(bad).kind, "err", bad);
+  for (const bad of ["synthetic-server-03", "admin@", "@host", "admin@host:0", "admin@host:70000", "a b@host", "-x@host"]) assertEquals(parseSsh(bad).kind, "err", bad);
 });
 
 proves(["0007-machine-probe-enroll FR-004"], "a machine never observed is waiting in the policy that says so and never failing, and an observation is judged with the risks accepted for it", () => {
@@ -41,7 +41,7 @@ const reason = await runtimeUsable("docker");
 
 proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"], "on a real sshd the host key is shown first, a wrong fingerprint pins and installs nothing, the right one pins that key alone and installs the probe and one restricted line, again safely, and the probe answers to the restricted key", async (t) => {
   if (reason !== undefined) return t.skip(reason);
-  const spec = readMachineSpec({ name: "sparta", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: [] });
+  const spec = readMachineSpec({ name: "synthetic-server-03", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: [] });
   assert(spec.kind === "ok");
   const started = await startMachine(spec.value);
   assert(started.kind === "ok", started.kind === "err" ? started.error : "");
@@ -50,7 +50,7 @@ proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"],
     const known = path.join(dir, "fleet", "known_hosts");
     const keys = path.join(dir, "keys");
     const ssh = { user: "admin", address: "127.0.0.1", port: m.port };
-    const o = { asset: "sparta", knownHosts: known, keys, identity: m.identityFile };
+    const o = { asset: "synthetic-server-03", knownHosts: known, keys, identity: m.identityFile };
 
     const shown = await enrollProbe(ssh, o);
     assert(shown.kind === "ok" && shown.value.kind === "show" && shown.value.fingerprint.includes("SHA256:"));
@@ -65,7 +65,7 @@ proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"],
     const done = await enrollProbe(ssh, { ...o, fingerprint });
     assert(done.kind === "ok" && done.value.kind === "done", done.kind === "err" ? done.error : "");
     const e = done.value;
-    assertEquals(e.reach, { address: "127.0.0.1", port: m.port, user: "admin", credential: "sparta-probe" });
+    assertEquals(e.reach, { address: "127.0.0.1", port: m.port, user: "admin", credential: "synthetic-server-03-probe" });
     const pinned = (await fs.readTextFile(known)).trim().split("\n");
     assertEquals(pinned.length, 1, "exactly the one host key compared is pinned");
     assertEquals((await fs.stat(e.keyFile)).mode! & 0o077, 0, "the private key is for its owner alone");

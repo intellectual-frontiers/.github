@@ -56,7 +56,7 @@ proves(["0013-grc-gitref FR-002"], "a commit leaves the working tree, the index 
     await git(dir, "add", "new.txt");
     const before = await git(dir, "status", "--porcelain=v1");
     const mainBefore = await git(dir, "rev-parse", "main");
-    const kept = await store.commit([{ path: "state/a.json", bytes: bytes("1\n") }], "olympia: first", "2026-12-01T10:00:00Z");
+    const kept = await store.commit([{ path: "state/a.json", bytes: bytes("1\n") }], "synthetic-server-01: first", "2026-12-01T10:00:00Z");
     assert(kept.kind === "ok");
     assertEquals(await git(dir, "status", "--porcelain=v1"), before, "the work and the index are as they were");
     assertEquals(await git(dir, "rev-parse", "main"), mainBefore);
@@ -74,7 +74,7 @@ proves(["0013-grc-gitref FR-003"], "a path that is not a relative path of the br
       assert(r.kind === "err" && r.error.kind === "path", JSON.stringify(bad));
     }
     assertEquals(await store.head(), undefined, "nothing was written");
-    assertEquals((await store.commit([{ path: "journal/olympia/2026/12/01.jsonl", bytes: bytes("x") }], "good")).kind, "ok");
+    assertEquals((await store.commit([{ path: "journal/synthetic-server-01/2026/12/01.jsonl", bytes: bytes("x") }], "good")).kind, "ok");
   });
 }, skip);
 

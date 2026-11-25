@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { parseSsh } from "./enroll.ts";
- * parseSsh("admin@sparta.example:2222"); // { kind: "ok", value: { user: "admin", address: "sparta.example", port: 2222 } }
+ * parseSsh("admin@synthetic-server-03.example:2222"); // { kind: "ok", value: { user: "admin", address: "synthetic-server-03.example", port: 2222 } }
  * ```
  *
  * @module

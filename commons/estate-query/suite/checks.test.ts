@@ -18,10 +18,10 @@ function asset(id: string, state: "adopted" | "managed", without: readonly strin
 
 const NOW = "2026-12-01T00:00:00Z";
 const DATA: EstateData = {
-  assets: [asset("athens", "managed"), asset("sparta", "managed", ["provision"]), asset("corinth", "adopted")],
-  observations: [{ asset: "athens", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: {} } }],
-  results: [{ asset: "athens", id: "firewall", status: "fail", controls: ["SC-7"] }],
-  truths: [{ asset: "athens", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }, { asset: "sparta", state: "managed", observedAt: null, currency: "never-observed", difference: null, agrees: false, alignment: "not-observed", source: null }],
+  assets: [asset("synthetic-server-02", "managed"), asset("synthetic-server-03", "managed", ["provision"]), asset("synthetic-server-04", "adopted")],
+  observations: [{ asset: "synthetic-server-02", observation: { at: "2026-11-30T00:00:00Z", source: "probe", state: {} } }],
+  results: [{ asset: "synthetic-server-02", id: "firewall", status: "fail", controls: ["SC-7"] }],
+  truths: [{ asset: "synthetic-server-02", state: "managed", observedAt: "2026-11-30T00:00:00Z", currency: "fresh", difference: null, agrees: true, alignment: "aligned", source: "probe" }, { asset: "synthetic-server-03", state: "managed", observedAt: null, currency: "never-observed", difference: null, agrees: false, alignment: "not-observed", source: null }],
   now: NOW,
 };
 
@@ -34,7 +34,7 @@ const check = (id: string, sql: string, more: Record<string, unknown> = {}) => {
 proves(["0004-estate-query-checks FR-001"], "the estate is a connection that reads, answers as rows that are objects of the columns, and fails with the reasons for a statement it refuses", async () => {
   const conn = estateConnection(openEstateQuery(DATA));
   assertEquals(conn.readOnly, true);
-  assertEquals(await conn.query("select id, state from asset where state = ? order by id", ["adopted"]), [{ id: "corinth", state: "adopted" }]);
+  assertEquals(await conn.query("select id, state from asset where state = ? order by id", ["adopted"]), [{ id: "synthetic-server-04", state: "adopted" }]);
   let message = "";
   try {
     await conn.query("delete from asset", []);
@@ -57,7 +57,7 @@ proves(["0004-estate-query-checks FR-003"], "a check passes where its rows are a
     check("no-managed-asset-lacks-converge-owner", "select asset from capability where capability = 'converge' and not offered and asset in (select id from asset where state = 'managed')"),
     check("every-managed-asset-is-observed", "select id from asset where state = 'managed' and id not in (select asset from observation)"),
     check("some-asset-is-adopted", "select id from asset where state = 'adopted'", { expect: { kind: "non-empty" } }),
-    check("no-asset-is-stale", "select asset from truth where currency in ('stale', 'never-observed') and asset = ?", { params: ["athens"] }),
+    check("no-asset-is-stale", "select asset from truth where currency in ('stale', 'never-observed') and asset = ?", { params: ["synthetic-server-02"] }),
     check("a-statement-that-deletes", "delete from asset"),
     check("a-name-that-is-not-there", "select * from assets"),
     check("an-inherited-asset-has-no-provision", "select asset from capability where capability = 'provision' and offered and asset in (select id from asset where install = 'inherited')"),
