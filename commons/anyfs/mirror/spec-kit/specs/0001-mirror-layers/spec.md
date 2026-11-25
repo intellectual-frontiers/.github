@@ -20,7 +20,7 @@
 
 ## Out of scope
 
-- Releasing the library to npm (its distribution is the GitHub package registry).
+- The package it is released in: commons is one package, `@intellectual-frontiers/commons`, and this library is a subpath of it.
 
 ## Edge cases
 
