@@ -114,9 +114,9 @@ export const commitVerb = defineVerb({
       case "refused":
         return outcomeOfDone({ data: null, text: "the commit was refused", findings: report.findings });
       case "preview":
-        return outcomeOfDone({ data: { message: report.message, files: report.files }, text: `${report.message}\n${report.files.map((f) => `  ${f}`).join("\n")}`, findings: [], title: "Previewed" });
+        return outcomeOfDone({ data: { message: report.message, files: report.files }, text: `${report.message}\n${report.files.map((f) => `  ${f}`).join("\n")}`, findings: report.findings, title: "Previewed" });
       case "committed":
-        return outcomeOfDone({ data: { sha: report.sha, files: report.files, message: report.message }, text: `${report.sha}  ${messageText({ subject: subject.value, trailers: [] }).trim()}\n${report.files.length} files`, findings: [], next: ["git push origin HEAD:main"], title: "Committed" });
+        return outcomeOfDone({ data: { sha: report.sha, files: report.files, message: report.message }, text: `${report.sha}  ${messageText({ subject: subject.value, trailers: [] }).trim()}\n${report.files.length} files`, findings: report.findings, next: ["git push origin HEAD:main"], title: "Committed" });
       default:
         return outcomeOfDone({ data: null, text: "", findings: [] });
     }

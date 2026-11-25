@@ -57,9 +57,9 @@ export function traitsOf(id: VerbId): ActionTraits {
   };
 }
 
-/** A finding as the problem of a run: its level, its code and the fix. */
+/** A finding as the problem of a run: its level, its code and the fix (a note of level `info` is a warning of Headless, which no exit status counts). */
 export function problemOf(f: Finding): Problem {
-  return problem(f.level, f.message, { code: f.code, fix: f.fix });
+  return problem(f.level === "info" ? "warn" : f.level, f.message, { code: f.code, fix: f.fix });
 }
 
 /** What a verb's body gives: the data (what `--json` carries), the text for a person, the findings, and what to run next. */

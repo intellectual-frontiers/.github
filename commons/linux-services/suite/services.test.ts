@@ -11,16 +11,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
+import { canaryText } from "@intellectual-frontiers/test/canaries";
 import { certificateRequirements, issueUnit, mailRelayRequirements, mainCf, mcpAccessRequirements, mcpAuthorizedKeys, parseCertificate, parseMailRelay, parseMcpAccess, parsePostgres, planDns, postgresDropIn, postgresRequirements, recipientMap, senderMap, isEmpty } from "../src/logical/mod.ts";
 import type { FoundRecord } from "../src/logical/mod.ts";
 import { cloudflare } from "../src/physical/mod.ts";
 
-const PG = { machine: "athens", version: 18, port: 5432, listen: ["localhost"] };
-const MAIL = { machine: "athens", tag: "example", domain: "example.org", mailbox: "ops@example.org", relay: "smtp.example.net:465", saslUser: "api_token" };
-const CERT = { machine: "athens", names: ["*.example.org", "example.org"], contact: "ops@example.org", dns: "cloudflare" };
+const PG = { machine: "synthetic-server-01", version: 18, port: 5432, listen: ["localhost"] };
+const MAIL = { machine: "synthetic-server-01", tag: "example", domain: "example.org", mailbox: "ops@example.org", relay: "smtp.example.net:465", saslUser: "api_token" };
+const CERT = { machine: "synthetic-server-01", names: ["*.example.org", "example.org"], contact: "ops@example.org", dns: "cloudflare" };
 
 proves(["0002-linux-services-profiles FR-001"], "a profile is refused with every reason, and accepted where there is none", () => {
-  const bad = parsePostgres({ machine: "Athens", version: 3, port: 70000, listen: [] });
+  const bad = parsePostgres({ machine: "Synthetic-server-01", version: 3, port: 70000, listen: [] });
   assert(bad.kind === "err");
   assertEquals(bad.error.map((e) => e.split(":")[0]), ["machine", "version", "port", "listen"]);
   assertEquals(parsePostgres({ ...PG, port: 80 }).kind, "err");
@@ -72,9 +73,9 @@ proves(["0002-linux-services-profiles FR-004", "0002-linux-services-profiles FR-
   assertEquals(r.ids, ["services.mail-relay.package", "services.mail-relay.main", "services.mail-relay.sender", "services.mail-relay.recipients", "services.mail-relay.service"]);
   assertEquals(r.deps[4], ["services.mail-relay.main", "services.mail-relay.sender", "services.mail-relay.recipients"]);
   const cf = mainCf(MAIL);
-  for (const line of ["myhostname = athens.example.example.org", "mydestination =", "inet_interfaces = loopback-only", "relayhost = [smtp.example.net]:465", "smtp_tls_wrappermode = yes", "smtp_tls_security_level = secure"]) assert(cf.includes(line), line);
-  assert(senderMap(MAIL).includes("${1}+athens.example@example.org"));
-  assert(recipientMap(MAIL).includes("athens\\.example\\.example\\.org$/ ops@example.org"));
+  for (const line of ["myhostname = synthetic-server-01.example.example.org", "mydestination =", "inet_interfaces = loopback-only", "relayhost = [smtp.example.net]:465", "smtp_tls_wrappermode = yes", "smtp_tls_security_level = secure"]) assert(cf.includes(line), line);
+  assert(senderMap(MAIL).includes("${1}+synthetic-server-01.example@example.org"));
+  assert(recipientMap(MAIL).includes("synthetic-server-01\\.example\\.example\\.org$/ ops@example.org"));
 });
 
 proves(["0002-linux-services-profiles FR-005", "0002-linux-services-profiles FR-006"], "the certificate's requirements install certbot and its plugin, configure DNS-01, issue once and renew by the timer, with the credentials a path and not a value", () => {
@@ -154,7 +155,7 @@ proves(["0002-linux-services-profiles FR-008"], "the Cloudflare provider pages t
 });
 
 const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-const ACCESS = { machine: "athens", user: "ops", program: "opsfolio", keys: [{ name: "reader", publicKey: `${KEY} reader@example`, role: "read-only" }, { name: "admin", publicKey: KEY, role: "full", from: ["192.0.2.0/24"] }] };
+const ACCESS = { machine: "synthetic-server-01", user: "ops", program: "opsfolio", keys: [{ name: "reader", publicKey: `${KEY} reader@example`, role: "read-only" }, { name: "admin", publicKey: KEY, role: "full", from: ["192.0.2.0/24"] }] };
 
 proves(["0002-linux-services-profiles FR-009"], "each key of a tool-server access forces the program's mcp under restrict, a read-only key says so, and a key that is not one public key line is refused", () => {
   const p = parseMcpAccess(ACCESS);
@@ -166,7 +167,7 @@ proves(["0002-linux-services-profiles FR-009"], "each key of a tool-server acces
   assertEquals(lines[1], `restrict,from="192.0.2.0/24",command="opsfolio mcp" ${KEY}`);
   const r = mcpAccessRequirements(p.value);
   assertEquals(ids(r).ids, ["services.mcp-ops.ssh-dir", "services.mcp-ops.keys"]);
-  for (const bad of [{ ...ACCESS, keys: [{ name: "k", publicKey: "-----BEGIN OPENSSH PRIVATE KEY-----", role: "full" }] }, { ...ACCESS, keys: [{ name: "k", publicKey: `command="x" ${KEY}`, role: "full" }] }, { ...ACCESS, program: 'x" --evil' }, { ...ACCESS, keys: [] }]) assertEquals(parseMcpAccess(bad).kind, "err");
+  for (const bad of [{ ...ACCESS, keys: [{ name: "k", publicKey: canaryText("openssh-private-key"), role: "full" }] }, { ...ACCESS, keys: [{ name: "k", publicKey: `command="x" ${KEY}`, role: "full" }] }, { ...ACCESS, program: 'x" --evil' }, { ...ACCESS, keys: [] }]) assertEquals(parseMcpAccess(bad).kind, "err");
 });
 
 proves(["0002-linux-services-profiles FR-009"], "the real ssh-keygen reads every line of the rendered authorized_keys", () => {

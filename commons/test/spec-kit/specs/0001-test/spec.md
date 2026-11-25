@@ -21,9 +21,11 @@
 
 ## The package
 
-- **FR-007**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`, the registration and the assertions) and one for the record (`./record`, the pure model of a test's record and its OpenTelemetry form), built, inspected and packed by `tools/pack.ts` (commons 0032-libraries-by-concern FR-005, FR-013), and it MUST depend only on `core`, `crypto`, `system` and `telemetry`, so that it imports nothing of the evidence's reports, ledger or runner.
+- **FR-007**: The library MUST be published to npm as compiled modules with their declarations, one entry for the package (`.`, the registration and the assertions), one for the record (`./record`, the pure model of a test's record and its OpenTelemetry form) and one for the canaries (`./canaries`, FR-009), built, inspected and packed by `tools/pack.ts` (commons 0032-libraries-by-concern FR-005, FR-013), and it MUST depend only on `core`, `crypto`, `system` and `telemetry`, so that it imports nothing of the evidence's reports, ledger or runner.
 
 - **FR-008**: The library MUST export `reportFindings(rule, found)`, which names each finding of `rule` on the standard error as `finding: <rule>: <what>`, returns the number of findings, and MUST NOT throw, so that a test of the repository's own tree reports what it finds and leaves the failing to the typed red causes of the build policy (commons 0038-build-policy).
+
+- **FR-009**: The library MUST export the canaries of the secret scanner from the one module `./canaries` (`CANARIES`, `canary(id)` and `canaryText(id)`): the typed corpus of text that looks like a secret and is not one, where each canary has an id, a kind (`private-key`, `token` or `access-key`), the rule of the scanner that must catch it (the label of that rule) and its text, every text carries `CANARY` and is no working secret, the module imports nothing, and a test that must hand a program a secret-looking text imports it from there and holds none in its own file (commons repoctl 0016-repoctl-canaries).
 
 ## Acceptance scenarios
 
@@ -31,6 +33,7 @@
 2. **Given** a test marked `only`, **When** its file runs, **Then** it runs alone and the others of the file are recorded as skipped, per FR-002.
 3. **Given** a run with `IFC_TEST_RECORD` set, **When** a test ends, **Then** its span and log record are appended to that file, on the installation record, per FR-004 to FR-006.
 4. **Given** the package is installed in an empty project, **When** Node 26 and Bun import its entries and a consumer type-checks them, **Then** they work, per FR-007.
+5. **Given** the corpus of canaries, **When** each canary is read, **Then** it has a unique id, a kind and a rule, its text carries `CANARY`, and `canary` of an id that is not there throws and names the ids there are, per FR-009.
 
 ## Out of scope
 

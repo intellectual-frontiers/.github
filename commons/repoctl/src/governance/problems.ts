@@ -71,7 +71,9 @@ export type ProblemCode =
   | "E-DOCS-GENERATOR-MISSING"
   | "E-DOCS-FAILED"
   | "E-USAGE-UNKNOWN"
-  | "E-NAMES-FOUND";
+  | "E-NAMES-FOUND"
+  | "E-CANARY"
+  | "E-CANARY-CHANGED";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -129,6 +131,8 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DOCS-FAILED",
   "E-USAGE-UNKNOWN",
   "E-NAMES-FOUND",
+  "E-CANARY",
+  "E-CANARY-CHANGED",
 ];
 
 /** Whether a text is one of the codes. */
@@ -461,5 +465,17 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "A file in the scope of the check holds a name from the names files, as a whole phrase in any case, where no allowance covers it.",
     why: "A fixture, a specification or a test that was written with a real tenant, host, network or retired name instead of a synthetic one.",
     fix: "replace it with a synthetic name (synthetic-<kind>-NN), or add an allowance for the path where the name is public",
+  },
+  "E-CANARY": {
+    title: "A canary file passed the secret scanner",
+    what: "A file holds text that looks like a secret and is one of the canary files the configuration pins by path and digest, and its content is the pinned one. It is told, not refused: it never fails a commit or a build.",
+    why: "The canaries are text that looks like a secret and is not one, kept in one module so that tests can hand a program a fake key or token without holding one in their own files.",
+    fix: "nothing: the finding is informational; a file that is not pinned, or is edited, is refused as an ordinary holder of a secret",
+  },
+  "E-CANARY-CHANGED": {
+    title: "A pinned canary file is missing or is not the pinned content",
+    what: "A file that commit.forbidden.canaries pins is not there, or its content has another SHA-256 than the one pinned, so the scanner no longer lets it pass.",
+    why: "The canary file was edited (a canary was added or changed) and the pin of the configuration was not changed with it, or the file was moved or removed.",
+    fix: "sha256sum the file, check that it holds only canaries and no real secret, and pin the digest in commit.forbidden.canaries of repoctl.config.ts (the owner's change), or remove the pin",
   },
 };

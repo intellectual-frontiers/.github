@@ -9,7 +9,8 @@
   },
   "exports": {
     ".": "./src/test.ts",
-    "./record": "./src/record.ts"
+    "./record": "./src/record.ts",
+    "./canaries": "./src/canaries.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

@@ -36,6 +36,9 @@ export type ForbiddenPath = { readonly glob: string; readonly why: string };
 /** A text that looks like a secret: a regular expression's source and what it looks like. */
 export type SecretPattern = { readonly pattern: string; readonly label: string };
 
+/** A canary file (commons repoctl 0016-repoctl-canaries FR-001): one file, by its exact path, and the SHA-256 of its text as UTF-8; it is a canary file only while its content has that digest. */
+export type CanaryPin = { readonly path: string; readonly sha256: string };
+
 /** The rules of `repoctl commit`. */
 export type CommitPolicy = {
   /** The author and the committer of every commit. */
@@ -53,6 +56,8 @@ export type CommitPolicy = {
     /** Globs of paths that are allowed though a forbidden glob matches them. */
     readonly allow: readonly string[];
     readonly secrets: readonly SecretPattern[];
+    /** The files that hold text that looks like a secret and are not one, each pinned by its path and the digest of its content (0016-repoctl-canaries): none where the configuration says nothing. */
+    readonly canaries: readonly CanaryPin[];
   };
 };
 
@@ -164,7 +169,7 @@ export type ConfigInput = {
     readonly trailers?: readonly TrailerKind[];
     readonly coAuthor?: string;
     readonly heldMerges?: readonly string[];
-    readonly forbidden?: { readonly paths?: readonly ForbiddenPath[]; readonly allow?: readonly string[]; readonly secrets?: readonly SecretPattern[] };
+    readonly forbidden?: { readonly paths?: readonly ForbiddenPath[]; readonly allow?: readonly string[]; readonly secrets?: readonly SecretPattern[]; readonly canaries?: readonly CanaryPin[] };
   };
   readonly generators?: readonly GeneratorInput[];
   readonly checks?: readonly CheckInput[];
@@ -267,13 +272,21 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
       bad(`commit.forbidden.secrets: ${JSON.stringify(s.pattern)} is not a regular expression`);
     }
   }
+  const canaries = c.forbidden?.canaries ?? [];
+  const pinned = new Set<string>();
+  for (const k of canaries) {
+    if (!relative(k.path) || /[*?[\]{}]/.test(k.path)) bad(`commit.forbidden.canaries: ${JSON.stringify(k.path)} is one file inside the repository, written with / and with no glob character: a canary file is pinned by its exact path`);
+    if (!/^[0-9a-f]{64}$/.test(k.sha256 ?? "")) bad(`commit.forbidden.canaries: ${JSON.stringify(k.path)} needs the sha256 of its content (64 lower-case hexadecimal digits): a file is never allowed by its path alone`);
+    if (pinned.has(k.path)) bad(`commit.forbidden.canaries: ${JSON.stringify(k.path)} is pinned twice`);
+    pinned.add(k.path);
+  }
   const commit: CommitPolicy = {
     identity: c.identity,
     issue: { prefix: c.issue?.prefix ?? "", required: c.issue?.required ?? false },
     trailers,
     coAuthor: c.coAuthor,
     heldMerges: c.heldMerges ?? [],
-    forbidden: { paths: c.forbidden?.paths ?? DEFAULT_FORBIDDEN_PATHS, allow: c.forbidden?.allow ?? DEFAULT_ALLOWED_PATHS, secrets },
+    forbidden: { paths: c.forbidden?.paths ?? DEFAULT_FORBIDDEN_PATHS, allow: c.forbidden?.allow ?? DEFAULT_ALLOWED_PATHS, secrets, canaries },
   };
 
   const generators: Generator[] = [];

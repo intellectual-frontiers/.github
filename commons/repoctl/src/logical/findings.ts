@@ -13,8 +13,8 @@
  */
 import type { ProblemCode } from "@intellectual-frontiers/repoctl/governance";
 
-/** How serious a finding is: a failure fails the run, a warning does not. */
-export type Level = "fail" | "warn";
+/** How serious a finding is: a failure fails the run, a warning does not, and a note (`info`, 0016-repoctl-canaries FR-004) only tells: neither changes an exit status. */
+export type Level = "fail" | "warn" | "info";
 
 /** A finding: its level, its code, what is wrong and what to run. */
 export type Finding = { readonly level: Level; readonly code: ProblemCode; readonly message: string; readonly fix: string };

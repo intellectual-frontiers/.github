@@ -18,7 +18,7 @@ export const about: About = {
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     {
       path: "src/",
-      what: "`test.ts`, the registration and the assertions, and `record.ts`, the pure model of a test's record and its OpenTelemetry form.",
+      what: "`test.ts`, the registration and the assertions, `record.ts`, the pure model of a test's record and its OpenTelemetry form, and `canaries.ts`, the corpus of text that looks like a secret and is not one (the one module that holds such text; the secret scanner of `repoctl commit` lets it pass only while its digest is the pinned one).",
       mayImport: ["node: builtins", "src/", "core, crypto, system and telemetry, by package name"],
     },
     {

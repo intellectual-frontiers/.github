@@ -122,7 +122,13 @@ export default defineConfig({
     issue: { prefix: "Refs #", required: false },
     trailers: ["issue", "impact", "co-author"],
     coAuthor: "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
-    forbidden: { paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: DEFAULT_SECRET_PATTERNS },
+    forbidden: {
+      paths: DEFAULT_FORBIDDEN_PATHS,
+      allow: DEFAULT_ALLOWED_PATHS,
+      secrets: DEFAULT_SECRET_PATTERNS,
+      // The one canary file (commons repoctl 0016-repoctl-canaries): it passes as a note only while its content has this digest; pin the new one after an edit, once it holds only canaries.
+      canaries: [{ path: "commons/test/src/canaries.ts", sha256: "fc802180f98dedad139cd0aee3e35ee01578fcff1126e458a3adb5190f856d41" }],
+    },
   },
   generators,
   checks: [

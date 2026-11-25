@@ -20,8 +20,9 @@ import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment } from ".
 export function checkText(r: CheckReport): string {
   const lines = r.sections.map((s) => {
     const failed = s.findings.filter((f) => f.level === "fail").length;
-    const warned = s.findings.length - failed;
-    return `${failed > 0 ? "FAIL" : warned > 0 ? "warn" : "ok  "}  ${s.title}${failed + warned > 0 ? ` (${failed + warned})` : ""}`;
+    const warned = s.findings.filter((f) => f.level === "warn").length;
+    const noted = s.findings.length - failed - warned;
+    return `${failed > 0 ? "FAIL" : warned > 0 ? "warn" : noted > 0 ? "info" : "ok  "}  ${s.title}${s.findings.length > 0 ? ` (${s.findings.length})` : ""}`;
   });
   const bad = r.sections.flatMap((s) => s.findings).length;
   return [...lines, ...(bad === 0 ? [] : ["explain a code: repoctl explain <code>"])].join("\n");

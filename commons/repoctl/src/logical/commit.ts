@@ -8,13 +8,14 @@
  * ```ts
  * import { DEFAULT_ALLOWED_PATHS, DEFAULT_FORBIDDEN_PATHS } from "@intellectual-frontiers/repoctl/governance";
  * import { forbidden, messageOf } from "./commit.ts";
- * forbidden({ paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: [] }, ".claude/settings.json"); // "the local folder of an agent (.claude/)"
+ * forbidden({ paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: [], canaries: [] }, ".claude/settings.json"); // "the local folder of an agent (.claude/)"
  * messageOf({ issue: { prefix: "Refs #", required: false }, trailers: ["issue"] }, { subject: "Add", refs: "10", coAuthor: undefined, session: undefined }).trailers; // ["Refs #10"]
  * ```
  *
  * @module
  */
 import { type CommitImpact, type CommitPolicy, type CommitSubject, type Generator, identityArgs, type IssueNumber, type SessionUrl } from "@intellectual-frontiers/repoctl/governance";
+import { sha256Hex } from "@intellectual-frontiers/headless/logical";
 import { matches } from "./glob.ts";
 import { absurd } from "@intellectual-frontiers/core";
 import { finding, type Finding } from "./findings.ts";
@@ -74,11 +75,33 @@ export function secretLike(policy: CommitPolicy["forbidden"], text: string): str
   return policy.secrets.find((s) => new RegExp(s.pattern).test(text))?.label;
 }
 
+/** The SHA-256 of a text as UTF-8, in lower-case hexadecimal: the digest a canary file is pinned by. */
+export function digestOf(text: string): string {
+  return sha256Hex(text);
+}
+
+/** What a file that holds what looks like a secret is under the policy (commons repoctl 0016-repoctl-canaries FR-002): a canary file where the policy pins its exact path and its text has the pinned digest, with the rule its text matches; else `pinned` where only its path is pinned (its content is not the pinned one), else `ordinary`. A text that matches no rule is not a holder of a secret and is `clean`. */
+export type Holder = { readonly kind: "clean" } | { readonly kind: "ordinary"; readonly rule: string } | { readonly kind: "changed"; readonly rule: string } | { readonly kind: "canary"; readonly rule: string };
+
+/** Whether a file is a canary file, and what the scanner says of it otherwise: pure, from the policy, the path and the text. */
+export function canaryOf(policy: CommitPolicy["forbidden"], path: string, text: string): Holder {
+  const rule = secretLike(policy, text);
+  if (rule === undefined) return { kind: "clean" };
+  const pin = policy.canaries.find((k) => k.path === path);
+  if (pin === undefined) return { kind: "ordinary", rule };
+  return digestOf(text) === pin.sha256 ? { kind: "canary", rule } : { kind: "changed", rule };
+}
+
+/** The note a canary file passed with: informational, never a failure. */
+export function canaryFinding(path: string, rule: string): Finding {
+  return finding("info", "E-CANARY", `${path} is a canary file (its digest is the pinned one) and holds what looks like ${rule}`, "repoctl explain E-CANARY");
+}
+
 /** What a commit came to. */
 export type CommitReport =
   | { readonly kind: "refused"; readonly findings: readonly Finding[] }
-  | { readonly kind: "preview"; readonly message: string; readonly files: readonly string[] }
-  | { readonly kind: "committed"; readonly message: string; readonly files: readonly string[]; readonly sha: string };
+  | { readonly kind: "preview"; readonly message: string; readonly files: readonly string[]; readonly findings: readonly Finding[] }
+  | { readonly kind: "committed"; readonly message: string; readonly files: readonly string[]; readonly sha: string; readonly findings: readonly Finding[] };
 
 const lines = (text: string): readonly string[] =>
   text
@@ -106,6 +129,7 @@ export async function runCommit(w: Pick<World, "process" | "repo" | "files">, in
   const files = input.dryRun ? [...new Set([...staged, ...input.paths])] : staged;
   if (files.length === 0) return refuse([finding("fail", "E-COMMIT-NOTHING", "nothing is staged and no path was given", "git status")]);
   const found: Finding[] = [];
+  const notes: Finding[] = [];
   for (const path of files) {
     const why = forbidden(policy.forbidden, path);
     if (why !== undefined) {
@@ -113,15 +137,29 @@ export async function runCommit(w: Pick<World, "process" | "repo" | "files">, in
       continue;
     }
     const text = await w.files.read(`${w.repo}/${path}`);
-    const looks = text === undefined ? undefined : secretLike(policy.forbidden, text);
-    if (looks !== undefined) found.push(finding("fail", "E-COMMIT-FORBIDDEN", `${path} holds what looks like ${looks}`, `git restore --staged ${path}`));
+    const holder = text === undefined ? ({ kind: "clean" } as const) : canaryOf(policy.forbidden, path, text);
+    switch (holder.kind) {
+      case "clean":
+        break;
+      case "canary":
+        notes.push(canaryFinding(path, holder.rule));
+        break;
+      case "changed":
+        found.push(finding("fail", "E-COMMIT-FORBIDDEN", `${path} holds what looks like ${holder.rule}, and its path is pinned as a canary file but its digest is not the pinned one`, `git restore --staged ${path}`));
+        break;
+      case "ordinary":
+        found.push(finding("fail", "E-COMMIT-FORBIDDEN", `${path} holds what looks like ${holder.rule}`, `git restore --staged ${path}`));
+        break;
+      default:
+        return absurd(holder);
+    }
   }
   if (found.length > 0) return refuse(found);
   const message = messageOf(policy, { subject: input.subject, refs: input.refs, impact: input.impact, coAuthor: input.coAuthor, session: input.session });
   const text = messageText(message);
-  if (input.dryRun) return { kind: "preview", message: text, files };
+  if (input.dryRun) return { kind: "preview", message: text, files, findings: notes };
   const made = await w.process.run(["git", ...identityArgs(policy.identity), "commit", "-m", message.subject, ...(message.trailers.length === 0 ? [] : ["-m", message.trailers.join("\n")])], here);
   if (made.code !== 0) return refuse([finding("fail", "E-COMMIT-FAILED", `git did not make the commit: ${lines(`${made.stdout}\n${made.stderr}`).slice(-2).join("; ")}`, "git status")]);
   const sha = lines((await git("rev-parse", "--short", "HEAD")).stdout)[0] ?? "";
-  return { kind: "committed", message: text, files, sha };
+  return { kind: "committed", message: text, files, sha, findings: notes };
 }

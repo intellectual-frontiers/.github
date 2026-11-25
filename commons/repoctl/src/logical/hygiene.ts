@@ -174,6 +174,7 @@ export function hygieneFails(findings: readonly Finding[]): boolean {
       case "fail":
         return true;
       case "warn":
+      case "info":
         return false;
       default:
         return absurd(f.level);

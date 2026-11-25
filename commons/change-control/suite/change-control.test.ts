@@ -9,6 +9,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
+import { canaryText } from "@intellectual-frontiers/test/canaries";
 import { allowedSigners, judgeRange, matches, parsePolicy, type Commit } from "../src/logical/mod.ts";
 import { readCommits } from "../src/physical/mod.ts";
 
@@ -16,7 +17,7 @@ const KEY = (n: string) => `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI${n.padEnd(43, 
 const POLICY = { signers: [{ name: "daily", role: "daily", key: KEY("D") }, { name: "recovery", role: "recovery", key: KEY("R") }], controlled: [{ path: "fleets/*/signers.ts", approvers: ["recovery"] }, { path: "deploy/**", approvers: ["recovery"] }] };
 
 proves(["0002-change-control-policy FR-001", "0002-change-control-policy FR-002"], "a policy is refused with every reason and accepted otherwise, a private key is never a signer's key, and the allowed signers text has a line for each signer", () => {
-  const bad = parsePolicy({ signers: [{ name: "Daily!", role: "daily", key: "not a key" }, { name: "x", role: "r", key: "-----BEGIN OPENSSH PRIVATE KEY-----" }], controlled: [{ path: "/etc/x", approvers: ["daily"] }, { path: "a", approvers: ["nobody"] }, { path: "b", approvers: [] }] });
+  const bad = parsePolicy({ signers: [{ name: "Daily!", role: "daily", key: "not a key" }, { name: "x", role: "r", key: canaryText("openssh-private-key") }], controlled: [{ path: "/etc/x", approvers: ["daily"] }, { path: "a", approvers: ["nobody"] }, { path: "b", approvers: [] }] });
   assert(bad.kind === "err");
   assert(bad.error.length >= 6, bad.error.join("\n"));
   assertEquals(parsePolicy({ signers: [] }).kind, "err");
@@ -24,7 +25,7 @@ proves(["0002-change-control-policy FR-001", "0002-change-control-policy FR-002"
   const ok = parsePolicy(POLICY);
   assert(ok.kind === "ok");
   assertEquals(allowedSigners(ok.value.signers), `daily namespaces="git" ${KEY("D")}\nrecovery namespaces="git" ${KEY("R")}\n`);
-  assert(matches("fleets/*/signers.ts", "fleets/fcr/signers.ts") && !matches("fleets/*/signers.ts", "fleets/a/b/signers.ts") && matches("deploy/**", "deploy/a/b.yml") && !matches("deploy/**", "other/deploy/a"));
+  assert(matches("fleets/*/signers.ts", "fleets/synthetic-fleet-01/signers.ts") && !matches("fleets/*/signers.ts", "fleets/a/b/signers.ts") && matches("deploy/**", "deploy/a/b.yml") && !matches("deploy/**", "other/deploy/a"));
 });
 
 const commit = (sha: string, signature: Commit["signature"], signer: string, files: readonly string[], body = ""): Commit => ({ sha, author: "x", subject: `change ${sha.slice(0, 4)}`, body, files, signature, signer });
@@ -37,10 +38,10 @@ proves(["0002-change-control-policy FR-003", "0002-change-control-policy FR-004"
   assertEquals(j.verdicts.map((v) => v.state), ["accepted", "refused", "refused", "refused", "refused"]);
   assert(j.verdicts[1]?.reasons[0] === "it is not signed" && j.verdicts[2]?.reasons[0]?.includes("not a signer of the fleet") === true && j.verdicts[3]?.reasons[0] === "its signature is bad" && j.verdicts[4]?.reasons[0]?.includes("stranger") === true);
   assertEquals(j.ok, false);
-  const blocked = judgeRange([commit(a, "G", "daily", ["fleets/fcr/signers.ts", "README.md"])], policy.value);
+  const blocked = judgeRange([commit(a, "G", "daily", ["fleets/synthetic-fleet-01/signers.ts", "README.md"])], policy.value);
   assertEquals(blocked.verdicts[0]?.state, "blocked");
-  assert(blocked.verdicts[0]?.reasons[0]?.includes("fleets/fcr/signers.ts") === true && blocked.verdicts[0]?.reasons[0]?.includes("recovery") === true);
-  const approved = judgeRange([commit(a, "G", "daily", ["fleets/fcr/signers.ts"]), commit(b, "G", "recovery", ["NOTES.md"], `Adds a signer.\n\nApproves: ${a.slice(0, 12)}`)], policy.value);
+  assert(blocked.verdicts[0]?.reasons[0]?.includes("fleets/synthetic-fleet-01/signers.ts") === true && blocked.verdicts[0]?.reasons[0]?.includes("recovery") === true);
+  const approved = judgeRange([commit(a, "G", "daily", ["fleets/synthetic-fleet-01/signers.ts"]), commit(b, "G", "recovery", ["NOTES.md"], `Adds a signer.\n\nApproves: ${a.slice(0, 12)}`)], policy.value);
   assertEquals(approved.verdicts.map((v) => v.state), ["accepted", "accepted"]);
   assertEquals(approved.verdicts[0]?.approvedBy, "recovery");
   assertEquals(approved.ok, true);
@@ -59,7 +60,7 @@ proves(["0002-change-control-policy FR-003", "0002-change-control-policy FR-004"
   assertEquals(late.verdicts[0]?.state, "refused");
   assert(late.verdicts[0]?.reasons[0]?.includes("retired on 2026-06-30") === true);
   assertEquals(parsePolicy({ signers: [{ name: "x", role: "r", key: KEY("X"), retired: "last week" }] }).kind, "err");
-  const self = judgeRange([commit(a, "G", "recovery", ["fleets/fcr/signers.ts"])], policy.value);
+  const self = judgeRange([commit(a, "G", "recovery", ["fleets/synthetic-fleet-01/signers.ts"])], policy.value);
   assertEquals([self.verdicts[0]?.state, self.verdicts[0]?.approvedBy], ["accepted", "recovery"], "a change by a signer of an approving role is its own approval");
   void c; void d; void e;
 });

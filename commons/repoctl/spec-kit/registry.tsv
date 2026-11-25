@@ -14,3 +14,4 @@ number	slug	state
 0013	repoctl-ci	in force
 0014	repoctl-usage	in force
 0015	repoctl-names	in force
+0016	repoctl-canaries	in force

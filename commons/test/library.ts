@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.2.7",
   distribution: ["github", "npm"],
-  exports: [".", "./record"],
+  exports: [".", "./record", "./canaries"],
   summary:
     "Tests that run unchanged under bun test and node --test and are recorded as evidence by their own code: the assertions under short plain names, proves (which names the requirements a test proves), only, steps, and the record of every test as an OpenTelemetry span and log record on the installation record.",
 };

@@ -15,6 +15,7 @@ import { type Config, stepText } from "@intellectual-frontiers/repoctl/governanc
 import { constantFindings, type Source } from "./constants.ts";
 import { type DeclaredInput, undeclaredFindings } from "./declared.ts";
 import { finding, type Finding, tailLines } from "./findings.ts";
+import { canaryFinding, canaryOf, digestOf } from "./commit.ts";
 import { fixOf } from "./order.ts";
 import { pool } from "./pool.ts";
 import type { LibraryInfo, Run, World } from "./ports.ts";
@@ -98,8 +99,26 @@ async function declaredInputs(w: Pick<World, "files" | "repo">, libs: readonly L
   return out;
 }
 
+/** The canary files the configuration pins (0016-repoctl-canaries FR-005): an `E-CANARY` note for each whose digest is the pinned one and a failure for each that is missing, or has another digest, or no longer holds what the scanner stops. */
+export async function canarySection(w: Pick<World, "files" | "repo">, policy: Config["commit"]["forbidden"]): Promise<Section> {
+  const findings: Finding[] = [];
+  for (const pin of policy.canaries) {
+    const text = await w.files.read(`${w.repo}/${pin.path}`);
+    const fix = `sha256sum ${pin.path}, then pin the digest in commit.forbidden.canaries of repoctl.config.ts (the owner's change) once the file holds only canaries`;
+    if (text === undefined) {
+      findings.push(finding("fail", "E-CANARY-CHANGED", `${pin.path} is pinned as a canary file and is not there`, `remove its pin from commit.forbidden.canaries of repoctl.config.ts`));
+      continue;
+    }
+    const held = canaryOf(policy, pin.path, text);
+    if (held.kind === "canary") findings.push(canaryFinding(pin.path, held.rule));
+    else if (digestOf(text) !== pin.sha256) findings.push(finding("fail", "E-CANARY-CHANGED", `${pin.path} is pinned as a canary file and its content is not the pinned one`, fix));
+    else findings.push(finding("fail", "E-CANARY-CHANGED", `${pin.path} is pinned as a canary file and holds no text the scanner stops`, `remove its pin from commit.forbidden.canaries of repoctl.config.ts`));
+  }
+  return { id: "canaries", title: "The canary files of the secret scanner", findings };
+}
+
 /** Runs every check of the configuration: the generators', its named checks, and, where it has libraries, the specification kit of each and the constants that say a version. */
-export async function runCheck(w: World, config: Pick<Config, "generators" | "checks" | "libraries">): Promise<CheckReport> {
+export async function runCheck(w: World, config: Pick<Config, "generators" | "checks" | "libraries"> & { readonly commit?: Config["commit"] }): Promise<CheckReport> {
   const sections: Section[] = [];
   const synced = await runSync(w, "check", config.generators);
   for (const o of synced.outcomes) {
@@ -107,6 +126,7 @@ export async function runCheck(w: World, config: Pick<Config, "generators" | "ch
     sections.push({ id: `generator:${o.id}`, title: `The files of the generator ${o.id}`, findings: findingsOfSync({ mode: "check", outcomes: [o] }).map((f) => (g === undefined ? f : { ...f, fix: fixOf(g) })) });
   }
   for (const c of config.checks) sections.push({ id: c.id, title: c.summary, findings: findingsOfProgram(await runStep(w, c.run), c.code, stepText(c.run)) });
+  if (config.commit !== undefined && config.commit.forbidden.canaries.length > 0) sections.push(await canarySection(w, config.commit.forbidden));
   if (config.libraries === undefined) return { sections };
   const libs = await w.libraries.list();
   if (libs.kind === "err") {

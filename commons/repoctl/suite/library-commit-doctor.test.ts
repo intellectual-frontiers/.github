@@ -16,7 +16,7 @@ import { CAN_RUN, CHECKOUT, checkVerdict, execute, git, hostOf, LIBRARIES, put, 
 
 const CO_AUTHOR = TEST_CO_AUTHOR;
 const IDENTITY = TEST_IDENTITY;
-const RULES: CommitPolicy["forbidden"] = { paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: DEFAULT_SECRET_PATTERNS };
+const RULES: CommitPolicy["forbidden"] = { paths: DEFAULT_FORBIDDEN_PATHS, allow: DEFAULT_ALLOWED_PATHS, secrets: DEFAULT_SECRET_PATTERNS, canaries: [] };
 const TRAILERS: Pick<CommitPolicy, "issue" | "trailers"> = { issue: { prefix: "Refs #", required: false }, trailers: ["issue", "co-author", "session"] };
 const DOCTOR: DoctorPolicy = { minNode: 26, bunPin: undefined, links: { folder: "commons/node_modules/@intellectual-frontiers", fix: ["bun", "commons/libraries/src/link.ts"] }, install: "bun install --frozen-lockfile" };
 
