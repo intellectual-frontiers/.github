@@ -20,7 +20,7 @@ function express(r: Requirement): Disposition {
 export const dialect: Dialect = { name: "claude-code", holder: "agent", express: (r, _c) => express(r) };
 
 /** The files the dialect makes for a contract: the same bytes for the same contract. */
-export function render(contract: Contract, command = "workbench"): readonly RenderedFile[] {
+export function render(contract: Contract, command = contract.command ?? "workbench"): readonly RenderedFile[] {
   const deny = [...new Set(contract.gates.flatMap((g) => g.commands))].sort().map((c) => `Bash(${c}:*)`);
   const settings = { hooks: { SessionStart: [{ matcher: "", hooks: [{ type: "command", command: `${command} ready` }] }] }, permissions: { deny } };
   return [

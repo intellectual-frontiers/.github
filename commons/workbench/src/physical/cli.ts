@@ -50,6 +50,16 @@ function parse(argv: readonly string[]): Parsed {
   return { verb, operands, options };
 }
 
+/** Where the contract is when `--contract` does not say: the `workbench.contract` of the package.json of the folder, else `workbench.contract.ts`. */
+async function contractFileOf(io: Io): Promise<string> {
+  const pkg = path.join(io.cwd, "package.json");
+  if (await fs.exists(pkg)) {
+    const parsed = JSON.parse(await fs.readTextFile(pkg).catch(() => "{}")) as { workbench?: { contract?: unknown } };
+    if (typeof parsed.workbench?.contract === "string") return parsed.workbench.contract;
+  }
+  return "workbench.contract.ts";
+}
+
 async function load(io: Io, file: string): Promise<Contract | string> {
   const full = path.resolve(io.cwd, file);
   if (!(await fs.exists(full))) return `${file} is not there: write the contract of this repository there, or name it with --contract`;
@@ -71,7 +81,7 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2 |
     io.err("usage: workbench ready [--for TASK] [--unit UNIT]... [--files FILE,...] [--all] [--ensure] [--ci] [--json] | project setup|container|ci|agents|runbook|matrix|dialect NAME | explain CODE  (--contract FILE)\n");
     return 2;
   }
-  const contract = await load(io, typeof p.options["contract"] === "string" ? p.options["contract"] : "workbench.contract.ts");
+  const contract = await load(io, typeof p.options["contract"] === "string" ? p.options["contract"] : await contractFileOf(io));
   if (typeof contract === "string") {
     io.err(`${contract}\n`);
     return 3;
@@ -81,7 +91,7 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2 |
     const text =
       what === "setup" ? setupScript(contract)
       : what === "container" ? containerfile(contract)
-      : what === "ci" ? ciStep()
+      : what === "ci" ? ciStep(contract.command)
       : what === "agents" ? agentsBlock(contract)
       : what === "runbook" ? (renderHuman(contract)[0]?.text ?? "")
       : what === "matrix" ? matrixMarkdown(matrixOf([...contract.base, ...contract.contributions.flatMap((c) => c.requirements)], contract, DIALECTS))

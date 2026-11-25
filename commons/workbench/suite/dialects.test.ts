@@ -55,6 +55,16 @@ proves(["0006-workbench-dialects FR-004"], "the setup script, Containerfile, pip
   assertEquals(spliceBlock("# Mine\n", block).includes(AGENTS_MARKS.begin), true);
 });
 
+proves(["0006-workbench-dialects FR-004"], "the commands the projections name are the contract's own command", () => {
+  const own = { ...contract, command: "bun run workbench" };
+  assert(agentsBlock(own).includes("`bun run workbench ready --for TASK --ensure`"));
+  assert(setupScript(own).includes("bun run workbench ready --for TASK --ensure"));
+  assert(ciStep(own.command).includes("bun run workbench ready"));
+  assert(renderHuman(own)[0]?.text.includes("`bun run workbench ready`") === true);
+  assertEquals(JSON.parse(renderClaude(own)[0]?.text ?? "{}").hooks.SessionStart[0].hooks[0].command, "bun run workbench ready");
+  assert(agentsBlock(contract).includes("`workbench ready`"));
+});
+
 proves(["0006-workbench-dialects FR-005"], "the runbook of a person has a checklist, the stages with their levels, and for each gate its approver and the record of an approval", () => {
   const [file] = renderHuman(contract);
   assertEquals(file?.path, "RUNBOOK.md");

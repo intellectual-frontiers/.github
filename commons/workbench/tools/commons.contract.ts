@@ -2,7 +2,7 @@
 /**
  * The workbench contract of the commons (commons workbench 0003-workbench-contract): what a person or an agent needs to work on this repository. The base is small: Git, the two runtimes, an identity and `origin/main`. Everything else
  * is what the libraries say they need in their own manifests (the field `workbench` of each `library.ts`), composed only for the units a task is about, and each library's own dependencies to install. Read by `workbench ready`:
- * `bun commons/workbench/src/physical/main.ts ready --for test --unit anyfs-sql --contract commons/workbench/tools/commons.contract.ts`.
+ * `bun commons/workbench/src/physical/main.ts ready --for test --unit anyfs-sql --contract commons/workbench/tools/commons.contract.ts` (or `bun run workbench ...`).
  *
  * @module
  */
@@ -43,6 +43,7 @@ const repositoryTests = { unit: "repository-tests", requirements: [{ id: "sshd",
 
 const made = defineContract({
   name: "commons",
+  command: "bun run workbench",
   enforceFrom: "2027-01-01",
   roles: [
     { id: "contributor", holder: "either", may: ["read", "edit", "test", "propose", "commit", "push"] },
@@ -53,13 +54,13 @@ const made = defineContract({
   gates: [
     { id: "release-tag", summary: "A release tag is signed by the releaser, from the commit that holds the release record.", approver: "releaser", commands: ["git tag", "git push --tags"] },
     { id: "scanner-pins", summary: "The pins of the secret scanner (the canaries) change only with the approver's say.", approver: "approver", commands: [] },
-    { id: "history-rewrite", summary: "Rewriting published history breaks every hash, tag and signature and is the releaser's.", approver: "releaser", commands: ["git push --force", "git filter-repo"] },
+    { id: "rewrite-published", summary: "Rewriting published commits breaks every hash, tag and signature and is the releaser's.", approver: "releaser", commands: ["git push --force", "git filter-repo"] },
   ],
   stages: [
     { id: "develop", level: "agent-autonomous", gates: [] },
     { id: "safety-configuration", level: "agent-proposes", gates: ["scanner-pins"] },
     { id: "release", level: "agent-acts-human-reviews", gates: ["release-tag"] },
-    { id: "history", level: "human-only", gates: ["history-rewrite"] },
+    { id: "rewrite", level: "human-only", gates: ["rewrite-published"] },
   ],
   base,
   contributions: [...[...merged.values()].filter((c) => c.requirements.length > 0), repositoryTests],

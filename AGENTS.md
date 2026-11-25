@@ -48,3 +48,38 @@ This repository is small on purpose: the organization's public profile (`profile
 **Set your identity before you pull** (commons repoctl 0007-repoctl-hygiene FR-007): a `git pull --no-rebase` or `git merge` makes a merge commit with the checkout's own `user.name` and `user.email`, and where they are not set the history credits another name. Before the first pull of a session run `git config user.name "Shahid Shah"` and `git config user.email "47497+shah@users.noreply.github.com"` (or merge with `bun run repoctl merge origin/main`, which uses the identity of `repoctl.config.ts`). `bun run repoctl hygiene` reports a merge by another identity as `E-HYGIENE-IDENTITY`; the merges made before the check are held by hash in `commit.heldMerges` and history is never rewritten.
 
 Every commit is made by `bun run repoctl commit -m "Subject" --refs N`: its author and committer is Shahid Shah <47497+shah@users.noreply.github.com> (given to Git with `-c user.name` and `-c user.email`, never another address) unless a person expressly authorizes an agent to be the author of that commit in its message, and its message includes `Refs #N` and the agent credit in `Co-Authored-By`. Use `--co-author` when the configured default does not identify the agent.
+
+<!-- workbench:begin -->
+## The workbench
+
+Generated from the workbench contract `commons`; do not edit between the marks. Until 2027-01-01 every finding but a safety rule is a hint: it says what to do and never stops you.
+
+**Before you start, run `bun run workbench ready`. For the task you are about to do, run `bun run workbench ready --for TASK --ensure`: it installs only what that task needs.**
+
+- **workstation**: Where the operator, a person or an agent, orchestrates from: the harness, the operator's identity and keys, and the tool client configuration.
+- **workshop**: Where the work happens: a machine, a virtual machine or a container, with its toolchain, runtimes and network.
+- **workspace**: The repositories and other stores the work is about, laid out predictably so that a path means the same everywhere.
+- **workbench**: Everything a role needs to do its job with a repository: programs and runtimes, credential names, network needs, Git settings and the authority it has.
+
+| Role | Held by | May |
+|---|---|---|
+| contributor | either | read, edit, test, propose, commit, push |
+| publisher | either | publish |
+| approver | human | approve |
+| releaser | human | approve, publish, tag |
+
+| Stage | Autonomy | Gates |
+|---|---|---|
+| develop | agent-autonomous | none |
+| safety-configuration | agent-proposes | scanner-pins |
+| release | agent-acts-human-reviews | release-tag |
+| rewrite | human-only | rewrite-published |
+
+| Gate | Approver | What stops |
+|---|---|---|
+| release-tag | releaser | A release tag is signed by the releaser, from the commit that holds the release record. |
+| scanner-pins | approver | The pins of the secret scanner (the canaries) change only with the approver's say. |
+| rewrite-published | releaser | Rewriting published commits breaks every hash, tag and signature and is the releaser's. |
+
+An agent that meets a gate stops and hands back; it never retries a denial and never approves its own work.
+<!-- workbench:end -->
