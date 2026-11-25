@@ -19,6 +19,7 @@
 - **FR-008**: The library MUST make the projections for every dialect registered (0007-workload-harness) from the one source, a workload, whatever its form, and switching the dialect MUST change only the projection (the skill files, the allow, ask and deny rules and the entry of a tool server) and never the nodes, the effects or the derived autonomy.
 - **FR-009**: A workload MUST read as a Mizan scenario: the library MUST project its Given as the requirements of the workbench it needs, its When as its nodes in order and its Then as the nodes that assert, and the projection MUST cite the requirements the nodes cite.
 - **FR-010**: Every projection MUST be made from the view of a workload, which each form gives of its own (its nodes with the autonomy derived for each, the verbs, the controls, the evidence), and not from a form, so that a dialect is written once and projects a workload of every form, an index lists the form of each workload, and a form added later is one view.
+- **FR-011**: The command a harness runs to call a verb MUST be a parameter of every projection that renders it (the option `verbCommand` of `projectAll`, `skillMd`, `rulesOf` and every dialect, and `verbCommandOf` for a host that validates it up front), and its default MUST be `VERB_COMMAND` (`bun run workload verb`), so that a host with a program of its own (such as `opsfolio verb`) has its skills, its Codex block and its `Bash(<command> <verbId> *)` rules call that program, and a projection with no option is the same bytes as before. A command MUST be words and a path only (letters, digits, `_`, `.`, `/`, `-`, single spaces, at most 200 characters) and any other MUST be refused with the code `E-WL-HARNESS-COMMAND-INVALID` (whose fixer is the agent), raised as a `VerbCommandError` by a projection and returned as a finding by `verbCommandOf`, with nothing rendered.
 
 ## Acceptance scenarios
 
@@ -32,6 +33,7 @@
 8. **Given** the starter workload and every registered dialect, **When** they are projected, **Then** each dialect gives files and each says the same autonomy for each node, per FR-008.
 9. **Given** the starter workload, **When** it is projected as a scenario, **Then** the Given names its requirements, the When its nodes and the Then its checks, per FR-009.
 10. **Given** a runbook and a reconcile, **When** they are projected by every dialect, **Then** each says the same autonomy for each node and the index names both forms, per FR-010.
+11. **Given** the command `opsfolio verb` and the same workloads, **When** they are projected by every dialect, **Then** each skill, the Codex block and every rule names `opsfolio verb`, no file names `bun run workload verb`, and with no option the bytes are those of the default; **Given** the command `a; b`, **Then** the projection is refused with `E-WL-HARNESS-COMMAND-INVALID`, per FR-011.
 
 ## Out of scope
 
@@ -44,7 +46,7 @@
 
 ## Assumptions
 
-- The command a harness runs to call a verb is the one program of the library, `workload verb <id>` (0006-workload-split): a rule names that command and the id, never a shell string of the node.
+- The command a harness runs to call a verb is by default the one program of the library, `workload verb <id>`; a host may say its own, as FR-011 requires: a rule names that command and the id, never a shell string of the node. The program is the one 0006-workload-split names.
 
 ## Open questions
 

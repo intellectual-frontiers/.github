@@ -1,8 +1,9 @@
-// Spec: 0001-net FR-002
+// Spec: 0001-net FR-002, FR-018
 /**
  * An HTTP server whose handler takes a web `Request` and gives a web `Response` on `node:http`, so the same handler
  * runs on Bun and Node (commons 0001-net FR-002). Request bodies and response bodies stream; a client that goes away
- * aborts `request.signal`. `serve` returns a promise, settled once the port is bound, so `addr` is known.
+ * aborts `request.signal`. `serve` returns a promise, settled once the port is bound, so `addr` is known. `folderHandler` and `serveFolder` serve a published folder (an agora rendition folder with `README.html` as its index)
+ * read-only and safely (0001-net FR-018).
  *
  * @example
  * ```ts
@@ -14,8 +15,11 @@
  *
  * @module
  */
+import { createReadStream } from "node:fs";
+import { realpath, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
+import { isAbsolute, join, relative, sep } from "node:path";
 import { Readable } from "node:stream";
 import { mapError } from "@intellectual-frontiers/system/errors";
 import { traceServer } from "@intellectual-frontiers/telemetry/host/otel";
@@ -132,4 +136,160 @@ export function serve(options: ServeOptions, handler: ServeHandler): Promise<Ser
       resolve({ addr: { hostname: a.address, port: a.port }, finished, shutdown });
     });
   });
+}
+
+/** How a folder is served. */
+export type FolderOptions = {
+  /** The files that answer a directory, in order; `index.html` then `README.html` by default. Each is a plain file name. */
+  readonly index?: readonly string[];
+  /** Content types by lower case extension with its dot (`.xyz`), added to or replacing the built-in ones. */
+  readonly types?: Readonly<Record<string, string>>;
+};
+
+/** The content types of a folder: what a published rendition holds. Anything else is `application/octet-stream`. */
+export const FOLDER_TYPES: Readonly<Record<string, string>> = {
+  ".html": "text/html; charset=utf-8",
+  ".htm": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".pdf": "application/pdf",
+  ".epub": "application/epub+zip",
+  ".txt": "text/plain; charset=utf-8",
+};
+
+const FOLDER_HEADERS = { "x-content-type-options": "nosniff", "cache-control": "no-cache" } as const;
+
+function plain(status: number, text: string, extra: Readonly<Record<string, string>> = {}): Response {
+  return new Response(text, { status, headers: { ...FOLDER_HEADERS, "content-type": "text/plain; charset=utf-8", ...extra } });
+}
+
+/** The segments of a request path, or nothing where the path is one that must not be served: malformed escapes, NUL, a backslash, `.` or `..`, a drive or an absolute form after decoding. Empty segments are dropped. */
+function segmentsOf(pathname: string): readonly string[] | undefined {
+  if (!pathname.startsWith("/") || pathname.includes("\\") || pathname.includes("\0")) return undefined;
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    return undefined;
+  }
+  if (decoded.includes("\0") || decoded.includes("\\")) return undefined;
+  const out: string[] = [];
+  for (const seg of decoded.split("/")) {
+    if (seg === "") continue;
+    if (seg === "." || seg === ".." || /^[A-Za-z]:/u.test(seg)) return undefined;
+    out.push(seg);
+  }
+  return out;
+}
+
+/** Whether `child` is `root` or inside it, both already resolved. */
+function inside(root: string, child: string): boolean {
+  const rel = relative(root, child);
+  return rel === "" || (!rel.startsWith(`..${sep}`) && rel !== ".." && !isAbsolute(rel));
+}
+
+/** The single range `bytes=a-b`, `bytes=a-` or `bytes=-n` of a size: the bytes, `"unsatisfiable"`, or nothing where the header is none we answer (several ranges, or a form we do not know), so the whole file is sent. */
+function rangeOf(header: string, size: number): { readonly start: number; readonly end: number } | "unsatisfiable" | undefined {
+  const m = /^bytes=(\d*)-(\d*)$/u.exec(header.trim());
+  if (m === null || (m[1] === "" && m[2] === "")) return undefined;
+  if (m[1] === "") {
+    const n = Number(m[2]);
+    if (n === 0) return "unsatisfiable";
+    return size === 0 ? "unsatisfiable" : { start: Math.max(0, size - n), end: size - 1 };
+  }
+  const start = Number(m[1]);
+  const end = m[2] === "" ? size - 1 : Math.min(Number(m[2]), size - 1);
+  if (start >= size || start > end) return "unsatisfiable";
+  return { start, end };
+}
+
+const etagMatches = (header: string, etag: string): boolean => header.trim() === "*" || header.split(",").some((t) => t.trim().replace(/^W\//u, "") === etag);
+
+/**
+ * A handler that serves the regular files of a folder, read-only: only `GET` and `HEAD` (405 otherwise), only a regular file inside the folder's resolved root (a `..`, an encoded traversal, a NUL, a backslash, a drive or a
+ * symlink that leaves the root is refused, with no word of what is outside), a directory answered by its `index.html` or `README.html` and never listed (404 where it has none), the content type from the extension (a safe
+ * default of `application/octet-stream`) with `X-Content-Type-Options: nosniff`, an `ETag` from size and modification time answering `If-None-Match` with 304, one `bytes=a-b` range (206, or 416), and `Cache-Control: no-cache`
+ * (0001-net FR-018). The root is resolved on the first request.
+ *
+ * @example
+ * ```ts
+ * const server = await serve({ port: 0 }, folderHandler("/srv/rendition"));
+ * ```
+ */
+export function folderHandler(root: string, options: FolderOptions = {}): ServeHandler {
+  const index = options.index ?? ["index.html", "README.html"];
+  const types = { ...FOLDER_TYPES, ...options.types };
+  let resolved: Promise<string> | undefined;
+  const rootReal = (): Promise<string> => {
+    resolved ??= realpath(root).catch((e: unknown) => {
+      resolved = undefined;
+      throw e;
+    });
+    return resolved;
+  };
+  /** The real path of a file inside the root with its stat, or nothing where it is missing, outside the root or not a regular file. */
+  const regular = async (base: string, path: string): Promise<{ readonly real: string; readonly size: number; readonly mtimeMs: number } | undefined> => {
+    try {
+      const real = await realpath(path);
+      if (!inside(base, real)) return undefined;
+      const st = await stat(real);
+      return st.isFile() ? { real, size: st.size, mtimeMs: st.mtimeMs } : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+  return async (request) => {
+    if (request.method !== "GET" && request.method !== "HEAD") return plain(405, "method not allowed", { allow: "GET, HEAD" });
+    const url = new URL(request.url);
+    const segments = segmentsOf(url.pathname);
+    if (segments === undefined) return plain(400, "bad path");
+    const base = await rootReal();
+    const wanted = join(base, ...segments);
+    let file = await regular(base, wanted);
+    if (file === undefined) {
+      let dir = false;
+      try {
+        const real = await realpath(wanted);
+        dir = inside(base, real) && (await stat(real)).isDirectory();
+        if (dir) for (const name of index) {
+          if (name.includes("/") || name.includes("\\")) continue;
+          file = await regular(base, join(real, name));
+          if (file !== undefined) break;
+        }
+      } catch {
+        dir = false;
+      }
+      if (file === undefined) return plain(404, "not found");
+      if (!url.pathname.endsWith("/")) return new Response(null, { status: 301, headers: { ...FOLDER_HEADERS, location: `${url.pathname}/${url.search}` } });
+    }
+    const etag = `"${file.size.toString(16)}-${Math.floor(file.mtimeMs).toString(16)}"`;
+    const dot = file.real.lastIndexOf(".");
+    const ext = dot > file.real.lastIndexOf(sep) ? file.real.slice(dot).toLowerCase() : "";
+    const common = { ...FOLDER_HEADERS, etag, "accept-ranges": "bytes", "content-type": types[ext] ?? "application/octet-stream" };
+    const inm = request.headers.get("if-none-match");
+    if (inm !== null && etagMatches(inm, etag)) return new Response(null, { status: 304, headers: { ...FOLDER_HEADERS, etag } });
+    const header = request.headers.get("range");
+    const ifRange = request.headers.get("if-range");
+    const range = header === null || (ifRange !== null && ifRange.trim() !== etag) ? undefined : rangeOf(header, file.size);
+    if (range === "unsatisfiable") return new Response(null, { status: 416, headers: { ...FOLDER_HEADERS, "content-range": `bytes */${file.size}` } });
+    const [start, end] = range === undefined ? [0, file.size - 1] : [range.start, range.end];
+    const length = file.size === 0 ? 0 : end - start + 1;
+    const headers = { ...common, "content-length": String(length), ...(range === undefined ? {} : { "content-range": `bytes ${start}-${end}/${file.size}` }) };
+    const status = range === undefined ? 200 : 206;
+    if (request.method === "HEAD" || length === 0) return new Response(null, { status, headers });
+    const body = Readable.toWeb(createReadStream(file.real, { start, end })) as ReadableStream<Uint8Array>;
+    return new Response(body, { status, headers });
+  };
+}
+
+/** Serve a folder on `127.0.0.1` (or the `hostname` given), a port of the system's choice unless one is given: `serve(options, folderHandler(root, options))`. */
+export function serveFolder(root: string, options: ServeOptions & FolderOptions = {}): Promise<Server> {
+  return serve(options, folderHandler(root, options));
 }

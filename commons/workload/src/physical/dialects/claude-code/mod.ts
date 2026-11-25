@@ -14,11 +14,11 @@ if (info === undefined) throw new Error("the dialect claude-code is registered b
 /** The dialect. */
 export const dialect: DialectImpl = {
   info,
-  render: (views) => {
-    const r = rulesOf(views);
+  render: (views, options = {}) => {
+    const r = rulesOf(views, options);
     return [
       { path: "SKILLS.md", text: skillsIndex(views) },
-      ...[...views].sort((a, b) => (a.id < b.id ? -1 : 1)).map((v) => ({ path: `.claude/skills/${v.id}/SKILL.md`, text: skillMd(v) })),
+      ...[...views].sort((a, b) => (a.id < b.id ? -1 : 1)).map((v) => ({ path: `.claude/skills/${v.id}/SKILL.md`, text: skillMd(v, undefined, options) })),
       { path: ".claude/workload.settings.json", text: `${JSON.stringify({ permissions: { allow: r.allow, ask: r.ask, deny: r.deny } }, null, 2)}\n` },
     ];
   },

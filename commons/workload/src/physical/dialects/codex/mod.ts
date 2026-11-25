@@ -6,7 +6,7 @@
  * @module
  */
 import { DIALECTS } from "@intellectual-frontiers/workload/governance";
-import { type DialectImpl, nodeLines, rulesOf, VERB_COMMAND, WORKLOAD_MARKS } from "@intellectual-frontiers/workload/logical";
+import { type DialectImpl, nodeLines, rulesOf, verbCommandOf, VerbCommandError, WORKLOAD_MARKS } from "@intellectual-frontiers/workload/logical";
 
 const info = DIALECTS.get("codex");
 if (info === undefined) throw new Error("the dialect codex is registered by the core");
@@ -16,15 +16,17 @@ const word = (s: string): string => s.replace(/\s+/gu, " ").trim();
 /** The dialect. */
 export const dialect: DialectImpl = {
   info,
-  render: (views) => {
-    const r = rulesOf(views);
+  render: (views, options = {}) => {
+    const r = rulesOf(views, options);
+    const command = verbCommandOf(options);
+    if (command.kind === "err") throw new VerbCommandError(command.error);
     const sorted = [...views].sort((a, b) => (a.id < b.id ? -1 : 1));
     const bare = (xs: readonly string[]): string => (xs.length === 0 ? "none" : xs.map((x) => x.replace(/^Bash\(|\)$/gu, "")).join("; "));
     const text = [
       WORKLOAD_MARKS.begin,
       "## Workloads",
       "",
-      `Generated from the workloads of the library; do not edit between the marks. You orchestrate; every effect is a verb of the pinned packages, called as \`${VERB_COMMAND} <id>\`. A judge only proposes. At an ask or a gate stop and hand back.`,
+      `Generated from the workloads of the library; do not edit between the marks. You orchestrate; every effect is a verb of the pinned packages, called as \`${command.value} <id>\`. A judge only proposes. At an ask or a gate stop and hand back.`,
       "",
       `Verbs you may call: ${bare(r.allow)}.`,
       `Verbs you propose and a person applies: ${bare(r.ask)}.`,

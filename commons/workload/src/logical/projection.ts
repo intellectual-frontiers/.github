@@ -17,11 +17,41 @@ import { type Crosswalk, type ControlRef, controlUrn, mappedControls } from "@in
 import { type Autonomy, AUTONOMY } from "@intellectual-frontiers/workbench/governance";
 import type { RenderedFile } from "@intellectual-frontiers/workbench/logical";
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { type BuiltFormId, citeText, type DialectInfo, type DialectRegistry, DIALECTS, type Expectation, type InputSpec, type SpecCite, type Trigger, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
+import { type BuiltFormId, citeText, type Finding, finding, type DialectInfo, type DialectRegistry, DIALECTS, type Expectation, type InputSpec, type SpecCite, type Trigger, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
 import { lessAutonomous } from "./autonomy.ts";
 
-/** The command a harness runs to call a verb: one program of the library, never a shell string built from a node. */
+/** The command a harness runs to call a verb: one program of the library, never a shell string built from a node. It is the default of the option `verbCommand`; a host that has a program of its own says it (0004-workload-projections FR-011). */
 export const VERB_COMMAND = "bun run workload verb";
+
+/** What a projection may be asked: the command a harness runs to call a verb, by default `VERB_COMMAND`. */
+export type ProjectionOptions = { readonly verbCommand?: string };
+
+/** The refusal of a command that is not words and a path: the finding, with the code `E-WL-HARNESS-COMMAND-INVALID`. */
+export class VerbCommandError extends Error {
+  readonly finding: Finding;
+  constructor(f: Finding) {
+    super(`${f.code}: ${f.message}`);
+    this.name = "VerbCommandError";
+    this.finding = f;
+  }
+}
+
+const COMMAND_WORDS = /^[A-Za-z0-9_./-]+( [A-Za-z0-9_./-]+)*$/u;
+
+/** The command of a projection: the one given if it is words and a path with no shell syntax (single spaces, at most 200 characters), the default if none is given, or the finding `E-WL-HARNESS-COMMAND-INVALID`. */
+export function verbCommandOf(options: ProjectionOptions = {}): Result<string, Finding> {
+  const c = options.verbCommand;
+  if (c === undefined) return ok(VERB_COMMAND);
+  if (c.length > 200 || !COMMAND_WORDS.test(c)) return err(finding("E-WL-HARNESS-COMMAND-INVALID", "", `the verb command ${JSON.stringify(c)} is not words and a path with no shell syntax in it`));
+  return ok(c);
+}
+
+/** The command of a projection, or the refusal thrown as a `VerbCommandError`. */
+function commandOrThrow(options: ProjectionOptions): string {
+  const r = verbCommandOf(options);
+  if (r.kind === "err") throw new VerbCommandError(r.error);
+  return r.value;
+}
 
 /** The marks between which the block of `AGENTS.md` is kept. */
 export const WORKLOAD_MARKS = { begin: "<!-- workload:begin -->", end: "<!-- workload:end -->" } as const;
@@ -107,10 +137,11 @@ export function verbLevels(view: WorkloadView): ReadonlyMap<string, Autonomy> {
 export type Rules = { readonly allow: readonly string[]; readonly ask: readonly string[]; readonly deny: readonly string[] };
 
 /** The rules for some workloads: a verb takes the strictest level of every node that calls it, in every workload. */
-export function rulesOf(views: readonly WorkloadView[]): Rules {
+export function rulesOf(views: readonly WorkloadView[], options: ProjectionOptions = {}): Rules {
+  const command = commandOrThrow(options);
   const all = new Map<string, Autonomy>();
   for (const v of views) for (const [verb, l] of verbLevels(v)) all.set(verb, lessAutonomous(all.get(verb) ?? "agent-autonomous", l));
-  const rule = (v: string): string => `Bash(${VERB_COMMAND} ${v} *)`;
+  const rule = (v: string): string => `Bash(${command} ${v} *)`;
   const pick = (f: (l: Autonomy) => boolean): readonly string[] => [...all].filter(([, l]) => f(l)).map(([v]) => rule(v)).sort();
   return {
     allow: pick((l) => l === "agent-autonomous" || l === "agent-acts-human-reviews"),
@@ -120,8 +151,9 @@ export function rulesOf(views: readonly WorkloadView[]): Rules {
 }
 
 /** The statement of a skill: one `SKILL.md` as Claude Code reads it. */
-export function skillMd(view: WorkloadView, verbs: VerbRegistry = VERBS): string {
-  const rules = rulesOf([view]);
+export function skillMd(view: WorkloadView, verbs: VerbRegistry = VERBS, options: ProjectionOptions = {}): string {
+  const command = commandOrThrow(options);
+  const rules = rulesOf([view], options);
   const header = ["---", `name: ${view.id}`, `description: ${JSON.stringify(word(`${view.summary} Version ${view.version}.`))}`, `disable-model-invocation: ${view.needsPerson ? "true" : "false"}`, ...(rules.allow.length === 0 ? [] : [`allowed-tools: ${rules.allow.join(" ")}`]), "---"];
   const verbList = [...verbLevels(view)].sort(([a], [b]) => (a < b ? -1 : 1)).map(([v, l]) => `- \`${v}\`${verbs.get(v) === undefined ? "" : ` (${verbs.get(v)?.package}): ${verbs.get(v)?.summary}`}; the strictest autonomy of its nodes is ${l}`);
   const evidence = view.nodes.flatMap((n) => (n.evidence === undefined ? [] : [`- \`${n.id}\`: ${n.evidence}`]));
@@ -137,7 +169,7 @@ export function skillMd(view: WorkloadView, verbs: VerbRegistry = VERBS): string
     "",
     "## How to run it",
     "",
-    `You orchestrate: every effect is a verb of the pinned packages, called by its id as \`${VERB_COMMAND} <id>\` and never by a command built from the text of a node. A \`judge\` only proposes: record what it proposes and apply nothing from it. At an ask or a gate stop and hand back: a person answers, and you never approve your own work. ${view.howToRun}`,
+    `You orchestrate: every effect is a verb of the pinned packages, called by its id as \`${command} <id>\` and never by a command built from the text of a node. A \`judge\` only proposes: record what it proposes and apply nothing from it. At an ask or a gate stop and hand back: a person answers, and you never approve your own work. ${view.howToRun}`,
     "",
     "## Inputs",
     "",
@@ -235,7 +267,7 @@ export function scenario(view: WorkloadView): string {
 }
 
 /** A dialect with its renderer: adding a harness is registering one. It renders the views of workloads of any form. */
-export type DialectImpl = { readonly info: DialectInfo; render(views: readonly WorkloadView[]): readonly RenderedFile[] };
+export type DialectImpl = { readonly info: DialectInfo; render(views: readonly WorkloadView[], options?: ProjectionOptions): readonly RenderedFile[] };
 
 /** A dialect registered: the list with one more, or why not (an id twice, or a dialect the registry does not hold). */
 export function registerDialect(impls: readonly DialectImpl[], impl: DialectImpl, registry: DialectRegistry = DIALECTS): Result<readonly DialectImpl[], string> {
@@ -245,6 +277,7 @@ export function registerDialect(impls: readonly DialectImpl[], impl: DialectImpl
 }
 
 /** The files of every dialect given from the one source, by dialect id. */
-export function projectAll(views: readonly WorkloadView[], impls: readonly DialectImpl[]): Readonly<Record<string, readonly RenderedFile[]>> {
-  return Object.fromEntries(impls.map((i) => [i.info.id, i.render(views)]));
+export function projectAll(views: readonly WorkloadView[], impls: readonly DialectImpl[], options: ProjectionOptions = {}): Readonly<Record<string, readonly RenderedFile[]>> {
+  commandOrThrow(options);
+  return Object.fromEntries(impls.map((i) => [i.info.id, i.render(views, options)]));
 }

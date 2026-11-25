@@ -42,6 +42,10 @@
 - **FR-016**: WHEN a pipeline of Telemetry is installed, the HTTP client MUST make a `client` span for each request (`http.request.method`, `url.full` redacted, `server.address`, `http.response.status_code`) that sends `traceparent`, and `serve` a `server` span whose parent is the request's `traceparent`, as Telemetry requires of the runtime's own modules (commons 0001-telemetry FR-018); where none is installed they MUST make no span and send no `traceparent`; an OTLP receiver over `serve` MUST make no span of its own, so that a pipeline exporting to it does not feed itself (commons 0001-telemetry FR-019).
 - **FR-017**: Net MUST depend on Core, Formats, Crypto, System and Telemetry alone, MUST name `node:` builtins and no vendor's global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/net` (commons 0032-libraries-by-concern FR-005, FR-013), one entry for the package and one for each module, importable by Node 26 and by Bun from `node_modules`, with `@types/node` as a peer.
 
+## A folder
+
+- **FR-018**: `folderHandler(root, options)` MUST give a `serve` handler that serves a published folder (such as an agora rendition folder, whose index is `README.html`), read-only, and `serveFolder(root, options)` MUST be `serve` with it, on `127.0.0.1` unless another address is asked for. The handler MUST answer only `GET` and `HEAD` (any other method 405 with `Allow: GET, HEAD`); MUST serve only a regular file inside the root as resolved (a `..` segment, an escape that decodes to one, a NUL, a backslash, a drive letter and a symlink whose target is outside the root MUST NOT be served and MUST NOT say what is outside); MUST never list a directory (it answers with its `index.html` or else its `README.html`, or the `index` option's names, and with 404 where it has none, and a directory asked for without its trailing slash MUST be redirected to the one with it); MUST give the content type of html, css, js, json, svg, png, jpg, webp, pdf, epub and txt and `application/octet-stream` for any other, with `X-Content-Type-Options: nosniff` and `Cache-Control: no-cache` on every response; MUST give an `ETag` from the size and the modification time and answer a matching `If-None-Match` with 304 and no body; and MUST answer one range `bytes=a-b`, `bytes=a-` or `bytes=-n` with 206 and its `Content-Range` (416 where it lies outside the file, and the whole file where the header is none it answers), with `Accept-Ranges: bytes`, so that a PDF can be read in parts. It MUST name `node:fs` and `node:path` and no package.
+
 ## Acceptance scenarios
 
 1. **Given** a server that answers 503 with `Retry-After: 120` when the cap is 30 seconds, **When** a download is retried, **Then** the wait is 30 seconds, per FR-001.
@@ -50,6 +54,7 @@
 4. **Given** a name and its wildcard, **When** `acme.issue` runs against a fake CA, **Then** two TXT records are set at `_acme-challenge.<name>` and both are removed, per FR-008 and FR-011.
 5. **Given** a collector pipeline installed, **When** the client calls the server, **Then** the server's span is the child of the client's, per FR-016.
 6. **Given** the packed package installed under `node_modules`, **When** Node 26 and Bun import each entry, **Then** both give the same value, per FR-017.
+7. **Given** a folder with `README.html`, a PDF and a symlink to a file outside it, **When** `serveFolder` serves it on port 0, **Then** `/` answers the README, `/x.pdf` answers a range with 206, a matching `If-None-Match` gets 304, `..` and encoded traversals, the symlink and a directory with no index get no file, and a `POST` gets 405, per FR-018.
 
 ## Out of scope
 

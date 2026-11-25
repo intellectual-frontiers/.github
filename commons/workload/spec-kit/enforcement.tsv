@@ -33,6 +33,7 @@ requirement	mechanism	by	note
 0004-workload-projections FR-008	check	.github: cd commons/workload && bun run verify	suite/projections.test.ts
 0004-workload-projections FR-009	check	.github: cd commons/workload && bun run verify	suite/projections.test.ts
 0004-workload-projections FR-010	check	.github: cd commons/workload && bun run verify	suite/projections.test.ts
+0004-workload-projections FR-011	check	.github: cd commons/workload && bun run verify	suite/projections.test.ts
 0005-workload-runs FR-001	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
 0005-workload-runs FR-002	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
 0005-workload-runs FR-003	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
@@ -52,6 +53,7 @@ requirement	mechanism	by	note
 0007-workload-harness FR-004	check	.github: cd commons/workload && bun run verify	suite/harness.test.ts
 0007-workload-harness FR-005	check	.github: cd commons/workload && bun run verify	suite/harness.test.ts
 0007-workload-harness FR-006	check	.github: cd commons/workload && bun run verify	suite/harness.test.ts
+0007-workload-harness FR-007	check	.github: cd commons/workload && bun run verify	suite/harness.test.ts
 0008-form-runbook FR-001	check	.github: cd commons/workload && bun run verify	suite/runbook-algebra.test.ts
 0008-form-runbook FR-002	check	.github: cd commons/workload && bun run verify	suite/runbook-algebra.test.ts
 0008-form-runbook FR-003	check	.github: cd commons/workload && bun run verify	suite/runbook-algebra.test.ts

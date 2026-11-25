@@ -110,3 +110,15 @@ proves(["0007-workload-harness FR-004"], "a reconcile is held to the same rule a
   const byWorkload = chooseDialect(POLICY, {}, RESTORE_DRILL);
   assert(byWorkload.kind === "ok" && byWorkload.value.dialect === "claude-code" && byWorkload.value.from === "workload");
 });
+
+proves(["0007-workload-harness FR-007"], "a registered dialect receives the options of the projection, and an invalid verb command is refused before any dialect renders", () => {
+  const seen: (string | undefined)[] = [];
+  const mine: DialectImpl = { info: MINIMAL, render: (views, options) => { seen.push(options?.verbCommand); return views.map((v) => ({ path: `minimal/${v.id}.txt`, text: `${v.id}\n` })); } };
+  const impls = must(registerDialect(DIALECT_IMPLS, mine, WITH_MINIMAL));
+  projectAll([viewOf(RESTORE_DRILL)], impls, { verbCommand: "opsfolio verb" });
+  assertEquals(seen, ["opsfolio verb"]);
+  let thrown: unknown;
+  try { projectAll([viewOf(RESTORE_DRILL)], impls, { verbCommand: "a; b" }); } catch (e) { thrown = e; }
+  assert(thrown instanceof Error && thrown.message.startsWith("E-WL-HARNESS-COMMAND-INVALID"));
+  assertEquals(seen.length, 1, "no dialect rendered");
+});

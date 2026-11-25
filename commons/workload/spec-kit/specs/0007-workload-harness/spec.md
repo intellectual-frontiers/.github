@@ -15,6 +15,7 @@
 - **FR-004**: A dialect MUST be chosen only where the matrix of the workbench (the requirements of the workload by dialect) shows no `dropped` and no `no-person` finding for that workload; otherwise the choice MUST be refused with the code `E-WL-HARNESS-UNSUITABLE`, whose fixer is a person, naming the dialect and each requirement it lacks, and the run MUST NOT fall back to another dialect by itself; each form says which requirements its workload has of its dialect.
 - **FR-005**: The library MUST project a workload for every registered dialect from the one source, and the autonomy derived for each node MUST be the same for every dialect and for every form: switching the dialect changes the skill files, the allow, ask and deny rules (and the entry of a tool server where the harness's format is verified, which none is today), and never the nodes, the effects or the autonomy.
 - **FR-006**: The projections MUST be the same bytes for the same workload and dialect, and a dialect whose format could not be verified MUST be the conservative one (0004-workload-projections FR-007).
+- **FR-007**: A dialect's renderer MUST take the options of a projection after the views (0004-workload-projections FR-011), so that a dialect registered later receives the verb command of its host with no change to any workload, and `projectAll` MUST refuse a command that is not words and a path with `E-WL-HARNESS-COMMAND-INVALID` before any dialect renders.
 
 ## Acceptance scenarios
 
@@ -24,6 +25,7 @@
 4. **Given** a workload that needs a credential and a dialect that cannot express it, **When** it is chosen, **Then** it is refused with its code and what it lacks and the run is not moved, per FR-004.
 5. **Given** every dialect, **When** a workload is projected, **Then** each says the same autonomy for each node, per FR-005.
 6. **Given** the same workload twice, **When** it is projected, **Then** the bytes are the same, per FR-006.
+7. **Given** a dialect registered by a host and the option `verbCommand`, **When** the workload is projected, **Then** the renderer receives the options and an invalid command is refused before it renders, per FR-007.
 
 ## Out of scope
 

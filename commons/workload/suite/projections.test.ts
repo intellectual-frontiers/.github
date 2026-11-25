@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import type { Crosswalk } from "@intellectual-frontiers/grc/governance";
-import { checklist, nodeLines, projectAll, rulesOf, scenario, skillMd, skillsIndex, statements, VERB_COMMAND } from "@intellectual-frontiers/workload/logical";
+import { checklist, nodeLines, projectAll, rulesOf, scenario, skillMd, skillsIndex, statements, VERB_COMMAND, VerbCommandError, verbCommandOf } from "@intellectual-frontiers/workload/logical";
 import { CONVERGE_SETTINGS, levelsOf as loopLevels, viewOf as loopView } from "@intellectual-frontiers/workload/forms/reconcile";
 import { flatten, levelsOf, RESTORE_DRILL, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
 import { DIALECT_IMPLS } from "@intellectual-frontiers/workload/physical";
@@ -143,4 +143,32 @@ proves(["0004-workload-projections FR-010"], "every projection is made from the 
   const rules = rulesOf([loop]);
   assert(rules.deny.some((r) => r.includes("state.apply")) && rules.allow.some((r) => r.includes("state.observe")));
   assert(scenario(loop).includes("Then the settings of the system are the settings that are wanted"));
+});
+
+proves(["0004-workload-projections FR-011"], "a host says its own verb command: every skill, the Codex block and every rule call it, the default is the same bytes as before, and a command with shell syntax is refused with its code", () => {
+  const command = "opsfolio verb";
+  const own = projectAll([V], DIALECT_IMPLS, { verbCommand: command });
+  const text = Object.values(own).flat().map((f) => f.text).join("\n");
+  assert(text.includes(`Bash(${command} store.checkpoint *)`) && text.includes(`called by its id as \`${command} <id>\``) && text.includes(`called as \`${command} <id>\``));
+  assert(!text.includes("bun run workload verb"), "no file names the default command");
+  const claude = own["claude-code"] ?? [];
+  const settings = JSON.parse(claude.find((f) => f.path === ".claude/workload.settings.json")?.text ?? "{}").permissions as Record<string, readonly string[]>;
+  for (const rule of [...(settings["allow"] ?? []), ...(settings["ask"] ?? []), ...(settings["deny"] ?? [])]) assert(/^Bash\(opsfolio verb [a-z.]+ \*\)$/u.test(rule), rule);
+  assert((claude.find((f) => f.path.endsWith("SKILL.md"))?.text ?? "").includes(`allowed-tools: Bash(${command} `));
+  assertEquals(rulesOf([V], { verbCommand: command }).allow, rulesOf([V]).allow.map((r) => r.replace(VERB_COMMAND, command)));
+  assert(skillMd(V, undefined, { verbCommand: command }).includes(`\`${command} <id>\``));
+  assertEquals(projectAll([V], DIALECT_IMPLS, {}), project());
+  assertEquals(projectAll([V], DIALECT_IMPLS, { verbCommand: VERB_COMMAND }), project());
+  assertEquals(verbCommandOf(), { kind: "ok", value: VERB_COMMAND });
+  assertEquals(verbCommandOf({ verbCommand: "./bin/opsfolio verb" }).kind, "ok");
+  for (const bad of ["a; b", "a && b", "a | b", "$(x) verb", "`x` verb", "a\nb", "", " a", "a  b", "a\"b", "a (b)", "a*", "x".repeat(201)]) {
+    const r = verbCommandOf({ verbCommand: bad });
+    assert(r.kind === "err" && r.error.code === "E-WL-HARNESS-COMMAND-INVALID" && r.error.fixer === "agent", JSON.stringify(bad));
+    for (const run of [() => projectAll([V], DIALECT_IMPLS, { verbCommand: bad }), () => rulesOf([V], { verbCommand: bad }), () => skillMd(V, undefined, { verbCommand: bad })]) {
+      let thrown: unknown;
+      try { run(); } catch (e) { thrown = e; }
+      assert(thrown instanceof VerbCommandError && thrown.finding.code === "E-WL-HARNESS-COMMAND-INVALID", JSON.stringify(bad));
+    }
+    for (const impl of DIALECT_IMPLS.filter((i) => i.info.id !== "human")) assert((() => { try { impl.render([V], { verbCommand: bad }); return false; } catch (e) { return e instanceof VerbCommandError; } })(), `${impl.info.id} ${JSON.stringify(bad)}`);
+  }
 });
