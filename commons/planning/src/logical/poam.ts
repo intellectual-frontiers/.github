@@ -36,6 +36,7 @@ export type PoamMilestone = {
 export type PoamRow = {
   readonly id: ItemId;
   readonly title: string;
+  readonly body: string;
   readonly severity?: Severity;
   readonly state: StateKind;
   /** The control references of its labels `control:<reference>`, as written, sorted, each once. */
@@ -119,6 +120,7 @@ export function poam(items: readonly Item[], today: Day): readonly PoamRow[] {
       return {
         id: finding.id,
         title: finding.title,
+        body: finding.body,
         ...(finding.severity === undefined ? {} : { severity: finding.severity }),
         state: finding.state.kind,
         controls: withPrefix(finding, CONTROL_LABEL),
