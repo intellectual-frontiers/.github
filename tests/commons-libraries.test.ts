@@ -18,6 +18,8 @@ import { synchronize as readmeSync } from "../commons/libraries/src/readme.ts";
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 const SPEC = "0027-commons-libraries";
 const PARTS = ["registry.tsv", "enforcement.tsv", "mizan.baseline.txt", "specs"] as const;
+/** A verify part is in a script as its text, and the tests are also run by the shard runner of the libraries, which runs `bun test` over the files of a folder in the shards of CI. */
+const hasPart = (script: string, part: string): boolean => script.includes(part) || (part === "test" && script.includes("libraries/src/shard.ts"));
 const VERIFY_PARTS = ["tsc", "mizan-check.ts --root spec-kit", "libraries/src/check.ts --root spec-kit", "test"] as const;
 const TRACE_PART = "tools/check.ts";
 
@@ -102,7 +104,7 @@ export function libraryFindings(repo: string): readonly string[] {
         found.push(`commons/${name}/package.json is not named @intellectual-frontiers/${name} (FR-001)`);
       const verify = pkg.scripts?.["verify"];
       if (verify === undefined) found.push(`commons/${name}/package.json has no verify script (FR-001)`);
-      else for (const part of VERIFY_PARTS) if (!verify.includes(part)) found.push(`commons/${name}'s verify lacks ${part} (FR-005)`);
+      else for (const part of VERIFY_PARTS) if (!hasPart(verify, part)) found.push(`commons/${name}'s verify lacks ${part} (FR-005)`);
       if (verify !== undefined && !verify.includes(TRACE_PART)) found.push(`commons/${name}'s verify lacks ${TRACE_PART} (FR-006)`);
     }
     if (existsSync(`${dir}/spec-kit/registry.tsv`)) {
@@ -240,7 +242,7 @@ proves([`${SPEC} FR-005`], "a verify that leaves out the compiler, a checker or 
     const pkg = JSON.parse(read(`${c.repo}/commons/data/package.json`)) as { scripts: Record<string, string> };
     pkg.scripts["verify"] = (pkg.scripts["verify"] ?? "")
       .split(" && ")
-      .filter((s) => !s.includes(part))
+      .filter((s) => !hasPart(s, part))
       .join(" && ");
     writeFileSync(`${c.repo}/commons/data/package.json`, JSON.stringify(pkg));
     assertStringIncludes(libraryFindings(c.repo).join("\n"), `verify lacks ${part}`);
