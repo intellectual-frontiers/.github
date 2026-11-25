@@ -1,0 +1,547 @@
+// Spec: 0002-guide FR-004
+/**
+ * The driver of a guided flow (commons terminal 0002-guide FR-004 to FR-008): `runGuide` loops (next step, decode, render, carry out) through
+ * the caller's functions and shows each step at the level the capabilities allow. It names no host: the input, the output, the clock and the
+ * signal are parameters, so that a test scripts all of them and the real program passes `process.stdin`, `process.stdout` and its own signal.
+ *
+ * It never answers for the person: a `human` step waits for the person (and where the input is not a TTY ends with `E-GUIDE-NEEDS-PERSON`
+ * with the step, never waiting), a field marked `secret` is refused (`E-GUIDE-SECRET-FIELD`) before anything is asked, and the driver has no
+ * way to read input without echo. On an abort it leaves the terminal as it found it and ends with `E-GUIDE-ABORTED`, whose status is 130.
+ *
+ * @example
+ * ```ts
+ * import { exitCodeOf, lineReader, runGuide } from "./guide-driver.ts";
+ * import { capabilitiesOf } from "./guide-caps.ts";
+ * const result = await runGuide({
+ *   next: async () => machine.step(),
+ *   run: async ({ step, answers }) => machine.apply(step, answers),
+ *   out: process.stdout,
+ *   in: lineReader(process.stdin, process.stdin.isTTY === true),
+ *   caps: capabilitiesOf(process.env, process.stdout),
+ *   signal: controller.signal,
+ * });
+ * process.exitCode = exitCodeOf(result);
+ * ```
+ *
+ * @module
+ */
+import { err, ok, type DecodeError, type Result } from "@intellectual-frontiers/core";
+import { atMost, FULL_MIN_COLUMNS, FULL_MIN_ROWS, type GuideCaps } from "./guide-caps.ts";
+import { type AskField, decodeStep, type DoneStep, type GuideStep } from "./guide-model.ts";
+import { clean, renderPrompt, renderResult, renderStep } from "./guide-render.ts";
+import { drawScreen, ENTER, frameOf, LEAVE, layoutOf, type PlanItem } from "./guide-screen.ts";
+import { paint } from "./palette.ts";
+
+const ESC = String.fromCharCode(0x1b);
+
+/** What reading a line gave: a line (without its end), the end of the input, or the abort of the signal. */
+export type LineRead = { readonly kind: "line"; readonly text: string } | { readonly kind: "end" } | { readonly kind: "aborted" };
+
+/** The input of a guide: whether a person is at it, and lines. */
+export type GuideIn = {
+  /** True where a person types at it (a TTY); false for a pipe or a file. */
+  readonly isTTY: boolean;
+  /** The next line without its end (`\n`, `\r\n` or `\r`), the end of the input, or the abort of `signal`. */
+  readLine(signal?: AbortSignal): Promise<LineRead>;
+};
+
+/** The output of a guide: text, the size where it is known, and a way to hear of a resize. */
+export type GuideOut = {
+  write(text: string): void;
+  readonly columns?: number | undefined;
+  readonly rows?: number | undefined;
+  /** Calls `listener` when the terminal is resized; returns the function that stops it. */
+  onResize?(listener: () => void): () => void;
+};
+
+/** The clock of a guide: the time in milliseconds, and a sleep that ends early on an abort. */
+export type GuideClock = {
+  now(): number;
+  sleep(ms: number, signal?: AbortSignal): Promise<void>;
+};
+
+/** What a verb gave back: a sentence, and optional lines of detail. */
+export type GuideRunResult = { readonly summary: string; readonly lines?: readonly string[] };
+
+/** What the driver hands the caller to carry out: the step and the answers the person gave (empty for a `run`). */
+export type GuideCall = { readonly step: GuideStep; readonly answers: Readonly<Record<string, string>>; readonly signal: AbortSignal | undefined };
+
+/** The typed ends of a guide that did not finish; each has `message`, a sentence for a person. */
+export type GuideError =
+  | { readonly code: "E-GUIDE-NEEDS-PERSON"; readonly step: GuideStep; readonly reason: "input-not-interactive" | "input-ended"; readonly message: string }
+  | { readonly code: "E-GUIDE-SECRET-FIELD"; readonly step: GuideStep; readonly field: string; readonly message: string }
+  | { readonly code: "E-GUIDE-ABORTED"; readonly exitCode: 130; readonly message: string }
+  | { readonly code: "E-GUIDE-STEP-INVALID"; readonly error: DecodeError; readonly message: string }
+  | { readonly code: "E-GUIDE-RUN-FAILED"; readonly step: GuideStep; readonly reason: string; readonly message: string }
+  | { readonly code: "E-GUIDE-DECLINED"; readonly step: GuideStep; readonly message: string }
+  | { readonly code: "E-GUIDE-ANSWER-INVALID"; readonly step: GuideStep; readonly field: string; readonly reason: string; readonly message: string }
+  | { readonly code: "E-GUIDE-WAIT-TIMEOUT"; readonly step: GuideStep; readonly message: string };
+
+/** What a finished guide gives: the last step and how many were shown. */
+export type GuideFinished = { readonly step: DoneStep; readonly steps: number };
+
+/** How a `wait` is polled. */
+export type GuidePoll = {
+  /** The first pause, in milliseconds (default 500). */
+  readonly initialMs?: number;
+  /** The longest pause (default 5000). */
+  readonly maxMs?: number;
+  /** The growth of the pause at each poll (default 1.5). */
+  readonly factor?: number;
+  /** In `plain`, a line that says it is still waiting every so many milliseconds (default 10000). */
+  readonly plainEveryMs?: number;
+  /** The time between frames of the spinner (default 120). */
+  readonly spinnerMs?: number;
+  /** Gives up after so many milliseconds of waiting (default: never). */
+  readonly maxWaitMs?: number;
+};
+
+/** What `runGuide` takes. */
+export type GuideOptions = {
+  /** The next step (anything: it is decoded by `decodeStep`, and a step that is not one ends the guide). */
+  readonly next: (signal?: AbortSignal) => Promise<unknown>;
+  /** Carries out a `run` step, and takes the answers of a `question` and the acknowledgement of a `human` step. */
+  readonly run: (call: GuideCall) => Promise<Result<GuideRunResult, string>>;
+  /** Validates one answer: the value to keep, or why it is refused (the field is asked again). By default, any answer that is not empty. */
+  readonly ask?: (field: AskField, answer: string, step: GuideStep) => Result<string, string>;
+  /** Asked before a `run` step is carried out; false ends the guide with `E-GUIDE-DECLINED`. Never answered by the driver. */
+  readonly confirm?: (step: GuideStep) => Promise<boolean>;
+  readonly out: GuideOut;
+  readonly in: GuideIn;
+  readonly caps: GuideCaps;
+  readonly signal?: AbortSignal | undefined;
+  /** The steps of the plan, for the left column of the full screen. */
+  readonly plan?: readonly PlanItem[];
+  /** The title of the full screen (default "Guide"). */
+  readonly title?: string;
+  readonly clock?: GuideClock;
+  readonly poll?: GuidePoll;
+  /** How many times a field is asked again after a refusal (default 5). */
+  readonly attempts?: number;
+};
+
+/** The clock of the host: `Date.now` and the web standard timer; a sleep ends at once on an abort. */
+export const systemClock: GuideClock = {
+  now: () => Date.now(),
+  sleep: (ms, signal) =>
+    new Promise<void>((resolve) => {
+      if (signal?.aborted === true) return resolve();
+      const done = (): void => {
+        clearTimeout(timer);
+        signal?.removeEventListener("abort", done);
+        resolve();
+      };
+      const timer = setTimeout(done, ms);
+      signal?.addEventListener("abort", done, { once: true });
+    }),
+};
+
+const ABORT = Symbol("abort");
+
+function raceAbort<T>(p: Promise<T>, signal: AbortSignal | undefined): Promise<T | typeof ABORT> {
+  if (signal === undefined) return p;
+  if (signal.aborted) return Promise.resolve(ABORT);
+  return new Promise((resolve, reject) => {
+    const onAbort = (): void => resolve(ABORT);
+    signal.addEventListener("abort", onAbort, { once: true });
+    p.then(
+      (v) => {
+        signal.removeEventListener("abort", onAbort);
+        resolve(v);
+      },
+      (e: unknown) => {
+        signal.removeEventListener("abort", onAbort);
+        reject(e);
+      },
+    );
+  });
+}
+
+/**
+ * A line reader over any stream of chunks (`process.stdin` is one): text or bytes decoded as UTF-8. A line ends with `\n`, `\r\n` or `\r`
+ * (a `\r` at the end of one chunk and a `\n` at the start of the next are one end); the last line may have none.
+ */
+export function lineReader(chunks: AsyncIterable<string | Uint8Array>, isTTY: boolean): GuideIn {
+  const it = chunks[Symbol.asyncIterator]();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let ended = false;
+  let pending: Promise<IteratorResult<string | Uint8Array>> | undefined;
+  const take = (): LineRead | undefined => {
+    const m = /\r\n|\n|\r/.exec(buffer);
+    if (m === null) return undefined;
+    if (m[0] === "\r" && m.index + 1 === buffer.length && !ended) return undefined;
+    const text = buffer.slice(0, m.index);
+    buffer = buffer.slice(m.index + m[0].length);
+    return { kind: "line", text };
+  };
+  return {
+    isTTY,
+    async readLine(signal) {
+      for (;;) {
+        const got = take();
+        if (got !== undefined) return got;
+        if (ended) {
+          if (buffer === "") return { kind: "end" };
+          const text = buffer;
+          buffer = "";
+          return { kind: "line", text };
+        }
+        if (signal?.aborted === true) return { kind: "aborted" };
+        pending ??= it.next();
+        const raced = await raceAbort(pending, signal);
+        if (raced === ABORT) return { kind: "aborted" };
+        pending = undefined;
+        if (raced.done === true) {
+          ended = true;
+          buffer += decoder.decode();
+        } else buffer += typeof raced.value === "string" ? raced.value : decoder.decode(raced.value, { stream: true });
+      }
+    },
+  };
+}
+
+const CTRL_C = "\u0003";
+const SPIN = ["|", "/", "-", "\\"] as const;
+
+/** The status a program should exit with: 0 for a finished guide, 130 for an abort, 2 where a person or a plain answer is needed, 1 otherwise. */
+export function exitCodeOf(result: Result<GuideFinished, GuideError>): number {
+  if (result.kind === "ok") return 0;
+  switch (result.error.code) {
+    case "E-GUIDE-ABORTED":
+      return 130;
+    case "E-GUIDE-NEEDS-PERSON":
+    case "E-GUIDE-SECRET-FIELD":
+    case "E-GUIDE-STEP-INVALID":
+      return 2;
+    case "E-GUIDE-RUN-FAILED":
+    case "E-GUIDE-DECLINED":
+    case "E-GUIDE-ANSWER-INVALID":
+    case "E-GUIDE-WAIT-TIMEOUT":
+      return 1;
+  }
+}
+
+type Block = (caps: GuideCaps) => readonly string[];
+
+/** Runs a guided flow to its end, or to the typed error that ended it (FR-004 to FR-008). */
+export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, GuideError>> {
+  const clock = o.clock ?? systemClock;
+  const poll = { initialMs: 500, maxMs: 5000, factor: 1.5, plainEveryMs: 10_000, spinnerMs: 120, ...o.poll };
+  const attempts = Math.max(1, o.attempts ?? 5);
+  const signal = o.signal;
+  /** Read each time: the signal may abort at any await. */
+  const stopped = (): boolean => signal?.aborted === true;
+  const plan = o.plan ?? [];
+  const title = o.title ?? "Guide";
+  const done = new Set<string>();
+  const blocks: Block[] = [];
+  let status = "";
+  let keys = "";
+  let typing = false;
+  let inAlt = false;
+  let shown = 0;
+  let current: string | undefined;
+
+  const size = (): { columns: number; rows: number } => ({
+    columns: Math.max(20, Math.floor(o.out.columns ?? o.caps.columns)),
+    rows: Math.max(4, Math.floor(o.out.rows ?? o.caps.rows)),
+  });
+  /** The capabilities now: the level asked for, lowered where the terminal is too small or the input is not a person's. */
+  const capsNow = (): GuideCaps => {
+    const s = size();
+    let c: GuideCaps = { ...o.caps, columns: s.columns, rows: s.rows };
+    if (c.level === "full" && (s.columns < FULL_MIN_COLUMNS || s.rows < FULL_MIN_ROWS || !o.in.isTTY)) c = atMost(c, "ansi");
+    return c;
+  };
+
+  const redraw = (): void => {
+    const c = capsNow();
+    if (c.level !== "full") {
+      if (inAlt) {
+        inAlt = false;
+        o.out.write(LEAVE);
+        for (const b of blocks) writeLines(b(c));
+      }
+      return;
+    }
+    if (!inAlt) {
+      inAlt = true;
+      o.out.write(ENTER);
+    }
+    const paneCols = Math.max(10, layoutOf(c.columns, c.rows, plan).pane);
+    const pane = blocks.flatMap((b) => b({ ...c, columns: paneCols }));
+    o.out.write(frameOf(drawScreen({ title, plan, done, current, pane, status, keys, typing }, size(), c)));
+  };
+  const writeLines = (lines: readonly string[]): void => {
+    if (lines.length > 0) o.out.write(`${lines.join("\n")}\n`);
+  };
+  /** Shows a block: printed at `plain` and `ansi`, drawn on the screen at `full`. */
+  const show = (b: Block): void => {
+    blocks.push(b);
+    const c = capsNow();
+    if (c.level === "full") redraw();
+    else writeLines(b(c));
+  };
+  const setStatus = (s: string, k = keys): void => {
+    status = s;
+    keys = k;
+    if (capsNow().level === "full") redraw();
+  };
+  const unsubscribe = o.caps.level === "full" ? o.out.onResize?.(redraw) : undefined;
+
+  const restore = (): void => {
+    if (inAlt) {
+      inAlt = false;
+      o.out.write(LEAVE);
+    } else if (o.caps.level !== "plain") o.out.write(`${ESC}[0m${ESC}[?25h`);
+  };
+  const failure = <E extends GuideError>(e: E): Result<never, GuideError> => {
+    show((c) => renderResult(false, e.message, [], c));
+    return err(e);
+  };
+  const abort = (): Result<never, GuideError> => {
+    const message = "Stopped.";
+    show((c) => renderResult(false, message, [], c));
+    return err({ code: "E-GUIDE-ABORTED", exitCode: 130, message });
+  };
+
+  const secret = (step: GuideStep): Result<never, GuideError> | undefined => {
+    if (step.kind !== "question" && step.kind !== "human") return undefined;
+    const bad = (step.ask ?? []).find((f) => f.secret === true);
+    if (bad === undefined) return undefined;
+    return failure({
+      code: "E-GUIDE-SECRET-FIELD",
+      step,
+      field: bad.field,
+      message: `The field ${bad.field} is a secret: this guide never asks for a token or a password. Give it where the program reads it, never here.`,
+    });
+  };
+
+  /** Asks every field of a step; the answers, or the end of the guide. */
+  const askFields = async (
+    step: GuideStep,
+    fields: readonly AskField[],
+    acceptEmpty = false,
+  ): Promise<Result<Record<string, string>, GuideError>> => {
+    const answers: Record<string, string> = {};
+    for (const f of fields) {
+      let reason = "";
+      for (let attempt = 1; ; attempt++) {
+        if (stopped()) return abort();
+        const prompt = renderPrompt(f, capsNow());
+        const lead = prompt.slice(0, -1);
+        const last = prompt.at(-1) ?? "  > ";
+        if (lead.length > 0) show(() => lead);
+        blocks.push(() => [last]);
+        typing = true;
+        if (capsNow().level === "full") {
+          setStatus(`waiting for you: ${f.field}`, "Enter send   Ctrl+C stop");
+        } else o.out.write(last);
+        const read = await o.in.readLine(signal);
+        typing = false;
+        if (read.kind === "aborted" || stopped()) return abort();
+        if (read.kind === "end") {
+          blocks[blocks.length - 1] = () => ["  > (the input ended)"];
+          return failure({
+            code: "E-GUIDE-NEEDS-PERSON",
+            step,
+            reason: "input-ended",
+            message: `The input ended before ${f.field} was answered: this step needs a person at a terminal.`,
+          });
+        }
+        if (read.text.includes(CTRL_C)) return abort();
+        const text = clean(read.text).trim();
+        blocks[blocks.length - 1] = () => [`  > ${text}`];
+        if (capsNow().level !== "full") {
+          /* the terminal echoed the typed line; the pipe did not */
+          if (!o.in.isTTY) o.out.write(`${text}\n`);
+        } else redraw();
+        const checked: Result<string, string> = acceptEmpty
+          ? ok(text)
+          : o.ask === undefined
+            ? text === ""
+              ? err("an answer is needed")
+              : ok(text)
+            : o.ask(f, text, step);
+        if (checked.kind === "ok") {
+          answers[f.field] = checked.value;
+          break;
+        }
+        reason = checked.error;
+        if (attempt >= attempts) {
+          return failure({
+            code: "E-GUIDE-ANSWER-INVALID",
+            step,
+            field: f.field,
+            reason,
+            message: `${f.field}: ${reason} (given up after ${attempts} tries).`,
+          });
+        }
+        const why = reason;
+        show((c) => renderResult(false, `${why}. Try again.`, [], c));
+      }
+    }
+    return ok(answers);
+  };
+
+  const carry = async (step: GuideStep, answers: Record<string, string>): Promise<Result<GuideRunResult, GuideError>> => {
+    const r = await o.run({ step, answers, signal });
+    if (stopped()) return abort();
+    if (r.kind === "err") {
+      return failure({ code: "E-GUIDE-RUN-FAILED", step, reason: r.error, message: `${step.summary}: ${r.error}` });
+    }
+    return ok(r.value);
+  };
+  const showResult = (r: GuideRunResult): void => {
+    if (r.summary.trim() !== "" || (r.lines ?? []).length > 0) show((c) => renderResult(true, r.summary, r.lines ?? [], c));
+  };
+
+  /** Fetches and decodes the next step. */
+  const fetch = async (): Promise<Result<GuideStep, GuideError>> => {
+    const raw = await o.next(signal);
+    if (stopped()) return abort();
+    const d = decodeStep(raw);
+    if (d.kind === "err") {
+      return failure({
+        code: "E-GUIDE-STEP-INVALID",
+        error: d.error,
+        message: `The next step is not a step of a guide: ${d.error.path}: expected ${d.error.expected}, found ${d.error.found}.`,
+      });
+    }
+    return ok(d.value);
+  };
+
+  /** Waits for something outside: polls `next` with backoff and a visible sign of life until a step that is not a wait. */
+  const waitFor = async (first: GuideStep): Promise<Result<GuideStep, GuideError>> => {
+    const started = clock.now();
+    let lastLine = started;
+    let delay = poll.initialMs;
+    let frame = 0;
+    let step = first;
+    while (step.kind === "wait") {
+      const waiting = step;
+      const label = (): string => `${waiting.summary} (${Math.floor((clock.now() - started) / 1000)}s)`;
+      let left = delay;
+      while (left > 0) {
+        if (stopped()) return abort();
+        const c = capsNow();
+        const slice = c.level === "plain" ? left : Math.min(left, poll.spinnerMs);
+        if (c.level === "full") setStatus(`${SPIN[frame++ % SPIN.length]} ${label()}`, "Ctrl+C stop");
+        else if (c.level === "ansi") o.out.write(`\r${ESC}[K${paint("dim", `${SPIN[frame++ % SPIN.length]} ${label()}`, c)}`);
+        await clock.sleep(slice, signal);
+        left -= slice;
+      }
+      if (stopped()) return abort();
+      if (capsNow().level === "ansi") o.out.write(`\r${ESC}[K`);
+      const now = clock.now();
+      if (poll.maxWaitMs !== undefined && now - started >= poll.maxWaitMs) {
+        return failure({ code: "E-GUIDE-WAIT-TIMEOUT", step: waiting, message: `${waiting.summary}: still waiting after ${Math.floor((now - started) / 1000)}s; gave up.` });
+      }
+      if (capsNow().level === "plain" && now - lastLine >= poll.plainEveryMs) {
+        lastLine = now;
+        o.out.write(`[wait] still waiting: ${clean(waiting.summary)} (${Math.floor((now - started) / 1000)}s)\n`);
+      }
+      const n = await fetch();
+      if (n.kind === "err") return n;
+      if (n.value.kind === "wait" && n.value.id !== waiting.id) show((c) => renderStep(n.value, c));
+      step = n.value;
+      delay = Math.min(poll.maxMs, Math.ceil(delay * poll.factor));
+    }
+    return ok(step);
+  };
+
+  const loop = async (): Promise<Result<GuideFinished, GuideError>> => {
+    let step: GuideStep;
+    {
+      const first = await fetch();
+      if (first.kind === "err") return first;
+      step = first.value;
+    }
+    for (;;) {
+      if (stopped()) return abort();
+      shown++;
+      current = step.id;
+      const s = step;
+      const refused = secret(s);
+      if (refused !== undefined) return refused;
+      show((c) => renderStep(s, c));
+      switch (s.kind) {
+        case "done": {
+          done.add(s.id);
+          setStatus("done", "");
+          return ok({ step: s, steps: shown });
+        }
+        case "wait": {
+          setStatus(s.summary, "Ctrl+C stop");
+          const w = await waitFor(s);
+          if (w.kind === "err") return w;
+          done.add(s.id);
+          step = w.value;
+          continue;
+        }
+        case "run": {
+          if (o.confirm !== undefined) {
+            setStatus("waiting for your confirmation", "Ctrl+C stop");
+            const yes = await o.confirm(s);
+            if (stopped()) return abort();
+            if (!yes) return failure({ code: "E-GUIDE-DECLINED", step: s, message: `${s.summary}: not run, it was not confirmed.` });
+          }
+          setStatus(`running ${s.verb.id}`, "Ctrl+C stop");
+          const r = await carry(s, {});
+          if (r.kind === "err") return r;
+          showResult(r.value);
+          break;
+        }
+        case "question": {
+          const a = await askFields(s, s.ask);
+          if (a.kind === "err") return a;
+          setStatus("working", "Ctrl+C stop");
+          const r = await carry(s, a.value);
+          if (r.kind === "err") return r;
+          showResult(r.value);
+          break;
+        }
+        case "human": {
+          if (!o.in.isTTY) {
+            return failure({
+              code: "E-GUIDE-NEEDS-PERSON",
+              step: s,
+              reason: "input-not-interactive",
+              message: `This step is for a person and the input is not a terminal: ${s.summary}. Run the guide at a terminal.`,
+            });
+          }
+          const typed = s.ask !== undefined && s.ask.length > 0;
+          const a = await askFields(
+            s,
+            typed ? (s.ask ?? []) : [{ field: "acknowledged", prompt: "Press Enter when you have done it", hint: "" }],
+            !typed,
+          );
+          if (a.kind === "err") return a;
+          setStatus("working", "Ctrl+C stop");
+          const r = await carry(s, typed ? a.value : {});
+          if (r.kind === "err") return r;
+          showResult(r.value);
+          break;
+        }
+      }
+      done.add(s.id);
+      const n = await fetch();
+      if (n.kind === "err") return n;
+      step = n.value;
+    }
+  };
+
+  try {
+    return await loop();
+  } finally {
+    unsubscribe?.();
+    const wasFull = inAlt;
+    restore();
+    // A full screen is gone when it is left: what was shown is written once more, on the screen the person keeps.
+    if (wasFull) {
+      const c = atMost({ ...o.caps, columns: size().columns, rows: size().rows }, "ansi");
+      for (const b of blocks) writeLines(b(c));
+    }
+  }
+}

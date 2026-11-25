@@ -7,3 +7,12 @@ requirement	mechanism	by	note
 0001-terminal FR-004	check	.github: cd commons/terminal && bun test suite/	width.test.ts: wide characters and escape sequences, a line cut by display width, never inside a grapheme or an escape sequence
 0001-terminal FR-005	check	.github: cd commons/terminal && bun test suite/	vt.test.ts: the terminal emulator's sequences, scrolling, wide characters and a cut line that never wraps
 0001-terminal FR-006	check	.github: cd commons/terminal && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer
+0002-guide FR-001	check	.github: cd commons/terminal && bun test suite/	guide-model.test.ts: each kind decoded, every refusal (unknown field, unknown kind, missing and mistyped field, a field of another kind) with its path
+0002-guide FR-002	check	.github: cd commons/terminal && bun test suite/	guide-caps.test.ts: the levels for a TTY, a pipe, NO_COLOR, TERM=dumb, CI, a small terminal, a forced level and a Windows terminal
+0002-guide FR-003	check	.github: cd commons/terminal && bun test suite/	guide-render.test.ts: snapshots of every kind at the three levels, every line within the columns, no escape in plain, wide characters wrapped whole
+0002-guide FR-004	check	.github: cd commons/terminal && bun test suite/	guide-driver.test.ts: a question with a validation retry, a run with its result, a wait polled with a fake clock and backoff, plain waits, a time limit, an invalid step
+0002-guide FR-005	check	.github: cd commons/terminal && bun test suite/	guide-driver.test.ts: a human gate released by Enter or by the value typed, refused on input that is not a TTY, an input that ends, lines ended by CRLF, CR and LF
+0002-guide FR-006	check	.github: cd commons/terminal && bun test suite/	guide-driver.test.ts: a secret field refused before anything is written or read
+0002-guide FR-007	check	.github: cd commons/terminal && bun test suite/	guide-driver.test.ts: an abort while waiting, while asking and in full, the terminal restored and status 130
+0002-guide FR-008	check	.github: cd commons/terminal && bun test suite/	guide-screen.test.ts: the layout on the emulator of vt, no row scrolls, a resize redrawn, the fallback to ansi and back
+0002-guide FR-009	check	.github: cd commons/terminal && bun run verify	guide-process.test.ts runs one script under Bun and under Node 26 with piped input of CRLF lines; tests/commons-packages.test.ts installs the packed entry
