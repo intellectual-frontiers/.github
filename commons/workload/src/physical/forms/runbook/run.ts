@@ -14,7 +14,7 @@
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Actor, ItemId } from "@intellectual-frontiers/planning/governance";
-import { authored, type Effect, type Executor, type Finding, storeRef, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
+import { authored, type Effect, type NativeRunner, type Finding, storeRef, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
 import { disposable, type ProposedValue } from "@intellectual-frontiers/workload/logical";
 import { canFinish, check, type EachKind, flatten, foldRun, levelsOf, makeRunEvent, type RunEvent, runbookFinding, type Runbook, type RunState, type Step } from "@intellectual-frontiers/workload/forms/runbook";
 import { runJudge } from "../../agent-runner.ts";
@@ -275,5 +275,5 @@ export async function runRunbook(runbook: Runbook, deps: RunDeps): Promise<Resul
   return ok(await stateOf());
 }
 
-/** The executor of the runbook form, behind the port of the core: it runs, or resumes, a runbook and gives the state of its run. */
-export const RUNBOOK_EXECUTOR: Executor<Runbook, RunDeps, RunState> = { form: "runbook", run: runRunbook };
+/** The native runner of the runbook form, behind the port of the core (the former executor): it runs, or resumes, a runbook and gives the state of its run. */
+export const RUNBOOK_RUNNER: NativeRunner<Runbook, RunDeps, RunState> = { form: "runbook", run: runRunbook };

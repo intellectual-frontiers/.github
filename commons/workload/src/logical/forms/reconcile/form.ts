@@ -1,6 +1,6 @@
 // Spec: 0003-workload-forms FR-001
 /**
- * The logic of the reconcile form, as the contract of a form wants it: its id, its closed sum of node kinds, `validate` (the static check), `plan` (the dry run) and `fold` (the events of a pass to a state). Its executor, behind
+ * The logic of the reconcile form, as the contract of a form wants it: its id, its closed sum of node kinds, `validate` (the static check), `plan` (the dry run) and `fold` (the events of a pass to a state). Its native runner, behind
  * a port, is in the physical layer. What a pass finished with is said in the three words every form shares.
  *
  * @example

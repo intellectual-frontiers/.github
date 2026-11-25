@@ -1,5 +1,5 @@
 /**
- * A world of fakes for the executor of the reconcile form: a system with settings that a person or a program changes, the wanted settings, and verbs bound to them, so that a pass needs no machine. Every name is synthetic.
+ * A world of fakes for the native runner of the reconcile form: a system with settings that a person or a program changes, the wanted settings, and verbs bound to them, so that a pass needs no machine. Every name is synthetic.
  *
  * @module
  */

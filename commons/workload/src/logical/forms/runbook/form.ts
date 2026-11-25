@@ -1,6 +1,6 @@
 // Spec: 0003-workload-forms FR-001
 /**
- * The logic of the runbook form, as the contract of a form wants it: its id, its closed sum of node kinds, `validate` (the static check), `plan` (the dry run) and `fold` (the run events to a state). Its executor, behind a
+ * The logic of the runbook form, as the contract of a form wants it: its id, its closed sum of node kinds, `validate` (the static check), `plan` (the dry run) and `fold` (the run events to a state). Its native runner, behind a
  * port, is in the physical layer. The outcome a run finished with is said in the three words every form shares.
  *
  * @example

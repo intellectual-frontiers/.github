@@ -17,5 +17,6 @@ export * from "./check.ts";
 export * from "./plan.ts";
 export * from "./events.ts";
 export * from "./harness.ts";
+export * from "./runner.ts";
 export * from "./view.ts";
 export * from "./form.ts";

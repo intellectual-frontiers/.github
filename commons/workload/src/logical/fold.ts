@@ -12,7 +12,7 @@
  * @module
  */
 import type { EventId, ItemEvent, ItemId } from "@intellectual-frontiers/planning/governance";
-import { type BuiltFormId, decodeEnvelope, EVENT_PREFIX } from "@intellectual-frontiers/workload/governance";
+import { type BuiltFormId, decodeEnvelope, EVENT_PREFIX, isRunnerPayload } from "@intellectual-frontiers/workload/governance";
 
 /** An event the fold did not take, and why. */
 export type Refusal = { readonly event: EventId; readonly reason: string };
@@ -20,8 +20,13 @@ export type Refusal = { readonly event: EventId; readonly reason: string };
 /** An event of the form, with its payload still to be decoded by the form. */
 export type Taken = { readonly event: ItemEvent; readonly payload: Readonly<Record<string, unknown>> };
 
-/** The events of a form on a work order in the order of their ids, and the ones the envelope refused. */
-export function takeEvents(form: BuiltFormId, item: ItemId, events: readonly ItemEvent[]): { readonly taken: readonly Taken[]; readonly refused: readonly Refusal[] } {
+/** The events of a form on a work order in the order of their ids, and the ones the envelope refused; the two events of a hand-off (0010-workload-runners FR-009) are not the form's and are left out. */
+export const takeEvents = (form: BuiltFormId, item: ItemId, events: readonly ItemEvent[]): { readonly taken: readonly Taken[]; readonly refused: readonly Refusal[] } => takeWhere(form, item, events, (p) => !isRunnerPayload(p));
+
+/** The events of a hand-off of a form on a work order, in the order of their ids, once each, and the ones the envelope refused. */
+export const takeRunnerEvents = (form: BuiltFormId, item: ItemId, events: readonly ItemEvent[]): { readonly taken: readonly Taken[]; readonly refused: readonly Refusal[] } => takeWhere(form, item, events, isRunnerPayload);
+
+function takeWhere(form: BuiltFormId, item: ItemId, events: readonly ItemEvent[], pick: (payload: Readonly<Record<string, unknown>>) => boolean): { readonly taken: readonly Taken[]; readonly refused: readonly Refusal[] } {
   const seen = new Set<string>();
   const ordered = events.filter((e) => e.item === item && !seen.has(e.id) && seen.add(e.id)).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   const taken: Taken[] = [];
@@ -33,7 +38,7 @@ export function takeEvents(form: BuiltFormId, item: ItemId, events: readonly Ite
       refused.push({ event: ev.id, reason: env.error });
       continue;
     }
-    if (env.value.form === form) taken.push({ event: ev, payload: env.value.payload });
+    if (env.value.form === form && pick(env.value.payload)) taken.push({ event: ev, payload: env.value.payload });
   }
   return { taken, refused };
 }

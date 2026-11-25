@@ -40,10 +40,14 @@ proves(["0040-workload-pattern FR-002"], "the library is built to Kanon with a c
   assertEquals(layered("src/logical/")?.layer, "logical");
   assertEquals(layered("src/logical/forms/")?.instances, true);
   assertEquals(layered("src/physical/dialects/")?.instances, true);
+  assertEquals(layered("src/physical/runners/")?.instances, true);
   assertEquals(layered("src/physical/")?.layer, "physical");
 });
 
-proves(["0040-workload-pattern FR-003"], "the form, the dialect and the trigger are three axes: no dialect is a form and no trigger is a form", () => {
+proves(["0040-workload-pattern FR-003"], "the form, the dialect, the trigger and the runner are four axes: no dialect and no trigger is a form, and no runner is a form, a dialect or a trigger", () => {
+  const runners = governance.RUNNERS.list().map((r) => r.id as string);
+  for (const other of [governance.FORM_IDS, governance.TRIGGER_KINDS, governance.DIALECTS.list().map((d) => d.id)] as readonly (readonly string[])[]) assertEquals(runners.filter((r) => other.includes(r)), []);
+  assert(governance.DEFINITIONS.runner.includes("never named by a workload") && governance.DEFINITIONS.form.includes("never a dialect and never a runner"));
   const dialects = governance.DIALECTS.list().map((d) => d.id as string);
   assertEquals(dialects.filter((d) => (governance.FORM_IDS as readonly string[]).includes(d)), []);
   assertEquals(governance.TRIGGER_KINDS.filter((t) => (governance.FORM_IDS as readonly string[]).includes(t)), []);

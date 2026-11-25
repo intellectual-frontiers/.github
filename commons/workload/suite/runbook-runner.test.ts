@@ -1,5 +1,5 @@
 /**
- * Tests of the executor of the runbook form with fakes (commons workload 0008-form-runbook FR-017 to FR-022): ask and gate park the run as events and a person answers, a store is attached by capability and detached at the end,
+ * Tests of the native runner of the runbook form with fakes (commons workload 0008-form-runbook FR-017 to FR-022): ask and gate park the run as events and a person answers, a store is attached by capability and detached at the end,
  * a failure runs the compensations, the actor is held to the autonomy, every fact is a planning event, and what a run finished with is said in the three words every form shares. It uses no machine.
  *
  * @module

@@ -1,6 +1,6 @@
 // Spec: 0006-workload-split FR-004, FR-005
 /**
- * The ports of the executors, whatever the form: what the host provides. A verb is bound by its id to a function of typed inputs, never to a shell string; an agent port gets a question and the type of the answer and nothing that could call a verb;
+ * The ports of the runners, whatever the form: what the host provides. A verb is bound by its id to a function of typed inputs, never to a shell string; an agent port gets a question and the type of the answer and nothing that could call a verb;
  * a sink keeps the planning events of a run; a catalog says what a store offers; a workshop port attaches and detaches. Each is small, so that a test provides it as a value.
  *
  * @example

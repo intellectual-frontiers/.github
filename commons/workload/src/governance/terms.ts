@@ -16,14 +16,14 @@
  */
 
 /** The terms of the library: a closed list. */
-export const TERMS = ["workload", "form", "trigger", "node", "runbook", "reconcile", "verb", "effect", "store", "attachment", "workshop", "run", "work-order", "judge", "proposal", "evidence", "gate", "autonomy", "dialect", "harness-policy", "skill", "finding"] as const;
+export const TERMS = ["workload", "form", "trigger", "node", "runbook", "reconcile", "verb", "effect", "store", "attachment", "workshop", "run", "work-order", "judge", "proposal", "evidence", "gate", "autonomy", "dialect", "harness-policy", "skill", "finding", "runner", "native-runner", "integration-runner", "runner-policy", "handoff", "receipt"] as const;
 /** One term. */
 export type Term = (typeof TERMS)[number];
 
 /** What each term is, in a sentence. */
 export const DEFINITIONS: Readonly<Record<Term, string>> = {
   workload: "A unit of operated work, not running software: typed data of one form, with a trigger, whose every effect is a verb and whose autonomy is derived from its effects.",
-  form: "What kind of work a workload is and how it executes: a closed sum of node kinds with its checks, its dry run, its fold of run events and an executor behind a port. A form is never a dialect.",
+  form: "What kind of work a workload is and how it executes: a closed sum of node kinds with its checks, its dry run, its fold of run events and a native runner behind a port. A form is never a dialect and never a runner.",
   trigger: "What starts a workload: manual, a schedule, an event or an alert. A field of a workload, never a form.",
   node: "One element of a workload: what a form calls a step or a phase. The kinds of node are the form's own closed list.",
   runbook: "The form of a procedure: an ordered algebra of steps that a person or an agent orchestrates.",
@@ -44,6 +44,12 @@ export const DEFINITIONS: Readonly<Record<Term, string>> = {
   "harness-policy": "Data a fleet owns that chooses a dialect for a run.",
   skill: "A folder with SKILL.md that a harness loads, made from one workload.",
   finding: "One problem a static check made, with its code in a catalog.",
+  runner: "How a plan is carried out: natively by our TypeScript, or by an integration runner that compiles the plan into an artifact a foreign system runs. Chosen by a policy, never named by a workload, and it changes no node, no effect and no autonomy.",
+  "native-runner": "The runner that is our TypeScript: it interprets the plan on Bun or Node, is interactive, is the default and records the events of a run directly.",
+  "integration-runner": "A runner that compiles the plan into an artifact (a script) that a foreign system runs and then hands off: the library keeps the plan, the policy and the evidence, and not the run.",
+  "runner-policy": "Data a fleet owns that chooses a runner for a run, native unless it says another.",
+  handoff: "The event that says a plan went to an integration runner: the plan hash and the runner.",
+  receipt: "The event that says what the external run did: the plan hash, the reference of the run, its exit status and the digest of its log, pulled by ingest.",
 };
 
 /** The five classes of store: how a store keeps what is written to it. */
@@ -108,7 +114,7 @@ export type FormEntry =
 export const FORMS: Readonly<Record<FormId, FormEntry>> = {
   runbook: { status: "built", summary: "An ordered algebra of steps: a procedure that a person or an agent orchestrates, with gates, compensations and a record of the run." },
   reconcile: { status: "built", summary: "A loop toward a desired state: observe, diff, plan, approve by plan hash, apply, verify; level-triggered." },
-  graph: { status: "reserved", summary: "A DAG of jobs with freshness, which an external executor runs.", criteria: "A second concrete user, besides CI/CD and its generated GitHub workflows (the first consumer), needs the same graph of jobs with freshness for an external executor." },
+  graph: { status: "reserved", summary: "A DAG of jobs with freshness, which an integration runner carries.", criteria: "A second concrete user, besides CI/CD and its generated GitHub workflows (the first consumer), needs the same graph of jobs with freshness for an integration runner." },
   campaign: { status: "reserved", summary: "A collection over a period with sampling.", criteria: "A second concrete user, besides the first, needs a collection over a period with sampling that cannot be said as a runbook with a schedule trigger." },
 };
 

@@ -31,6 +31,8 @@ export type VerbId = Brand<string, "verb id">;
 export type StoreRef = Brand<string, "store ref">;
 /** The id of a dialect. */
 export type DialectId = Brand<string, "dialect id">;
+/** The id of a runner. */
+export type RunnerId = Brand<string, "runner id">;
 
 const made = <B extends string>(name: B, pattern: RegExp) => {
   const decoder = refine(string, name, (s) => pattern.test(s) && s.length <= 96);
@@ -50,6 +52,9 @@ export const verbId = made("verb id", VERB);
 export const storeRef = made("store ref", NAME);
 /** A dialect id from text, or why it is not one. */
 export const dialectId = made("dialect id", NAME);
+
+/** A runner id from text, or why it is not one. */
+export const runnerId = made("runner id", NAME);
 
 /** A requirement of a spec that a node answers to. */
 export type SpecCite = { readonly spec: string; readonly requirement: string };

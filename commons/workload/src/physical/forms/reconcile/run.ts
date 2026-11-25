@@ -1,6 +1,6 @@
 // Spec: 0009-form-reconcile FR-007, FR-008, FR-009, FR-010
 /**
- * The executor of the reconcile form: it runs a pass of a loop, level-triggered. Each call observes the actual and the desired state again, diffs them, plans the changes and hashes the plan; where there is nothing to change
+ * The native runner of the reconcile form: it runs a pass of a loop, level-triggered. Each call observes the actual and the desired state again, diffs them, plans the changes and hashes the plan; where there is nothing to change
  * the pass applies nothing and verifies; where there is, the pass parks at the approval, naming the approver, the deadline and the hash of the plan, and goes on only when an event of a person approves that hash. The apply
  * runs once for a hash in a pass, by that hash as its idempotency key, and only for changes its declared effect covers; then the verification reads again. Every fact is a planning event on the work order, and what the pass is
  * is the fold of them.
@@ -16,7 +16,7 @@
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import type { Actor, ItemId } from "@intellectual-frontiers/planning/governance";
-import { authored, type Effect, type Executor, type Finding, modeRank, storeRef, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
+import { authored, type Effect, type NativeRunner, type Finding, modeRank, storeRef, VERBS, type VerbRegistry } from "@intellectual-frontiers/workload/governance";
 import { effectAutonomy } from "@intellectual-frontiers/workload/logical";
 import { type Change, check, diffStates, foldReconcile, levelsOf, makeReconcileEvent, planText, type Reconcile, type ReconcileEvent, type ReconcileNode, type ReconcileState, reconcileFinding, requiredMode } from "@intellectual-frontiers/workload/forms/reconcile";
 import type { EventSink, ResolvedInputs, Source, VerbBindings } from "../../ports.ts";
@@ -25,7 +25,7 @@ import { runVerb } from "../../verb-runner.ts";
 /** How many hours a person has to approve a plan. */
 export const APPROVAL_HOURS = 24;
 
-/** What the executor is given: no agent, no workshop; the verbs, the place events are kept, the clock and who runs. */
+/** What the native runner is given: no agent, no workshop; the verbs, the place events are kept, the clock and who runs. */
 export type ReconcileDeps = {
   readonly registry?: VerbRegistry;
   readonly bindings: VerbBindings;
@@ -180,5 +180,5 @@ export async function runReconcile(loop: Reconcile, deps: ReconcileDeps): Promis
   return ok(await stateOf());
 }
 
-/** The executor of the reconcile form, behind the port of the core. */
-export const RECONCILE_EXECUTOR: Executor<Reconcile, ReconcileDeps, ReconcileState> = { form: "reconcile", run: runReconcile };
+/** The native runner of the reconcile form, behind the port of the core (the former executor). */
+export const RECONCILE_RUNNER: NativeRunner<Reconcile, ReconcileDeps, ReconcileState> = { form: "reconcile", run: runReconcile };

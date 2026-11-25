@@ -26,10 +26,11 @@ export const WORKLOAD_LABEL = "workload:";
 /** A run event as the envelope holds it: the form it is of and the event of that form, still to be decoded by the form. */
 export type Envelope = { readonly form: BuiltFormId; readonly payload: Readonly<Record<string, unknown>> };
 
-const canonical = (v: unknown): unknown => (Array.isArray(v) ? v.map(canonical) : typeof v === "object" && v !== null ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, x]) => [k, canonical(x)])) : v);
+/** The canonical form of a value: object keys in order, so that the same value is the same bytes. */
+export const canonicalJson = (v: unknown): unknown => (Array.isArray(v) ? v.map(canonicalJson) : typeof v === "object" && v !== null ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, x]) => [k, canonicalJson(x)])) : v);
 
 /** The body of a planning event that carries an event of a form: the prefix and the canonical JSON, the same bytes for the same event. */
-export const encodeEnvelope = (form: BuiltFormId, payload: object): string => `${EVENT_PREFIX}${JSON.stringify(canonical({ ...payload, form }))}`;
+export const encodeEnvelope = (form: BuiltFormId, payload: object): string => `${EVENT_PREFIX}${JSON.stringify(canonicalJson({ ...payload, form }))}`;
 
 /** The envelope of the body of a comment, or why it is none. */
 export function decodeEnvelope(body: string): Result<Envelope, string> {

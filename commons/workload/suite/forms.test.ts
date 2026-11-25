@@ -11,7 +11,7 @@ import { BUILT_FORM_IDS, CADENCES, FORM_IDS, FORMS, isBuiltForm, OUTCOMES, TRIGG
 import { meets } from "@intellectual-frontiers/workload/logical";
 import { CONVERGE_SETTINGS, decodeReconcile, RECONCILE_FORM, outcomeOf as reconcileOutcome } from "@intellectual-frontiers/workload/forms/reconcile";
 import { decodeRunbook, outcomeOf as runbookOutcome, RESTORE_DRILL, RUNBOOK_FORM, STEP_KINDS } from "@intellectual-frontiers/workload/forms/runbook";
-import { decodeWorkload, RECONCILE_EXECUTOR, RUNBOOK_EXECUTOR, STARTERS } from "@intellectual-frontiers/workload/physical";
+import { decodeWorkload, RECONCILE_RUNNER, RUNBOOK_RUNNER, STARTERS } from "@intellectual-frontiers/workload/physical";
 import { library } from "../library.ts";
 import { ITEM } from "./kit.ts";
 
@@ -39,14 +39,14 @@ async function importsOf(folder: string): Promise<readonly { readonly file: stri
 
 const names = (form: string): string[] => FORM_IDS.filter((f) => f !== form);
 
-proves(["0003-workload-forms FR-001"], "a form is declared by its id, its closed sum of node kinds, validate, plan, fold and an executor behind a port, and nothing else", () => {
+proves(["0003-workload-forms FR-001"], "a form is declared by its id, its closed sum of node kinds, validate, plan, fold and a native runner behind a port, and nothing else", () => {
   assertEquals(Object.keys(RUNBOOK_FORM).sort(), ["fold", "id", "nodeKinds", "plan", "validate"]);
   assertEquals(RUNBOOK_FORM.id, "runbook");
   assertEquals(RUNBOOK_FORM.nodeKinds, STEP_KINDS);
-  assertEquals(Object.keys(RUNBOOK_EXECUTOR).sort(), ["form", "run"]);
-  assertEquals(RUNBOOK_EXECUTOR.form, RUNBOOK_FORM.id);
+  assertEquals(Object.keys(RUNBOOK_RUNNER).sort(), ["form", "run"]);
+  assertEquals(RUNBOOK_RUNNER.form, RUNBOOK_FORM.id);
   assertEquals(Object.keys(RECONCILE_FORM).sort(), Object.keys(RUNBOOK_FORM).sort());
-  assertEquals(RECONCILE_EXECUTOR.form, RECONCILE_FORM.id);
+  assertEquals(RECONCILE_RUNNER.form, RECONCILE_FORM.id);
   assertEquals(new Set(STARTERS.map((w) => w.form)), new Set(BUILT_FORM_IDS));
 });
 
@@ -141,8 +141,21 @@ proves(["0003-workload-forms FR-007"], "the forms graph and campaign are specifi
   const campaign = FORMS["campaign"];
   assert(campaign.status === "reserved" && campaign.criteria.includes("sampling"));
   const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0003-workload-forms", "spec.md"));
-  for (const word of ["`graph`", "`campaign`", "second concrete user", "generated GitHub workflows", "typed definitions", "an external executor", "sampling"]) assert(spec.includes(word), word);
+  for (const word of ["`graph`", "`campaign`", "second concrete user", "generated GitHub workflows", "typed definitions", "an integration runner", "sampling"]) assert(spec.includes(word), word);
   for (const dir of ["src/governance", "src/logical", "src/physical"]) {
     for (const i of await importsOf(dir)) assert(!/forms\/(graph|campaign)/u.test(i.spec), `${i.file} imports ${i.spec}`);
   }
+});
+
+proves(["0013-form-graph FR-001"], "the form graph stays a reserved slot with its criterion, and the specification that reserves it names the integration runner and has no code", async () => {
+  const graph = FORMS["graph"];
+  assert(graph.status === "reserved" && graph.criteria.includes("CI/CD") && graph.criteria.includes("integration runner"));
+  assertEquals(BUILT_FORM_IDS.includes("graph" as never), false);
+  assertEquals(await fs.exists(path.join(ROOT, "src", "logical", "forms", "graph")), false);
+  assertEquals(await fs.exists(path.join(ROOT, "src", "physical", "forms", "graph")), false);
+  for (const dir of ["src/governance", "src/logical", "src/physical"]) {
+    for (const i of await importsOf(dir)) assert(!/forms\/graph/u.test(i.spec), `${i.file} imports ${i.spec}`);
+  }
+  const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0013-form-graph", "spec.md"));
+  for (const word of ["reserved slot", "no code", "integration runner", "0010-workload-runners"]) assert(spec.includes(word), word);
 });

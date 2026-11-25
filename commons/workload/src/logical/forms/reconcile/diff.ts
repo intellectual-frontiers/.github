@@ -1,7 +1,7 @@
 // Spec: 0009-form-reconcile FR-006
 /**
  * The diff and the plan, pure and deterministic. A state is named values; the diff of the actual state with the desired one is the changes that make the first the second, each a create, an update or a delete, in the order of
- * their names; the plan is the canonical text of those changes, the same bytes for the same changes, and what a person approves is the SHA-256 of that text, made by the executor. The least mode of effect that can apply a
+ * their names; the plan is the canonical text of those changes, the same bytes for the same changes, and what a person approves is the SHA-256 of that text, made by the native runner. The least mode of effect that can apply a
  * plan follows from its actions: a create appends, an update mutates and a delete destroys.
  *
  * @example

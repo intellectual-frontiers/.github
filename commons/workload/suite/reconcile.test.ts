@@ -1,6 +1,6 @@
 /**
  * Tests of the reconcile form (commons workload 0009-form-reconcile FR-001 to FR-013): six kinds of node in a closed sum, the checks of a loop, the autonomy of each node, the diff and the plan, a pass that is level-triggered,
- * the approval of a plan by its hash and nothing else, the apply that covers the plan and is made once for a hash, the events and their fold, the catalog, the dry run and the outcome. It runs a fake executor and uses no machine.
+ * the approval of a plan by its hash and nothing else, the apply that covers the plan and is made once for a hash, the events and their fold, the catalog, the dry run and the outcome. It runs a fake native runner and uses no machine.
  *
  * @module
  */

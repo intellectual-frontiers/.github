@@ -1,5 +1,5 @@
 /**
- * A world of fakes for the executors of the tests: the stores, the workshop, the agent and the verbs are values, so that a run needs no machine. Every name is synthetic.
+ * A world of fakes for the native runners of the tests: the stores, the workshop, the agent and the verbs are values, so that a run needs no machine. Every name is synthetic.
  *
  * @module
  */

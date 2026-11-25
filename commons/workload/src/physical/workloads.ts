@@ -1,4 +1,4 @@
-// Spec: 0003-workload-forms FR-001, FR-004
+// Spec: 0003-workload-forms FR-001, FR-004; 0010-workload-runners FR-004, FR-016
 /**
  * The workloads the physical layer knows, one for each form that has code: the starters, the static check, the autonomy of each node, the view the projections are made from, the catalogs and the decoder that reads a
  * workload of any form by the form it names. This is where the forms are put side by side, which no unit of the core or of the logical layer does: a form that is reserved, or none, is refused with its code.
@@ -12,10 +12,10 @@
  * @module
  */
 import { absurd, err, type Result } from "@intellectual-frontiers/core";
-import { type Catalog, CORE_CATALOG, type Finding, finding, isBuiltForm, type VerbRegistry, VERBS } from "@intellectual-frontiers/workload/governance";
+import { type CallPlan, type Catalog, CORE_CATALOG, type Finding, finding, isBuiltForm, type RunnerNeed, type VerbRegistry, VERBS } from "@intellectual-frontiers/workload/governance";
 import { type NodeLevel, type WorkloadView } from "@intellectual-frontiers/workload/logical";
-import { check as checkLoop, decodeReconcile, levelsOf as loopLevels, RECONCILE_CATALOG, type Reconcile, STARTERS as RECONCILE_STARTERS, viewOf as loopView } from "@intellectual-frontiers/workload/forms/reconcile";
-import { check, decodeRunbook, levelsOf, RUNBOOK_CATALOG, type Runbook, STARTERS as RUNBOOK_STARTERS, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
+import { check as checkLoop, decodeReconcile, levelsOf as loopLevels, RECONCILE_CATALOG, type Reconcile, runnerNeedsOf as loopNeeds, STARTERS as RECONCILE_STARTERS, viewOf as loopView } from "@intellectual-frontiers/workload/forms/reconcile";
+import { callsOf, type CallsInput, check, decodeRunbook, levelsOf, RUNBOOK_CATALOG, type Runbook, runnerNeedsOf, STARTERS as RUNBOOK_STARTERS, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
 
 /** A workload of a form that has code: a closed sum, one member for each form. */
 export type AnyWorkload = Runbook | Reconcile;
@@ -57,6 +57,30 @@ export function viewOfWorkload(w: AnyWorkload): WorkloadView {
       return viewOf(w);
     case "reconcile":
       return loopView(w);
+    default:
+      return absurd(w);
+  }
+}
+
+/** What a workload needs of a runner, by the form's own derivation from its nodes. */
+export function runnerNeedsOfWorkload(w: AnyWorkload): readonly RunnerNeed[] {
+  switch (w.form) {
+    case "runbook":
+      return runnerNeedsOf(w);
+    case "reconcile":
+      return loopNeeds(w);
+    default:
+      return absurd(w);
+  }
+}
+
+/** The plan of calls of a workload, or the findings that refuse it: a form that cannot lower to calls is refused with `E-WL-RUNNER-EMIT-UNSUPPORTED`. */
+export function callsOfWorkload(w: AnyWorkload, input: CallsInput): Result<CallPlan, readonly Finding[]> {
+  switch (w.form) {
+    case "runbook":
+      return callsOf(w, input);
+    case "reconcile":
+      return err([finding("E-WL-RUNNER-EMIT-UNSUPPORTED", "", `${w.id} is of the form reconcile, which a person approves by the hash of its plan: it has no plan of calls and the native runner runs it`, { node: "the reconcile" })]);
     default:
       return absurd(w);
   }

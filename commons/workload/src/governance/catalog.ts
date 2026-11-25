@@ -61,7 +61,7 @@ export function makeFinding(e: CatalogEntry, node: string, message: string, vars
 }
 
 /** The concepts a problem of the core belongs to: a closed list. */
-export const PROBLEM_CONCEPTS = ["workload", "citation", "verb", "effect", "external", "gate", "check", "need", "harness", "judge"] as const;
+export const PROBLEM_CONCEPTS = ["workload", "citation", "verb", "effect", "external", "gate", "check", "need", "harness", "judge", "runner"] as const;
 
 /** The codes of the core catalog. */
 export type CatalogCode =
@@ -75,6 +75,13 @@ export type CatalogCode =
   | "E-WL-NEED-MISSING"
   | "E-WL-NEED-INSTALLER"
   | "E-WL-HARNESS-UNSUITABLE"
+  | "E-WL-RUNNER-UNSUITABLE"
+  | "E-WL-RUNNER-EMIT-UNSUPPORTED"
+  | "E-WL-RUNNER-VALUE-UNSAFE"
+  | "E-WL-RUNNER-EACH-UNLISTED"
+  | "E-WL-RUNNER-DRIFT"
+  | "E-WL-RUNNER-RECEIPT-UNMATCHED"
+  | "E-WL-RUNNER-APPROVAL-NOT-PERSON"
   | "E-WL-JUDGE-EFFECT"
   | "E-WL-JUDGE-APPLIED"
   | "E-WL-WORKLOAD-UNKNOWN-FORM"
@@ -92,6 +99,13 @@ export const CATALOG: Readonly<Record<CatalogCode, CatalogEntry<CatalogCode>>> =
   "E-WL-NEED-MISSING": entry("E-WL-NEED-MISSING", "need", "missing", "A need of a verb is not declared", "The verb a node calls needs a program or a credential that neither the node nor the workload declares.", "agent", "declare the needs of {verb} in {node} or in the workload"),
   "E-WL-NEED-INSTALLER": entry("E-WL-NEED-INSTALLER", "need", "installer", "A need names an installer", "A need carries an install command. A workload says what it needs; obtaining it is the workbench's.", "agent", "remove the installer from the need of {node}"),
   "E-WL-HARNESS-UNSUITABLE": entry("E-WL-HARNESS-UNSUITABLE", "harness", "unsuitable", "The dialect cannot carry the workload", "The dialect chosen lacks something the workload needs, and the run is not moved to another dialect by itself.", "person", "choose another dialect for the run, or give {dialect} what it lacks: {lacks}"),
+  "E-WL-RUNNER-UNSUITABLE": entry("E-WL-RUNNER-UNSUITABLE", "runner", "unsuitable", "The runner cannot carry the workload", "The runner chosen lacks a capability the workload needs (a judge, an ask, a gate, typed logic, an undo or a destroy of a durable store), and the run is not moved to another runner by itself.", "person", "choose the native runner for the run, or give {runner} what it lacks: {lacks}"),
+  "E-WL-RUNNER-EMIT-UNSUPPORTED": entry("E-WL-RUNNER-EMIT-UNSUPPORTED", "runner", "emit-unsupported", "The plan is outside what an artifact may say", "A node, or an input, is outside the closed subset an artifact is made from: a call of a verb or a check, and an each over a fixed list.", "person", "run the workload with the native runner, or take {node} out of what is handed off"),
+  "E-WL-RUNNER-VALUE-UNSAFE": entry("E-WL-RUNNER-VALUE-UNSAFE", "runner", "value-unsafe", "A value cannot be written into an artifact", "A value an artifact would hold is not printable ASCII with no control character, so no quoting could keep it from changing how the script is read.", "agent", "use printable ASCII for {node}"),
+  "E-WL-RUNNER-EACH-UNLISTED": entry("E-WL-RUNNER-EACH-UNLISTED", "runner", "each-unlisted", "A fan out has no fixed list", "An each names a source that is no literal naming a list the caller gave, so the artifact would have to find its members at run time.", "agent", "give {node} a literal source and the fixed list it names"),
+  "E-WL-RUNNER-DRIFT": entry("E-WL-RUNNER-DRIFT", "runner", "drift", "An artifact is not what the plan makes", "The artifact differs from the one regenerated from the plan: it was edited by hand, the plan changed, or it is the artifact of another runner.", "ci", "regenerate the artifact with the generator and commit it; never edit it by hand"),
+  "E-WL-RUNNER-RECEIPT-UNMATCHED": entry("E-WL-RUNNER-RECEIPT-UNMATCHED", "runner", "receipt-unmatched", "A receipt names no hand-off", "The receipt carries a plan hash that no hand-off of the run has, so it is not the result of any plan that was handed off.", "person", "check the plan hash of the receipt against the hand-offs of the run"),
+  "E-WL-RUNNER-APPROVAL-NOT-PERSON": entry("E-WL-RUNNER-APPROVAL-NOT-PERSON", "runner", "approval-not-person", "An approval was recorded by an agent", "A receipt carries an approval of a gate and the actor who recorded it is not a person; only a person approves.", "person", "have a person record the approval; an agent never approves", true),
   "E-WL-JUDGE-EFFECT": entry("E-WL-JUDGE-EFFECT", "judge", "effect", "A judge has an effect", "A judge node carries an effect. A judge only proposes: its output is typed and it applies nothing.", "agent", "remove the effect from {node} and apply the proposal with a verb node behind a gate", true),
   "E-WL-JUDGE-APPLIED": entry("E-WL-JUDGE-APPLIED", "judge", "applied", "The proposal of a judge is applied with no person between", "A verb node above the level agent-proposes uses the output of a judge, and no gate or ask stands between them.", "person", "put a gate or an ask between the judge and {node}", true),
   "E-WL-WORKLOAD-UNKNOWN-FORM": entry("E-WL-WORKLOAD-UNKNOWN-FORM", "workload", "unknown-form", "The form is not a form that has code", "The workload names a form that is reserved or is none: a reserved form is a named slot and has no code.", "person", "use a form that is built (runbook or reconcile), or build the reserved form where its criteria are met"),

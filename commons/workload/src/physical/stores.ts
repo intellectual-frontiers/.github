@@ -1,7 +1,7 @@
 // Spec: 0002-workload-effects FR-003
 /**
  * The attachment of a store to a workshop, for every form that attaches: a store is attached only where it offers every capability the attachment needs, the missing capability is named otherwise, and the workshop port does
- * the attaching and the detaching. The executor of a form records the facts as events; this holds the rule.
+ * the attaching and the detaching. The native runner of a form records the facts as events; this holds the rule.
  *
  * @example
  * ```ts
