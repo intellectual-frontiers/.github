@@ -16,12 +16,18 @@ import type { Contract, Requirement, Task } from "@intellectual-frontiers/workbe
 /** What a task is about: some units, or all of them (the cold start of CI only), and the test files that are selected where the task is `test`. */
 export type Selection = { readonly units: readonly string[] | "all"; readonly files?: readonly string[] };
 
+/** A glob with one level of `{a,b}` alternatives written out as the globs they stand for. */
+const expandBraces = (glob: string): readonly string[] => {
+  const m = /\{([^{}]*)\}/u.exec(glob);
+  return m === null ? [glob] : (m[1] ?? "").split(",").flatMap((alt) => expandBraces(`${glob.slice(0, m.index)}${alt}${glob.slice(m.index + m[0].length)}`));
+};
+
 const regexOf = (glob: string): RegExp => new RegExp(`^${glob.split("**").map((part) => part.split("*").map((p) => p.replace(/[.+?^${}()|[\]\\]/gu, "\\$&")).join("[^/]*")).join(".*")}$`, "u");
 
-/** Whether a path matches a glob: `*` is the characters of one segment and `**` any number of segments. */
-export const globMatches = (glob: string, path: string): boolean => regexOf(glob).test(path);
+/** Whether a path matches a glob: `*` is the characters of one segment, `**` any number of segments and `{a,b}` either. */
+export const globMatches = (glob: string, path: string): boolean => expandBraces(glob).some((g) => regexOf(g).test(path));
 
-const applies = (r: Requirement, task: Task): boolean => r.task === "any" || r.task === task;
+const applies = (r: Requirement, task: Task): boolean => r.task === "any" || r.task === task || (task === "verify" && (r.task === "build" || r.task === "test"));
 
 /** The requirements of a task, once each, in the order of their ids. */
 export function compose(contract: Contract, task: Task, selection: Selection = { units: [] }): readonly Requirement[] {
@@ -31,7 +37,7 @@ export function compose(contract: Contract, task: Task, selection: Selection = {
     if (selection.units !== "all" && !selection.units.includes(c.unit)) continue;
     const testNeeded = new Set((c.tests ?? []).flatMap((t) => t.needs));
     for (const r of c.requirements) if (applies(r, task) && !testNeeded.has(r.id)) out.set(r.id, r);
-    if (task === "test") {
+    if (task === "test" || task === "verify") {
       for (const t of c.tests ?? []) {
         const selected = selection.files === undefined || selection.files.some((f) => globMatches(t.glob, f));
         if (!selected) continue;

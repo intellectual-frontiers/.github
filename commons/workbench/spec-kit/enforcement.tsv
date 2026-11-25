@@ -29,3 +29,5 @@ requirement	mechanism	by	note
 0006-workbench-dialects FR-004	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
 0006-workbench-dialects FR-005	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
 0006-workbench-dialects FR-006	check	.github: cd commons/workbench && bun run verify	suite/dialects.test.ts
+0003-workbench-contract FR-006	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
+0003-workbench-contract FR-007	check	.github: cd commons/workbench && bun run verify	suite/collect.test.ts

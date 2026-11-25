@@ -11,7 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical", "./dialects/claude-code", "./dialects/codex", "./dialects/human"],
   family: { host: "workbench", role: "host" },
   summary: "The workbench: what a human or an agent needs to do their job with a repository, declared as a contract made of contributions from the units that need things, checked by one command and projected for each harness and for a human, so that a task installs only what it runs.",

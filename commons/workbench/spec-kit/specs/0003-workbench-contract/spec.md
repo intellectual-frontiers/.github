@@ -11,9 +11,11 @@
 
 - **FR-001**: A requirement MUST be one of six kinds, `program`, `credential`, `network`, `git`, `install` and `authority`, with an id of lower case words joined by hyphens, a concept, a task (`any`, `build`, `test`, `verify`, `release` or `run`), whether it is a safety rule and a summary, and a name that is not a name of its kind (a program, a host, a folder inside the repository, a gate) MUST be refused where it is made, as MUST an install or a probe that is not an argument vector free of shell syntax.
 - **FR-002**: A contribution MUST be one unit's requirements and its test needs, each a glob of test files and the ids of the requirements those tests need, so that a runner knows what a selected test needs before it runs; a test need for a requirement that is none MUST be refused, as MUST a unit that contributes twice.
-- **FR-003**: `defineContract` MUST return a contract or every reason it is not one: a name that is not a name, an `enforceFrom` that is not a day, an id used twice, a role or a gate or a stage used twice, a gate whose approver is not a role or is a role not held by a person, a stage that names a gate that is none, an authority that names a gate that is none, and a test need for a requirement that is none.
+- **FR-003**: `defineContract` MUST return a contract or every reason it is not one: a name that is not a name, an `enforceFrom` that is not a day, an id used twice with different content (two units that need the same thing may each state it, asking for exactly the same, whatever their words), a role or a gate or a stage used twice, a gate whose approver is not a role or is a role not held by a person, a stage that names a gate that is none, an authority that names a gate that is none, and a test need for a requirement that is none.
 - **FR-004**: There MUST be four autonomy levels, `human-only`, `agent-proposes`, `agent-acts-human-reviews` and `agent-autonomous`, each allowing an agent more actions than the one before and `human-only` none, and an approval and a signed tag MUST be a person's at every level; the level of a stage the contract calls regulated and says no more of MUST be `agent-proposes`.
 - **FR-005**: A credential requirement MUST name environment variables, in capitals and underscores, and never a value: a name that is not one MUST be refused with a message that does not repeat it.
+- **FR-006**: What a unit's manifest says it contributes (the field `workbench` of a library of commons, or of a part of erga) MUST be decoded into a contribution or every reason it is not one: a requirement says its kind, its id and its summary and what its kind needs, and the concept of its kind, the task `any` and not being a safety rule are the defaults; a requirement of a kind that is none, a list that is not a list and a test need with no glob or no ids MUST be refused with the unit named.
+- **FR-007**: The manifests of a repository MUST be read from `<folder>/<library>/library.ts` and `<folder>/<library>/<extension>/library.ts`, each unit named by its manifest's `name`, and a manifest with no `workbench` field MUST contribute nothing, with every reason one is not valid given at once and the unit named.
 
 ## Acceptance scenarios
 
@@ -22,6 +24,8 @@
 3. **Given** the case of FR-003, **When** it is checked, **Then** it holds, per FR-003.
 4. **Given** the case of FR-004, **When** it is checked, **Then** it holds, per FR-004.
 5. **Given** the case of FR-005, **When** it is checked, **Then** it holds, per FR-005.
+6. **Given** the case of FR-006, **When** it is checked, **Then** it holds, per FR-006.
+7. **Given** the case of FR-007, **When** it is checked, **Then** it holds, per FR-007.
 
 ## Out of scope
 

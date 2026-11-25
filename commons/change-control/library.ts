@@ -15,6 +15,10 @@ export const library = {
   held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Change control for a fleet's repository: each change is accepted only if a signer of the fleet signed it, a change to a controlled path is blocked until a different signer of an approving role approves it, and what is refused or blocked is said with the reason; the signers are the fleet's own and the check reads Git with its own signature verification.",
+  workbench: {
+    requirements: [{ kind: "program", id: "ssh-keygen", name: "ssh-keygen", task: "test", summary: "ssh-keygen makes the keys that the key and signature tests use", install: ["apt-get", "install", "-y", "openssh-client"] }],
+    tests: [{ glob: "suite/{keys,change-control}.test.ts", needs: ["ssh-keygen"] }],
+  },
   kanon: {
     package: "@intellectual-frontiers/change-control",
     units: [
