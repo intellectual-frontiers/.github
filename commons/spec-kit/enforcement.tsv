@@ -788,6 +788,7 @@ requirement	mechanism	by	note
 0030-generated-workflows FR-011	check	.github: cd commons/libraries && bun test suite/	ci-policy.test.ts: every step of the real workflows has a policy, and each rule of the validation finds what it is for on a workflow made to break it
 0030-generated-workflows FR-012	check	.github: cd commons/libraries && bun test suite/	registry-clean.test.ts: the maintenance workflow is by hand only, its jobs have the narrowest permissions, its inputs reach the scripts by env and its steps are of the gate maintenance
 0030-generated-workflows FR-013	check	.github: cd commons/libraries && bun test suite/	workflows.test.ts: the tests of the root run on Linux alone, and the installers of agora alone on macOS
+0030-generated-workflows FR-014	check	.github: bun test ./tests/	commons-workflows-golden.test.ts: every workflow and composite action of the model is its golden copy and its checked-in file, byte for byte, and a golden copy that nothing makes is found
 0039-content-method FR-001	review	0039-content-method FR-001	the series bible and the roles of the books are kept by their authors; a reviewer reads them
 0039-content-method FR-002	review	0039-content-method FR-002	no book has passed the audit gate; a reviewer reads the status
 0039-content-method FR-003	review	0039-content-method FR-003	the voice sweep has no command today, a recorded gap
