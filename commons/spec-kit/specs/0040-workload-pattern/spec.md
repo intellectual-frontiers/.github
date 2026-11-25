@@ -56,7 +56,7 @@
 
 | Standard | What the library takes from it | Read |
 | --- | --- | --- |
-| Kanon (commons 0033-kanon, read in this repository) | Three layers; a unit imports only the units of a layer above its own and, of its own layer, only the units its row lists; a class of units has instances that import no sibling; an extension reaches a library through its public entries | FR-001 to FR-006 of the specification; the checker is `commons/kanon` (`kanon 0001-kanon-checker` FR-012, read in this repository) |
+| Kanon (commons 0033-kanon, read in this repository) | Three layers; a unit imports only the units of a layer above its own and, of its own layer, only the units its row lists; a class of units has instances that import no sibling; an extension reaches a library through its public entries | FR-001 to FR-006 of 0033-kanon, and FR-012 of `kanon 0001-kanon-checker` (`commons/kanon/spec-kit`) |
 | The libraries by concern and the roles of a library (`commons/spec-kit/specs/0032-libraries-by-concern`, `commons/libraries/src/readme.ts` and `metapackages.ts`, read in this repository) | A library has one role (`foundation`, `pattern`, `program` or `standard`); the metapackage of a role depends on each consumer-facing library of that role at one exact version, and the set is computed from the manifests, never written by hand | The files themselves |
 
 ## Success criteria
