@@ -1,0 +1,29 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-mirror-layers FR-001	check	.github: cd commons/anyfs/mirror && bun run verify	suite/layers.test.ts
+0001-mirror-layers FR-002	check	.github: cd commons/anyfs/mirror && bun run verify	suite/layers.test.ts
+0002-mirror-governance FR-001	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0002-mirror-governance FR-002	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0002-mirror-governance FR-003	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0002-mirror-governance FR-004	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0002-mirror-governance FR-005	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-001	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-002	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-003	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-004	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-005	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0003-mirror-logical FR-006	check	.github: cd commons/anyfs/mirror && bun run verify	suite/plan.test.ts
+0004-mirror-store FR-001	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-002	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-003	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-004	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-005	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-006	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-007	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-008	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-009	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0004-mirror-store FR-010	check	.github: cd commons/anyfs/mirror && bun run verify	suite/mirror.test.ts
+0005-mirror-conformance FR-001	check	.github: cd commons/anyfs/mirror && bun run verify	suite/conformance.test.ts
+0005-mirror-conformance FR-002	check	.github: cd commons/anyfs/mirror && bun run verify	suite/conformance.test.ts
+0005-mirror-conformance FR-003	check	.github: cd commons/anyfs/mirror && bun run verify	suite/conformance.test.ts
