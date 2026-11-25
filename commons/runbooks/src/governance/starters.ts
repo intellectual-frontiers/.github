@@ -13,6 +13,7 @@
  * @module
  */
 import type { ControlRef } from "@intellectual-frontiers/grc/governance";
+import type { Requirement } from "@intellectual-frontiers/workbench/governance";
 import type { Effect } from "./effect.ts";
 import { authored, parseCite, runbookId, type SpecCite, type StepId, stepId, storeRef, verbId } from "./ids.ts";
 import type { Common, InputValue, Runbook, Step } from "./step.ts";
@@ -21,6 +22,7 @@ const sid = (t: string): StepId => authored(stepId(t));
 const cite = (t: string): SpecCite => authored(parseCite(t));
 const store = (t: string): InputValue => ({ kind: "store", store: authored(storeRef(t)) });
 const effect = (t: string, class_: Effect["class"], mode: Effect["mode"], reversible: boolean): Effect => ({ store: authored(storeRef(t)), class: class_, mode, reversible });
+const SQLITE: Requirement = { id: "sqlite3", kind: "program", concept: "workshop", task: "run", safety: false, summary: "sqlite3 reads, backs up and restores the SQLite stores of the drill", name: "sqlite3" };
 const control = (framework: string, version: string, id: string): ControlRef => ({ framework, version, control: id });
 
 const BACKUP: ControlRef = control("nist-800-53", "5.2.0", "CP-9");
@@ -35,6 +37,7 @@ const PLAN = "synthetic-plan-01";
 
 const head = (id: string, title: string, spec: string, controls: readonly ControlRef[] = []): Common => ({ id: sid(id), title, spec: [cite(spec)], ...(controls.length === 0 ? {} : { controls }) });
 const verb = (id: string, title: string, spec: string, v: string, inputs: Record<string, InputValue>, e: Effect, controls: readonly ControlRef[] = []): Step => ({ ...head(id, title, spec, controls), kind: "verb", verb: authored(verbId(v)), inputs, effect: e });
+const needing = (s: Step): Step => ({ ...s, needs: [SQLITE] });
 const attach = (id: string, which: string, class_: Effect["class"]): Step => verb(id, `Attach ${which}`, "0003-runbooks-effects FR-003", "workshop.attach", { store: store(which) }, effect(which, class_, "read", true));
 const detach = (id: string, which: string, class_: Effect["class"]): Step => verb(id, `Detach ${which}`, "0003-runbooks-effects FR-003", "workshop.detach", { store: store(which) }, effect(which, class_, "read", true));
 
@@ -58,9 +61,9 @@ export const RESTORE_DRILL: Runbook = {
     attach("attach-source", DB, "transactional"),
     attach("attach-backups", BACKUPS, "durable"),
     attach("attach-scratch", SCRATCH, "ephemeral"),
-    verb("checkpoint-source", "Make a restore point of the source", "0003-runbooks-effects FR-004", "store.checkpoint", { store: store(DB) }, effect(DB, "transactional", "append", true), [BACKUP]),
-    verb("backup-source", "Back the source up", "0003-runbooks-effects FR-001", "store.backup", { store: store(DB), target: store(BACKUPS) }, effect(BACKUPS, "durable", "append", true), [BACKUP]),
-    verb("restore-into-scratch", "Restore the backup into the scratch store of the workshop", "0003-runbooks-effects FR-003", "store.restore", { store: store(SCRATCH), from: store(BACKUPS) }, effect(SCRATCH, "ephemeral", "mutate", true), [RECOVER, SOC2]),
+    needing(verb("checkpoint-source", "Make a restore point of the source", "0003-runbooks-effects FR-004", "store.checkpoint", { store: store(DB) }, effect(DB, "transactional", "append", true), [BACKUP])),
+    needing(verb("backup-source", "Back the source up", "0003-runbooks-effects FR-001", "store.backup", { store: store(DB), target: store(BACKUPS) }, effect(BACKUPS, "durable", "append", true), [BACKUP])),
+    needing(verb("restore-into-scratch", "Restore the backup into the scratch store of the workshop", "0003-runbooks-effects FR-003", "store.restore", { store: store(SCRATCH), from: store(BACKUPS) }, effect(SCRATCH, "ephemeral", "mutate", true), [RECOVER, SOC2])),
     {
       ...head("verify-digests", "The restored digests are the digests of the source", "0006-runbooks-split FR-003", [RECOVER, CSF, SOC2]),
       kind: "check",

@@ -1,4 +1,4 @@
-// Spec: 0002-runbooks-algebra FR-003, FR-006, FR-007
+// Spec: 0006-runbooks-split FR-002, FR-003, FR-004, FR-009
 /**
  * The closed catalog of what can go wrong with a runbook. Each problem has one code, `E-RB-<CONCEPT>-<KIND>`, with the concept it belongs to, who may fix it (the agent, a person, the environment's owner or CI),
  * the one fix and whether it is a safety rule. A failure in no entry is `E-RB-UNKNOWN`, and meeting one is itself a finding: it is classified, given a check and a test and documented in one change. Every finding is an error.

@@ -14,3 +14,4 @@ export * from "./catalog.ts";
 export * from "./define.ts";
 export * from "./decode.ts";
 export * from "./starters.ts";
+export * from "./harness.ts";

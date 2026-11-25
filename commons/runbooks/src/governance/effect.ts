@@ -1,4 +1,4 @@
-// Spec: 0002-runbooks-algebra FR-004
+// Spec: 0003-runbooks-effects FR-001, FR-002, FR-004
 /**
  * What a verb step does to the world, declared as data: the store, its class, the mode, whether it can be undone and how, and for a system of record the name of the input that is its idempotency key. The autonomy
  * of a step is derived from the class and the mode by one table and is never declared. A store is attached to a workshop by the capabilities it must offer (the closed union of AnyFS) and the workshop is disposable

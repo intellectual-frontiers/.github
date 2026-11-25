@@ -48,3 +48,37 @@ export const plain = {
     { kind: "judge", id: "think", title: "Think", spec: ["0003-runbooks-effects FR-001"], question: "What now?", output: { answer: { kind: "text" } } },
   ],
 };
+
+import type { Contract } from "@intellectual-frontiers/workbench/governance";
+import type { Facts } from "@intellectual-frontiers/workbench/logical";
+import { agent, type EventId, type Actor, type ItemEvent, type ItemId, parseEventId, parseInstant, parseItemId, person } from "@intellectual-frontiers/planning/governance";
+import { makeRunEvent, type RunEvent } from "@intellectual-frontiers/runbooks/logical";
+
+/** The value of a result in a test: a failure stops the test with its reason. */
+export function must<T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly kind: "err"; readonly error: E }): T {
+  if (r.kind === "err") throw new Error(JSON.stringify(r.error));
+  return r.value;
+}
+
+export const ITEM: ItemId = must(parseItemId("018f3a6e-7c00-7000-8123-456789abcdef"));
+export const PERSON = must(person("synthetic-person-01", "Synthetic Person"));
+export const AGENT = must(agent("synthetic-agent-01", "Synthetic Agent", PERSON, "session"));
+export const eventId = (k: number): EventId => must(parseEventId(`018f3a6e-7c00-7000-8123-4567890000${k.toString(16).padStart(2, "0")}`));
+const AT = must(parseInstant("2026-11-25T10:00:00Z"));
+
+/** The planning event that records a run event, by an actor, with the id numbered `k`. */
+export const ev = (k: number, actor: Actor, e: RunEvent): ItemEvent => must(makeRunEvent({ id: eventId(k), item: ITEM, at: AT, actor }, e));
+
+/** A contract with the one requirement the starter runbook is given. */
+export const CONTRACT: Contract = {
+  name: "synthetic-contract",
+  enforceFrom: "2027-01-01",
+  roles: [],
+  gates: [],
+  stages: [],
+  base: [{ id: "sqlite3", kind: "program", concept: "workshop", task: "run", safety: false, summary: "sqlite3 runs", name: "sqlite3" }],
+  contributions: [],
+};
+
+/** The facts of a machine with only what is given. */
+export const facts = (over: Partial<Facts> = {}): Facts => ({ programs: {}, env: new Set(), refs: new Set(), identity: true, installed: new Set(), network: {}, ...over });

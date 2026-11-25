@@ -29,11 +29,11 @@ export function defineRunbook(input: Runbook): Result<Runbook, readonly Finding[
     if (index.has(s.id)) bad(s.id, `the step id ${s.id} is used twice`);
     index.set(s.id, i);
   }
-  const stores = new Map(input.stores.map((s) => [s.ref as string, s]));
+  const stores = new Map(input.stores.map((s) => [String(s.ref), s]));
   if (stores.size !== input.stores.length) bad("", "a store is declared twice");
   const stepBad = (s: Step, message: string): void => bad(s.id, `${s.id}: ${message}`);
   const earlier = (s: Step, id: string): boolean => (index.get(id) ?? Number.POSITIVE_INFINITY) < (index.get(s.id) ?? -1);
-  const undos = new Set(flat.filter((s) => s.kind === "undo").map((s) => s.id as string));
+  const undos = new Set(flat.filter((s) => s.kind === "undo").map((s) => String(s.id)));
   const checkEffect = (s: Step, e: { readonly store: string; readonly class: string; readonly mode: string; readonly compensation?: string; readonly idempotencyKey?: string }, inputs: Readonly<Record<string, unknown>>): void => {
     const decl = stores.get(e.store);
     if (decl === undefined) stepBad(s, `its effect names the store ${e.store}, which the runbook does not declare`);
