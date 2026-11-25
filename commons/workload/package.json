@@ -1,0 +1,42 @@
+{
+  "name": "@intellectual-frontiers/workload",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and executors behind ports.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts",
+    "./forms/runbook": "./src/logical/forms/runbook/mod.ts",
+    "./dialects/claude-code": "./src/physical/dialects/claude-code/mod.ts",
+    "./dialects/codex": "./src/physical/dialects/codex/mod.ts",
+    "./dialects/human": "./src/physical/dialects/human/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/ && bun tools/pack.ts --check",
+    "pack": "bun tools/pack.ts"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/anyfs": "link:../anyfs",
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/grc": "link:../grc",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/planning": "link:../planning",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@intellectual-frontiers/workbench": "link:../workbench",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

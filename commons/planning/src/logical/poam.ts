@@ -2,7 +2,7 @@
 /**
  * The plan of action and milestones and the work orders of Planning (0006-planning-poam), as two views over the items that add no kind of item and no kind of link. A POA&M entry is an item of kind `finding` that is not
  * closed; its milestones are the items of kind `task` it is the parent of, each with the day it is due (`due`, the field the kind `task` adds) and its owners (its assignees); its controls are the labels `control:<reference>`,
- * kept as written, because the reference belongs to the library that writes it. A work order is a task that carries a label `runbook:<id>` and is linked `relates-to` to what it serves. The views are pure functions of the
+ * kept as written, because the reference belongs to the library that writes it. A work order is a task that carries a label `workload:<id>` and is linked `relates-to` to what it serves. The views are pure functions of the
  * items and of a day that is an argument: the same items and day give the same rows in any order.
  *
  * @example
@@ -49,12 +49,12 @@ export type PoamRow = {
   readonly status: PoamStatus;
 };
 
-/** A work order: a task that runs a runbook for what it serves. */
+/** A work order: a task that runs a workload for what it serves. */
 export type WorkOrderRow = {
   readonly id: ItemId;
   readonly title: string;
-  /** The ids after the labels `runbook:`, sorted. */
-  readonly runbooks: readonly string[];
+  /** The ids after the labels `workload:`, sorted. */
+  readonly workloads: readonly string[];
   /** The items it is linked to by `relates-to`, in either direction, sorted by id. */
   readonly serves: readonly ItemId[];
   readonly owners: readonly string[];
@@ -65,8 +65,8 @@ export type WorkOrderRow = {
 
 /** The label prefix of a control reference. */
 export const CONTROL_LABEL = "control:";
-/** The label prefix of the runbook a work order runs. */
-export const RUNBOOK_LABEL = "runbook:";
+/** The label prefix of the workload a work order runs. */
+export const WORKLOAD_LABEL = "workload:";
 
 const byText = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
 
@@ -134,16 +134,16 @@ export function poam(items: readonly Item[], today: Day): readonly PoamRow[] {
   return rows.sort((a, b) => byDueThenId(key(a), key(b)));
 }
 
-/** The work orders: the counted tasks that carry a label `runbook:<id>` and are not cancelled, with what they serve, at a day. */
+/** The work orders: the counted tasks that carry a label `workload:<id>` and are not cancelled, with what they serve, at a day. */
 export function workOrders(items: readonly Item[], today: Day): readonly WorkOrderRow[] {
   const known = new Set(items.map((i) => i.id));
   return items
-    .filter((i) => i.kind === "task" && isCounted(i) && !cancelled(i) && withPrefix(i, RUNBOOK_LABEL).length > 0)
+    .filter((i) => i.kind === "task" && isCounted(i) && !cancelled(i) && withPrefix(i, WORKLOAD_LABEL).length > 0)
     .map((wo): WorkOrderRow => {
       const out = wo.links.filter((l) => l.kind === "relates-to" && l.from === wo.id).map((l) => l.to);
       const into = items.flatMap((i) => i.links.filter((l) => l.kind === "relates-to" && l.to === wo.id).map((l) => l.from));
       const serves = [...new Set([...out, ...into])].filter((id) => known.has(id) && id !== wo.id).sort(byText);
-      return { id: wo.id, title: wo.title, runbooks: withPrefix(wo, RUNBOOK_LABEL), serves, owners: wo.assignees, ...(wo.due === undefined ? {} : { due: wo.due }), state: wo.state.kind, status: statusOf(wo, today) };
+      return { id: wo.id, title: wo.title, workloads: withPrefix(wo, WORKLOAD_LABEL), serves, owners: wo.assignees, ...(wo.due === undefined ? {} : { due: wo.due }), state: wo.state.kind, status: statusOf(wo, today) };
     })
     .sort(byDueThenId);
 }

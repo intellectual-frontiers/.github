@@ -135,22 +135,22 @@ proves(["0006-planning-poam FR-005"], "the rows are in the order of the schedule
   assertEquals(poam([b[1] as Item, none[0] as Item, a[0] as Item, b[0] as Item, a[1] as Item], day("2027-01-01")).map((r) => r.title), expected);
 });
 
-proves(["0006-planning-poam FR-007"], "a work order is a task with a runbook label linked relates-to to what it serves, in either direction, ordered by its day due, and a task with no such label is not one", () => {
+proves(["0006-planning-poam FR-007"], "a work order is a task with a workload label linked relates-to to what it serves, in either direction, ordered by its day due, and a task with no such label is not one", () => {
   const items = [
     make(60, { kind: "finding", title: "synthetic-finding-60" }),
-    make(61, { kind: "task", title: "synthetic-work-order-61", labels: ["runbook:synthetic-runbook-01"], assignees: ["synthetic-person-01"], due: "2027-01-10" }, [relates(60)]),
-    make(62, { kind: "task", title: "synthetic-work-order-62", labels: ["runbook:synthetic-runbook-02", "runbook:synthetic-runbook-01"], due: "2027-03-01" }),
+    make(61, { kind: "task", title: "synthetic-work-order-61", labels: ["workload:synthetic-workload-01"], assignees: ["synthetic-person-01"], due: "2027-01-10" }, [relates(60)]),
+    make(62, { kind: "task", title: "synthetic-work-order-62", labels: ["workload:synthetic-workload-02", "workload:synthetic-workload-01"], due: "2027-03-01" }),
     make(63, { kind: "task", title: "synthetic-task-63" }, [relates(60)]),
-    make(64, { kind: "task", title: "synthetic-work-order-64", labels: ["runbook:synthetic-runbook-03"] }, [{ type: "closed", reason: "completed" }]),
-    make(65, { kind: "task", title: "synthetic-work-order-65", labels: ["runbook:synthetic-runbook-03"] }, [{ type: "closed", reason: "not-planned" }]),
+    make(64, { kind: "task", title: "synthetic-work-order-64", labels: ["workload:synthetic-workload-03"] }, [{ type: "closed", reason: "completed" }]),
+    make(65, { kind: "task", title: "synthetic-work-order-65", labels: ["workload:synthetic-workload-03"] }, [{ type: "closed", reason: "not-planned" }]),
   ];
   // the finding links to the second work order: a link in the other direction serves too
   const finding = make(60, { kind: "finding", title: "synthetic-finding-60" }, [relates(62)]);
   const rows = workOrders([finding, ...items.slice(1)], day("2027-02-01"));
-  assertEquals(rows.map((r) => [r.title, r.runbooks, r.serves.length, r.due, r.status, r.owners]), [
-    ["synthetic-work-order-61", ["synthetic-runbook-01"], 1, "2027-01-10", "delayed", ["synthetic-person-01"]],
-    ["synthetic-work-order-62", ["synthetic-runbook-01", "synthetic-runbook-02"], 1, "2027-03-01", "open", []],
-    ["synthetic-work-order-64", ["synthetic-runbook-03"], 0, undefined, "completed", []],
+  assertEquals(rows.map((r) => [r.title, r.workloads, r.serves.length, r.due, r.status, r.owners]), [
+    ["synthetic-work-order-61", ["synthetic-workload-01"], 1, "2027-01-10", "delayed", ["synthetic-person-01"]],
+    ["synthetic-work-order-62", ["synthetic-workload-01", "synthetic-workload-02"], 1, "2027-03-01", "open", []],
+    ["synthetic-work-order-64", ["synthetic-workload-03"], 0, undefined, "completed", []],
   ]);
   assertEquals(rows[0]?.serves, [itemId(60)]);
   assertEquals(rows[1]?.serves, [itemId(60)]);

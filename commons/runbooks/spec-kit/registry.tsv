@@ -1,9 +1,0 @@
-number	slug	state
-0001	runbooks-layers	in force
-0002	runbooks-algebra	in force
-0003	runbooks-effects	in force
-0004	runbooks-projections	in force
-0005	runbooks-runners	in force
-0006	runbooks-split	in force
-0007	runbooks-harness	in force
-0008	runbooks-runs	in force

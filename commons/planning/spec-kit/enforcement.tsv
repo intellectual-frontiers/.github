@@ -51,5 +51,5 @@ requirement	mechanism	by	note
 0006-planning-poam FR-004	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the control labels of two regimes are kept as written in the row
 0006-planning-poam FR-005	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the rows, their order, the scheduled completion and the same rows for the items in any order
 0006-planning-poam FR-006	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the statuses open, delayed and completed of a milestone and of a finding, and what is not a milestone or a row
-0006-planning-poam FR-007	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the work orders by the label runbook and the link relates-to, their status and order
+0006-planning-poam FR-007	check	.github: cd commons/planning && bun run verify	suite/poam.test.ts: the work orders by the label workload and the link relates-to, their status and order
 0006-planning-poam FR-008	check	.github: cd commons/planning && bun run verify	suite/typing.test.ts: the logical sources import no system module, read no clock and hold no any, non-null assertion, enum or cast but brand

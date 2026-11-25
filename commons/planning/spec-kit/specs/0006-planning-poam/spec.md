@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A plan of action and milestones (a POA&M) and a work order are made of the items Planning already has, with no new kind of item: a POA&M entry is an item of kind `finding` whose milestones are linked items of kind `task`, each with a day it is due and an owner, and a work order is an item of kind `task` linked to the runbook it runs and to the finding or issue it serves. The core of an item (commons planning 0002-planning-core FR-002) has owners (its assignees) and no day a task is due, so this specification adds that one field to the kind `task`, as 0002-planning-core FR-002 allows a kind to do, and adds two views, `poam` and `workOrders`, that read it. It realizes commons 0037-planning FR-001, FR-009, FR-021 and FR-046 and only cites upward. The writing of a POA&M in OSCAL is the library `grc` (its own spec kit); the relation of SQL is `planning-query` (its own spec kit).
+**Input:** A plan of action and milestones (a POA&M) and a work order are made of the items Planning already has, with no new kind of item: a POA&M entry is an item of kind `finding` whose milestones are linked items of kind `task`, each with a day it is due and an owner, and a work order is an item of kind `task` linked to the workload it runs and to the finding or issue it serves. The core of an item (commons planning 0002-planning-core FR-002) has owners (its assignees) and no day a task is due, so this specification adds that one field to the kind `task`, as 0002-planning-core FR-002 allows a kind to do, and adds two views, `poam` and `workOrders`, that read it. It realizes commons 0037-planning FR-001, FR-009, FR-021 and FR-046 and only cites upward. The writing of a POA&M in OSCAL is the library `grc` (its own spec kit); the relation of SQL is `planning-query` (its own spec kit).
 
 ## Requirements
 
@@ -15,7 +15,7 @@
 - **FR-004**: The control references of a finding MUST be carried as its labels of the form `control:<reference>`, where the reference is written as the catalogs and the assessments of commons write a control (the control URN of the library `grc`, `urn:grc:<framework>:<version>:<control>`), any number of them and of any number of frameworks, so that one finding may bear on the controls of several regimes; Planning MUST keep the reference as written and MUST NOT parse, translate or invent one, which is the work of the library that owns the reference.
 - **FR-005**: The view `poam` MUST be a pure function of the items and of a day (the day is an argument, and no clock is read) that gives one row for each counted finding that is not closed, and for each row: the finding (its id, title, body, severity and state), its controls (the references of FR-004, sorted), its owners (the assignees of the finding), its milestones, its scheduled completion (the latest `due` among its milestones, none where no milestone has one) and its status; the rows MUST be in the order of the scheduled completion (earliest first, none last) and then of the id, the milestones in the order of their `due` (none last) and then of their id, and the same items and day MUST give the same rows in any order of the items; `planctl views` MUST offer it as `--view poam` (and the work orders of FR-007 as `--view work-orders`) with the day as `--today` and the day of the run where none is given, a day that is not a day being refused.
 - **FR-006**: A milestone's status MUST be `completed` where its item is closed with the reason `completed`, `delayed` where it is not closed, has a `due` and that day is before the day given, and `open` otherwise; a finding's status MUST be `completed` where it has at least one milestone and every milestone is completed, `delayed` where any of its milestones is delayed, and `open` otherwise; a proposed milestone, a milestone that is not a task, a link to an item that is not among the items and a milestone closed `not-planned` or `duplicate` MUST NOT be a milestone of a row; a finding that is closed MUST NOT be a row, whatever the status of its milestones.
-- **FR-007**: A work order MUST be an item of kind `task` that carries a label `runbook:<id>` (the id of the runbook it runs, as the library of runbooks names it) and is linked to the finding, issue or milestone it serves by a link of kind `relates-to` between the two, in either direction; the view `workOrders` MUST be a pure function of the items and of a day that gives, for each counted work order that is not closed, its runbook, the items it serves (sorted by id), its owners, its `due`, its state and its status (`completed`, `delayed` or `open` as FR-006 says of a milestone), in the order of the `due` (none last) and then of the id; a work order with no `runbook:` label MUST NOT be a work order, and no new kind of item or of link MUST be made for it.
+- **FR-007**: A work order MUST be an item of kind `task` that carries a label `workload:<id>` (the id of the workload it runs, as the library of workloads names it) and is linked to the finding, issue or milestone it serves by a link of kind `relates-to` between the two, in either direction; the view `workOrders` MUST be a pure function of the items and of a day that gives, for each counted work order that is not closed, its workloads, the items it serves (sorted by id), its owners, its `due`, its state and its status (`completed`, `delayed` or `open` as FR-006 says of a milestone), in the order of the `due` (none last) and then of the id; a work order with no `workload:` label MUST NOT be a work order, and no new kind of item or of link MUST be made for it.
 - **FR-008**: The views of this specification MUST be pure and typed as the algebra of 0002-planning-core FR-008 and FR-009: they read no file, call no network and take no clock, and hold no `any`, non-null assertion, `enum` or cast but `brand` (commons 0037-planning FR-022, FR-041).
 
 ## Acceptance scenarios
@@ -28,12 +28,12 @@
 6. **Given** two milestones due on 2027-03-01 and 2027-01-15 and the day 2027-02-01, **When** the view is made, **Then** the scheduled completion is 2027-03-01, the first milestone is open and the second is delayed, and the finding is delayed, per FR-005 and FR-006.
 7. **Given** every milestone of a finding closed as completed, **When** the view is made, **Then** the finding is completed and still a row, and **When** the finding itself is closed, **Then** it is not a row, per FR-006.
 8. **Given** the same items in two orders, **When** the view is made, **Then** the rows are equal, per FR-005.
-9. **Given** a task with the label `runbook:synthetic-runbook-01` linked `relates-to` a finding and a task with no such label, **When** `workOrders` is made, **Then** one work order is listed, with the finding it serves, per FR-007.
+9. **Given** a task with the label `workload:synthetic-workload-01` linked `relates-to` a finding and a task with no such label, **When** `workOrders` is made, **Then** one work order is listed, with the finding it serves, per FR-007.
 
 ## Out of scope
 
 - The OSCAL document that a POA&M is written as (the library `grc`) and the relation of SQL (the library `planning-query`).
-- A runbook itself (the library of runbooks): Planning holds only the label that names it.
+- A workload itself (the library of workloads): Planning holds only the label that names it.
 - Any change of the state of a milestone or of a work order by a view: the views read and write nothing.
 
 ## Edge cases
@@ -56,7 +56,7 @@
 
 - **Milestone** - a task that a finding is the parent of, with a day due and owners.
 - **POA&M entry** - a finding that is not closed, with its milestones.
-- **Work order** - a task with a `runbook:` label, linked to what it serves.
+- **Work order** - a task with a `workload:` label, linked to what it serves.
 
 ## Standards considered
 

@@ -145,7 +145,7 @@ proves(["0005-planning-surfaces FR-003", "0005-planning-surfaces FR-006"], "coll
     assertEquals((await run(dir, ["query", "--state", "bogus"])).code === 0, false);
     const views = await run(dir, ["views", "--view", "roadmap"]);
     assertEquals(views.code, 0);
-    // the plan of action and milestones and the work orders (0006-planning-poam FR-005, FR-007): no finding and no runbook label in these tasks, and a day that is not a day is refused
+    // the plan of action and milestones and the work orders (0006-planning-poam FR-005, FR-007): no finding and no workload label in these tasks, and a day that is not a day is refused
     assertEquals((await run(dir, ["views", "--view", "poam", "--today", "2027-02-01", "--json"])).out.includes("[]"), true);
     assertEquals((await run(dir, ["views", "--view", "work-orders", "--json"])).code, 0);
     assertEquals((await run(dir, ["views", "--view", "poam", "--today", "soon"])).code === 0, false);

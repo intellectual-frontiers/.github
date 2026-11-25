@@ -316,7 +316,7 @@ const viewsVerb = (host: Host): Command<typeof VIEWS_OPTIONS> =>
             return outcomeOf(rows, { text: lines(...rows.map((r) => `${r.status} ${short(r.id)} ${r.title} (${r.milestones.length} milestones, scheduled ${r.scheduledCompletion ?? "-"}, controls ${r.controls.join(",") || "-"})`)) });
           }
           const rows = workOrders(items, parsed.value);
-          return outcomeOf(rows, { text: lines(...rows.map((r) => `${r.status} ${short(r.id)} ${r.title} (runs ${r.runbooks.join(",")}, serves ${r.serves.map(short).join(",") || "-"}, due ${r.due ?? "-"})`)) });
+          return outcomeOf(rows, { text: lines(...rows.map((r) => `${r.status} ${short(r.id)} ${r.title} (runs ${r.workloads.join(",")}, serves ${r.serves.map(short).join(",") || "-"}, due ${r.due ?? "-"})`)) });
         }
         default:
           return fail("E-USAGE", `${args.options.view} is not a view: roadmap, blocks, requirements, responsibility, poam or work-orders`);
