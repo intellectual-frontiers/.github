@@ -39,6 +39,7 @@ requirement	mechanism	by	note
 0005-workload-runs FR-004	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
 0005-workload-runs FR-005	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
 0005-workload-runs FR-006	check	.github: cd commons/workload && bun run verify	suite/runs.test.ts
+0005-workload-runs FR-007	none	-	Planned: proved in the slice of the code, suite/runs.test.ts
 0006-workload-split FR-001	check	.github: cd commons/workload && bun run verify	suite/split.test.ts
 0006-workload-split FR-002	check	.github: cd commons/workload && bun run verify	suite/split.test.ts
 0006-workload-split FR-003	check	.github: cd commons/workload && bun run verify	suite/split.test.ts
@@ -73,6 +74,7 @@ requirement	mechanism	by	note
 0008-form-runbook FR-020	check	.github: cd commons/workload && bun run verify	suite/runbook-runner.test.ts
 0008-form-runbook FR-021	check	.github: cd commons/workload && bun run verify	suite/runbook-runner.test.ts
 0008-form-runbook FR-022	check	.github: cd commons/workload && bun run verify	suite/runbook-runner.test.ts
+0008-form-runbook FR-023	none	-	Planned: proved in the slice of the code, suite/runbook-runner.test.ts
 0009-form-reconcile FR-001	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
 0009-form-reconcile FR-002	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
 0009-form-reconcile FR-003	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
@@ -87,3 +89,37 @@ requirement	mechanism	by	note
 0009-form-reconcile FR-012	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
 0009-form-reconcile FR-013	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
 0009-form-reconcile FR-014	check	.github: cd commons/workload && bun run verify	suite/reconcile.test.ts
+0009-form-reconcile FR-015	none	-	Planned: proved in the slice of the code, suite/reconcile.test.ts
+0010-workload-runners FR-001	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-002	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-003	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-004	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-005	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-006	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-007	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-008	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-009	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-010	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-011	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-012	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-013	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-014	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-015	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-016	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0010-workload-runners FR-017	none	-	Planned: proved in the slice of the code, suite/runners.test.ts
+0011-runner-bash FR-001	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-002	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-003	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-004	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-005	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-006	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0011-runner-bash FR-007	none	-	Planned: proved in the slice of the code, suite/runner-bash.test.ts
+0012-runner-powershell FR-001	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-002	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-003	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-004	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-005	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-006	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-007	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0012-runner-powershell FR-008	none	-	Planned: proved in the slice of the code, suite/runner-powershell.test.ts
+0013-form-graph FR-001	none	-	Planned: proved in the slice of the code, suite/forms.test.ts

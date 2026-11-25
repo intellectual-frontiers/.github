@@ -15,6 +15,7 @@
 - **FR-004**: The state of a run MUST be the fold of its events in the order of their ids: the same events in any arrival order give the same state, an event repeated is one event, an event of another item or of another form is left out, and no state MUST be stored; the fold MUST be pure.
 - **FR-005**: A dry run MUST return, with no effect and no event, the plan of the nodes in order with the derived autonomy of each, the preconditions the workbench would evaluate against given facts for the needs of the nodes that read and of the workload only (a dry run MUST NOT demand what a node that applies something needs), and the finding of every check; and a workload with a finding MUST give no plan.
 - **FR-006**: A workload MUST be a unit contribution of the workbench: `workloadContribution(workload, nodes, selected)` MUST return the contribution for the nodes selected for a run, namely the needs of the workload and of each selected node and nothing of a node not selected, so that a node behind a branch that is not taken, or a fan out with no member, needs nothing, and the workbench's `compose` MUST compose it lazily for the unit named for the workload.
+- **FR-007**: A run MAY gain two events of the integration runners (0010-workload-runners FR-009), `handoff` and `receipt`, in the same envelope and naming the form of the workload; `takeEvents` MUST leave them out of the events a form decodes, so that the fold of a form is the same with and without them, and the fold of the hand-off MUST be a function of its own that starts from the same order and the same dedupe.
 
 ## Acceptance scenarios
 
@@ -24,6 +25,7 @@
 4. **Given** the events of a run in two orders and with a repeat, **When** they are folded, **Then** the state is the same, per FR-004.
 5. **Given** a starter workload, **When** it is planned, **Then** the nodes have their autonomy and the preconditions are the workbench's findings, and a workload with a finding gives none, per FR-005.
 6. **Given** a workload with a branch and a fan out, **When** its contribution is made for the nodes selected, **Then** only what they need is composed, per FR-006.
+7. **Given** a run with a hand-off and a receipt among its events, **When** the form folds it, **Then** its state is the one it has without them, per FR-007.
 
 ## Out of scope
 

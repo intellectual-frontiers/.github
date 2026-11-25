@@ -8,3 +8,7 @@ number	slug	state
 0007	workload-harness	in force
 0008	form-runbook	in force
 0009	form-reconcile	in force
+0010	workload-runners	in force
+0011	runner-bash	in force
+0012	runner-powershell	in force
+0013	form-graph	in force

@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The runbook form: a workload that is a procedure. Its nodes, which it calls steps, are a closed sum of eight kinds (a deterministic verb, a check, an ask of a person, a judge that only proposes, a branch, a fan out, a gate and an undo) with the checks, the dry run, the run events and the runner that hold it. A drill or a game day is a runbook with a schedule trigger and an expected outcome. This form is the former library of runbooks, generalized: what it shares with every form (effects, autonomy, the verb registry, the dialects, the envelope of events) is the core's.
+**Input:** The runbook form: a workload that is a procedure. Its nodes, which it calls steps, are a closed sum of eight kinds (a deterministic verb, a check, an ask of a person, a judge that only proposes, a branch, a fan out, a gate and an undo) with the checks, the dry run, the run events and the native runner that hold it. A drill or a game day is a runbook with a schedule trigger and an expected outcome. This form is the former library of runbooks, generalized: what it shares with every form (effects, autonomy, the verb registry, the dialects, the envelope of events) is the core's.
 
 ## Requirements
 
@@ -25,12 +25,13 @@
 - **FR-014**: The starter runbook `restore-drill` MUST pass the static checks, MUST run on a schedule trigger and MUST say that a run is expected to complete.
 - **FR-015**: A run event of a runbook MUST be one of `started`, `step-started`, `step-succeeded` (with the digests of its evidence and what it gave for later steps to read), `step-failed`, `parked` (with the approver and the deadline), `answered`, `proposed` (the decoded output of a judge), `attached`, `detached`, `compensated`, `expired` and `finished`, in the envelope of the core with the form `runbook`, and decoded at the boundary into the closed union or refused; the fold MUST give the status of each step, the stores attached, whether the workshop is disposable (computed), what is parked and for whom, and whether the run is finished.
 - **FR-016**: A run MUST be refused its `finished` event while a store is attached or a step is parked.
-- **FR-017**: An `ask` or a `gate` step MUST park the run as a planning event that names the approver and the deadline, and the run MUST go on only when an event of a person answers it; an answer of an agent or a tool MUST be refused.
-- **FR-018**: The runner MUST attach a store only where the store offers every capability the attachment needs, MUST refuse with the missing capability otherwise, and MUST detach every store it attached when the run ends, whether it ended well, failed or was parked past its deadline.
-- **FR-019**: WHEN a step fails, the runner MUST run the `undo` steps of the steps that succeeded, in the reverse order, and MUST record each compensation as an event.
-- **FR-020**: The runner MUST hold the actor to the derived autonomy of each step: an agent MUST NOT apply a `human-only` step (the run parks and hands back), MUST propose and wait for an answer on an `agent-proposes` step, and MAY apply the others; a person MAY apply any step except one that needs another person.
-- **FR-021**: The runner MUST write every fact of a run as an event of planning on the work order, as one `commented` event in the envelope of the core, and MUST keep no state that is not the fold of those events.
+- **FR-017**: An `ask` or a `gate` step MUST park the run (by the native runner) as a planning event that names the approver and the deadline, and the run MUST go on only when an event of a person answers it; an answer of an agent or a tool MUST be refused.
+- **FR-018**: The native runner MUST attach a store only where the store offers every capability the attachment needs, MUST refuse with the missing capability otherwise, and MUST detach every store it attached when the run ends, whether it ended well, failed or was parked past its deadline.
+- **FR-019**: WHEN a step fails, the native runner MUST run the `undo` steps of the steps that succeeded, in the reverse order, and MUST record each compensation as an event.
+- **FR-020**: The native runner MUST hold the actor to the derived autonomy of each step: an agent MUST NOT apply a `human-only` step (the run parks and hands back), MUST propose and wait for an answer on an `agent-proposes` step, and MAY apply the others; a person MAY apply any step except one that needs another person.
+- **FR-021**: The native runner MUST write every fact of a run as an event of planning on the work order, as one `commented` event in the envelope of the core, and MUST keep no state that is not the fold of those events.
 - **FR-022**: What a run finished with MUST be said in the three words every form shares (`completes` for `succeeded`, `parks` for `parked`, `fails` for `failed`), so that the outcome a workload is expected to have can be met or not.
+- **FR-023**: A runbook MUST say what it needs of a runner (`runnerNeedsOf`), derived from its steps by the rule of 0010-workload-runners FR-004, and MUST lower to a plan of calls (`callsOf`) only where every step is a `verb`, a `check` or an `each` over a literal fixed list that the caller gives, with inputs that are literals, stores or inputs of the run; any other step, an input that is the output of an earlier step and an `each` inside an `each` MUST be refused with `E-WL-RUNNER-EMIT-UNSUPPORTED`, and a source that is no literal list with `E-WL-RUNNER-EACH-UNLISTED`.
 
 ## Acceptance scenarios
 
@@ -56,6 +57,7 @@
 20. **Given** an agent and a destroy of a durable store, **When** the run reaches it, **Then** the run is parked and hands back, per FR-020.
 21. **Given** a finished run, **When** its state is asked, **Then** it is the fold of its events and nothing else, per FR-021.
 22. **Given** a drill that completes, **When** it is judged against its expectation, **Then** it is met, per FR-022.
+23. **Given** the restore drill and the bootstrap runbook, **When** their needs are derived and they are lowered, **Then** the drill needs the native runner and is refused by an emit, and the bootstrap runbook is a plan of calls, per FR-023.
 
 ## Out of scope
 

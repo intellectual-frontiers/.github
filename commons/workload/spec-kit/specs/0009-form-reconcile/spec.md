@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The reconcile form: a workload that is a loop toward a desired state. It observes the actual state and the desired state, diffs them, plans the changes, has a person approve the plan by its hash, applies it and verifies that the state converged. It is level-triggered: a pass starts from what is observed now and never from a log of what changed, so that a missed trigger is repaired by the next pass. The first real user is the converge of a fleet toward its declared state; this library holds the form and a fake executor for its tests and nothing of any fleet.
+**Input:** The reconcile form: a workload that is a loop toward a desired state. It observes the actual state and the desired state, diffs them, plans the changes, has a person approve the plan by its hash, applies it and verifies that the state converged. It is level-triggered: a pass starts from what is observed now and never from a log of what changed, so that a missed trigger is repaired by the next pass. The first real user is the converge of a fleet toward its declared state; this library holds the form and a fake native runner for its tests and nothing of any fleet.
 
 ## Requirements
 
@@ -23,6 +23,7 @@
 - **FR-012**: A dry run MUST return, with no effect and no event, the nodes in order with the derived autonomy of each, what stops for a person, and the preconditions the workbench would evaluate for the needs of the nodes that read, and a loop with a finding MUST give no plan.
 - **FR-013**: What a pass finished with MUST be said in the three words every form shares (`completes` for `converged`, `parks` for `parked`, `fails` for `failed`), so that the outcome a workload is expected to have can be met or not.
 - **FR-014**: The starter reconcile `converge-settings` MUST pass the static checks, MUST run on a schedule trigger and MUST use only registered verbs, with synthetic names.
+- **FR-015**: A reconcile MUST say what it needs of a runner (`runnerNeedsOf`) by the rule of 0010-workload-runners FR-004: its diff and its plan need `logic` and its approval needs `approval` and `interactive`, so that a reconcile is run by the native runner and is refused by every integration runner with `E-WL-RUNNER-UNSUITABLE`, and it MUST NOT lower to a plan of calls.
 
 ## Acceptance scenarios
 
@@ -40,10 +41,11 @@
 12. **Given** the starter loop, **When** it is planned, **Then** the approval stops for a person, per FR-012.
 13. **Given** a pass that converged and one that expired, **When** they are judged, **Then** they complete and park, per FR-013.
 14. **Given** the starter loop, **When** it is checked, **Then** it has no finding, per FR-014.
+15. **Given** the starter loop and each runner, **When** the runner is chosen, **Then** only the native runner carries it and no integration runner does, per FR-015.
 
 ## Out of scope
 
-- Any real executor: the first real user binds the verbs `state.observe`, `state.apply` and `state.verify` in its own host; this library holds the form and a fake for its tests.
+- Any real native runner host: the first real user binds the verbs `state.observe`, `state.apply` and `state.verify` in its own host; this library holds the form and a fake for its tests.
 - A reconcile of many members (a fleet): one loop of a workload is one target, and a fan out over members is the business of a form that has one, which a second concrete user would ask for.
 - Compensation: a loop is level-triggered, so the next pass repairs what a pass left, and there is no undo node.
 

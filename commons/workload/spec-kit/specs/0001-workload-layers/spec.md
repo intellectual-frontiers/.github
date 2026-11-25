@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Workload: units of operated work (not running software) as typed data of a form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors. A runbook is one form of workload. The library is built to Kanon (commons 0033-kanon): Governance is the core that says what a workload is and imports nothing from a form, Logical holds the pure functions every form shares and, as instances, each form as a module of its own, and Physical is what touches the world (the executor of each form behind a port, the dialects, the command). It is modelled on the workbench (commons workbench 0001-workbench-layers) and reuses its governance types by package name.
+**Input:** Workload: units of operated work (not running software) as typed data of a form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors. A runbook is one form of workload. The library is built to Kanon (commons 0033-kanon): Governance is the core that says what a workload is and imports nothing from a form, Logical holds the pure functions every form shares and, as instances, each form as a module of its own, and Physical is what touches the world (the native runner of each form behind a port, the emitters of the integration runners, the dialects, the command). It is modelled on the workbench (commons workbench 0001-workbench-layers) and reuses its governance types by package name.
 
 ## Requirements
 
@@ -49,7 +49,7 @@
 ## Key entities
 
 - **Workload** - a unit of operated work, not running software: typed data of a form (0003-workload-forms).
-- **Form** - what kind of work and how it executes; a module of the logical layer with an executor behind a port of the physical layer.
+- **Form** - what kind of work and how it executes; a module of the logical layer with a native runner behind a port of the physical layer.
 - **Dialect** - how a harness or a person receives a workload: a projection, never a form.
 
 ## Standards considered
