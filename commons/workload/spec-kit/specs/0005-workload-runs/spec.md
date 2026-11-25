@@ -28,7 +28,7 @@
 ## Out of scope
 
 - The events of a plan other than a run: the planning library's.
-- The events of each form and what each fold makes of them: the form's own specification (0008-form-runbook).
+- The events of each form and what each fold makes of them: the form's own specification (0008-form-runbook, 0009-form-reconcile).
 
 ## Edge cases
 

@@ -98,3 +98,24 @@ Every problem the static check of a workload finds has one code in a closed cata
 | Code | What happened | Who fixes it | What it says | The fix |
 |---|---|---|---|---|
 | `E-RB-WORKSHOP-NOT-DISPOSABLE` | The workshop is disposed of while a store that is not ephemeral is attached | agent | Whether a workshop is disposable is computed from what is attached; a store that is not ephemeral is still attached at the disposal. | detach {store} before {node} |
+
+## The catalog of the reconcile form, `E-RC-`
+
+### Loop
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-RC-LOOP-MALFORMED` | The loop is not well formed | agent | A value is not of the type the loop declares, an id is used twice, a node names a node that is not where it must be, or the loop lacks the observation of the actual or the desired state. | correct the loop where the message says: {node} |
+
+### Apply
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-RC-APPLY-UNAPPROVED` | An apply that needs a person has no approval of its plan | person | The effect of the apply is not autonomous and no approve node of the same plan, before it, guards it, so a plan could be applied that no person approved by its hash. | decide who may apply {node}: add an approve node of its plan before it that guards it |
+| `E-RC-APPLY-EXCEEDS-PLAN` | The plan does more than the effect of its apply is declared to do | agent | A change of the plan needs a mode above the mode the apply declares (a create appends, an update mutates, a delete destroys), so it would do what its autonomy was not derived for. | declare an effect of {node} that covers every change of the plan, or narrow the plan |
+
+### Verify
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-RC-VERIFY-MISSING` | A loop applies and never verifies | agent | An apply is not followed by a verify node, so nothing says the state converged. | add a verify node after {node} |

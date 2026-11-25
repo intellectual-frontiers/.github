@@ -14,24 +14,27 @@
 import { absurd, err, type Result } from "@intellectual-frontiers/core";
 import { type Catalog, CORE_CATALOG, type Finding, finding, isBuiltForm, type VerbRegistry, VERBS } from "@intellectual-frontiers/workload/governance";
 import { type NodeLevel, type WorkloadView } from "@intellectual-frontiers/workload/logical";
+import { check as checkLoop, decodeReconcile, levelsOf as loopLevels, RECONCILE_CATALOG, type Reconcile, STARTERS as RECONCILE_STARTERS, viewOf as loopView } from "@intellectual-frontiers/workload/forms/reconcile";
 import { check, decodeRunbook, levelsOf, RUNBOOK_CATALOG, type Runbook, STARTERS as RUNBOOK_STARTERS, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
 
-/** A workload of a form that has code. */
-export type AnyWorkload = Runbook;
+/** A workload of a form that has code: a closed sum, one member for each form. */
+export type AnyWorkload = Runbook | Reconcile;
 
 /** The starters of every form that has code. */
-export const STARTERS: readonly AnyWorkload[] = [...RUNBOOK_STARTERS];
+export const STARTERS: readonly AnyWorkload[] = [...RUNBOOK_STARTERS, ...RECONCILE_STARTERS];
 
 /** The catalogs there are: the core and one for each form that has code. */
-export const CATALOGS: readonly Catalog[] = [CORE_CATALOG, RUNBOOK_CATALOG];
+export const CATALOGS: readonly Catalog[] = [CORE_CATALOG, RUNBOOK_CATALOG, RECONCILE_CATALOG];
 
 /** The findings of a workload, by the static check of its form. */
 export function checkWorkload(w: AnyWorkload, registry: VerbRegistry = VERBS): readonly Finding[] {
   switch (w.form) {
     case "runbook":
       return check(w, registry);
+    case "reconcile":
+      return checkLoop(w, registry);
     default:
-      return absurd(w.form);
+      return absurd(w);
   }
 }
 
@@ -40,8 +43,10 @@ export function levelsOfWorkload(w: AnyWorkload): readonly NodeLevel[] {
   switch (w.form) {
     case "runbook":
       return levelsOf(w);
+    case "reconcile":
+      return loopLevels(w);
     default:
-      return absurd(w.form);
+      return absurd(w);
   }
 }
 
@@ -50,8 +55,10 @@ export function viewOfWorkload(w: AnyWorkload): WorkloadView {
   switch (w.form) {
     case "runbook":
       return viewOf(w);
+    case "reconcile":
+      return loopView(w);
     default:
-      return absurd(w.form);
+      return absurd(w);
   }
 }
 
@@ -62,7 +69,9 @@ export function decodeWorkload(input: unknown): Result<AnyWorkload, readonly Fin
   switch (form) {
     case "runbook":
       return decodeRunbook(input);
+    case "reconcile":
+      return decodeReconcile(input);
     default:
-      return err([finding("E-WL-WORKLOAD-UNKNOWN-FORM", "", `the form ${form} has no decoder here`)]);
+      return absurd(form);
   }
 }

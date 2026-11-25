@@ -7,10 +7,15 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { decodeTable } from "@intellectual-frontiers/kanon";
 import { fs, path } from "@intellectual-frontiers/system";
-import { BUILT_FORM_IDS, FORM_IDS, FORMS, isBuiltForm } from "@intellectual-frontiers/workload/governance";
-import { RUNBOOK_FORM, STEP_KINDS } from "@intellectual-frontiers/workload/forms/runbook";
-import { RUNBOOK_EXECUTOR } from "@intellectual-frontiers/workload/physical";
+import { BUILT_FORM_IDS, CADENCES, FORM_IDS, FORMS, isBuiltForm, OUTCOMES, TRIGGER_KINDS, trigger } from "@intellectual-frontiers/workload/governance";
+import { meets } from "@intellectual-frontiers/workload/logical";
+import { CONVERGE_SETTINGS, decodeReconcile, RECONCILE_FORM, outcomeOf as reconcileOutcome } from "@intellectual-frontiers/workload/forms/reconcile";
+import { decodeRunbook, outcomeOf as runbookOutcome, RESTORE_DRILL, RUNBOOK_FORM, STEP_KINDS } from "@intellectual-frontiers/workload/forms/runbook";
+import { decodeWorkload, RECONCILE_EXECUTOR, RUNBOOK_EXECUTOR, STARTERS } from "@intellectual-frontiers/workload/physical";
 import { library } from "../library.ts";
+import { ITEM } from "./kit.ts";
+
+const ITEM_FOR_TEST = ITEM;
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
 
@@ -40,6 +45,9 @@ proves(["0003-workload-forms FR-001"], "a form is declared by its id, its closed
   assertEquals(RUNBOOK_FORM.nodeKinds, STEP_KINDS);
   assertEquals(Object.keys(RUNBOOK_EXECUTOR).sort(), ["form", "run"]);
   assertEquals(RUNBOOK_EXECUTOR.form, RUNBOOK_FORM.id);
+  assertEquals(Object.keys(RECONCILE_FORM).sort(), Object.keys(RUNBOOK_FORM).sort());
+  assertEquals(RECONCILE_EXECUTOR.form, RECONCILE_FORM.id);
+  assertEquals(new Set(STARTERS.map((w) => w.form)), new Set(BUILT_FORM_IDS));
 });
 
 proves(["0003-workload-forms FR-002"], "the core imports nothing from a form: no source of the governance or of the shared logical layer names a form, and the table puts no unit of either above a form", async () => {
@@ -85,4 +93,56 @@ proves(["0003-workload-forms FR-004"], "the forms are a closed registry in the c
     assert(f.status === "reserved" && f.criteria.includes("second") || f.status === "reserved" && f.criteria.includes("two"), id);
   }
   assertEquals(isBuiltForm("graph"), false);
+  for (const form of ["graph", "campaign", "teleport", undefined]) {
+    const r = decodeWorkload({ form });
+    assert(r.kind === "err" && r.error[0]?.code === "E-WL-WORKLOAD-UNKNOWN-FORM", String(form));
+  }
+  assertEquals(decodeWorkload(JSON.parse(JSON.stringify(RESTORE_DRILL))).kind, "ok");
+  assertEquals(decodeWorkload(JSON.parse(JSON.stringify(CONVERGE_SETTINGS))).kind, "ok");
+});
+
+proves(["0003-workload-forms FR-005"], "a trigger is a field of every workload, a closed sum of manual, schedule with a cadence, event and alert, and never a form", () => {
+  assertEquals(TRIGGER_KINDS, ["manual", "schedule", "event", "alert"]);
+  assertEquals(CADENCES, ["daily", "weekly", "monthly", "quarterly", "yearly"]);
+  for (const t of [{ kind: "manual" }, { kind: "schedule", cadence: "quarterly" }, { kind: "event", name: "synthetic-event-01" }, { kind: "alert", name: "synthetic-alert-01" }]) assertEquals(trigger(t).kind, "ok");
+  for (const t of [{ kind: "cron" }, { kind: "schedule" }, { kind: "schedule", cadence: "hourly" }, { kind: "event" }]) assertEquals(trigger(t).kind, "err");
+  assertEquals(FORM_IDS.filter((f) => (TRIGGER_KINDS as readonly string[]).includes(f)), []);
+  assertEquals(RESTORE_DRILL.trigger.kind, "schedule");
+  assertEquals(CONVERGE_SETTINGS.trigger.kind, "schedule");
+  const withEvent = { ...JSON.parse(JSON.stringify(RESTORE_DRILL)), trigger: { kind: "event", name: "synthetic-event-01" } };
+  assertEquals(decodeRunbook(withEvent).kind, "ok");
+  assertEquals(decodeReconcile({ ...JSON.parse(JSON.stringify(CONVERGE_SETTINGS)), trigger: { kind: "alert", name: "synthetic-alert-01" } }).kind, "ok");
+  assertEquals(decodeReconcile({ ...JSON.parse(JSON.stringify(CONVERGE_SETTINGS)), trigger: undefined }).kind, "err");
+});
+
+proves(["0003-workload-forms FR-006"], "a workload may say the outcome a run is expected to have in three words every form shares, so that a drill or a game day is a workload with a schedule trigger and an expectation", () => {
+  assertEquals(OUTCOMES, ["completes", "parks", "fails"]);
+  assertEquals(RESTORE_DRILL.expect, { outcome: "completes" });
+  assertEquals(meets(RESTORE_DRILL.expect, "completes"), true);
+  assertEquals(meets({ outcome: "parks" }, "fails"), false);
+  assertEquals(meets(undefined, "parks"), true);
+  const finished = (f: "succeeded" | "failed" | "parked" | undefined) => runbookOutcome({ run: ITEM_FOR_TEST, runbook: undefined, steps: {}, attached: [], disposable: true, parked: [], finished: f, refused: [] });
+  assertEquals([finished("succeeded"), finished("parked"), finished("failed"), finished(undefined)], ["completes", "parks", "fails", undefined]);
+  const converged = (f: "converged" | "failed" | "parked" | undefined) => reconcileOutcome({ run: ITEM_FOR_TEST, loop: undefined, passes: 1, nodes: {}, plan: undefined, approved: [], declined: [], applied: [], planApproved: false, parked: [], finished: f, refused: [] });
+  assertEquals([converged("converged"), converged("parked"), converged("failed"), converged(undefined)], ["completes", "parks", "fails", undefined]);
+  assertEquals(decodeRunbook({ ...JSON.parse(JSON.stringify(RESTORE_DRILL)), expect: { outcome: "explodes" } }).kind, "err");
+});
+
+proves(["0003-workload-forms FR-007"], "the forms graph and campaign are specified as named slots with the criterion for building each, and have no code: no folder, no entry and no source names them but the registry", async () => {
+  for (const id of ["graph", "campaign"] as const) {
+    const f = FORMS[id];
+    assert(f.status === "reserved" && f.criteria.length > 40 && f.summary.length > 10, id);
+    assertEquals(await fs.exists(path.join(ROOT, "src", "logical", "forms", id)), false, `${id} has no folder in the logical layer`);
+    assertEquals(await fs.exists(path.join(ROOT, "src", "physical", "forms", id)), false, `${id} has no folder in the physical layer`);
+    assertEquals(library.exports.some((e) => e.includes(id)), false);
+  }
+  const graph = FORMS["graph"];
+  assert(graph.status === "reserved" && graph.criteria.includes("CI/CD") && graph.criteria.includes("workflows"));
+  const campaign = FORMS["campaign"];
+  assert(campaign.status === "reserved" && campaign.criteria.includes("sampling"));
+  const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0003-workload-forms", "spec.md"));
+  for (const word of ["`graph`", "`campaign`", "second concrete user", "generated GitHub workflows", "typed definitions", "an external executor", "sampling"]) assert(spec.includes(word), word);
+  for (const dir of ["src/governance", "src/logical", "src/physical"]) {
+    for (const i of await importsOf(dir)) assert(!/forms\/(graph|campaign)/u.test(i.spec), `${i.file} imports ${i.spec}`);
+  }
 });

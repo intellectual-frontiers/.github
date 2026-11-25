@@ -16,6 +16,7 @@
 - **FR-005**: A gate MUST only raise the control over a node, never lower it: the level of a guarded node is the less autonomous of its derived level and the level the gate demands, and no gate makes a node more autonomous than its effect makes it.
 - **FR-006**: The actions `approve` and `tag` MUST be a person's at every level (the workbench's `PERSON_ONLY`), a gate MUST name one of `approve`, `tag` and `pentest-scope`, and a gate MUST be passed only by an actor that is a person.
 - **FR-007**: The effect a node declares MUST NOT exceed the effect its verb is registered with: a node may declare less than the verb can do (a narrower mode) and never more, and the class MUST be the one the verb is registered with.
+- **FR-008**: The autonomy derived for an effect MUST be the same in every form: each form MUST derive the autonomy of a node that has an effect from the one table of the core, and no form MUST hold a table of its own, so that the same class and mode give the same level in a runbook and in a reconcile.
 
 ## Acceptance scenarios
 
@@ -27,6 +28,7 @@
 6. **Given** a node on an external store with no idempotency key, **When** it is decoded, **Then** it is refused, per FR-002.
 7. **Given** a node that declares a destroy of a verb registered as append, **When** it is checked, **Then** it is refused, per FR-007.
 8. **Given** a gate named `deploy`, **When** it is decoded, **Then** it is refused, per FR-006.
+9. **Given** the same effect in a step of a runbook and in an apply of a reconcile, **When** the autonomy of each is derived, **Then** it is the same, per FR-008.
 
 ## Out of scope
 

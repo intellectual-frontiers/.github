@@ -13,6 +13,7 @@
     "./logical": "./src/logical/mod.ts",
     "./physical": "./src/physical/mod.ts",
     "./forms/runbook": "./src/logical/forms/runbook/mod.ts",
+    "./forms/reconcile": "./src/logical/forms/reconcile/mod.ts",
     "./dialects/claude-code": "./src/physical/dialects/claude-code/mod.ts",
     "./dialects/codex": "./src/physical/dialects/codex/mod.ts",
     "./dialects/human": "./src/physical/dialects/human/mod.ts"
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@intellectual-frontiers/anyfs": "link:../anyfs",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",

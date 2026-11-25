@@ -30,10 +30,11 @@ proves(["0001-workload-layers FR-002"], "verify runs every check of the library"
 proves(["0001-workload-layers FR-003"], "the library imports other libraries by package name and their allowed entries only, and never by a path out of its folder", async () => {
   const allowed: Readonly<Record<string, readonly string[]>> = {
     "@intellectual-frontiers/anyfs": ["governance"],
+    "@intellectual-frontiers/crypto": ["sha256"],
     "@intellectual-frontiers/grc": ["governance"],
     "@intellectual-frontiers/planning": ["governance"],
     "@intellectual-frontiers/workbench": ["governance", "logical"],
-    "@intellectual-frontiers/workload": ["governance", "logical", "forms/runbook", "dialects/claude-code", "dialects/codex", "dialects/human"],
+    "@intellectual-frontiers/workload": ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human"],
     "@intellectual-frontiers/core": [""],
     "@intellectual-frontiers/system": [""],
   };
@@ -83,6 +84,8 @@ proves(["0001-workload-layers FR-004"], "the entries give a program the core (th
   const top = await import("@intellectual-frontiers/workload");
   assert(top.governance.VERBS.has("verb") === false && top.governance.VERBS.has("store.backup"));
   assertEquals(top.runbook.RESTORE_DRILL.id, "restore-drill");
+  assertEquals(top.reconcile.CONVERGE_SETTINGS.id, "converge-settings");
+  assertEquals((await import("@intellectual-frontiers/workload/forms/reconcile")).decodeReconcile((await import("@intellectual-frontiers/workload/forms/reconcile")).CONVERGE_SETTINGS).kind, "ok");
   for (const d of ["claude-code", "codex", "human"]) assertEquals((await import(`@intellectual-frontiers/workload/dialects/${d}`)).dialect.info.id, d);
 });
 
@@ -103,7 +106,13 @@ proves(["0001-workload-layers FR-006"], "the program is workload, with the verbs
   };
   const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "..", "..", "package.json"))) as { scripts: Record<string, string> };
   assertEquals(pkg.scripts["workload"], "bun commons/workload/src/physical/main.ts");
-  assertEquals((await run(["check"])).code, 0);
+  const checked = await run(["check"]);
+  assertEquals(checked.code, 0);
+  assert(checked.out.includes("restore-drill (runbook): no finding") && checked.out.includes("converge-settings (reconcile): no finding"));
+  assert((await run(["plan", "converge-settings"])).out.includes("approve-plan: approve, human-only"));
+  const projected = await run(["project", "--dialect", "codex"]);
+  assert(projected.out.includes("=== codex AGENTS.md") && projected.out.includes("<!-- workload:begin -->") && projected.out.includes("### converge-settings"));
+  assertEquals((await run(["project", "--dialect", "mystery"])).code, 1);
   assert((await run(["plan", "restore-drill"])).out.includes("claim-order: verb, agent-acts-human-reviews"));
   assertEquals((await run(["plan", "nope"])).code, 1);
   const forms = await run(["forms"]);

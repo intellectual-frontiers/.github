@@ -7,6 +7,7 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { ok } from "@intellectual-frontiers/core";
 import { authored, CATALOG, catalogProblems, CORE_CATALOG, createVerbRegistry, explain, explainIn, finding, FIXERS, isCatalogCode, PROBLEM_CONCEPTS, VERBS, verbId } from "@intellectual-frontiers/workload/governance";
+import { RECONCILE_CATALOG } from "@intellectual-frontiers/workload/forms/reconcile";
 import { check, checkValue, plan, RESTORE_DRILL, RUNBOOK_CATALOG, type Runbook, type Step } from "@intellectual-frontiers/workload/forms/runbook";
 import { runJudge, runRunbook, runVerb, type VerbBindings } from "@intellectual-frontiers/workload/physical";
 import { CONTRACT, effect, facts, must, PERSON, plain, runbook, sid, store, verb } from "./kit.ts";
@@ -26,20 +27,23 @@ proves(["0006-workload-split FR-001"], "a judge has no effect and only proposes:
 proves(["0006-workload-split FR-002"], "the catalogs are closed: the core has E-WL codes, each form its own prefix, each code has a concept, a fixer and a fix, and what no entry names is E-WL-UNKNOWN", () => {
   assertEquals(catalogProblems(CORE_CATALOG), []);
   assertEquals(catalogProblems(RUNBOOK_CATALOG), []);
+  assertEquals(catalogProblems(RECONCILE_CATALOG), []);
   const entries = Object.values(CATALOG);
   assert(entries.length >= 14);
   for (const e of entries) {
     assert(PROBLEM_CONCEPTS.includes(e.concept as never) , e.code);
     assert(FIXERS.includes(e.fixer), e.code);
   }
-  const all = [...Object.keys(CATALOG), ...Object.keys(RUNBOOK_CATALOG.entries)];
+  const all = [...Object.keys(CATALOG), ...Object.keys(RUNBOOK_CATALOG.entries), ...Object.keys(RECONCILE_CATALOG.entries)];
   assertEquals(new Set(all).size, all.length);
   assertEquals(isCatalogCode("E-WL-VERB-UNKNOWN"), true);
   assertEquals(isCatalogCode("E-RB-STORE-NO-CHECKPOINT"), false);
   const unknown = explain("E-SOMETHING-NEW");
   assertEquals(unknown.code, "E-WL-UNKNOWN");
   assert(unknown.fix.includes("add an entry, a check and a test"));
-  assertEquals(explainIn([CORE_CATALOG, RUNBOOK_CATALOG], "E-RB-STORE-NO-CHECKPOINT").code, "E-RB-STORE-NO-CHECKPOINT");
+  assertEquals(explainIn([CORE_CATALOG, RUNBOOK_CATALOG, RECONCILE_CATALOG], "E-RB-STORE-NO-CHECKPOINT").code, "E-RB-STORE-NO-CHECKPOINT");
+  assertEquals(explainIn([CORE_CATALOG, RUNBOOK_CATALOG, RECONCILE_CATALOG], "E-RC-APPLY-UNAPPROVED").code, "E-RC-APPLY-UNAPPROVED");
+  assertEquals(explainIn([CORE_CATALOG], "E-RC-APPLY-UNAPPROVED").code, "E-WL-UNKNOWN");
   const bad = { ...CORE_CATALOG, prefix: "E-XX-" };
   assert(catalogProblems(bad).length > 0);
 });

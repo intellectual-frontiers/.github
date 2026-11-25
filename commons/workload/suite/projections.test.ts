@@ -7,6 +7,7 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import type { Crosswalk } from "@intellectual-frontiers/grc/governance";
 import { checklist, nodeLines, projectAll, rulesOf, scenario, skillMd, skillsIndex, statements, VERB_COMMAND } from "@intellectual-frontiers/workload/logical";
+import { CONVERGE_SETTINGS, levelsOf as loopLevels, viewOf as loopView } from "@intellectual-frontiers/workload/forms/reconcile";
 import { flatten, levelsOf, RESTORE_DRILL, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
 import { DIALECT_IMPLS } from "@intellectual-frontiers/workload/physical";
 import { effect, runbook, store, verb } from "./kit.ts";
@@ -120,4 +121,26 @@ proves(["0004-workload-projections FR-009"], "a runbook reads as a scenario whos
   assert(text.includes("  Then The restored digests are the digests of the source".replace("The restored digests are the digests of the source", "the digests of the restored store are the digests of the source")) && text.includes("per 0006-workload-split FR-003"));
   const none = scenario(viewOf(runbook([verb("x", "work.claim", effect("synthetic-vault-01", "durable", "append"))])));
   assert(none.includes("Given nothing is required"));
+});
+
+proves(["0004-workload-projections FR-010"], "every projection is made from the view of a workload and not from a form, so that a reconcile is projected by every dialect with the same autonomy for each node as a runbook, and an index lists both forms", () => {
+  const loop = loopView(CONVERGE_SETTINGS);
+  const both = project([V, loop]);
+  assertEquals(Object.keys(both).sort(), DIALECT_IMPLS.map((d) => d.info.id).sort());
+  const expected = loopLevels(CONVERGE_SETTINGS).map((l) => `${l.id}|${l.kind}|${l.autonomy}`);
+  for (const [dialect, files] of Object.entries(project([loop]))) {
+    const text = files.map((f) => f.text).join("\n");
+    const seen = [...text.matchAll(/^- (?:\[ \] )?`([^`]+)`: ([a-z]+), (human-only|agent-[a-z-]+)/gmu)].map((m) => `${m[1]}|${m[2]}|${m[3]}`);
+    assertEquals(seen.slice(0, expected.length), expected, dialect);
+  }
+  const index = skillsIndex([V, loop]);
+  assert(index.includes("| `restore-drill` | runbook |") && index.includes("| `converge-settings` | reconcile |"));
+  const skill = skillMd(loop);
+  assert(skill.includes("Form: reconcile. Started by: a schedule, daily.") && skill.includes("level-triggered"));
+  assert(checklist(loop).includes("approves the plan by its hash"));
+  assert(statements([loop]).includes("the digest of the plan approved, recorded on the approval"));
+  assert(statements([loop]).includes("`urn:grc:nist-800-53:5.2.0:CM-3`"));
+  const rules = rulesOf([loop]);
+  assert(rules.deny.some((r) => r.includes("state.apply")) && rules.allow.some((r) => r.includes("state.observe")));
+  assert(scenario(loop).includes("Then the settings of the system are the settings that are wanted"));
 });

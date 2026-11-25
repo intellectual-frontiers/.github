@@ -18,6 +18,7 @@
 - **FR-007**: Where a format of a harness could not be verified, the projection MUST be the conservative one and the spec MUST say so: the Codex dialect writes `AGENTS.md` text and no skill file, and no OSCAL JSON is written.
 - **FR-008**: The library MUST make the projections for every dialect registered (0007-workload-harness) from the one source, a workload, whatever its form, and switching the dialect MUST change only the projection (the skill files, the allow, ask and deny rules and the entry of a tool server) and never the nodes, the effects or the derived autonomy.
 - **FR-009**: A workload MUST read as a Mizan scenario: the library MUST project its Given as the requirements of the workbench it needs, its When as its nodes in order and its Then as the nodes that assert, and the projection MUST cite the requirements the nodes cite.
+- **FR-010**: Every projection MUST be made from the view of a workload, which each form gives of its own (its nodes with the autonomy derived for each, the verbs, the controls, the evidence), and not from a form, so that a dialect is written once and projects a workload of every form, an index lists the form of each workload, and a form added later is one view.
 
 ## Acceptance scenarios
 
@@ -30,6 +31,7 @@
 7. **Given** the Codex dialect, **When** it is rendered, **Then** it holds `AGENTS.md` text and no skill file, per FR-007.
 8. **Given** the starter workload and every registered dialect, **When** they are projected, **Then** each dialect gives files and each says the same autonomy for each node, per FR-008.
 9. **Given** the starter workload, **When** it is projected as a scenario, **Then** the Given names its requirements, the When its nodes and the Then its checks, per FR-009.
+10. **Given** a runbook and a reconcile, **When** they are projected by every dialect, **Then** each says the same autonomy for each node and the index names both forms, per FR-010.
 
 ## Out of scope
 

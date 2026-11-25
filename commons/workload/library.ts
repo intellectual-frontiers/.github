@@ -13,7 +13,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./dialects/claude-code", "./dialects/codex", "./dialects/human"],
+  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./dialects/claude-code", "./dialects/codex", "./dialects/human"],
   summary: "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and executors behind ports.",
   kanon: {
     package: "@intellectual-frontiers/workload",
@@ -72,7 +72,8 @@ export const library = {
           { name: "@intellectual-frontiers/planning", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/system", subpaths: "any" },
           { name: "@intellectual-frontiers/workbench", subpaths: ["governance"] },
-          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "dialects/claude-code", "dialects/codex", "dialects/human"] },
+          { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
+          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human"] },
         ],
       },
       { folder: "src/", own: true },

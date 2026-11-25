@@ -6,9 +6,9 @@ A workload never names a harness. A harness is a dialect, and the set of dialect
 
 | Dialect | Held by | Reads a skill file | What it writes for the starter workloads |
 |---|---|---|---|
-| `claude-code` | agent | yes | `SKILLS.md`, `.claude/skills/restore-drill/SKILL.md`, `.claude/workload.settings.json` |
+| `claude-code` | agent | yes | `SKILLS.md`, `.claude/skills/converge-settings/SKILL.md`, `.claude/skills/restore-drill/SKILL.md`, `.claude/workload.settings.json` |
 | `codex` | agent | no | `AGENTS.md` |
-| `human` | human | no | `workload/restore-drill.md` |
+| `human` | human | no | `workload/converge-settings.md`, `workload/restore-drill.md` |
 
 Switching the dialect changes only these files. The nodes, the effects and the autonomy derived for each node are the same for every dialect, and for every form.
 

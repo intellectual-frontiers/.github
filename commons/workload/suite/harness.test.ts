@@ -7,6 +7,7 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { authored, createDialectRegistry, decodePolicy, DIALECTS, dialectId, type DialectInfo, type HarnessPolicy } from "@intellectual-frontiers/workload/governance";
 import { type DialectImpl, projectAll, registerDialect, resolveDialect, type WorkloadView } from "@intellectual-frontiers/workload/logical";
+import { chooseDialect as chooseLoopDialect, CONVERGE_SETTINGS, requirementsOf as loopRequirements, suitable as loopSuitable } from "@intellectual-frontiers/workload/forms/reconcile";
 import { chooseDialect, levelsOf, requirementsOf, RESTORE_DRILL, type Runbook, suitable, viewOf } from "@intellectual-frontiers/workload/forms/runbook";
 import { DIALECT_IMPLS } from "@intellectual-frontiers/workload/physical";
 import { effect, must, runbook, verb } from "./kit.ts";
@@ -95,4 +96,16 @@ proves(["0007-workload-harness FR-006"], "the projection of a dialect is the sam
   assert(codex !== undefined && codex.info.skillFiles === false && codex.render([view]).every((f) => !f.path.endsWith("SKILL.md")));
   const claude = DIALECT_IMPLS.find((i) => i.info.id === "claude-code");
   assert(claude !== undefined && claude.info.skillFiles === true);
+});
+
+proves(["0007-workload-harness FR-004"], "a reconcile is held to the same rule as a runbook: its approval is an authority a person must carry, and the policy chooses by its form", () => {
+  assert(loopRequirements(CONVERGE_SETTINGS).some((r) => r.kind === "authority" && r.id === "person-approve-plan"));
+  assertEquals(loopSuitable(CONVERGE_SETTINGS, d("codex")).kind, "ok");
+  const agentsOnly = must(createDialectRegistry(DIALECTS.list().filter((x) => x.holder === "agent")));
+  const noPerson = loopSuitable(CONVERGE_SETTINGS, d("codex"), agentsOnly);
+  assert(noPerson.kind === "err" && noPerson.error.code === "E-WL-HARNESS-UNSUITABLE" && noPerson.error.message.includes("needs a person"));
+  const byForm = chooseLoopDialect(POLICY, {}, CONVERGE_SETTINGS);
+  assert(byForm.kind === "ok" && byForm.value.dialect === "human" && byForm.value.from === "form");
+  const byWorkload = chooseDialect(POLICY, {}, RESTORE_DRILL);
+  assert(byWorkload.kind === "ok" && byWorkload.value.dialect === "claude-code" && byWorkload.value.from === "workload");
 });

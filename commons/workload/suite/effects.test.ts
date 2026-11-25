@@ -6,8 +6,9 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { agentMay } from "@intellectual-frontiers/workbench/governance";
-import { AUTONOMY_TABLE, GATE_ACTIONS, MODES, STORE_CLASSES } from "@intellectual-frontiers/workload/governance";
-import { agentCanGate, disposable, GATE_PERSON_ONLY, lessAutonomous, mayPassGate } from "@intellectual-frontiers/workload/logical";
+import { AUTONOMY_TABLE, authored, GATE_ACTIONS, MODES, STORE_CLASSES, verbId } from "@intellectual-frontiers/workload/governance";
+import { agentCanGate, disposable, effectAutonomy, GATE_PERSON_ONLY, lessAutonomous, mayPassGate } from "@intellectual-frontiers/workload/logical";
+import { CONVERGE_SETTINGS, derivedAutonomy as reconcileAutonomy, type ReconcileNode } from "@intellectual-frontiers/workload/forms/reconcile";
 import { check, decodeRunbook, defineRunbook, derivedAutonomy, levelsOf, RESTORE_DRILL, type Runbook, type Step } from "@intellectual-frontiers/workload/forms/runbook";
 import { AGENT, effect, PERSON, plain, runbook, sid, verb } from "./kit.ts";
 
@@ -90,4 +91,16 @@ proves(["0002-workload-effects FR-007"], "an effect may be less than its verb's 
   assert(more.some((f) => f.code === "E-WL-EFFECT-EXCEEDS-VERB"));
   const wrongClass = check(runbook([verb("wipe", "store.backup", effect("synthetic-scratch-01", "ephemeral", "append"))]));
   assert(wrongClass.some((f) => f.code === "E-WL-EFFECT-EXCEEDS-VERB"));
+});
+
+proves(["0002-workload-effects FR-008"], "the same effect gives the same autonomy in every form: the runbook and the reconcile form derive it from the one table of the core", () => {
+  const probe = [...STORE_CLASSES].flatMap((c) => MODES.map((m) => effect("synthetic-probe-01", c, m)));
+  for (const e of probe) {
+    const asStep = verb("probe", "work.claim", e);
+    const asNode: ReconcileNode = { ...CONVERGE_SETTINGS.nodes[5], id: sid("probe"), kind: "apply", plan: sid("plan-changes"), verb: authored(verbId("state.apply")), inputs: {}, effect: e } as ReconcileNode;
+    assertEquals(derivedAutonomy(asStep), AUTONOMY_TABLE[e.class][e.mode], `${e.class} ${e.mode}`);
+    assertEquals(reconcileAutonomy(asNode), AUTONOMY_TABLE[e.class][e.mode], `${e.class} ${e.mode}`);
+    assertEquals(effectAutonomy(e), AUTONOMY_TABLE[e.class][e.mode]);
+  }
+  assertEquals(probe.length, 20);
 });
