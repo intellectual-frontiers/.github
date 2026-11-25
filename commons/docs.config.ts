@@ -440,6 +440,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/integrations-identity/spec-kit" },
     { layout: "commons", dir: "commons/planning-query/spec-kit" },
     { layout: "commons", dir: "commons/workbench/spec-kit" },
+    { layout: "commons", dir: "commons/runbooks/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "archon", "thyra"] },
   lenses: [guides, releases, dataModels, programs, repoOps],
