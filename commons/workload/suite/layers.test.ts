@@ -34,7 +34,7 @@ proves(["0001-workload-layers FR-003"], "the library imports other libraries by 
     "@intellectual-frontiers/grc": ["governance"],
     "@intellectual-frontiers/planning": ["governance"],
     "@intellectual-frontiers/workbench": ["governance", "logical"],
-    "@intellectual-frontiers/workload": ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human"],
+    "@intellectual-frontiers/workload": ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human", "runners/bash", "runners/pwsh"],
     "@intellectual-frontiers/core": [""],
     "@intellectual-frontiers/system": [""],
   };
@@ -96,7 +96,7 @@ proves(["0001-workload-layers FR-005"], "the manifest declares github and npm an
   assert((pkg.scripts["verify"] ?? "").includes("tools/pack.ts --check"));
 });
 
-proves(["0001-workload-layers FR-006"], "the program is workload, with the verbs check, plan, project, forms, explain and verb, and every refusal prints its code and its fix", async () => {
+proves(["0001-workload-layers FR-006"], "the program is workload, with the verbs check, plan, project, forms, runners, needs, emit, explain and verb, and every refusal prints its code and its fix", async () => {
   const { main } = await import("@intellectual-frontiers/workload/physical");
   const run = async (argv: string[]): Promise<{ code: number; out: string; err: string }> => {
     let out = "";
@@ -117,6 +117,19 @@ proves(["0001-workload-layers FR-006"], "the program is workload, with the verbs
   assertEquals((await run(["plan", "nope"])).code, 1);
   const forms = await run(["forms"]);
   assert(forms.out.includes("graph: reserved") && forms.out.includes("campaign: reserved") && forms.out.includes("runbook: built"));
+  const runners = await run(["runners"]);
+  assert(runners.out.includes("native: native:") && runners.out.includes("bash: integration:") && runners.out.includes("pwsh: integration:"));
+  const needs = await run(["needs", "restore-drill"]);
+  assert(needs.out.includes("summarize-drill: needs judge") && needs.out.includes("bash: cannot carry it: lacks judge, approval") && needs.out.includes("native: can carry it"));
+  assert((await run(["needs", "synthetic-bootstrap-01"])).out.includes("pwsh: can carry it"));
+  assertEquals((await run(["needs", "nope"])).code, 1);
+  const emitted = await run(["emit", "synthetic-bootstrap-01", "bash"]);
+  assert(emitted.code === 0 && emitted.out.startsWith("#!/usr/bin/env bash") && emitted.out.includes("run_verb 'claim-order' 'work.claim'"));
+  const refusedEmit = await run(["emit", "restore-drill", "bash"]);
+  assert(refusedEmit.code === 1 && refusedEmit.err.includes("E-WL-RUNNER-EMIT-UNSUPPORTED") && refusedEmit.err.includes("fix ("));
+  assertEquals((await run(["emit", "synthetic-bootstrap-01", "native"])).code, 1);
+  assertEquals((await run(["emit", "synthetic-bootstrap-01", "mystery"])).code, 1);
+  assert((await run(["explain", "E-WL-RUNNER-UNSUITABLE"])).out.includes("fixer: person"));
   assert((await run(["explain", "E-WL-JUDGE-EFFECT"])).out.includes("fixer: agent"));
   assert((await run(["explain", "E-RB-STORE-NO-CHECKPOINT"])).out.includes("fixer: agent"));
   assert((await run(["explain", "E-NOPE"])).out.includes("E-WL-UNKNOWN"));

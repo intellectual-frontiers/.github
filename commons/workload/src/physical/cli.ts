@@ -1,7 +1,7 @@
 // Spec: 0001-workload-layers FR-006
 /**
  * The command `workload`: `check` (the static check of the starter workloads, whatever their form), `plan ID` (the nodes and the autonomy derived for each), `project [--dialect D]` (the files of every registered dialect,
- * or one), `forms` (the forms, built and reserved), `explain CODE` (across the catalogs of the core and of each form) and `verb ID`, which checks the id against the registry: an id that is not registered is refused with its
+ * or one), `forms` (the forms, built and reserved), `runners` (the runners and what each can carry), `needs ID` (what a workload needs of a runner and which runner can carry it), `emit ID RUNNER` (the artifact of an integration runner, to the output) and `explain CODE` (across the catalogs of the core and of each form) and `verb ID`, which checks the id against the registry: an id that is not registered is refused with its
  * code, and a registered one says that the host that has the pinned package binds it, and exits non-zero until it does. Every refusal prints its code and its fix. It reads nothing and writes nothing.
  *
  * @example
@@ -12,10 +12,14 @@
  *
  * @module
  */
-import { describeFinding, explainIn, FORM_IDS, FORMS, finding, VERBS } from "@intellectual-frontiers/workload/governance";
-import { projectAll } from "@intellectual-frontiers/workload/logical";
+import { authored, describeFinding, explainIn, FORM_IDS, FORMS, finding, runnerId, RUNNERS, VERBS } from "@intellectual-frontiers/workload/governance";
+import { lacksOf, projectAll } from "@intellectual-frontiers/workload/logical";
+import { bootstrapFleet, FIXTURES } from "@intellectual-frontiers/workload/forms/runbook";
 import { DIALECT_IMPLS } from "./dialects.ts";
-import { CATALOGS, checkWorkload, levelsOfWorkload, STARTERS, viewOfWorkload } from "./workloads.ts";
+import { emitWorkload } from "./runners.ts";
+import { type AnyWorkload, CATALOGS, checkWorkload, levelsOfWorkload, runnerNeedsOfWorkload, STARTERS, viewOfWorkload } from "./workloads.ts";
+
+const KNOWN: readonly AnyWorkload[] = [...STARTERS, ...FIXTURES];
 
 /** Where the command writes. */
 export type Io = { readonly out: (text: string) => void; readonly err: (text: string) => void };
@@ -65,6 +69,39 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2> 
       }
       return 0;
     }
+    case "runners": {
+      for (const r of RUNNERS.list()) io.out(`${r.id}: ${r.kind}: ${r.title}; can carry ${r.capabilities.join(", ")}`);
+      return 0;
+    }
+    case "needs": {
+      const w = KNOWN.find((x) => x.id === arg);
+      if (w === undefined) {
+        io.err(`no workload ${arg ?? ""}; the workloads are ${KNOWN.map((x) => x.id).join(", ")}`);
+        return 1;
+      }
+      const needs = runnerNeedsOfWorkload(w);
+      for (const n of needs) io.out(`${n.node}: needs ${n.capability}: ${n.why}`);
+      for (const r of RUNNERS.list()) {
+        const lacks = lacksOf(needs, r);
+        io.out(`${r.id}: ${lacks.length === 0 ? "can carry it" : `cannot carry it: lacks ${[...new Set(lacks.map((n) => n.capability))].join(", ")}`}`);
+      }
+      return 0;
+    }
+    case "emit": {
+      const w = KNOWN.find((x) => x.id === arg);
+      const runner = argv[2];
+      if (w === undefined || runner === undefined || !RUNNERS.has(runner)) {
+        io.err(`usage: workload emit ID RUNNER; the workloads are ${KNOWN.map((x) => x.id).join(", ")} and the runners ${RUNNERS.list().map((r) => r.id).join(", ")}`);
+        return 1;
+      }
+      const made = await emitWorkload(w, authored(runnerId(runner)), { fleet: bootstrapFleet });
+      if (made.kind === "err") {
+        for (const f of made.error) io.err(describeFinding(f));
+        return 1;
+      }
+      io.out(made.value.text);
+      return 0;
+    }
     case "explain": {
       const e = explainIn(CATALOGS, arg ?? "");
       io.out(`${e.code}: ${e.title}\n${e.what}\nfixer: ${e.fixer}\nfix: ${e.fix}`);
@@ -80,7 +117,7 @@ export async function main(argv: readonly string[], io: Io): Promise<0 | 1 | 2> 
       return 2;
     }
     default:
-      io.err("usage: workload check | plan ID | project [--dialect D] | forms | explain CODE | verb ID");
+      io.err("usage: workload check | plan ID | project [--dialect D] | forms | runners | needs ID | emit ID RUNNER | explain CODE | verb ID");
       return 1;
   }
 }

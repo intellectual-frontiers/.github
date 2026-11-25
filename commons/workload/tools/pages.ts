@@ -5,9 +5,10 @@
  *
  * @module
  */
-import { type Catalog, type CatalogEntry, DIALECTS, FORM_IDS, FORMS, TRIGGER_KINDS } from "../src/governance/mod.ts";
-import { checklist, projectAll, rulesOf, scenario, skillMd, statements } from "../src/logical/mod.ts";
-import { CATALOGS, DIALECT_IMPLS, STARTERS, viewOfWorkload } from "../src/physical/mod.ts";
+import { type Catalog, type CatalogEntry, DIALECTS, FORM_IDS, FORMS, RUNNER_CAPABILITIES, RUNNERS, TRIGGER_KINDS } from "../src/governance/mod.ts";
+import { checklist, lacksOf, projectAll, rulesOf, scenario, skillMd, statements } from "../src/logical/mod.ts";
+import { bootstrapFleet, FIXTURES } from "../src/logical/forms/runbook/mod.ts";
+import { CATALOGS, DIALECT_IMPLS, emitWorkload, runnerNeedsOfWorkload, STARTERS, viewOfWorkload } from "../src/physical/mod.ts";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 
 const ROOT = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "..", "..");
@@ -118,9 +119,60 @@ function harness(): string {
   ].join("\n");
 }
 
+const CAPABILITIES: Readonly<Record<(typeof RUNNER_CAPABILITIES)[number], string>> = {
+  calls: "a call of a verb by its id, with typed inputs",
+  "fan-out": "a loop over a fixed list",
+  interactive: "a stop for a person",
+  judge: "a bounded judgement of an agent",
+  approval: "the approval of a gate by a person, ingested as evidence",
+  logic: "a computation of typed TypeScript: a branch, a diff, a plan",
+  compensate: "the undo of a step that succeeded",
+  destroy: "a destroy of a durable, git or external store",
+};
+
+async function runners(): Promise<string> {
+  const known = [...STARTERS, ...FIXTURES];
+  const artifacts = await Promise.all(FIXTURES.flatMap((w) => RUNNERS.list().filter((r) => r.kind === "integration").map(async (r) => ({ w, r, made: await emitWorkload(w, r.id, { fleet: bootstrapFleet }) }))));
+  return [
+    "# Runners: how a plan is carried out",
+    "",
+    NOTE,
+    "",
+    "A **runner** is how a plan is carried out. The **form** says what the work is, the **dialect** says how a harness or a person receives it, and the **runner** says what carries it out. A **native** runner is the TypeScript of the library: it interprets the plan on Bun or Node, is interactive, is the default and records the events of a run directly. An **integration** runner compiles the plan into an artifact, a script, that a foreign system runs, and then hands it off: the library keeps the plan, the policy and the evidence, and not the run. (Where this documentation names the machines of GitHub it calls them **hosts**, so that they are not confused with runners.)",
+    "",
+    "A workload never names its runner. A fleet owns a `RunnerPolicy` (a default, which is `native`, a choice by workload, a choice by form and a preference by operator); a run resolves its runner as the explicit choice, then the operator's preference, then the choice for the workload, then the choice for its form, then the default. A runner that lacks something the workload needs is refused with `E-WL-RUNNER-UNSUITABLE`, and the run is never moved to another runner by itself. The autonomy derived for each node is the same under every runner.",
+    "",
+    "| Runner | Kind | What it is | What it can carry |",
+    "|---|---|---|---|",
+    ...RUNNERS.list().map((r) => `| \`${r.id}\` | ${r.kind} | ${r.title} | ${r.capabilities.map((c) => `\`${c}\``).join(", ")} |`),
+    "",
+    "## What a workload needs of a runner",
+    "",
+    "A form derives the needs of its workload from its nodes, and never has them declared:",
+    "",
+    ...RUNNER_CAPABILITIES.map((c) => `- \`${c}\`: ${CAPABILITIES[c]}.`),
+    "",
+    "A call of a verb or a check needs `calls`; an `each` needs `fan-out`; an `ask` needs `interactive`; a `judge` needs `judge`; a gate needs `approval`; a `branch`, a diff and a plan need `logic`; an `undo` needs `compensate`; a destroy of a durable, git or external store needs `destroy`, unless a gate guards it and then it needs `approval`; any other node that is `human-only` and that no gate guards needs `interactive`. Only the native runner has `interactive`, `judge`, `logic`, `compensate` and `destroy`, so a workload with an ask, a judge or an ungated destroy of a durable store is run by the native runner.",
+    "",
+    `| Workload | Form | ${RUNNERS.list().map((r) => `\`${r.id}\``).join(" | ")} |`,
+    `|---|---|${RUNNERS.list().map(() => "---").join("|")}|`,
+    ...known.map((w) => {
+      const needs = runnerNeedsOfWorkload(w);
+      return `| \`${w.id}\` | ${w.form} | ${RUNNERS.list().map((r) => (lacksOf(needs, r).length === 0 ? "can carry it" : `lacks ${[...new Set(lacksOf(needs, r).map((n) => n.capability))].join(", ")}`)).join(" | ")} |`;
+    }),
+    "",
+    "## What an artifact is",
+    "",
+    "An artifact obeys the thin emit rule: it is only a sequence of calls to the pinned verb command by verb id, a loop over a fixed list and the order of the steps. It holds no expression, no inline logic, no `eval`, no command built from a string and no secret; a credential is only a name, and the verb command reads it from the environment. All meaning stays in typed TypeScript. The emitters target only Bash 5 or later and PowerShell 7 or later. The artifact carries the hash of its plan, the same for both emitters, and writes one receipt line when it ends; ingest pulls the receipt and the library records it as a `receipt` event beside the `handoff` event that carried the same plan hash. `bun commons/workload/tools/runners.ts --check` regenerates the artifacts and compares: a hand-edited artifact is `E-WL-RUNNER-DRIFT`.",
+    "",
+    ...artifacts.flatMap(({ w, r, made }) => (made.kind === "ok" ? [`## The artifact of \`${w.id}\` for \`${r.id}\``, "", ...fence(r.id === "bash" ? "bash" : "powershell", made.value.text)] : [])),
+  ].join("\n");
+}
+
 /** Every file this writes, with its text. */
-export function outputs(): Readonly<Record<string, string>> {
+export async function outputs(): Promise<Readonly<Record<string, string>>> {
   return {
+    [`${GUIDES}/workload-runners.auto.md`]: await runners(),
     [`${GUIDES}/workload-forms.auto.md`]: forms(),
     [`${GUIDES}/workload-errors.auto.md`]: errors(),
     ...Object.fromEntries(STARTERS.map((w, i) => [`${GUIDES}/workload-${w.id}.auto.md`, starter(i)])),
@@ -131,7 +183,7 @@ export function outputs(): Readonly<Record<string, string>> {
 if (import.meta.main) {
   const check = proc.args.includes("--check");
   const stale: string[] = [];
-  for (const [file, text] of Object.entries(outputs())) {
+  for (const [file, text] of Object.entries(await outputs())) {
     const full = path.join(ROOT, file);
     const have = (await fs.exists(full)) ? await fs.readTextFile(full) : undefined;
     if (have === text) continue;

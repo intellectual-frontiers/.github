@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/workload",
   "private": true,
   "version": "0.1.0",
-  "description": "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and executors behind ports.",
+  "description": "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and runners behind ports.",
   "type": "module",
   "engines": {
     "node": ">=26"
@@ -16,7 +16,9 @@
     "./forms/reconcile": "./src/logical/forms/reconcile/mod.ts",
     "./dialects/claude-code": "./src/physical/dialects/claude-code/mod.ts",
     "./dialects/codex": "./src/physical/dialects/codex/mod.ts",
-    "./dialects/human": "./src/physical/dialects/human/mod.ts"
+    "./dialects/human": "./src/physical/dialects/human/mod.ts",
+    "./runners/bash": "./src/physical/runners/bash/mod.ts",
+    "./runners/pwsh": "./src/physical/runners/pwsh/mod.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

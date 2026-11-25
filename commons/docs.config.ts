@@ -210,6 +210,7 @@ const guides = guidesLens({
     { file: "commons/docs/guides/workload-harness.auto.md", path: "start/workload-harness.html", section: "start", group: "Workload", order: 2 },
     { file: "commons/docs/guides/workload-errors.auto.md", path: "start/workload-errors.html", section: "start", group: "Workload", order: 3 },
     { file: "commons/docs/guides/workload-converge-settings.auto.md", path: "start/workload-converge-settings.html", section: "start", group: "Workload", order: 4 },
+    { file: "commons/docs/guides/workload-runners.auto.md", path: "start/workload-runners.html", section: "start", group: "Workload", order: 5 },
     { file: "commons/docs/guides/auditor.md", path: "start/auditor.html", section: "start", group: "Start here", order: 4 },
     { file: "commons/docs/guides/agents-md.md", path: "start/agents-md.html", section: "start", group: "Start here", order: 5 },
     { file: "commons/docs/guides/why-not-memory-md.md", path: "start/why-not-memory-md.html", section: "start", group: "Start here", order: 6 },

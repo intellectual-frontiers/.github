@@ -72,6 +72,18 @@ Every problem the static check of a workload finds has one code in a closed cata
 | `E-WL-JUDGE-EFFECT` | A judge has an effect | agent | A judge node carries an effect. A judge only proposes: its output is typed and it applies nothing. | remove the effect from {node} and apply the proposal with a verb node behind a gate |
 | `E-WL-JUDGE-APPLIED` | The proposal of a judge is applied with no person between | person | A verb node above the level agent-proposes uses the output of a judge, and no gate or ask stands between them. | put a gate or an ask between the judge and {node} |
 
+### Runner
+
+| Code | What happened | Who fixes it | What it says | The fix |
+|---|---|---|---|---|
+| `E-WL-RUNNER-UNSUITABLE` | The runner cannot carry the workload | person | The runner chosen lacks a capability the workload needs (a judge, an ask, a gate, typed logic, an undo or a destroy of a durable store), and the run is not moved to another runner by itself. | choose the native runner for the run, or give {runner} what it lacks: {lacks} |
+| `E-WL-RUNNER-EMIT-UNSUPPORTED` | The plan is outside what an artifact may say | person | A node, or an input, is outside the closed subset an artifact is made from: a call of a verb or a check, and an each over a fixed list. | run the workload with the native runner, or take {node} out of what is handed off |
+| `E-WL-RUNNER-VALUE-UNSAFE` | A value cannot be written into an artifact | agent | A value an artifact would hold is not printable ASCII with no control character, so no quoting could keep it from changing how the script is read. | use printable ASCII for {node} |
+| `E-WL-RUNNER-EACH-UNLISTED` | A fan out has no fixed list | agent | An each names a source that is no literal naming a list the caller gave, so the artifact would have to find its members at run time. | give {node} a literal source and the fixed list it names |
+| `E-WL-RUNNER-DRIFT` | An artifact is not what the plan makes | ci | The artifact differs from the one regenerated from the plan: it was edited by hand, the plan changed, or it is the artifact of another runner. | regenerate the artifact with the generator and commit it; never edit it by hand |
+| `E-WL-RUNNER-RECEIPT-UNMATCHED` | A receipt names no hand-off | person | The receipt carries a plan hash that no hand-off of the run has, so it is not the result of any plan that was handed off. | check the plan hash of the receipt against the hand-offs of the run |
+| `E-WL-RUNNER-APPROVAL-NOT-PERSON` | An approval was recorded by an agent | person | A receipt carries an approval of a gate and the actor who recorded it is not a person; only a person approves. | have a person record the approval; an agent never approves |
+
 ## The catalog of the runbook form, `E-RB-`
 
 ### Runbook

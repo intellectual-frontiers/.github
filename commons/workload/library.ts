@@ -13,8 +13,8 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./dialects/claude-code", "./dialects/codex", "./dialects/human"],
-  summary: "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and executors behind ports.",
+  exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./dialects/claude-code", "./dialects/codex", "./dialects/human", "./runners/bash", "./runners/pwsh"],
+  summary: "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and runners behind ports.",
   kanon: {
     package: "@intellectual-frontiers/workload",
     units: [
@@ -63,9 +63,18 @@ export const library = {
         ],
       },
       {
+        folder: "src/physical/runners/",
+        layer: "physical",
+        instances: true,
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical"] },
+        ],
+      },
+      {
         folder: "src/physical/",
         layer: "physical",
-        mayImport: ["src/governance/", "src/logical/", "src/logical/forms/", "src/physical/dialects/"],
+        mayImport: ["src/governance/", "src/logical/", "src/logical/forms/", "src/physical/dialects/", "src/physical/runners/"],
         packages: [
           { name: "@intellectual-frontiers/anyfs", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/core", subpaths: [] },
@@ -73,7 +82,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: "any" },
           { name: "@intellectual-frontiers/workbench", subpaths: ["governance"] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
-          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human"] },
+          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "logical", "forms/runbook", "forms/reconcile", "dialects/claude-code", "dialects/codex", "dialects/human", "runners/bash", "runners/pwsh"] },
         ],
       },
       { folder: "src/", own: true },

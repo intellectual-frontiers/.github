@@ -88,6 +88,13 @@ const generators: readonly GeneratorInput[] = [
     outputs: ["commons/docs/guides/workload-*.auto.md"],
   },
   {
+    id: "workload-runners",
+    summary: "The artifacts of the integration runners (a Bash and a PowerShell script) for the fixture synthetic-bootstrap-01, from the code of the library workload; a hand-edited artifact is drift.",
+    command: ["bun", "commons/workload/tools/runners.ts"],
+    inputs: ["commons/workload/src/**", "commons/workload/tools/**"],
+    outputs: ["commons/workload/artifacts/*"],
+  },
+  {
     id: "readme",
     summary: "The table of the libraries in README.md, from the manifests and the summaries of their about.ts.",
     command: ["bun", "commons/libraries/src/readme.ts"],
