@@ -38,3 +38,4 @@ export * from "./hygiene-facts.ts";
 export * from "./history.ts";
 export * from "./query.ts";
 export * from "./usage.ts";
+export * from "./names.ts";

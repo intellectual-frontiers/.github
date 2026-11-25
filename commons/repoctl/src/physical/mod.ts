@@ -26,5 +26,6 @@ export * from "./verbs/prove.ts";
 export * from "./verbs/ci.ts";
 export * from "./verbs/query.ts";
 export * from "./verbs/usage.ts";
+export * from "./verbs/names.ts";
 export * from "./verbs/releasing.ts";
 export * from "./verbs/sync.ts";

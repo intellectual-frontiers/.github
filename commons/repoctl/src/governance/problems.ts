@@ -70,7 +70,8 @@ export type ProblemCode =
   | "E-CONFIG-INVALID"
   | "E-DOCS-GENERATOR-MISSING"
   | "E-DOCS-FAILED"
-  | "E-USAGE-UNKNOWN";
+  | "E-USAGE-UNKNOWN"
+  | "E-NAMES-FOUND";
 
 /** Every code, in the order the explanations are listed. */
 export const PROBLEM_CODES: readonly ProblemCode[] = [
@@ -127,6 +128,7 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-DOCS-GENERATOR-MISSING",
   "E-DOCS-FAILED",
   "E-USAGE-UNKNOWN",
+  "E-NAMES-FOUND",
 ];
 
 /** Whether a text is one of the codes. */
@@ -453,5 +455,11 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "A file of the repository imports `@intellectual-frontiers/commons/<library>` and the installed package has no library of that name; it is not counted.",
     why: "A library that was renamed or removed, a library of a newer version than the one installed, or a path that only looks like an import.",
     fix: "install the version of the package the repository was written against, or correct the import",
+  },
+  "E-NAMES-FOUND": {
+    title: "A file says a name it must not",
+    what: "A file in the scope of the check holds a name from the names files, as a whole phrase in any case, where no allowance covers it.",
+    why: "A fixture, a specification or a test that was written with a real tenant, host, network or retired name instead of a synthetic one.",
+    fix: "replace it with a synthetic name (synthetic-<kind>-NN), or add an allowance for the path where the name is public",
   },
 };
