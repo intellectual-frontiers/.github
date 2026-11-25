@@ -31,6 +31,15 @@ export interface Seen {
   readonly password: string | undefined;
 }
 
+/**
+ * Waits until the password server has recorded `count` connections. A client that is given no password gives up and exits, and the server records that connection when it sees the socket close, which can be
+ * after the client's process has ended where the machine is busy, so a test that reads `seen` right after `psql` returns must wait for it.
+ */
+export async function settled(seen: readonly Seen[], count: number, ms = 10_000): Promise<void> {
+  const until = Date.now() + ms;
+  while (seen.length < count && Date.now() < until) await new Promise((r) => setTimeout(r, 10));
+}
+
 /** A server that asks every client for a cleartext password, records it, and refuses the query that follows. */
 export async function passwordServer(): Promise<{ readonly port: number; readonly seen: Seen[]; close(): Promise<void> }> {
   const seen: Seen[] = [];
