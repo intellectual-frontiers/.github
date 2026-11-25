@@ -9,8 +9,8 @@
 
 ## Requirements
 
-- **FR-001**: `compose` MUST give, for a task and a selection of units, the base requirements and the requirements of the selected units that apply to the task, once each in the order of their ids, and a unit that is not selected MUST contribute nothing.
-- **FR-002**: A requirement named by the test needs of a unit MUST be part of a `test` task only where a selected test file matches one of the globs that name it (or, where no files are given, where its unit is selected), and a unit's other requirements MUST NOT include it.
+- **FR-001**: `compose` MUST give, for a task and a selection of units, the base requirements and the requirements of the selected units that apply to the task, once each in the order of their ids, and a unit that is not selected MUST contribute nothing; the task `verify` MUST also take what `build` and `test` need, since verifying builds and tests.
+- **FR-002**: A requirement named by the test needs of a unit MUST be part of a `test` task only where a selected test file matches one of the globs that name it (or, where no files are given, where its unit is selected), and a unit's other requirements MUST NOT include it; a glob MUST be able to say `*` (one segment), `**` (any segments) and `{a,b}` (either).
 - **FR-003**: Selecting every unit MUST be possible only by asking for all of them, which is for the cold start of a pipeline and never the default.
 - **FR-004**: `ready` without a selection MUST check the base alone, with a selection the base and the contributions composed, MUST obtain nothing unless asked, and MUST end with 1 only where a finding is an error: a hint or a warning never fails it.
 - **FR-005**: With `ensure`, `ready` MUST run only the install argument vector of a requirement whose finding an agent may fix, never through a shell, never for a safety rule, a credential or a gate, and then look again and report what it obtained and for which requirement.

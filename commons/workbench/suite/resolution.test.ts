@@ -16,6 +16,7 @@ proves(["0005-workbench-resolution FR-001"], "a task needs the base and the cont
   assertEquals(ids(compose(contract, "test", { units: ["synthetic-plain"] })), ["git", "registry-token"]);
   assertEquals(ids(compose(contract, "test", { units: ["synthetic-sql"] })), ["git", "registry-token", "sql-install", "sqlite3"]);
   assertEquals(ids(compose(contract, "release")), ["git", "registry-token", "tag-release"]);
+  assertEquals(ids(compose(contract, "verify", { units: ["synthetic-sql"] })), ["git", "registry-token", "sql-install", "sqlite3"], "verifying builds and tests");
   assertEquals(ids(compose(contract, "test", { units: ["nothing-here"] })), ["git", "registry-token"]);
 });
 
@@ -26,6 +27,7 @@ proves(["0005-workbench-resolution FR-002"], "a requirement that only some tests
   assertEquals(ids(compose(contract, "test", { units: ["synthetic-sql"], files: ["suite/other.test.ts"] })), ["git", "registry-token", "sql-install"]);
   assertEquals(globMatches("suite/*sqlite*.test.ts", "suite/a/sqlite.test.ts"), false);
   assertEquals(globMatches("**/*.test.ts", "suite/a/sqlite.test.ts"), true);
+  assertEquals([globMatches("suite/{seal,views}.test.ts", "suite/views.test.ts"), globMatches("suite/{seal,views}.test.ts", "suite/keys.test.ts")], [true, false]);
 });
 
 proves(["0005-workbench-resolution FR-003"], "every unit is selected only by asking for all of them, which is what the cold start of CI does", () => {

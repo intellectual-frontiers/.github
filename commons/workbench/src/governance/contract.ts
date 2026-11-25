@@ -13,7 +13,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Concept } from "./terms.ts";
 import { isConcept } from "./terms.ts";
 import { AUTONOMY, type Gate, HOLDERS, type Role, type Stage } from "./roles.ts";
@@ -109,11 +109,14 @@ export function defineContract(input: Contract): Result<Contract, readonly strin
   if (!ID.test(input.name)) problems.push(`${JSON.stringify(input.name)} is not a contract name`);
   if (!DAY.test(input.enforceFrom)) problems.push(`enforceFrom ${JSON.stringify(input.enforceFrom)} is not a day (YYYY-MM-DD)`);
   const all = [...input.base, ...input.contributions.flatMap((c) => c.requirements)];
-  const seen = new Set<string>();
+  // two units may need the same thing and say so: an id may be stated again where it asks for exactly the same (its words aside), and is used twice where it does not
+  const seen = new Map<string, string>();
   for (const r of all) {
-    problems.push(...problemsOf(r));
-    if (seen.has(r.id)) problems.push(`${r.id} is used twice`);
-    seen.add(r.id);
+    const said = JSON.stringify({ ...r, summary: "" });
+    const before = seen.get(r.id);
+    if (before === undefined) problems.push(...problemsOf(r));
+    else if (before !== said) problems.push(`${r.id} is used twice, and says something different each time`);
+    seen.set(r.id, said);
   }
   const roleIds = new Set<string>();
   for (const role of input.roles) {
@@ -144,4 +147,73 @@ export function defineContract(input: Contract): Result<Contract, readonly strin
     for (const t of c.tests ?? []) for (const n of t.needs) if (!seen.has(n)) problems.push(`${c.unit}: the test glob ${t.glob} needs ${n}, which is no requirement`);
   }
   return problems.length === 0 ? ok(input) : err(problems);
+}
+
+const DEFAULT_CONCEPT: Readonly<Record<RequirementKind, Concept>> = { program: "workshop", credential: "workbench", network: "workshop", git: "workspace", install: "workspace", authority: "workstation" };
+
+const isRecord = (x: unknown): x is Readonly<Record<string, unknown>> => typeof x === "object" && x !== null && !Array.isArray(x);
+const text = (o: Readonly<Record<string, unknown>>, k: string): string | undefined => (typeof o[k] === "string" ? o[k] : undefined);
+const texts = (o: Readonly<Record<string, unknown>>, k: string): readonly string[] | undefined => (Array.isArray(o[k]) && (o[k] as readonly unknown[]).every((e) => typeof e === "string") ? (o[k] as readonly string[]) : undefined);
+
+/**
+ * What a unit's manifest says it contributes, as data read from the manifest (`library.workbench` of a library of commons, `workbench` of a part of erga), made into a contribution or every reason it is not one. A manifest
+ * is terse: a requirement says its `kind`, `id`, `summary` and what its kind needs, and the concept (by kind), the task (`any`) and whether it is a safety rule (no) are the defaults. The names are validated by `defineContract`.
+ */
+export function decodeContribution(unit: string, raw: unknown): Result<Contribution, readonly string[]> {
+  if (!isRecord(raw)) return err([`${unit}: the workbench field is an object with requirements and, optionally, tests`]);
+  const problems: string[] = [];
+  const requirements: Requirement[] = [];
+  const list = raw["requirements"] ?? [];
+  if (!Array.isArray(list)) problems.push(`${unit}: requirements is a list`);
+  else
+    for (const [i, item] of (list as readonly unknown[]).entries()) {
+      if (!isRecord(item)) {
+        problems.push(`${unit}: requirement ${i} is an object`);
+        continue;
+      }
+      const kind = text(item, "kind");
+      const id = text(item, "id") ?? "";
+      if (kind === undefined || !(REQUIREMENT_KINDS as readonly string[]).includes(kind)) {
+        problems.push(`${unit}: requirement ${id || i} has a kind that is none of ${REQUIREMENT_KINDS.join(", ")}`);
+        continue;
+      }
+      const k = kind as RequirementKind;
+      const concept = text(item, "concept") ?? DEFAULT_CONCEPT[k];
+      const task = (text(item, "task") ?? "any") as Task;
+      const common = { id, concept: concept as Concept, task, safety: item["safety"] === true, summary: text(item, "summary") ?? "" };
+      const opt = <T,>(key: string, v: T | undefined): Record<string, T> => (v === undefined ? {} : { [key]: v });
+      switch (k) {
+        case "program":
+          requirements.push({ ...common, kind: "program", name: text(item, "name") ?? "", ...opt("minimum", text(item, "minimum")), ...opt("probe", texts(item, "probe")), ...opt("install", texts(item, "install")) });
+          break;
+        case "credential":
+          requirements.push({ ...common, kind: "credential", name: text(item, "name") ?? "", ...opt("aliases", texts(item, "aliases")), ...opt("scope", text(item, "scope")) });
+          break;
+        case "network":
+          requirements.push({ ...common, kind: "network", host: text(item, "host") ?? "", access: item["access"] === "write" ? "write" : "read" });
+          break;
+        case "git":
+          requirements.push({ ...common, kind: "git", check: item["check"] === "identity-set" ? "identity-set" : "ref-present", ...opt("ref", text(item, "ref")) });
+          break;
+        case "install":
+          requirements.push({ ...common, kind: "install", folder: text(item, "folder") ?? "", ...opt("install", texts(item, "install")) });
+          break;
+        case "authority":
+          requirements.push({ ...common, kind: "authority", gate: text(item, "gate") ?? "" });
+          break;
+        default:
+          return absurd(k);
+      }
+    }
+  const tests: TestNeed[] = [];
+  const tlist = raw["tests"] ?? [];
+  if (!Array.isArray(tlist)) problems.push(`${unit}: tests is a list`);
+  else
+    for (const [i, t] of (tlist as readonly unknown[]).entries()) {
+      const glob = isRecord(t) ? text(t, "glob") : undefined;
+      const needs = isRecord(t) ? texts(t, "needs") : undefined;
+      if (glob === undefined || needs === undefined) problems.push(`${unit}: test need ${i} has a glob and a list of the ids it needs`);
+      else tests.push({ glob, needs });
+    }
+  return problems.length > 0 ? err(problems) : ok({ unit, requirements, ...(tests.length === 0 ? {} : { tests }) });
 }

@@ -7,3 +7,4 @@
 export * from "./probe.ts";
 export * from "./ready.ts";
 export * from "./cli.ts";
+export * from "./collect.ts";

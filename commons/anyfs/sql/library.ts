@@ -18,6 +18,13 @@ export const library = {
   family: { host: "anyfs", role: "plugin" },
   summary:
     "The SQL stores of AnyFS: objects kept in a table of any SQL-speaking database (a SQLite file by default, PostgreSQL and DuckDB too, and libSQL and Turso as drivers of SQLite), with a revision on every object, a native transaction for a batch, a history of revisions and search where the engine has an index for it, and the layout of the tables documented for a catalog.",
+  workbench: {
+    requirements: [
+      { kind: "program", id: "sqlite3", name: "sqlite3", task: "test", summary: "The real sqlite3 program makes and reads the dumps the SQLite tests compare with", install: ["apt-get", "install", "-y", "sqlite3"] },
+      { kind: "install", id: "anyfs-sql-install", folder: "commons/anyfs/sql", task: "test", summary: "The dependencies of the SQL library (its drivers) are installed", install: ["bun", "install"] },
+    ],
+    tests: [{ glob: "suite/{compact,dialects,dump,signing}.test.ts", needs: ["sqlite3"] }],
+  },
   kanon: {
     package: "@intellectual-frontiers/anyfs-sql",
     extends: "@intellectual-frontiers/anyfs",

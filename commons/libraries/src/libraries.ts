@@ -92,6 +92,8 @@ export type Library = {
   readonly summary?: string;
   /** Where it is published: always `github` (the GitHub package registry of the organization), and `npm` as well where a decision about that package has made it so (FR-015 and FR-016). */
   readonly distribution: readonly Registry[];
+  /** What the library contributes to the workbench (commons workbench 0003-workbench-contract): its tools, credentials and hosts by task, and the tests that need them, as data; the workbench validates and composes it, and a library that contributes nothing has none. */
+  readonly workbench?: unknown;
   /** The table of its layers where it is built to Kanon (commons 0033-kanon FR-010); none where it is not. */
   readonly kanon?: Table;
   /** Its host and its role where it is of a family (a host, a dialect of it or a plugin of it; 0033-kanon FR-021, 0027-commons-libraries FR-023). */
@@ -242,9 +244,9 @@ const constantName: Decoder<string> = (input, path = "$") => {
 };
 const body = object(
   { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, group: nameDecoder, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), held: unknownValue },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, group: nameDecoder, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), workbench: unknownValue, held: unknownValue },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "group", "license", "versionConstants", "publishes", "bundle", "held"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "group", "license", "versionConstants", "publishes", "bundle", "held", "workbench"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -319,6 +321,7 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(publishes === undefined ? {} : { publishes }),
     ...(v.bundle === undefined ? {} : { bundle: v.bundle }),
     ...(held === undefined ? {} : { held }),
+    ...(v.workbench === undefined ? {} : { workbench: v.workbench }),
   });
 }
 
