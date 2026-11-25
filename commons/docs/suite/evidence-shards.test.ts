@@ -4,10 +4,9 @@
  *
  * @module
  */
+import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { ROOT } from "./helpers.ts";
 import { linesOfLcov, mergeCtrf, mergeLines, mergeStatus, parseShardFile } from "../src/shards.ts";
 import { parseLcov } from "../src/coverage.ts";
 
@@ -65,8 +64,7 @@ proves(["0001-docs FR-049"], "a shard file is named for its library, its place a
 });
 
 proves(["0001-docs FR-048"], "the generated evidence workflow runs the tests once with the coverage, in the shards of CI, and puts the shards together", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-  const text = readFileSync(join(root, ".github", "workflows", "evidence.auto.yml"), "utf8");
+  const text = fs.readTextFileSync(path.join(ROOT, ".github", "workflows", "evidence.auto.yml"));
   assert(text.includes("IFC_SHARD: ${{ matrix.shard }}"), "the cells run their shard");
   assert(text.includes("merge-shards.ts"), "the shards are put together");
   assert(text.includes("tests (repository ${{ matrix.part }}/3)"), "the repository tests are split");
@@ -77,19 +75,17 @@ proves(["0001-docs FR-048"], "the generated evidence workflow runs the tests onc
 });
 
 proves(["0001-docs FR-050"], "the mutation job keeps Stryker's incremental file between nights and gives it to the tool", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-  const text = readFileSync(join(root, ".github", "workflows", "evidence.auto.yml"), "utf8");
+  const text = fs.readTextFileSync(path.join(ROOT, ".github", "workflows", "evidence.auto.yml"));
   assert(text.includes("mutation-${{ matrix.library }}-${{ github.run_id }}"), "the file is kept under a key of the run");
   assert(text.includes("restore-keys: mutation-${{ matrix.library }}-"), "and the night after restores the latest");
   assert(text.includes("--incremental") && text.includes("mutation-incremental/${{ matrix.library }}.json"), "the tool is given the file");
-  const tool = readFileSync(join(root, "commons", "docs", "tools", "mutation.ts"), "utf8");
+  const tool = fs.readTextFileSync(path.join(ROOT, "commons", "docs", "tools", "mutation.ts"));
   assert(tool.includes("incrementalFile") && tool.includes('flag("--incremental")'), "the tool passes it to Stryker");
   assert(tool.includes("ensureDir(path.dirname(incremental))"), "and makes the folder the cache of CI keeps, which it does not save where the folder is not there");
 });
 
 proves(["0001-docs FR-051"], "the generated site workflow gathers what the build reads in one step, the five sources at the same time", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-  const text = readFileSync(join(root, ".github", "workflows", "site.auto.yml"), "utf8");
+  const text = fs.readTextFileSync(path.join(ROOT, ".github", "workflows", "site.auto.yml"));
   for (const g of ["reports", "history", "issues", "registry", "package"]) assert(text.includes(`gather_${g}() {`), `${g} is gathered`);
   assert(text.includes("for g in reports history issues registry package; do (gather_$g"), "each in the background");
   assert(text.includes("::group::$g"), "and shown in order");
@@ -97,11 +93,9 @@ proves(["0001-docs FR-051"], "the generated site workflow gathers what the build
 });
 
 proves(["0001-docs FR-048"], "no step of a generated workflow is wrapped with an empty module, which would keep neither its result nor its findings", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-  const dir = join(root, ".github", "workflows");
-  const { readdirSync } = require("node:fs") as typeof import("node:fs");
-  for (const f of readdirSync(dir).filter((n) => n.endsWith(".auto.yml"))) {
-    const text = readFileSync(join(dir, f), "utf8");
+  const dir = path.join(ROOT, ".github", "workflows");
+  for (const f of [...fs.readDirSync(dir)].map((e) => e.name).filter((n) => n.endsWith(".auto.yml"))) {
+    const text = fs.readTextFileSync(path.join(dir, f));
     assert(!/--module ""/.test(text), `${f} has a step wrapped with no module`);
   }
 });

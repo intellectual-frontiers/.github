@@ -45,7 +45,7 @@ Here is how AnyFS, the host, declares itself. Its manifest says it is the host o
     package: "@intellectual-frontiers/anyfs",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
     instances: [],
-    plugins: [{ noun: "bridge" }, { noun: "cli", dependsOn: ["bridge", "posix", "serve", "ssh"] }, { noun: "git" }, { noun: "gdrive" }, { noun: "githost" }, { noun: "onedrive" }, { noun: "posix" }, { noun: "query" }, { noun: "s3" }, { noun: "serve", dependsOn: ["posix"] }, { noun: "sql" }, { noun: "ssh" }],
+    plugins: [{ noun: "bridge" }, { noun: "cli", dependsOn: ["bridge", "posix", "serve", "ssh"] }, { noun: "git" }, { noun: "gdrive" }, { noun: "githost" }, { noun: "mirror" }, { noun: "onedrive" }, { noun: "posix" }, { noun: "query" }, { noun: "s3" }, { noun: "serve", dependsOn: ["posix"] }, { noun: "sql" }, { noun: "ssh" }],
 ```
 
 The `family` line is the naming rule: a plugin's package is named `{host}-{name}`, so the plugin `s3` is the package `@intellectual-frontiers/anyfs-s3`, and a dialect would be named `{host}-dialect-{name}`. The package of a member is **made from the rule and never written a second time**, so a package whose name the rule does not make is `family/name`.
@@ -126,7 +126,7 @@ The core is the smaller part of the family. A count of the non-test TypeScript l
 
 | Family | Host `src/` | Extensions' `src/` (together) | Host's share |
 | --- | --- | --- | --- |
-| AnyFS (host and 12 extensions) | 5,894 lines | 24,203 lines | about 20% |
+| AnyFS (host and 13 extensions) | 5,894 lines | 24,203 lines | about 20% |
 | Archon (host, 4 plugins, 8 dialects) | 1,223 lines | 3,858 lines | about 24% |
 
 The host is not tiny in absolute terms. AnyFS's core is nearly six thousand lines. What the table shows is the shape: **most of the code is in the extensions, each of which is a small package** (the largest AnyFS extension is about 3,900 lines, and the smallest about 560), and the part that every extension depends on is the minority of the family.
