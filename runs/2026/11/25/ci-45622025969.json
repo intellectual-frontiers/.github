@@ -1,0 +1,1064 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45622025969",
+    "workflow": "ci",
+    "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+    "at": "2026-11-25T13:21:28Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45622025969"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 378,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31424,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31424,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 426,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 171511,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 171511,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 343,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27877,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27877,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 159,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 802,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-boot",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 802,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 377,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 257,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 134,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 425,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 83261,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 39290,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 39290,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 176,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 391,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 75705,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54158,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54158,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 49,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 310,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41451,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27813,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 27813,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 103,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 414,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 64283,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31684,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31684,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 40,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 5,
+      "durationMs": 2660,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 30354,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 1125,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 40,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 10,
+      "durationMs": 1467,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 153,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 12736,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14125,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7422,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 132,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22422,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "netboot",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22422,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 59332,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 59332,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-050b9b8d0a5fae37",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf1158b1ba688f99310abb96f7cf6ab197a8d8b0927b95b92a24c877c495473b"
+      },
+      "at": "2026-11-25T13:18:19Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-0855e2ab7460cdb8",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-086ebaed8c288542",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/grouping.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/grouping.test.ts"
+    },
+    {
+      "id": "f-0b865391a95ab81d",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-2229089b6911b157",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    },
+    {
+      "id": "f-222ea52641741e7a",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    },
+    {
+      "id": "f-2a8c156f44fc74db",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-2ebf51ec694ab7fb",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-3544479b2430d770",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/mizan-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/mizan-guides.test.ts"
+    },
+    {
+      "id": "f-4a09281032a76418",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-4dbff5f1c80480e2",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-4f5a3b4802c93650",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf1158b1ba688f99310abb96f7cf6ab197a8d8b0927b95b92a24c877c495473b"
+      },
+      "at": "2026-11-25T13:18:19Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-56f1be6ba5bbfaa4",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf1158b1ba688f99310abb96f7cf6ab197a8d8b0927b95b92a24c877c495473b"
+      },
+      "at": "2026-11-25T13:18:19Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-5a3159aacb892b39",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    },
+    {
+      "id": "f-6692adec27c953a7",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/kanon-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/kanon-guides.test.ts"
+    },
+    {
+      "id": "f-6bb22f9227c5660f",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-6f60b3c3aa1a778d",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-7fbbab4b6614990d",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-818247904fb81323",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-884660cff84f77a6",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-9f6c853d6c3be792",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-a65c9bde05657266",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf1158b1ba688f99310abb96f7cf6ab197a8d8b0927b95b92a24c877c495473b"
+      },
+      "at": "2026-11-25T13:18:19Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-a7c4ebbe40ac8b3f",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-aac69f73771835b4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-ac692524bb695fd3",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-b1e7c5548bdb36f2",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-b5179e92cc27dad4",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "163a738c12b3d0219a330e6dc597f49eb70e2a1362dbe44453884c2a623892e3"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence-shards.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence-shards.test.ts"
+    },
+    {
+      "id": "f-bc44995470f32712",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "31c4062b572272fe9f797b2642223c1e33c4ef13fbf96cc4e368aad91170f3a5"
+      },
+      "at": "2026-11-25T13:18:15Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-d5b7ee2bb3456845",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf1158b1ba688f99310abb96f7cf6ab197a8d8b0927b95b92a24c877c495473b"
+      },
+      "at": "2026-11-25T13:18:19Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-f3f738b74643b731",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45622025969",
+        "commit": "30d1ec39d10d957e21409e830ecbcc4ee8eb7df1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f7b55f315a74820aac279c2e86776109b1143e7b871dabbc08605ecf7190df05"
+      },
+      "at": "2026-11-25T13:18:44Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    }
+  ]
+}
