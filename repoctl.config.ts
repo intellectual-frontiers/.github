@@ -81,6 +81,13 @@ const generators: readonly GeneratorInput[] = [
     mixed: ["AGENTS.md"],
   },
   {
+    id: "runbooks",
+    summary: "The catalog of errors of the runbooks, the starter drill with its skill, checklist, statements and rules, and the dialects, from the code of the library runbooks.",
+    command: ["bun", "commons/runbooks/tools/pages.ts"],
+    inputs: ["commons/runbooks/src/**", "commons/runbooks/tools/**"],
+    outputs: ["commons/docs/guides/runbooks-*.auto.md"],
+  },
+  {
     id: "readme",
     summary: "The table of the libraries in README.md, from the manifests and the summaries of their about.ts.",
     command: ["bun", "commons/libraries/src/readme.ts"],
