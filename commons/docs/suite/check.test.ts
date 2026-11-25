@@ -40,6 +40,7 @@ proves(["0011-documentation FR-018"], "a link to a page or an anchor that is not
   assertEquals(report(found), ["a.html: links to a.html#gone, which is not a page or an anchor of the site", "a.html: links to b.html, which is not a page or an anchor of the site"]);
 });
 
+// A build of the whole of commons takes about a minute on four cores and twice that where dev:check runs the suites of other libraries beside it, so the limit is five minutes, not one.
 proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-documentation FR-041", "0001-docs FR-018", "0001-docs FR-019", "0001-docs FR-021"], "the site of commons builds with no finding, the same twice, with its sections, the Quality section and the issues of data", async () => {
   const one = await siteOnce();
   const two = await siteOnce();
@@ -60,7 +61,7 @@ proves(["0011-documentation FR-003", "0011-documentation FR-009", "0011-document
   assertEquals([bom.bomFormat, bom.specVersion], ["CycloneDX", "1.5"]);
   assert(bom.components.some((c) => c.name === "@intellectual-frontiers/core") && bom.components.length > 60 && bom.dependencies.length > 40, "a component for each library and package");
   assert(one.files.some((f) => f.path === "quality/core.json"), "the quality of a library as JSON, for a program");
-}, { timeout: 60_000 });
+}, { timeout: 300_000 });
 
 proves(["0011-documentation FR-003"], "check writes nothing in the checkout and exits 0 on commons", async () => {
   const before = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
@@ -68,4 +69,4 @@ proves(["0011-documentation FR-003"], "check writes nothing in the checkout and 
   assertEquals(r.code, 0, r.stderr);
   const after = fs.existsSync(path.join(ROOT, "_site")) ? (await fs.stat(path.join(ROOT, "_site"))).mtime?.getTime() : undefined;
   assertEquals(after, before);
-}, { timeout: 60_000 });
+}, { timeout: 300_000 });

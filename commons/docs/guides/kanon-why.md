@@ -97,7 +97,7 @@ A library that supports many databases, many storage backends or many tools tend
 - **A tiny core** that holds the three layers: what the thing is, the model a program reasons with, and the interface that extensions must meet.
 - **Extensions**, each a package of its own, that reach the core only through its public exports and never the reverse.
 
-AnyFS is the clearest example in this repository. The host package states what a store, a place and a revision are. Twelve extensions, each a package of its own in its own folder, supply the backends and tools: S3, SSH, Git, OneDrive, Google Drive, POSIX, SQL and more. Archon does the same for convergence, with a dialect for each tool it drives. [The page on families](kanon-families.md) shows the real manifests.
+AnyFS is the clearest example in this repository. The host package states what a store, a place and a revision are. Thirteen extensions, each a package of its own in its own folder, supply the backends and tools: S3, SSH, Git, OneDrive, Google Drive, POSIX, SQL and more. Archon does the same for convergence, with a dialect for each tool it drives. [The page on families](kanon-families.md) shows the real manifests.
 
 This shape suits agents for the reason the first section gives. An agent asked to add a backend works in one small package, against one small contract, with a check that tells it if it reached past the contract. It does not need to understand the other twelve.
 

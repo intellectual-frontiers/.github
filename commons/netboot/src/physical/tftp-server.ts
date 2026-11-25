@@ -56,9 +56,15 @@ export async function tftpServer(o: TftpOptions): Promise<TftpServer> {
   async function transfer(bytes: Uint8Array, file: string, rinfo: dgram.RemoteInfo, asked: Readonly<Record<string, string>>, from: string): Promise<void> {
     const t = dgram.createSocket("udp4");
     active.add(t);
+    // `stop` closes the socket of a transfer that is still going, and a socket closed twice, or sent on once closed, throws: the transfer notices that it was closed and ends without a word
+    let closed = false;
+    let wake: (() => void) | undefined;
+    t.once("close", () => {
+      closed = true;
+      wake?.();
+    });
     const { blksize, timeoutMs, oack } = agreedOptions(asked, bytes.length);
     const inbox: number[] = [];
-    let wake: (() => void) | undefined;
     t.on("message", (m) => {
       if (m.length >= 4 && ((m[0] ?? 0) << 8 | (m[1] ?? 0)) === OP.ACK) {
         inbox.push((m[2] ?? 0) << 8 | (m[3] ?? 0));
@@ -67,7 +73,7 @@ export async function tftpServer(o: TftpOptions): Promise<TftpServer> {
     });
     const waitFor = async (block: number): Promise<boolean> => {
       const deadline = Date.now() + timeoutMs;
-      while (Date.now() < deadline) {
+      while (Date.now() < deadline && !closed) {
         const i = inbox.indexOf(block);
         if (i >= 0) {
           inbox.length = 0;
@@ -80,27 +86,37 @@ export async function tftpServer(o: TftpOptions): Promise<TftpServer> {
       }
       return false;
     };
-    const send = (p: Uint8Array): void => void t.send(p, rinfo.port, rinfo.address);
+    const send = (p: Uint8Array): void => {
+      try {
+        if (!closed) t.send(p, rinfo.port, rinfo.address);
+      } catch {
+        closed = true; // closed by `stop` since the event: the same end
+      }
+    };
     const retries = o.retries ?? 5;
     const reliably = async (p: Uint8Array, block: number): Promise<boolean> => {
-      for (let attempt = 0; attempt <= retries; attempt++) {
+      for (let attempt = 0; attempt <= retries && !closed; attempt++) {
         send(p);
         if (await waitFor(block)) return true;
       }
       return false;
     };
     try {
-      if (Object.keys(oack).length > 0 && !(await reliably(oackPacket(oack), 0))) return void o.onTransfer?.({ file, from, outcome: "timed-out" });
+      if (Object.keys(oack).length > 0 && !(await reliably(oackPacket(oack), 0))) return void (closed || o.onTransfer?.({ file, from, outcome: "timed-out" }));
       let n = 1;
       for (let off = 0; ; off += blksize, n++) {
         const chunk = bytes.subarray(off, off + blksize);
-        if (!(await reliably(dataPacket(n & 0xffff, chunk), n & 0xffff))) return void o.onTransfer?.({ file, from, outcome: "timed-out" });
+        if (!(await reliably(dataPacket(n & 0xffff, chunk), n & 0xffff))) return void (closed || o.onTransfer?.({ file, from, outcome: "timed-out" }));
         if (chunk.length < blksize) break;
       }
       o.onTransfer?.({ file, from, outcome: "sent" });
     } finally {
       active.delete(t);
-      t.close();
+      try {
+        t.close();
+      } catch {
+        // `stop` closed it already
+      }
     }
   }
 

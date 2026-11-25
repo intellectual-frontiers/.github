@@ -15,11 +15,12 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const LANG = join(ROOT, "src");
 
+/** The `.ts` files under a folder, never entering `node_modules` (a library's own install links other libraries back into this checkout, a loop that a recursive listing would follow). */
 const tsFiles = (dir: string): string[] =>
-  readdirSync(dir, { recursive: true, withFileTypes: true })
-    .filter((e) => e.isFile() && e.name.endsWith(".ts"))
-    .map((e) => join(e.parentPath, e.name))
-    .filter((f) => !f.includes(`${sep}node_modules${sep}`));
+  readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    if (e.isDirectory()) return e.name === "node_modules" ? [] : tsFiles(join(dir, e.name));
+    return e.isFile() && e.name.endsWith(".ts") ? [join(dir, e.name)] : [];
+  });
 
 const specifiers = (text: string): string[] => {
   const out: string[] = [];

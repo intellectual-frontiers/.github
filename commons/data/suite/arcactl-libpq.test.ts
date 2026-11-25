@@ -13,7 +13,7 @@ import { dialect as postgres } from "@intellectual-frontiers/data/sql/dialects/p
 import { invariants } from "@intellectual-frontiers/data/sql/extensions/invariants";
 import { bind } from "@intellectual-frontiers/data/sql/physical";
 import { applyChange, type Credential, type Instance, type Paths, type Plan, checkCredential, checkInstance, fixModes, parsePgpass, parseServices, pathsOf, pgpassLine, planPgpass, planPsql, planServices, planUndo, psqlrcBody, readInstances, schemaOf, serviceSection, settingsOf, splitPgpass } from "@intellectual-frontiers/data/sql/cli";
-import { passwordServer, pgliteServer, run } from "./net-fixtures.ts";
+import { passwordServer, pgliteServer, run, settled } from "./net-fixtures.ts";
 import { same } from "./governance-fixture.ts";
 
 const must = <T>(r: { kind: "ok"; value: T } | { kind: "err"; error: unknown }): T => {
@@ -110,11 +110,13 @@ proves(
       await psql("ann", "only_this");
       await psql("ann", "other_db");
       await psql("bob", "only_this");
+      await settled(server.seen, 3);
       same(server.seen.map((s) => `${s.user}/${s.database}/${s.password}`), ["ann/only_this/annpw", "ann/other_db/undefined", "bob/only_this/undefined"]);
       // libpq ignores a password file the group can read, and says so
       chmodSync(paths.pgpass, 0o640);
       server.seen.length = 0;
       const ignored = await psql("ann", "only_this");
+      await settled(server.seen, 1);
       same(server.seen.at(-1)?.password, undefined);
       assert(ignored.err.includes("group or world access"), ignored.err);
       const fix = must(planPgpass(paths, { set: [{ host: "127.0.0.1", port: String(server.port), database: "only_this", user: "ann", password: "annpw" }] }));
