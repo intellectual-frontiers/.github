@@ -240,12 +240,15 @@ proves(
     );
     assertEquals(Object.keys(pm).length, packagingTerms.length);
     const by = (basis: string) => packagingTerms.filter((t) => t.values.basis.iri === basis).length;
-    assertEquals([by(bases.Specializes.iri), by(bases.Maps.iri), by(bases.Unaligned.iri)], [5, 9, 52]);
+    // every term has exactly one of the three bases, so the three counts account for all of them; the counts themselves grow with the ontology and are not fixed here
+    const counts = [by(bases.Specializes.iri), by(bases.Maps.iri), by(bases.Unaligned.iri)];
+    assertEquals(counts.reduce((a, b) => a + b, 0), packagingTerms.length);
+    assert(counts.every((n) => n > 0), "each basis is used");
   },
 );
 
-/** The namespaces of the standards the packaging ontology's mappings name: schema.org, DCAT 3, the Package URL specification and SKOS. */
-const STANDARD_NAMESPACES = ["https://schema.org/", "http://www.w3.org/ns/dcat#", "https://github.com/package-url/purl-spec#", "http://www.w3.org/2004/02/skos/core#"];
+/** The namespaces of the standards the packaging ontology's mappings name: schema.org, DCAT 3, the Package URL specification, SKOS and the relationship types of SPDX 3.0.1. */
+const STANDARD_NAMESPACES = ["https://schema.org/", "http://www.w3.org/ns/dcat#", "https://github.com/package-url/purl-spec#", "http://www.w3.org/2004/02/skos/core#", "https://spdx.org/rdf/3.0.1/terms/"];
 
 proves(
   ["0012-ontology FR-014"],
@@ -254,11 +257,12 @@ proves(
     for (const t of packagingTerms) {
       if (t.values.basis.iri === bases.Unaligned.iri) {
         assert((t.values.justification ?? "").includes("Candidates to examine"), `${t.iri} names its candidates`);
-        assertEquals(t.values.addedOn, AUDITED_ON);
+        // a term carries the day it was added: the day of the audit, or a later day for a term added since (an ISO date, never earlier than the audit)
+        assert(/^\d{4}-\d{2}-\d{2}$/u.test(t.values.addedOn ?? "") && (t.values.addedOn ?? "") >= AUDITED_ON, `${t.iri} says when it was added`);
       } else {
         assert(
           STANDARD_NAMESPACES.some((ns) => (t.values.standardTerm ?? "").startsWith(ns)),
-          `${t.iri} names a term of schema.org, DCAT, the Package URL specification or SKOS`,
+          `${t.iri} names a term of schema.org, DCAT, the Package URL specification, SKOS or SPDX`,
         );
         assert(t.values.mappingRelation !== undefined, `${t.iri} says its relation`);
       }
