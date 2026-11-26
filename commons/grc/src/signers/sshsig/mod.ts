@@ -14,11 +14,24 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { pae } from "@intellectual-frontiers/crypto/dsse";
 import { proc } from "@intellectual-frontiers/system";
 import type { Envelope, SignProblem, Signer } from "@intellectual-frontiers/grc/physical";
 
-/** The namespace every signature is made in: a signature made for something else does not verify here. */
+/** The namespace of the evidence of grc: a signature made for something else does not verify here. */
 export const NAMESPACE = "grc-evidence";
+
+/** The known namespaces, one closed table (0017-grc-sshsig-namespace FR-002). */
+export const NAMESPACES = ["grc-evidence", "ifc-telemetry"] as const;
+
+/** A namespace, made only by `parseNamespace`. */
+export type Namespace = string & { readonly "@grc/namespace": true };
+
+/** A namespace from text: not empty, no space, no comma, no control character, at most 64 characters. */
+export function parseNamespace(text: string): Result<Namespace, string> {
+  if (text === "" || text.length > 64 || /[\s,\u0000-\u001f\u007f]/.test(text)) return err(`${JSON.stringify(text)} is not a namespace: not empty, at most 64 characters, no space, comma or control character`);
+  return ok(text as Namespace);
+}
 
 /** A key to sign with: the file of the private key (or of the public key where an agent holds the private one, with `agent`). */
 export type SignKey = { readonly keyFile: string; readonly agent?: boolean };
@@ -77,11 +90,7 @@ class Wire {
   }
 }
 
-/** DSSE's pre-authentication encoding of a payload type and a payload: what is signed. */
-export function pae(payloadType: string, payload: Uint8Array): Uint8Array {
-  const type = enc.encode(payloadType);
-  return concat(enc.encode(`DSSEv1 ${type.length} `), type, enc.encode(` ${payload.length} `), payload);
-}
+export { pae };
 
 /** The blob of a public key line, or why not. */
 function keyBlob(line: string): Result<Uint8Array, string> {
@@ -131,16 +140,16 @@ async function hashOf(algorithm: string, message: Uint8Array): Promise<Uint8Arra
   return name === undefined ? undefined : new Uint8Array(await crypto.subtle.digest(name, new Uint8Array(message)));
 }
 
-async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKey): Promise<Result<void, SignProblem>> {
+async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKey, namespace: string): Promise<Result<void, SignProblem>> {
   const parsed = parseSignature(armored);
   if (parsed.kind === "err") return err({ kind: "signature", message: parsed.error });
   const trusted = keyBlob(key.publicKey);
   if (trusted.kind === "err") return err({ kind: "key", message: trusted.error });
-  if (parsed.value.namespace !== NAMESPACE) return err({ kind: "signature", message: `the signature is in the namespace ${parsed.value.namespace}, not ${NAMESPACE}` });
+  if (parsed.value.namespace !== namespace) return err({ kind: "signature", message: `the signature is in the namespace ${parsed.value.namespace}, not ${namespace}` });
   if (parsed.value.publicKey.length !== trusted.value.length || !parsed.value.publicKey.every((b, i) => b === trusted.value[i])) return err({ kind: "key", message: "the signature is by another key than the one trusted" });
   const digest = await hashOf(parsed.value.hash, message);
   if (digest === undefined) return err({ kind: "signature", message: `the hash ${parsed.value.hash} is not sha256 or sha512` });
-  const data = concat(enc.encode("SSHSIG"), str(enc.encode(NAMESPACE)), str(new Uint8Array()), str(enc.encode(parsed.value.hash)), str(digest));
+  const data = concat(enc.encode("SSHSIG"), str(enc.encode(namespace)), str(new Uint8Array()), str(enc.encode(parsed.value.hash)), str(digest));
   const raw = new Wire(trusted.value);
   raw.string();
   const pub = raw.string();
@@ -150,35 +159,43 @@ async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKe
   return good ? ok(undefined) : err({ kind: "signature", message: "the signature does not verify" });
 }
 
-/** The `sshsig` signer. Its custody is `file`: the key is held in a file (or by an agent) the person controls. */
-export const sshsigSigner: Signer = {
-  id: "sshsig",
-  custody: "file",
-  async sign(payloadType, payload, keys) {
-    const k = keys[0] as SignKey | undefined;
-    if (k === undefined || typeof k.keyFile !== "string") return err({ kind: "key", message: "an sshsig key is { keyFile }, and one is needed" });
-    const r = await proc.run(["ssh-keygen", "-Y", "sign", "-f", k.keyFile, "-n", NAMESPACE, ...(k.agent === true ? ["-U"] : [])], { input: pae(payloadType, payload) });
-    if (!r.success) return err({ kind: "key", message: `ssh-keygen did not sign: ${r.stderr.trim().split("\n").slice(-1)[0] ?? ""}` });
-    const parsed = parseSignature(r.stdout);
-    if (parsed.kind === "err") return err({ kind: "signature", message: parsed.error });
-    const pub = new Wire(parsed.value.publicKey);
-    pub.string();
-    const fp = await fingerprintOf(`ssh-ed25519 ${b64(parsed.value.publicKey)}`);
-    return ok({ payloadType, payload: b64(payload), signatures: [{ ...(fp.kind === "ok" ? { keyid: fp.value } : {}), sig: r.stdout.trim() }] } satisfies Envelope);
-  },
-  async verify(envelope, payloadType, keys) {
-    if (envelope.payloadType !== payloadType) return err({ kind: "payload-type", message: `the payload is for ${envelope.payloadType}, not ${payloadType}` });
-    const payload = unb64(envelope.payload);
-    if (payload === undefined) return err({ kind: "signature", message: "the payload is not base64" });
-    const message = pae(envelope.payloadType, payload);
-    let last: SignProblem = { kind: "key", message: "there is no key to verify with" };
-    for (const sig of envelope.signatures) {
-      for (const key of keys as readonly VerifyKey[]) {
-        const r = await verifyArmored(sig.sig, message, key);
-        if (r.kind === "ok") return ok(payload);
-        last = r.error;
+/** A signature verified without a program, for a message that is not the encoding of DSSE (the bytes of a Git object, for instance): the armored signature, the message, the public key line and the namespace it must be in. */
+export function verifySshsig(armored: string, message: Uint8Array, publicKey: string, namespace: string): Promise<Result<void, SignProblem>> {
+  return verifyArmored(armored, message, { publicKey }, namespace);
+}
+
+/** The `sshsig` signer of a namespace (0017-grc-sshsig-namespace FR-001). Its custody is `file`: the key is held in a file (or by an agent) the person controls. Signing is by `ssh-keygen -Y sign`, which it names where it is not installed. */
+export function sshsigSignerFor(namespace: Namespace | typeof NAMESPACE): Signer {
+  return {
+    id: "sshsig",
+    custody: "file",
+    async sign(payloadType, payload, keys) {
+      const k = keys[0] as SignKey | undefined;
+      if (k === undefined || typeof k.keyFile !== "string") return err({ kind: "key", message: "an sshsig key is { keyFile }, and one is needed" });
+      const r = await proc.run(["ssh-keygen", "-Y", "sign", "-f", k.keyFile, "-n", namespace, ...(k.agent === true ? ["-U"] : [])], { input: pae(payloadType, payload) });
+      if (!r.success) return err({ kind: "key", message: `ssh-keygen did not sign: ${r.stderr.trim().split("\n").slice(-1)[0] ?? "is ssh-keygen installed?"}` });
+      const parsed = parseSignature(r.stdout);
+      if (parsed.kind === "err") return err({ kind: "signature", message: parsed.error });
+      const fp = await fingerprintOf(`ssh-ed25519 ${b64(parsed.value.publicKey.slice(0))}`);
+      return ok({ payloadType, payload: b64(payload), signatures: [{ ...(fp.kind === "ok" ? { keyid: fp.value } : {}), sig: r.stdout.trim() }] } satisfies Envelope);
+    },
+    async verify(envelope, payloadType, keys) {
+      if (envelope.payloadType !== payloadType) return err({ kind: "payload-type", message: `the payload is for ${envelope.payloadType}, not ${payloadType}` });
+      const payload = unb64(envelope.payload);
+      if (payload === undefined) return err({ kind: "signature", message: "the payload is not base64" });
+      const message = pae(envelope.payloadType, payload);
+      let last: SignProblem = { kind: "key", message: "there is no key to verify with" };
+      for (const sig of envelope.signatures) {
+        for (const key of keys as readonly VerifyKey[]) {
+          const r = await verifyArmored(sig.sig, message, key, namespace);
+          if (r.kind === "ok") return ok(payload);
+          last = r.error;
+        }
       }
-    }
-    return err(last);
-  },
-};
+      return err(last);
+    },
+  };
+}
+
+/** The `sshsig` signer of the evidence of grc, in the namespace `grc-evidence`. */
+export const sshsigSigner: Signer = sshsigSignerFor(NAMESPACE);
