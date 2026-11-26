@@ -18,7 +18,7 @@ export const library = {
   kanon: {
     package: "@intellectual-frontiers/dossier",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}", contract: "./logical" },
-    plugins: [],
+    plugins: [{ noun: "assurance" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {
