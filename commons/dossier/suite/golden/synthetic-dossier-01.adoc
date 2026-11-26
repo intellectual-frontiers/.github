@@ -1,0 +1,97 @@
+= A made-up dossier
+:lang: en
+:revdate: 2026-11-26T12:00:00Z
+:toc:
+:sectanchors:
+:nofooter:
+
+[[about]]
+== About this dossier
+
+As of:: 2026-11-26T12:00:00Z
+Audience:: cui
+Inputs:: `+67972620172967d5f5c1d418b70985aa705bebcb5591bfae8b1e41f0c0784514+`
+Lenses:: runs 1.0.0, incidents 1.0.0, readings 1.0.0
+
+Every statement of fact in this dossier cites its evidence, and the evidence at the end of it names the hash of each source, so that the dossier can be checked against its manifest without any other means.
+
+[[runs]]
+== Runs
+
+[cols="1,1,1",options="header"]
+|===
+|Run
+|Cases
+|Evidence
+
+|xref:ev-quality-run-001[quality/run-001]
+|2
+|observed 2026-11-20T09:00:00Z, 6 days before the date of the dossier
+
+|xref:ev-quality-run-002[quality/run-002]
+|1
+|observed 2026-11-25T09:00:00Z, 1 day before the date of the dossier
+|===
+
+[[incidents]]
+== Incidents
+
+xref:ev-incident-synthetic-incident-01[incident/synthetic-incident-01] a made-up incident
+
+[[readings]]
+== Readings
+
+xref:ev-reading-synthetic-reading-01[reading/synthetic-reading-01] is 7
+
+[[evidence]]
+== Evidence
+
+[cols="1,1,1,1,1,1",options="header"]
+|===
+|Source
+|Kind
+|Observed
+|Class
+|Hash
+|Signer
+
+|incident/synthetic-incident-01
+|incident
+|2026-11-23T09:00:00Z
+|cui
+|`+209f2d823ac319fad205a5febdc0eac5c6101621c33bf8ccb111e8fcc660c16a+`
+|not signed
+
+|quality/run-001
+|quality-run
+|2026-11-20T09:00:00Z
+|internal
+|`+d7c1ce96f152e4db1e7644b8b90501c934fbff0edb6e92cc572fa7387ae120c2+`
+|not signed
+
+|quality/run-002
+|quality-run
+|2026-11-25T09:00:00Z
+|internal
+|`+3c92ca2057a8860454776f2985ef0224aaca69ba985b259afdfb934e4eda8dca+`
+|SHA256:synthetic-key-01
+
+|reading/synthetic-reading-01
+|reading
+|2026-11-24T09:00:00Z
+|public
+|`+9d709bba0358da8fdf5600bb3692fa32d0aa2a19a08152cf4307e0b4240e71ac+`
+|not signed
+|===
+
+[[ev-incident-synthetic-incident-01]]
+Evidence: incident/synthetic-incident-01
+
+[[ev-quality-run-001]]
+Evidence: quality/run-001
+
+[[ev-quality-run-002]]
+Evidence: quality/run-002
+
+[[ev-reading-synthetic-reading-01]]
+Evidence: reading/synthetic-reading-01

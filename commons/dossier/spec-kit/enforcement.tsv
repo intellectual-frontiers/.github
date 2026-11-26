@@ -1,0 +1,17 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-dossier-layers FR-001	check	.github: cd commons/dossier && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-dossier-layers FR-002	check	.github: cd commons/dossier && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-dossier-core FR-001	check	.github: cd commons/dossier && bun run verify	suite/core.test.ts: sources
+0002-dossier-core FR-002	check	.github: cd commons/dossier && bun run verify	suite/core.test.ts: selection
+0002-dossier-core FR-003	check	.github: cd commons/dossier && bun run verify	suite/disclosure.test.ts
+0002-dossier-core FR-004	check	.github: cd commons/dossier && bun run verify	suite/lens.test.ts
+0002-dossier-core FR-005	check	.github: cd commons/dossier && bun run verify	suite/lens.test.ts: compositions
+0002-dossier-core FR-006	check	.github: cd commons/dossier && bun run verify	suite/adoc.test.ts
+0002-dossier-core FR-007	check	.github: cd commons/dossier && bun run verify	suite/build.test.ts
+0002-dossier-core FR-008	check	.github: cd commons/dossier && bun run verify	suite/build.test.ts: manifest and inputs hash
+0002-dossier-core FR-009	check	.github: cd commons/dossier && bun run verify	suite/build.test.ts: diff
+0002-dossier-core FR-010	check	.github: cd commons/dossier && bun run verify	suite/files.test.ts
+0002-dossier-core FR-011	check	.github: cd commons/dossier && bun run verify	suite/files.test.ts: verify
+0002-dossier-core FR-012	check	.github: cd commons/dossier && bun run verify	suite/seal.test.ts
