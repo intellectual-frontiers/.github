@@ -31,3 +31,7 @@ requirement	mechanism	by	note
 0006-zero-trust-terms FR-002	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
 0006-zero-trust-terms FR-003	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
 0006-zero-trust-terms FR-004	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
+0007-actor-terms FR-001	check	.github: cd commons/ontology && bun test suite/	actor-ontology.test.ts
+0007-actor-terms FR-002	check	.github: cd commons/ontology && bun test suite/	actor-ontology.test.ts
+0007-actor-terms FR-003	check	.github: cd commons/ontology && bun test suite/	actor-ontology.test.ts
+0007-actor-terms FR-004	check	.github: cd commons/ontology && bun test suite/	actor-ontology.test.ts

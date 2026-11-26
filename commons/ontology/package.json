@@ -23,6 +23,8 @@
     "./workload/workload": "./src/workload/workload.ts",
     "./boundary": "./src/boundary/mod.ts",
     "./boundary/boundary": "./src/boundary/boundary.ts",
+    "./actor": "./src/actor/mod.ts",
+    "./actor/actor": "./src/actor/actor.ts",
     "./zerotrust": "./src/zerotrust/mod.ts",
     "./zerotrust/zerotrust": "./src/zerotrust/zerotrust.ts",
     "./ifr": "./src/ifr/mod.ts",

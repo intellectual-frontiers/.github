@@ -42,6 +42,7 @@ import * as planningOntology from "@intellectual-frontiers/ontology/planning";
 import * as workloadOntology from "@intellectual-frontiers/ontology/workload";
 import * as boundaryOntology from "@intellectual-frontiers/ontology/boundary";
 import * as zerotrustOntology from "@intellectual-frontiers/ontology/zerotrust";
+import * as actorOntology from "@intellectual-frontiers/ontology/actor";
 import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
@@ -484,8 +485,44 @@ export const ZEROTRUST: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Actors (commons 0048-actors), as it is published. */
+export const ACTOR: OntologyPublication = {
+  name: "actor",
+  ns: { prefix: "act", iri: actorOntology.ACTOR.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["act", actorOntology.ACTOR.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+  ],
+  files: actorOntology.files,
+  ontology: actorOntology.actorOntology,
+  classes: actorOntology.classes,
+  properties: actorOntology.properties,
+  terms: actorOntology.terms,
+  schemas: [actorOntology.RoleSchema, actorOntology.ActorKindSchema, actorOntology.TaskingLevelSchema, actorOntology.SignatureMeaningSchema],
+  lists: listsOf("act", [
+    ["Role", actorOntology.roles],
+    ["ActorKind", actorOntology.actorKinds],
+    ["TaskingLevel", actorOntology.taskingLevels],
+    ["SignatureMeaning", actorOntology.signatureMeanings],
+  ]),
+  source: "commons/ontology/src/actor/*.ts",
+  run: RUN,
+  shapes: { prefix: "actsh", iri: "https://www.intellectualfrontiers.com/ontology/actor-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/actor-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/actor-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#" },
+  viewTitle: "Actor Ontology",
+  license: CC0,
+};
+
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, WORKLOAD, BOUNDARY, ZEROTRUST, IFR, KANON];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, WORKLOAD, BOUNDARY, ZEROTRUST, ACTOR, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";

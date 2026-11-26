@@ -17,6 +17,7 @@ import { planningOntology } from "@intellectual-frontiers/ontology/planning";
 import { workloadOntology } from "@intellectual-frontiers/ontology/workload";
 import { boundaryOntology } from "@intellectual-frontiers/ontology/boundary";
 import { zeroTrustOntology } from "@intellectual-frontiers/ontology/zerotrust";
+import { actorOntology } from "@intellectual-frontiers/ontology/actor";
 import { mizanOntology } from "@intellectual-frontiers/ontology/mizan";
 import { packagingOntology } from "@intellectual-frontiers/ontology/supply-chain/packaging";
 
@@ -34,6 +35,7 @@ const ONTOLOGIES = [
   { name: "workload", ontology: workloadOntology, prefix: "wlv" },
   { name: "boundary", ontology: boundaryOntology, prefix: "bndv" },
   { name: "zerotrust", ontology: zeroTrustOntology, prefix: "ztv" },
+  { name: "actor", ontology: actorOntology, prefix: "actv" },
   { name: "ifr", ontology: ifrOntology, prefix: "ifrv" },
   { name: "kanon", ontology: kanonOntology, prefix: "kanonv" },
   { name: "packaging", ontology: packagingOntology, prefix: "pmv" },
@@ -64,9 +66,9 @@ proves(
       assert(ttl.includes('owl:versionInfo "1.0.0"'), `${name}: the version`);
       assert(!/owl:versionInfo "[0-9]+"/.test(ttl), `${name}: no integer version`);
     }
-    // the catalog lists the ten published ontologies, each at 1.0.0
+    // the catalog lists the eleven published ontologies, each at 1.0.0
     const catalog = text("generated/mizan-catalog.auto.ttl");
-    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 10);
+    assertEquals((catalog.match(/dcat:version "1\.0\.0"/g) ?? []).length, 11);
     assert(!/dcat:version "[0-9]+"/.test(catalog));
   },
 );

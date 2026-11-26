@@ -7,6 +7,23 @@
 <https://www.intellectualfrontiers.com/> a foaf:Agent ;
     foaf:name "Intellectual Frontiers" .
 
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-actor> a dcat:Dataset ;
+    dcterms:description "The vocabulary of Actors: the act and the actor that takes part in it, the roles, the directive, the tasking, the qualification, the nonconformity and the meanings of a signature."@en ;
+    dcterms:identifier "https://www.intellectualfrontiers.com/ontology/actor" ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:publisher <https://www.intellectualfrontiers.com/> ;
+    dcterms:title "Actors"@en ;
+    dcat:distribution <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-code-lists.auto.skos.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-code-lists.auto.sql>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-mappings.auto.sssom.tsv>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-ontology.auto.html>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-schemas.auto.json>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-shapes.auto.ttl>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.ofn>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.rdf>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.ttl> ;
+    dcat:version "1.0.0" .
+
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-boundary> a dcat:Dataset ;
     dcterms:description "The vocabulary of Boundaries: a boundary as the accountability scope of a kind that a regime defines, the dispositions of assets in it, the interconnections that cross it and what it inherits."@en ;
     dcterms:identifier "https://www.intellectualfrontiers.com/ontology/boundary" ;
@@ -176,6 +193,82 @@
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-zerotrust-zerotrust.auto.rdf>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-zerotrust-zerotrust.auto.ttl> ;
     dcat:version "1.0.0" .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-code-lists.auto.skos.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors code lists, SKOS"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-code-lists.auto.skos.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-code-lists.auto.skos.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-code-lists.auto.sql> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/sql> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors code lists, SQL"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-code-lists.auto.sql> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-code-lists.auto.sql> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/sql> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-mappings.auto.sssom.tsv> a dcat:Distribution ;
+    dcterms:conformsTo <https://mapping-commons.github.io/sssom/spec/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/tab-separated-values> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors mappings to standards, SSSOM"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-mappings.auto.sssom.tsv> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-mappings.auto.sssom.tsv> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/tab-separated-values> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-ontology.auto.html> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/html> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors ontology, HTML view"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-ontology.auto.html> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-ontology.auto.html> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/html> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-schemas.auto.json> a dcat:Distribution ;
+    dcterms:conformsTo <https://json-schema.org/draft/2020-12/schema> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/schema+json> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors JSON Schema"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-schemas.auto.json> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-schemas.auto.json> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/schema+json> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor-shapes.auto.ttl> a dcat:Distribution ;
+    dcterms:conformsTo <https://www.w3.org/TR/shacl/> ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors SHACL shapes"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-shapes.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor-shapes.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.ofn> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/owl-functional> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors ontology, OWL 2 functional syntax"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.ofn> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.ofn> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/owl-functional> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.rdf> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/application/rdf+xml> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors ontology, RDF/XML"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.rdf> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.rdf> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/application/rdf+xml> .
+
+<https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-actor-actor.auto.ttl> a dcat:Distribution ;
+    dcterms:format <https://www.iana.org/assignments/media-types/text/turtle> ;
+    dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
+    dcterms:title "Actors ontology, Turtle"@en ;
+    dcat:accessURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.ttl> ;
+    dcat:downloadURL <https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/generated/actor.auto.ttl> ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/text/turtle> .
 
 <https://www.intellectualfrontiers.com/ontology/mizan-catalog#distribution-boundary-boundary-code-lists.auto.skos.ttl> a dcat:Distribution ;
     dcterms:conformsTo <https://www.w3.org/TR/skos-reference/> ;
@@ -942,7 +1035,8 @@
     dcterms:license <https://creativecommons.org/publicdomain/zero/1.0/> ;
     dcterms:publisher <https://www.intellectualfrontiers.com/> ;
     dcterms:title "Mizan, the IF Spec Profile: published ontologies"@en ;
-    dcat:dataset <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-boundary>,
+    dcat:dataset <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-actor>,
+        <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-boundary>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifccm>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifqs>,
         <https://www.intellectualfrontiers.com/ontology/mizan-catalog#dataset-ifr>,
