@@ -1,0 +1,1063 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45890525012",
+    "workflow": "ci",
+    "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+    "at": "2026-11-26T20:25:35Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45890525012"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 193,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 31268,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 39032,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7798,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32552,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 91,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 430,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 82889,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36123,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 36123,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 249,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 284,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34613,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14500,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14500,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 188,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 362,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 68998,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 49558,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 49558,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 106,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 333,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47077,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23357,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 23357,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 44,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 5,
+      "durationMs": 3155,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 35452,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 26,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 1394,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 43,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 10,
+      "durationMs": 1497,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "formats",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 144,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "formats",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5149,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "formats",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4114,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 145,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 12741,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 17132,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 159,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 15166,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7835,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 192,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4804,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4804,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-0855e2ab7460cdb8",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-086ebaed8c288542",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/grouping.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/grouping.test.ts"
+    },
+    {
+      "id": "f-0dcfc4f80c1d66c2",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "96361f3b4b9eff497a2f312540eb431d5df8d06bf4a247afe3c987483a00b28b"
+      },
+      "at": "2026-11-26T20:23:31Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make",
+      "key": "0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make"
+    },
+    {
+      "id": "f-0e175ea646e12743",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-222ea52641741e7a",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    },
+    {
+      "id": "f-2a8c156f44fc74db",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-2ebf51ec694ab7fb",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-4a09281032a76418",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-4ad83c6cf7328ae5",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3921d84cfe9d135c2bac45ad0bf1a08d3fdffba88ade4a25d6bacae50c671950"
+      },
+      "at": "2026-11-26T20:23:05Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-4f5a3b4802c93650",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3921d84cfe9d135c2bac45ad0bf1a08d3fdffba88ade4a25d6bacae50c671950"
+      },
+      "at": "2026-11-26T20:23:05Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-5a3159aacb892b39",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    },
+    {
+      "id": "f-6692adec27c953a7",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/kanon-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/kanon-guides.test.ts"
+    },
+    {
+      "id": "f-6f60b3c3aa1a778d",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-7786036edda36b23",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/mizan-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/mizan-guides.test.ts"
+    },
+    {
+      "id": "f-7bd832ef168341e6",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-7fbbab4b6614990d",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-818247904fb81323",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-884660cff84f77a6",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-908cc3087365f188",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-a65c9bde05657266",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3921d84cfe9d135c2bac45ad0bf1a08d3fdffba88ade4a25d6bacae50c671950"
+      },
+      "at": "2026-11-26T20:23:05Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-a956f5ae8e935ff2",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-aac69f73771835b4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-ac692524bb695fd3",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-acd9741f861e05b0",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "59c08141e2273905651d00189bf9901abe34ce95ea54f7e1b880941ee9b86322"
+      },
+      "at": "2026-11-26T20:23:37Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-b1e7c5548bdb36f2",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-b5179e92cc27dad4",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence-shards.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence-shards.test.ts"
+    },
+    {
+      "id": "f-c3c32c48a4ac7746",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    },
+    {
+      "id": "f-d27419413326f5a4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/agents-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/agents-guides.test.ts"
+    },
+    {
+      "id": "f-d5b7ee2bb3456845",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3921d84cfe9d135c2bac45ad0bf1a08d3fdffba88ade4a25d6bacae50c671950"
+      },
+      "at": "2026-11-26T20:23:05Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-d882e5600b1ec85c",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "3921d84cfe9d135c2bac45ad0bf1a08d3fdffba88ade4a25d6bacae50c671950"
+      },
+      "at": "2026-11-26T20:23:05Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-e970e1c80d0501b3",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "a2bfaab2a7513385ff2002bcdef787723f39fb698d158f907bacd73ed0dffbae"
+      },
+      "at": "2026-11-26T20:23:53Z",
+      "code": "test-failed",
+      "file": "suite/ci-findings.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make",
+      "key": "0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make"
+    },
+    {
+      "id": "f-eb8cdfc862e236b4",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "a2bfaab2a7513385ff2002bcdef787723f39fb698d158f907bacd73ed0dffbae"
+      },
+      "at": "2026-11-26T20:23:53Z",
+      "code": "test-failed",
+      "file": "suite/metapackages.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make",
+      "key": "0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make"
+    },
+    {
+      "id": "f-eddbc00bf6be51e3",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d22d3e332d27b1659e312b08a9aef1fa430b4007d2a3f8c8fbb5137f57db3e2a"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-f77f107826a6ae55",
+      "tool": "verify",
+      "module": "libraries",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ac49a5d47e918830009ec0b39c61799b8af233520110e77311472e38b70d60ce"
+      },
+      "at": "2026-11-26T20:23:18Z",
+      "code": "test-failed",
+      "file": "suite/release-lockfile.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make",
+      "key": "0036-distribution FR-005, 0036-distribution FR-006, 0036-distribution FR-007, 0001-libraries FR-023: the real manifests: every library declares github and npm, the five metapackages are folders named for their set, and the generated files are what the manifests make"
+    },
+    {
+      "id": "f-fb3d12ee27330ec0",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45890525012",
+        "commit": "4d80bed82435d692e68893a1ed68bff713659ce4",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "469577e5f95e7907b036abc4823e75458fe7fd4a42996575e0e43461ef966cd4"
+      },
+      "at": "2026-11-26T20:23:07Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    }
+  ]
+}
