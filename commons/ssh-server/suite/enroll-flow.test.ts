@@ -133,7 +133,7 @@ proves(["0002-enrollment-protocol FR-008"], "a person refuses: the script ends a
   }
 });
 
-proves(["0004-scripts FR-007"], "a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs", async () => {
+proves(["0004-scripts FR-007", "0004-scripts FR-011"], "a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs", async () => {
   const key = join(process.env["TMPDIR"] ?? "/tmp", `synthetic-${process.pid}.key`);
   const crt = `${key}.crt`;
   const made = spawnSync("openssl", ["req", "-x509", "-newkey", "ed25519", "-nodes", "-subj", "/CN=localhost", "-addext", "subjectAltName=IP:127.0.0.1", "-keyout", key, "-out", crt, "-days", "1"], { stdio: "ignore" });
@@ -150,8 +150,19 @@ proves(["0004-scripts FR-007"], "a download whose SHA-256 is wrong stops the ins
       const plan: InstallPlan = { steps: [{ kind: "install-package", osFamily: "linux", name: "synthetic-package", version: "1.0", url, sha256: sha, installer: "deb" }] };
       const r = await runWithPerson(f, script, plan, { SYNTH_CONSENT: "yes", CURL_CA_BUNDLE: crt, SSL_CERT_FILE: crt });
       assert((r.stdout + r.stderr).includes(want), `${want}: ${r.stdout}${r.stderr}`);
-      assertEquals((await f.store.listSessions()).find((s) => s.plan?.steps[0]?.kind === "install-package" && s.state === "approved") !== undefined || sha === good, true);
+      const state = (await f.store.listSessions()).find((s) => s.plan?.steps[0]?.kind === "install-package")?.state;
+      if (sha !== good) assertEquals(state, "failed", "a required download that does not match ends the session as failed");
     }
+    // the same wrong hash on an optional step does not stop the enrollment: the session is enrolled and says why the step was not done
+    const optional = await bootstrap(f);
+    const optionalPlan: InstallPlan = { steps: [{ kind: "install-package", osFamily: "linux", name: "synthetic-package", version: "1.0", url, sha256: "0".repeat(64), installer: "deb", optional: true }] };
+    const o = await runWithPerson(f, optional, optionalPlan, { SYNTH_CONSENT: "yes", CURL_CA_BUNDLE: crt, SSL_CERT_FILE: crt });
+    assertEquals(o.code, 0, o.stdout + o.stderr);
+    assert(o.stdout.includes("this machine is enrolled"), o.stdout);
+    const last = (await f.store.listSessions()).filter((s) => s.plan?.steps[0]?.kind === "install-package").at(-1);
+    assertEquals(last?.state, "enrolled");
+    assertEquals(last?.outcome?.steps[0]?.optional, true);
+    assert(last?.outcome?.steps[0]?.detail.includes("does not match the plan"), JSON.stringify(last?.outcome));
   } finally {
     await f.done();
     web.close();

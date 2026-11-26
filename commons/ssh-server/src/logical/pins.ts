@@ -13,7 +13,7 @@ export type Pin = { readonly arch: "amd64" | "arm64" | "any"; readonly step: Ins
 const RELEASE = "https://github.com/osquery/osquery/releases/download/5.24.1";
 
 function osquery(arch: Pin["arch"], osFamily: InstallPackageStep["osFamily"], installer: InstallPackageStep["installer"], file: string, sha256: string): Pin {
-  return { arch, step: { kind: "install-package", osFamily, name: "osquery", version: "5.24.1", url: `${RELEASE}/${file}`, sha256, installer } };
+  return { arch, step: { kind: "install-package", osFamily, name: "osquery", version: "5.24.1", url: `${RELEASE}/${file}`, sha256, installer, optional: true } };
 }
 
 /** The catalog of pins. */

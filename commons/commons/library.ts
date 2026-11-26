@@ -7,7 +7,7 @@ export const library = {
   name: "commons",
   level: "L0",
   verify: "bun run verify",
-  version: "0.23.1",
+  version: "0.24.0",
   distribution: ["github", "npm"],
   exports: ["."],
   bundle: "commons",

@@ -223,17 +223,18 @@ while ($true) {
         $waited += $Poll
         continue
     }
-    if ($tag -in @('REFUSED', 'EXPIRED', 'ENROLLED')) { Say "the server says: $head"; return }
+    if ($tag -in @('REFUSED', 'EXPIRED', 'ENROLLED', 'FAILED')) { Say "the server says: $head"; return }
     throw "an answer this script does not know: $tag"
 }
 Say 'approved. The plan:'
 $steps = @()
 foreach ($row in $answer) {
     $fields = ([string]$row).Split($tab)
-    if ($fields[0] -ne 'STEP') { continue }
+    if ($fields[0] -ne 'STEP' -and $fields[0] -ne 'OPT') { continue }
     foreach ($f in $fields[1..($fields.Count - 1)]) { Test-Safe -Value $f }
     $steps += , $fields
-    Say ('  ' + ($fields[1..($fields.Count - 1)] -join ' '))
+    $note = if ($fields[0] -eq 'OPT') { ' (optional)' } else { '' }
+    Say ('  ' + ($fields[1..($fields.Count - 1)] -join ' ') + $note)
 }
 if (Get-Consent) {
     $null = Invoke-Door -Words @('report', $Session) -Text '{"type":"consent","granted":true}'
@@ -244,23 +245,46 @@ if (Get-Consent) {
 }
 $results = @()
 $failed = $false
+$kept = $false
+$left = @()
+$cleanup = @()
 $index = 0
+function Save-DeviceKey {
+    New-Item -ItemType Directory -Force -Path $Dir | Out-Null
+    Copy-Item -LiteralPath $script:KeyPath -Destination (Join-Path $Dir 'device_key') -Force
+    Copy-Item -LiteralPath "$($script:KeyPath).pub" -Destination (Join-Path $Dir 'device_key.pub') -Force
+}
 foreach ($fields in $steps) {
+    $optional = ($fields[0] -eq 'OPT')
+    if ($optional -and -not $kept) {
+        $kept = $true
+        try { Save-DeviceKey } catch { Say "  failed: $($_.Exception.Message)"; $failed = $true; $results += [ordered]@{ index = $index; ok = $false; detail = 'keep the key of this machine' }; break }
+    }
     Say "step $($index): $($fields[1])"
     $ok = $true
-    try { Invoke-Step -Fields $fields } catch { Say "  failed: $($_.Exception.Message)"; $ok = $false; $failed = $true }
-    $results += [ordered]@{ index = $index; ok = $ok; detail = [string]$fields[1] }
+    $reason = ''
+    $existed = $true
+    if ($fields[1] -eq 'ensure-account') { $existed = [bool](Get-LocalUser -Name $fields[2] -ErrorAction SilentlyContinue) }
+    try { Invoke-Step -Fields $fields } catch { $reason = ([string]$_.Exception.Message) -replace '[^\x20-\x7e]', ' '; if ($reason.Length -gt 150) { $reason = $reason.Substring(0, 150) }; $ok = $false }
+    if ($ok) {
+        switch ($fields[1]) {
+            'ensure-account' { if (-not $existed) { $left += "the account $($fields[2])"; $cleanup += "remove the account in an administrator PowerShell: Remove-LocalUser -Name $($fields[2])" } }
+            'authorize-key' { $left += "a key authorized for the account $($fields[2])"; $cleanup += "remove the line of the controller's key from the authorized_keys file of $($fields[2])" }
+            'pin-controller' { $left += "the host key of the controller in $Dir"; $cleanup += "remove the line of $($fields[2]) from known_hosts in $Dir" }
+        }
+    } else {
+        if ($optional) { Say "  not done (optional, the enrollment goes on): $reason" } else { Say "  failed: $reason"; $failed = $true }
+    }
+    $entry = [ordered]@{ index = $index; ok = $ok; detail = "$($fields[1]): $reason" }
+    if ($optional) { $entry['optional'] = $true }
+    $results += $entry
     $index += 1
     if ($failed) { break }
 }
-if (-not $failed) {
-    try {
-        New-Item -ItemType Directory -Force -Path $Dir | Out-Null
-        Copy-Item -LiteralPath $script:KeyPath -Destination (Join-Path $Dir 'device_key') -Force
-        Copy-Item -LiteralPath "$($script:KeyPath).pub" -Destination (Join-Path $Dir 'device_key.pub') -Force
-    } catch { Say "  failed: $($_.Exception.Message)"; $failed = $true }
+if (-not $failed -and -not $kept) {
+    try { Save-DeviceKey } catch { Say "  failed: $($_.Exception.Message)"; $failed = $true }
 }
-$result = [ordered]@{ type = 'result'; ok = (-not $failed); steps = @($results) } | ConvertTo-Json -Compress -Depth 6
+$result = [ordered]@{ type = 'result'; ok = (-not $failed); steps = @($results); left = @($left); cleanup = @($cleanup) } | ConvertTo-Json -Compress -Depth 6
 $null = Invoke-Door -Words @('done', $Session) -Text $result
-if ($failed) { throw 'a step failed: see above' }
+if ($failed) { Say 'a required step failed, so this machine is not enrolled. What it left here, and how to remove it, is recorded on the controller.'; throw 'a step failed: see above' }
 Say 'done: this machine is enrolled'

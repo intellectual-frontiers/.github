@@ -7,14 +7,14 @@
 import type { Brand } from "@intellectual-frontiers/core";
 import type { Facts } from "./facts.ts";
 import type { Fingerprint, OfferedKey } from "./keys.ts";
-import type { InstallPlan } from "./plan.ts";
+import type { InstallPlan, StepResult } from "./plan.ts";
 
 /** The identifier of a session: `en-` and 16 characters of base32. It is a capability for the commands `report`, `next` and `done`, and is bound to the source address that opened it. */
 export type SessionId = Brand<string, "SessionId">;
 /** The state of a session. */
-export type SessionState = "pending" | "interrogated" | "approved" | "installing" | "enrolled" | "refused" | "expired";
+export type SessionState = "pending" | "interrogated" | "approved" | "installing" | "enrolled" | "failed" | "refused" | "expired";
 /** The states from which a session does not move. */
-export const TERMINAL: readonly SessionState[] = ["enrolled", "refused", "expired"];
+export const TERMINAL: readonly SessionState[] = ["enrolled", "failed", "refused", "expired"];
 /** The class of a device, guessed from the banner of its client. */
 export type DeviceClass = "openssh" | "dropbear" | "libssh" | "cisco" | "routeros" | "junos" | "edgeos" | "unifi" | "putty" | "other";
 
@@ -52,6 +52,9 @@ export type PairingState = {
   readonly burned?: string;
 };
 
+/** What a device reported when it ended the install: the result of every step it ran (an optional step may have failed or been skipped), what a failed install left on the device, and what a person runs there to clean it. The strings are the device's words, shown and never run by the controller. */
+export type InstallOutcome = { readonly steps: readonly StepResult[]; readonly left: readonly string[]; readonly cleanup: readonly string[] };
+
 /** A session. */
 export type EnrollmentSession = {
   /** The key the device proved when it paired: every later command of the session MUST be proven by the same key. */
@@ -68,6 +71,7 @@ export type EnrollmentSession = {
   readonly binding?: Binding;
   readonly facts?: Facts;
   readonly plan?: InstallPlan;
+  readonly outcome?: InstallOutcome;
   readonly decision?: Decision;
   readonly assetId?: string;
   readonly consent?: boolean;
