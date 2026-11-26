@@ -1,4 +1,4 @@
-// Spec: 0004-headless-cli FR-011, FR-015
+// Spec: 0004-headless-cli FR-011, FR-015, FR-016
 // Spec: 0008-exit-style-consent FR-002
 /**
  * What a run of the command line is given about its world (commons headless 0004-headless-cli FR-011): the environment, what each stream is, the clock,
@@ -16,6 +16,7 @@
  * @module
  */
 import type { dirs } from "@intellectual-frontiers/system";
+import type { UiCaps } from "@intellectual-frontiers/terminal/ui";
 import type { Counts, Problem, TierName } from "@intellectual-frontiers/headless/governance";
 import type { Clock, CredentialPort, ExecutorFor } from "@intellectual-frontiers/headless/logical";
 import type { StateStore } from "./state.ts";
@@ -69,6 +70,10 @@ export type Io = {
   readonly terminal: { readonly stdin: boolean; readonly stdout: boolean; readonly stderr: boolean };
   /** The width of the terminal, where it is one. */
   readonly columns: number | undefined;
+  /** What the error stream (where the narration goes) can show, decided once by the host with `capabilitiesOf` (FR-016): decided from `env` and `terminal` where it is not given. */
+  readonly caps?: UiCaps;
+  /** What the output stream (where a report goes) can show, decided once by the host: plain where it is a pipe. Decided from `env` and `terminal` where it is not given. */
+  readonly outCaps?: UiCaps;
   /** Milliseconds since the epoch. */
   readonly now: () => number;
   readonly pid: number;

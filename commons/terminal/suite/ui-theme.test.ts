@@ -5,7 +5,7 @@
  */
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { capabilitiesOf, drawScreen, frameOf, ICONS, iconCell, iconOf, renderSelect, selectStart, tint, type IconName, type ScreenState } from "../src/ui.ts";
+import { capabilitiesOf, drawScreen, frameOf, ICONS, iconCell, iconOf, lineMarkOf, renderSelect, selectStart, tint, type IconName, type ScreenState } from "../src/ui.ts";
 import { createScreen } from "../src/vt.ts";
 import { displayWidth } from "../src/width.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -105,4 +105,14 @@ proves(["0002-ui FR-024"], "the sources of the ui import only core, the palette,
     for (const s of specs) assert(allowed(s), `${f} imports ${s}`);
     assert(!/opsfolio|erga/i.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), `${f} names a domain`);
   }
+});
+
+proves(["0002-ui FR-026"], "the line mark is the emoji, else the icon's ASCII tag, else its three-column ASCII", () => {
+  const tags = { done: "[ok]", failed: "[x]", warn: "[!]", skipped: "[skip]", action: "[you]", hint: "->", stop: "[stop]", working: "[todo]" } as const;
+  for (const [name, tag] of Object.entries(tags)) {
+    assertEquals(lineMarkOf(name as IconName, { emoji: false }), tag);
+    assertEquals(lineMarkOf(name as IconName, { emoji: true }), ICONS[name as IconName].emoji);
+  }
+  assertEquals(lineMarkOf("host", { emoji: false }), "[#]");
+  for (const name of Object.keys(ICONS)) assertEquals(displayWidth(lineMarkOf(name as IconName, { emoji: true })), 2, name);
 });

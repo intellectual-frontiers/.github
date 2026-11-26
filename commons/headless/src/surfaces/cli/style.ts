@@ -1,14 +1,15 @@
-// Spec: 0004-headless-cli FR-001, FR-002, FR-005
+// Spec: 0004-headless-cli FR-001, FR-002, FR-005, FR-017, FR-024
 /**
- * How the command line looks (commons headless 0004-headless-cli FR-001, FR-002, FR-005): the marks, the colours and the widths. The marks are the
- * terminal's one palette and no other (an ASCII fallback where the terminal shows no emoji); colour is written only where the look allows it; a
+ * How the command line looks (commons headless 0004-headless-cli FR-001, FR-002, FR-005, FR-017): the marks, the colours and the widths. The marks are the
+ * ui's one table of icons and no other (an ASCII tag where the capabilities show no emoji); the colours are the ui's one theme; colour is written only where the look allows it; a
  * text is cut to the columns of the terminal, never inside a character or an escape sequence. The spinner and the progress bar are pure
  * functions of a number, so that a test draws them without a terminal.
  *
  * @example
  * ```ts
- * import { line, progressBar } from "./style.ts";
- * const look = { tty: false, colour: false, emoji: false, columns: 80 };
+ * import { capabilitiesOf } from "@intellectual-frontiers/terminal/ui";
+ * import { line, lookOf, progressBar } from "./style.ts";
+ * const look = lookOf(capabilitiesOf({}, { isTTY: false }), false);
  * line("ok", "built", look); // "[ok] built"
  * progressBar(5, 10, 10, look); // "[#####-----]"
  * ```
@@ -16,27 +17,27 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import { lineMarkOf, tint, type IconName, type ThemeName, type UiCaps } from "@intellectual-frontiers/terminal/ui";
 import { cutToWidth } from "@intellectual-frontiers/terminal/width";
-import * as palette from "@intellectual-frontiers/terminal/palette";
 import type { ProblemLevel } from "@intellectual-frontiers/headless/governance";
 
-/** What the terminal written to can show, and whether it is one. */
-export type Look = palette.Capabilities & { readonly tty: boolean };
+/** What the terminal written to can show (the ui's capabilities: level, colour depth, emoji, columns, rows), and whether it is one. */
+export type Look = UiCaps & { readonly tty: boolean };
 
 /** What a line of output is about: a problem's level, or how something ended. */
 export type Tone = ProblemLevel | "ok" | "skip" | "hint" | "cancelled";
 
-/** The mark of the palette a tone is written with (the palette's marks are the only marks). */
-export function markKindOf(tone: Tone): palette.MarkKind {
+/** The icon of the ui's one table that a tone is written with (FR-001): one icon for each tone, and no two tones share one. */
+export function iconOfTone(tone: Tone): IconName {
   switch (tone) {
     case "ok":
       return "done";
     case "fail":
       return "failed";
     case "warn":
-      return "warning";
+      return "warn";
     case "pending":
-      return "pending";
+      return "working";
     case "action":
       return "action";
     case "skip":
@@ -44,7 +45,28 @@ export function markKindOf(tone: Tone): palette.MarkKind {
     case "hint":
       return "hint";
     case "cancelled":
-      return "cancelled";
+      return "stop";
+    default:
+      return absurd(tone);
+  }
+}
+
+/** The name of the ui's one theme that a tone is coloured with (FR-017). */
+export function themeOfTone(tone: Tone): ThemeName {
+  switch (tone) {
+    case "ok":
+      return "success";
+    case "fail":
+      return "error";
+    case "warn":
+      return "warn";
+    case "pending":
+    case "skip":
+    case "cancelled":
+      return "dim";
+    case "action":
+    case "hint":
+      return "accent";
     default:
       return absurd(tone);
   }
@@ -52,23 +74,30 @@ export function markKindOf(tone: Tone): palette.MarkKind {
 
 /** The tone's mark, painted. */
 export function mark(tone: Tone, look: Look): string {
-  const kind = markKindOf(tone);
-  return palette.paint(palette.MARKS[kind].role, palette.mark(kind, look), look);
+  return tint(themeOfTone(tone), lineMarkOf(iconOfTone(tone), look), look);
 }
 
-/** A line's beginning: the tone's mark, a space and the text. */
+/** The lines of a text, whatever its line endings (`\r\n`, `\r` or `\n`): no line holds a carriage return (FR-024). */
+export function textLines(text: string): readonly string[] {
+  return text.replace(/\r\n?/g, "\n").split("\n");
+}
+
+/** A line's beginning: the tone's mark, a space and the text; the lines of a longer text follow, indented under the text. */
 export function line(tone: Tone, text: string, look: Look): string {
-  return palette.label(markKindOf(tone), text, look);
+  const [first = "", ...rest] = textLines(text);
+  return [`${mark(tone, look)} ${first}`, ...rest.map((l) => `   ${l}`)].join("\n");
 }
 
-/** A text painted in a role. */
-export function paint(role: palette.Role, text: string, look: Look): string {
-  return palette.paint(role, text, look);
+/** A text in a name of the theme, line by line so that a colour never runs across a line end. */
+export function paint(name: ThemeName, text: string, look: Look): string {
+  return textLines(text)
+    .map((l) => tint(name, l, look))
+    .join("\n");
 }
 
 /** A text dimmed. */
 export function dim(text: string, look: Look): string {
-  return palette.paint("dim", text, look);
+  return paint("dim", text, look);
 }
 
 /** The frames of the spinner: braille where the terminal is a modern one (it shows emoji), else ASCII. */
@@ -104,4 +133,9 @@ export function fmtDuration(ms: number): string {
 /** A line cut to the terminal's width (one column is left free so that the line never wraps), with `…` where it was cut. */
 export function fit(text: string, look: Look): string {
   return cutToWidth(text, Math.max(1, look.columns - 1), "…");
+}
+
+/** The look of a stream: its capabilities, decided once by the host, and whether it is a terminal. */
+export function lookOf(caps: UiCaps, tty: boolean): Look {
+  return { ...caps, tty };
 }

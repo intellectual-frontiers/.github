@@ -1,0 +1,20 @@
+### plain at 100
+  HOST               STATUS           EXIT  FIRST PROBLEM
+  synthetic-host-01  [ok] ok             0
+  synthetic-host-02  [x] failed          1  the disk is full
+  synthetic-host-03  [!] unreachable     3  synthetic-host-03 could not be reached
+  synthetic-host-04  [todo] waiting      4  no token yet
+
+### ansi at 100
+␛[2m  HOST               STATUS           EXIT  FIRST PROBLEM␛[0m
+  synthetic-host-01  ␛[32m[ok]␛[0m ok             0
+  synthetic-host-02  ␛[31;1m[x]␛[0m failed          1  the disk is full
+  synthetic-host-03  ␛[33m[!]␛[0m unreachable     3  synthetic-host-03 could not be reached
+  synthetic-host-04  ␛[2m[todo]␛[0m waiting      4  no token yet
+
+### full at 100
+␛[38;2;136;136;136m  HOST               STATUS          EXIT  FIRST PROBLEM␛[0m
+  synthetic-host-01  ␛[38;2;102;204;136m✅␛[0m ok              0
+  synthetic-host-02  ␛[38;2;238;102;102m❌␛[0m failed          1  the disk is full
+  synthetic-host-03  ␛[38;2;238;170;68m⚠️␛[0m unreachable     3  synthetic-host-03 could not be reached
+  synthetic-host-04  ␛[38;2;136;136;136m⏳␛[0m waiting         4  no token yet
