@@ -37,10 +37,10 @@ export const FULL_MIN_ROWS = 12;
 /** The columns of a plain output where the stream does not say. */
 export const DEFAULT_COLUMNS = 80;
 
-/** What the guide may do on a stream; `colour`, `emoji` and `columns` are the fields of the palette's `Capabilities`, so it is one. */
 /** How many colours the terminal shows: none, the 16 of ANSI, 256, or 24-bit. */
 export type ColourDepth = "none" | "16" | "256" | "truecolor";
 
+/** What the ui may do on a stream; `colour`, `emoji` and `columns` are the fields of the palette's `Capabilities`, so it is one. */
 export type UiCaps = {
   /** How many colours (`none` exactly where `colour` is false). */
   readonly colourDepth: ColourDepth;
