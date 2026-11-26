@@ -206,7 +206,7 @@ install_deps() {
   if [[ -f "$ROOT/bun.lock" ]]; then flag=(--frozen-lockfile); fi
   ( cd "$ROOT" && bun install "$@{flag[@]}" ) || fail "bun install failed" "its message is above; a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again"
   mkdir -p "$(dirname "$STAMP")"
-  printf '%s\n' "$want" > "$STAMP"
+  printf '%s\n' "$(stamp_of)" > "$STAMP"
 }
 ${converge}
 main() {
