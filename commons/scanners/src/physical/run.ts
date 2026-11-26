@@ -39,10 +39,10 @@ export type RunBase = {
 };
 
 /**
- * What a run is given: a scan of a path reads local files and needs no permit; a scan of an endpoint or a host reaches a target and needs the permit of the interlock (`permits` of estate) for the action `scan` on the asset, made
- * only by that function, so that a call with none does not type-check.
+ * What a run is given: a scanner of the technique `passive` reads files or an image and sends nothing to a target, so it needs no permit; any other (a probe, a scan) reaches a target and needs the permit of the interlock (`permits`
+ * of estate) for the action `scan` on the asset, which only that function makes: a run without it, or with one for another asset or past its expiry, is refused before anything starts.
  */
-export type RunInput = RunBase & ({ readonly target: Extract<Target, { readonly kind: "path" }>; readonly permit?: undefined } | { readonly target: Exclude<Target, { readonly kind: "path" }>; readonly permit: Permit<"scan"> });
+export type RunInput = RunBase & { readonly target: Target; readonly permit?: Permit<"scan"> };
 
 /** The record of a run, refused or made. */
 export type RunRecord = {
@@ -80,7 +80,7 @@ export async function runScanner(i: RunInput): Promise<Result<RunResult, RunRefu
   if (bad !== undefined) return refuse(bad);
   if (target.kind === "path" && !(await fs.exists(target.value))) return refuse(`${target.value} does not exist`);
 
-  if (target.kind !== "path") {
+  if (scanner.technique !== "passive") {
     const problem = i.permit === undefined ? "a scan that reaches a target needs the permit of the interlock for it" : permitProblem(i.permit, "scan", i.asset, i.now);
     if (problem !== undefined) return refuse(`not allowed: ${problem}`);
   }
