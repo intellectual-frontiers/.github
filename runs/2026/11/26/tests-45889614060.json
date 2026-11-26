@@ -1,0 +1,1046 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45889614060",
+    "workflow": "tests",
+    "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+    "at": "2026-11-26T20:16:07Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45889614060"
+  },
+  "steps": [
+    {
+      "id": "commons-generated-files-and-specificatio-8",
+      "job": "check",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6984,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-documentation-generator-s-dependenci-4",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-formatter-6",
+      "job": "check",
+      "module": "repository",
+      "tool": "format",
+      "outcome": "findings",
+      "findings": 21,
+      "durationMs": 16,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-linter-type-aware-no-warning-allowed-7",
+      "job": "check",
+      "module": "repository",
+      "tool": "lint",
+      "outcome": "findings",
+      "findings": 10,
+      "durationMs": 1780,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-root-s-development-tools-from-bun-lo-3",
+      "job": "check",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-on-the-tests-of-the-root-an-5",
+      "job": "check",
+      "module": "repository",
+      "tool": "tsc",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2945,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-installers-of-agora-on-macos-4",
+      "job": "installers",
+      "module": "repository",
+      "tool": "bun-test",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 7,
+      "exitStatus": 127
+    },
+    {
+      "id": "the-root-s-development-tools-from-bun-lo-3",
+      "job": "installers",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18,
+      "exitStatus": 0
+    },
+    {
+      "id": "independent-validators-of-the-exports-rd-5",
+      "job": "tests",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4730,
+      "exitStatus": 0
+    },
+    {
+      "id": "shellcheck-which-the-packaging-test-uses-4",
+      "job": "tests",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4131,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/agents-md-check.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/agora-install.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-any-layout.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-anyfs-merge-medium.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-estate-fleet-s3.test.ts",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-estate-fleet-sshd.test.ts",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-headless-describe.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-kanon.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-libraries-by-concern.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-libraries.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-licensing.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-mizan-harness.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-mizan-importers.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-mizan-ontology.test.ts",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-mizan.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-no-product.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-packaging.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-site-evidence.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-typescript-practice.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-workflows-golden.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-workflows-schema.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/commons-workload-pattern.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository/tests/repository-layout.test.ts",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 0
+    },
+    {
+      "id": "the-root-s-development-tools-from-bun-lo-3",
+      "job": "tests",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-bun-each-file-by-itself-so--6",
+      "job": "tests",
+      "module": "repository",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32346,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-7",
+      "job": "tests",
+      "module": "repository",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 4,
+      "durationMs": 29633,
+      "exitStatus": 1
+    },
+    {
+      "id": "commons-generated-files-and-specificatio-3",
+      "job": "windows",
+      "module": "repository",
+      "tool": "checks",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2272,
+      "exitStatus": 0
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-1be5934591a5378e",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 139,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:replica: a.sql.store as unknown as Mergeable,"
+    },
+    {
+      "id": "f-1d3677798b004e27",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-any-layout.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-any-layout.test.ts is not formatted",
+      "key": "tests/commons-any-layout.test.ts"
+    },
+    {
+      "id": "f-20b1ea2721db14d0",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-mizan-harness.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-mizan-harness.test.ts is not formatted",
+      "key": "tests/commons-mizan-harness.test.ts"
+    },
+    {
+      "id": "f-28f9478e66849053",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-workflows-golden.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-workflows-golden.test.ts is not formatted",
+      "key": "tests/commons-workflows-golden.test.ts"
+    },
+    {
+      "id": "f-31549a10c75bd137",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-mizan.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-mizan.test.ts is not formatted",
+      "key": "tests/commons-mizan.test.ts"
+    },
+    {
+      "id": "f-33bb92f92af17d9c",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-packaging.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-packaging.test.ts is not formatted",
+      "key": "tests/commons-packaging.test.ts"
+    },
+    {
+      "id": "f-3b32259e3d363339",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-kanon.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-kanon.test.ts is not formatted",
+      "key": "tests/commons-kanon.test.ts"
+    },
+    {
+      "id": "f-3c239d5e50efdbf5",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-site-evidence.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-site-evidence.test.ts is not formatted",
+      "key": "tests/commons-site-evidence.test.ts"
+    },
+    {
+      "id": "f-42f94108c4e31fba",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 226,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"real sshd\", opened.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-48fa6e8799527f47",
+      "tool": "bun-test",
+      "module": "repository/tests/commons-mizan-ontology.test.ts",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-bun-each-file-by-itself-so--6",
+        "logSha256": "d427facac4893a88b6086f7c5714e66a79cf851b3f11588d5f2c00552830fcf0"
+      },
+      "at": "2026-11-26T20:15:43Z",
+      "code": "test-failed",
+      "file": "tests/commons-mizan-ontology.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0019-mizan-integrations FR-011, 0019-mizan-integrations FR-016, 0019-mizan-integrations FR-017, 0019-mizan-integrations FR-018: independent tools read the exports: rdflib parses the Turtle, the RDF/XML (into the same graph) and the DCAT catalog (with its datasets, distributions and media types), pySHACL finds the ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema",
+      "key": "0019-mizan-integrations FR-011, 0019-mizan-integrations FR-016, 0019-mizan-integrations FR-017, 0019-mizan-integrations FR-018: independent tools read the exports: rdflib parses the Turtle, the RDF/XML (into the same graph) and the DCAT catalog (with its datasets, distributions and media types), pySHACL finds the ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema"
+    },
+    {
+      "id": "f-5302b47aac2d1a2b",
+      "tool": "bun-test",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-node-26-7",
+        "logSha256": "782d3d4458c418b9d78af0c21b675a069909ac4d8a87ebeff19934c88e5c95a9"
+      },
+      "at": "2026-11-26T20:15:39Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0019-mizan-integrations FR-011, 0019-mizan-integrations FR-016, 0019-mizan-integrations FR-017, 0019-mizan-integrations FR-018: independent tools read the exports: rdflib parses the Turtle, the RDF/XML (into the same graph) and the DCAT catalog (with its datasets, distributions and media types), pySHACL finds the ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema",
+      "key": "0019-mizan-integrations FR-011, 0019-mizan-integrations FR-016, 0019-mizan-integrations FR-017, 0019-mizan-integrations FR-018: independent tools read the exports: rdflib parses the Turtle, the RDF/XML (into the same graph) and the DCAT catalog (with its datasets, distributions and media types), pySHACL finds the ontology conforms to the shapes made from its schemas and rejects a broken one, jsonschema checks the JSON Schema"
+    },
+    {
+      "id": "f-556f51c0bd505363",
+      "tool": "bun-test",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-node-26-7",
+        "logSha256": "782d3d4458c418b9d78af0c21b675a069909ac4d8a87ebeff19934c88e5c95a9"
+      },
+      "at": "2026-11-26T20:15:39Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0019-mizan-integrations FR-010, 0019-mizan-integrations FR-019: the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings, RDF/XML, OWL, the DCAT catalog, the audit of the packaging ontology) are written, current, and each says it is generated",
+      "key": "0019-mizan-integrations FR-010, 0019-mizan-integrations FR-019: the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings, RDF/XML, OWL, the DCAT catalog, the audit of the packaging ontology) are written, current, and each says it is generated"
+    },
+    {
+      "id": "f-561d578415bf7f0d",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/fixtures/workflows-golden/site.auto.yml",
+      "severity": "warning",
+      "message": "tests/fixtures/workflows-golden/site.auto.yml is not formatted",
+      "key": "tests/fixtures/workflows-golden/site.auto.yml"
+    },
+    {
+      "id": "f-579ed53721bdb3dd",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/release/commons-package.test.ts",
+      "severity": "warning",
+      "message": "tests/release/commons-package.test.ts is not formatted",
+      "key": "tests/release/commons-package.test.ts"
+    },
+    {
+      "id": "f-5b63ebd31dc7dbb7",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "commons/tools/agents-md-check.ts",
+      "severity": "warning",
+      "message": "commons/tools/agents-md-check.ts is not formatted",
+      "key": "commons/tools/agents-md-check.ts"
+    },
+    {
+      "id": "f-5e790ead6c3615ff",
+      "tool": "bun-test",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-node-26-7",
+        "logSha256": "782d3d4458c418b9d78af0c21b675a069909ac4d8a87ebeff19934c88e5c95a9"
+      },
+      "at": "2026-11-26T20:15:39Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: tests/commons-estate-fleet-s3.test.ts",
+      "key": "tests/commons-estate-fleet-s3.test.ts"
+    },
+    {
+      "id": "f-61bd93dbe0efd3e8",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/fixtures/workflows-golden/action-bun.yml",
+      "severity": "warning",
+      "message": "tests/fixtures/workflows-golden/action-bun.yml is not formatted",
+      "key": "tests/fixtures/workflows-golden/action-bun.yml"
+    },
+    {
+      "id": "f-631aacb7c48d1c52",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/fixtures/workflows-golden/evidence.auto.yml",
+      "severity": "warning",
+      "message": "tests/fixtures/workflows-golden/evidence.auto.yml is not formatted",
+      "key": "tests/fixtures/workflows-golden/evidence.auto.yml"
+    },
+    {
+      "id": "f-6714af217023cd78",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/agents-md-check.test.ts",
+      "severity": "warning",
+      "message": "tests/agents-md-check.test.ts is not formatted",
+      "key": "tests/agents-md-check.test.ts"
+    },
+    {
+      "id": "f-77712d283a17fe2c",
+      "tool": "bun-test",
+      "module": "repository/tests/commons-mizan-ontology.test.ts",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-bun-each-file-by-itself-so--6",
+        "logSha256": "d427facac4893a88b6086f7c5714e66a79cf851b3f11588d5f2c00552830fcf0"
+      },
+      "at": "2026-11-26T20:15:43Z",
+      "code": "test-failed",
+      "file": "tests/commons-mizan-ontology.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0019-mizan-integrations FR-010, 0019-mizan-integrations FR-019: the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings, RDF/XML, OWL, the DCAT catalog, the audit of the packaging ontology) are written, current, and each says it is generated",
+      "key": "0019-mizan-integrations FR-010, 0019-mizan-integrations FR-019: the exports of the ontology (SHACL shapes, JSON Schema, SKOS, SQL, SSSOM mappings, RDF/XML, OWL, the DCAT catalog, the audit of the packaging ontology) are written, current, and each says it is generated"
+    },
+    {
+      "id": "f-831bae2d1b5c061a",
+      "tool": "bun-test",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-node-26-7",
+        "logSha256": "782d3d4458c418b9d78af0c21b675a069909ac4d8a87ebeff19934c88e5c95a9"
+      },
+      "at": "2026-11-26T20:15:39Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: tests/commons-estate-fleet-sshd.test.ts",
+      "key": "tests/commons-estate-fleet-sshd.test.ts"
+    },
+    {
+      "id": "f-83f49b17a6d23644",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "ifc/module-doc",
+      "file": "tests/commons-workflows-golden.test.ts",
+      "line": 1,
+      "severity": "error",
+      "message": "begin the file with its module's documentation: a /** ... */ block that says @module, before any code or other comment",
+      "key": "ifc/module-doc:begin the file with its module's documentation: a /** ... */ block that says @module, before any code or other comment:// Spec: 0030-generated-workflows FR-014"
+    },
+    {
+      "id": "f-872219f399d36f9d",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-estate-fleet-s3.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-estate-fleet-s3.test.ts is not formatted",
+      "key": "tests/commons-estate-fleet-s3.test.ts"
+    },
+    {
+      "id": "f-8762d74d284fa9a1",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 210,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"git branch\", git.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-897472b18a0d011e",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/repository-layout.test.ts",
+      "severity": "warning",
+      "message": "tests/repository-layout.test.ts is not formatted",
+      "key": "tests/repository-layout.test.ts"
+    },
+    {
+      "id": "f-8f38f15eb3de5a29",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 155,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:assert((await publishVector({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium })).kind === \"ok\");"
+    },
+    {
+      "id": "f-950196bab089ebac",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-no-product.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-no-product.test.ts is not formatted",
+      "key": "tests/commons-no-product.test.ts"
+    },
+    {
+      "id": "f-9a977de3ef179b16",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/fixtures/workflows-golden/tests.auto.yml",
+      "severity": "warning",
+      "message": "tests/fixtures/workflows-golden/tests.auto.yml is not formatted",
+      "key": "tests/fixtures/workflows-golden/tests.auto.yml"
+    },
+    {
+      "id": "f-9aa0051c14d78c18",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-estate-fleet-sshd.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-estate-fleet-sshd.test.ts is not formatted",
+      "key": "tests/commons-estate-fleet-sshd.test.ts"
+    },
+    {
+      "id": "f-9f969139855235c6",
+      "tool": "bun-test",
+      "module": "repository/tests/commons-estate-fleet-s3.test.ts",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-bun-each-file-by-itself-so--6",
+        "logSha256": "6bb4aa78ad6e50bdde3d954127c8de1bb150d577aad4ba36f34be9920c66f490"
+      },
+      "at": "2026-11-26T20:15:43Z",
+      "code": "unhandled-error",
+      "file": "tests/commons-estate-fleet-s3.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled tests/commons-estate-fleet-s3.test.ts"
+    },
+    {
+      "id": "f-a6ee255b88ce666b",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 275,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"real S3 (RustFS)\", opened.value.store as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-ab7d97bdedfcfc99",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/release/quality-assessor-package.test.ts",
+      "line": 75,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:const packed = await sh([bun, \"tools/pack.ts\"], dir, { ...process.env, IFC_DISTRIBUTION: \"per-library\" } as Record<string, string>);"
+    },
+    {
+      "id": "f-cb2e17397f22d384",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 94,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:const done = await syncThrough({ self: r.id, replica: r.sql.store as unknown as Mergeable, medium, cursor: r.cursor, ...more });"
+    },
+    {
+      "id": "f-da45878d3f785453",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-packaging.test.ts",
+      "line": 1288,
+      "severity": "error",
+      "message": "This assertion is unnecessary since it does not change the type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since it does not change the type of the expression.:assertEquals(String((v[\"mappingRelation\"] as unknown) ?? \"\"), \"closeMatch\", local);"
+    },
+    {
+      "id": "f-dda73eb44536d888",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-workload-pattern.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-workload-pattern.test.ts is not formatted",
+      "key": "tests/commons-workload-pattern.test.ts"
+    },
+    {
+      "id": "f-dfbc555184b12f3c",
+      "tool": "lint",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-linter-type-aware-no-warning-allowed-7",
+        "logSha256": "c418c61031a008ee0fb325b89cfcec280dbac1ec047f97bb60bf1eb994355eda"
+      },
+      "at": "2026-11-26T20:15:11Z",
+      "code": "@typescript-eslint/no-unnecessary-type-assertion",
+      "file": "tests/commons-anyfs-merge-medium.test.ts",
+      "line": 186,
+      "severity": "error",
+      "message": "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+      "key": "@typescript-eslint/no-unnecessary-type-assertion:This assertion is unnecessary since the receiver accepts the original type of the expression.:console.log(`[anyfs merge medium] ${await exercise(\"folder\", m.value as unknown as Medium, dir)}`);"
+    },
+    {
+      "id": "f-e13a15aca970c00d",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/commons-libraries.test.ts",
+      "severity": "warning",
+      "message": "tests/commons-libraries.test.ts is not formatted",
+      "key": "tests/commons-libraries.test.ts"
+    },
+    {
+      "id": "f-e21d6f458c7c6117",
+      "tool": "format",
+      "module": "repository",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-formatter-6",
+        "logSha256": "3b858d25de9cc06dbb9adfdd03d9ac52fb030f287d5cac15bccce891d3236258"
+      },
+      "at": "2026-11-26T20:15:09Z",
+      "code": "unformatted",
+      "file": "tests/release/commons-ci.test.ts",
+      "severity": "warning",
+      "message": "tests/release/commons-ci.test.ts is not formatted",
+      "key": "tests/release/commons-ci.test.ts"
+    },
+    {
+      "id": "f-edba2d8fe9dfedd1",
+      "tool": "bun-test",
+      "module": "repository/tests/commons-estate-fleet-sshd.test.ts",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-tests-on-bun-each-file-by-itself-so--6",
+        "logSha256": "c36b1f6a2221fb54fa2bda870e9ebf5937e7e755bc186138cbe619e46b0dd460"
+      },
+      "at": "2026-11-26T20:15:43Z",
+      "code": "unhandled-error",
+      "file": "tests/commons-estate-fleet-sshd.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled tests/commons-estate-fleet-sshd.test.ts"
+    },
+    {
+      "id": "f-f5d11a36ffa4b362",
+      "tool": "bun-test",
+      "code": "no-output",
+      "module": "repository",
+      "severity": "error",
+      "message": "the command ended with status 127 and printed nothing a parser of bun-test reads",
+      "key": "the-installers-of-agora-on-macos-4:no-output",
+      "evidence": {
+        "run": "45889614060",
+        "commit": "018afe880e0ae8af69797cf2df1c2404e585b9d1",
+        "step": "the-installers-of-agora-on-macos-4",
+        "logSha256": "7c338f380141ad2fdc3ec7a9c5851edef6c2549ce7f717e5538ea6e258048b4d"
+      },
+      "at": "2026-11-26T20:15:03Z"
+    }
+  ]
+}
