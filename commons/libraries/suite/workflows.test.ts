@@ -174,7 +174,7 @@ proves(
       assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.systems) }}");
       assertStringIncludes(ci, "IFC_STEP_SCRIPT: ${{ matrix.verify }}");
       assertStringIncludes(ci, "working-directory: ${{ matrix.folder }}");
-      assertStringIncludes(ci, "needs: [plan, verify, systems]");
+      assertStringIncludes(ci, "needs: [seen, plan, verify, systems]");
       assert(!ci.includes("commons/alpha"), "no library is named in the workflow: the plan says which are affected");
       assert(!existsSync(join(dir, ".github", "workflows", "alpha.auto.yml")) && !existsSync(join(dir, ".github", "workflows", "beta.auto.yml")));
       assertEquals(LIBRARY_CI["alpha"], undefined);
@@ -279,4 +279,61 @@ proves([`${SPEC} FR-013`], "the tests of the root run on Linux alone, and the in
   );
   const matrix = w.jobs["tests"]?.strategy?.matrix;
   assert(matrix !== undefined && typeof matrix === "object" && !("expression" in matrix), "the matrix of tests is data");
+});
+
+proves([`${SPEC} FR-015`], "a push to a branch other than main is proved once: the workflows that a push to any branch starts have the job seen, which says proved only for such a push whose commit has a successful run, and every other job of them waits for it and is skipped where it says proved", () => {
+  const runs = workflows().filter((x) => x.on.push !== undefined && x.on.push.branches === undefined && x.file !== "site");
+  assertEquals(runs.map((x) => x.file).sort(), ["ci", "conformance"]);
+  for (const w of runs) {
+    const seen = w.jobs["seen"];
+    assert(seen !== undefined, `${w.file}: the job seen`);
+    assertEquals(seen.permissions, { actions: "read" }, `${w.file}: seen reads the runs and nothing else`);
+    assert(seen.steps.every((st) => st.kind !== "uses"), `${w.file}: seen checks nothing out and installs nothing`);
+    assert(seen.steps.every((st) => st.continueOnError === true), `${w.file}: where the guard fails the workflow runs`);
+    const script = seen.steps.map((st) => (st.kind === "run" ? st.run : "")).join("\n");
+    assertStringIncludes(script, 'GITHUB_EVENT_NAME" = push');
+    assertStringIncludes(script, 'GITHUB_REF" != refs/heads/main');
+    assertStringIncludes(script, "status=success");
+    assertStringIncludes(script, "|| n=0");
+    for (const [id, j] of Object.entries(w.jobs)) {
+      if (id === "seen" || id === "keep-findings") continue;
+      assert((j.needs ?? []).length > 0, `${w.file}/${id}: waits for seen, directly or through a job that does`);
+      if (!(j.needs ?? []).includes("seen")) continue;
+      assertStringIncludes(j.when ?? "", "needs.seen.outputs.proved != 'true'");
+    }
+    const text = renderWorkflow(w);
+    assertStringIncludes(text, "if: \"always() && needs.seen.outputs.proved != 'true'\"");
+  }
+  for (const w of workflows()) if (!runs.some((r) => r.file === w.file)) assert(w.jobs["seen"] === undefined, `${w.file}: a workflow that no push to a branch starts has no guard`);
+});
+
+proves([`${SPEC} FR-016`], "the findings wait for the plan and the jobs that make findings and for no other, keep-findings waits for findings alone, and neither installs the root's tools", () => {
+  for (const w of workflows()) {
+    const gather = w.jobs[w.file === "ci" ? "ci" : "findings"];
+    if (gather === undefined) continue;
+    const makers = Object.entries(w.jobs).filter(([, j]) => j.steps.some((st) => st.kind === "run" && st.env?.["IFC_STEP_SCRIPT"] !== undefined)).map(([id]) => id);
+    assertEquals((gather.needs ?? []).filter((n) => n !== "seen").sort(), [...("plan" in w.jobs ? ["plan"] : []), ...makers].sort(), `${w.file}: what the findings wait for`);
+    const keep = w.jobs["keep-findings"];
+    assertEquals(keep?.needs, [w.file === "ci" ? "ci" : "findings"], `${w.file}: keep-findings waits for the findings alone`);
+    for (const j of [gather, keep]) {
+      const bun = j?.steps.find((st) => st.kind === "uses" && st.uses === PIN.bun);
+      assert(bun?.kind === "uses" && bun.with?.["tools"] === "false", `${w.file}: the programs of the findings read no package`);
+    }
+  }
+  const action = ACTIONS.find((a) => a.folder === "bun");
+  assertEquals(action?.inputs["tools"]?.default, "true");
+  assertEquals(action?.steps.at(-1)?.when, "inputs.tools == 'true'");
+});
+
+proves([`${SPEC} FR-017`], "the release publishes only after the build of each release has ended in success, tags in the step that publishes, and the findings do not wait for the publication", () => {
+  const w = workflows().find((x) => x.file === "release");
+  assert(w !== undefined);
+  const publish = w.jobs["publish"];
+  assert(publish !== undefined);
+  assertEquals(publish.needs, ["plan", "build"]);
+  assertStringIncludes(publish.when ?? "", "inputs.publish");
+  assertEquals((w.jobs["findings"]?.needs ?? []).includes("publish"), false, "the findings do not wait for the publication");
+  assert(publish.steps.every((st) => st.kind !== "run" || st.env?.["IFC_STEP_SCRIPT"] === undefined), "the publication makes no finding and is a gate");
+  const sent = publish.steps.filter((st) => st.kind === "run" && /releasing\.ts publish/.test(st.run));
+  assertEquals(sent.length, 1, "publication and tagging are one step, which withholds a tag where its release is not on the registry");
 });

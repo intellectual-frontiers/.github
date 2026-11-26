@@ -322,7 +322,7 @@ jobs:
     name: findings
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [check, tests, installers, workflows, windows, robot]
+    needs: [check, tests, installers, windows, robot]
     if: "always()"
     permissions:
       contents: read
@@ -333,6 +333,8 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
       - name: The findings every job kept
         uses: actions/download-artifact@v4
         with:
@@ -372,6 +374,8 @@ jobs:
       - uses: actions/checkout@v4
         continue-on-error: true
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
         continue-on-error: true
       - name: The merged findings of this workflow
         uses: actions/download-artifact@v4

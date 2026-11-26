@@ -15,3 +15,4 @@ number	slug	state
 0014	repoctl-usage	in force
 0015	repoctl-names	in force
 0016	repoctl-canaries	in force
+0017	repoctl-release-train	in force

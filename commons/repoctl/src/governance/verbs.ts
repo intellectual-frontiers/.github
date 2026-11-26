@@ -17,7 +17,7 @@ import type { Channel, ConfirmationClass, Effect, Kind } from "@intellectual-fro
 import type { TierId } from "./tiers.ts";
 
 /** The words of every verb, as a person types them: a closed union. */
-export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "usage" | "names" | "ci step" | "mcp";
+export type VerbId = "sync" | "merge" | "check" | "status" | "hygiene" | "release plan" | "release apply" | "release train" | "release publish" | "new library" | "commit" | "doctor" | "prove" | "docs build" | "docs serve" | "docs check" | "query" | "usage" | "names" | "ci step" | "mcp";
 
 /** What a verb is. */
 export type VerbFacts = {
@@ -186,6 +186,19 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
     confirmation: "none",
     humanOnly: [],
   },
+  "release train": {
+    id: "release train",
+    summary: "Walk a release in order: make it, say whether it may be published, and once it is published move the pins of the consumers, install and check them; it publishes and tags nothing.",
+    kind: "action",
+    effect: "mutate",
+    idempotent: false,
+    dryRun: true,
+    check: false,
+    tier: "contributor",
+    channels: ["local"],
+    confirmation: "none",
+    humanOnly: [],
+  },
   "release publish": {
     id: "release publish",
     summary: "Publish the packed libraries of the release record to npm, behind the releaser tier and a typed confirmation.",
@@ -307,5 +320,5 @@ export const VERBS: Readonly<Record<VerbId, VerbFacts>> = {
 
 /** The words of every verb, in the order the help lists them. */
 export function verbIds(): readonly VerbId[] {
-  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "usage", "names", "ci step", "mcp"];
+  return ["check", "sync", "merge", "status", "hygiene", "release plan", "release apply", "release train", "release publish", "new library", "commit", "doctor", "prove", "docs build", "docs serve", "docs check", "query", "usage", "names", "ci step", "mcp"];
 }

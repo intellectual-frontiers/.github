@@ -32,6 +32,8 @@ export type Host = {
   readonly configProblem?: { readonly code: "E-CONFIG-MISSING" | "E-CONFIG-LOAD" | "E-CONFIG-INVALID"; readonly message: string };
   /** What `release apply` runs besides the planner (the generators of the release and the tests that pack): the real ones where it is not given. */
   readonly releasing?: ReleasingHost;
+  /** How `release train` waits for a publication (0017-repoctl-release-train FR-005): the interval between two tries of an install, in milliseconds (10000 where it is not given). */
+  readonly train?: { readonly pollMs?: number };
 };
 
 /** The generators a host runs: those of the configuration, in the order it declared them. */

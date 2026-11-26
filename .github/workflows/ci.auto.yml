@@ -34,9 +34,38 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  # whether this commit was proved already by a run of this workflow (0030-generated-workflows FR-015): only a push to a branch other than main can be, and the answer is not proved where GitHub cannot be asked
+  seen:
+    name: seen
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      proved: ${{ steps.seen.outputs.proved }}
+    steps:
+      - name: Whether this commit has a run of this workflow that succeeded
+        id: seen
+        shell: bash
+        run: |
+          proved=false
+          if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" != refs/heads/main ]; then
+            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&status=success&per_page=1" --jq .total_count 2>/dev/null) || n=0
+            case "$n" in ""|*[!0-9]*) n=0 ;; esac
+            if [ "$n" -gt 0 ]; then proved=true; fi
+          fi
+          echo "proved=$proved" >> "$GITHUB_OUTPUT"
+          echo "commit $GITHUB_SHA on $GITHUB_REF: proved before = $proved" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_FILE: ci.auto.yml
+        continue-on-error: true
+
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    needs: [seen]
+    if: "needs.seen.outputs.proved != 'true'"
     outputs:
       has-linux: ${{ steps.plan.outputs.has-linux }}
       linux: ${{ steps.plan.outputs.linux }}
@@ -201,8 +230,8 @@ jobs:
     name: ci
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [plan, verify, systems]
-    if: "always()"
+    needs: [seen, plan, verify, systems]
+    if: "always() && needs.seen.outputs.proved != 'true'"
     permissions:
       contents: read
       checks: write
@@ -212,6 +241,8 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
       - name: The findings every job kept
         uses: actions/download-artifact@v4
         with:
@@ -257,6 +288,8 @@ jobs:
       - uses: actions/checkout@v4
         continue-on-error: true
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
         continue-on-error: true
       - name: The merged findings of this workflow
         uses: actions/download-artifact@v4
