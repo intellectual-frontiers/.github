@@ -10,7 +10,7 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { classify, inventory, policyFindings } from "../src/ci/inventory.ts";
-import { RED_CAUSES } from "../src/ci/policy.ts";
+import { blocksRelease, CHECK_CLASS, CHECKS, checkOf, RED_CAUSES } from "../src/ci/policy.ts";
 import { wrapWorkflow } from "../src/ci/wrap.ts";
 import { workflows } from "../src/workflows/definitions.ts";
 import { expr, job, run, use, type Workflow } from "../src/workflows/model.ts";
@@ -126,4 +126,13 @@ proves([`${SPEC} FR-005`, `${SPEC} FR-007`], "the history is written by one job 
     const gather = w.jobs[w.file === "ci" ? "ci" : "findings"];
     assert(gather?.permissions?.["contents"] !== "write", `${w.file}: the job that runs on every event holds no write permission`);
   }
+});
+
+proves([`${SPEC} FR-010`], "the table of checks says that exactly a syntax error, a type error, a package that does not pack and a credential in a package block a release, and that every other check is a finding with its reason", () => {
+  const blocking = CHECKS.filter((c) => blocksRelease(c));
+  assertEquals([...blocking].sort(), ["pack", "secret-scan", "syntax", "types"]);
+  for (const c of CHECKS) assert(CHECK_CLASS[c].why.length > 20, `${c} has no reason`);
+  for (const c of ["tests", "trace", "mizan", "hygiene", "surface-thin", "lint", "format", "citations"] as const) assertEquals(CHECK_CLASS[c].class, "finding");
+  assertEquals(checkOf("types"), "types");
+  assertEquals(checkOf("a-line-count"), undefined);
 });

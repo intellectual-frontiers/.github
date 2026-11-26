@@ -47,6 +47,8 @@ export type ProblemCode =
   | "E-TRAIN-WAITING"
   | "E-TRAIN-INSTALL"
   | "E-TRAIN-VERIFY"
+  | "E-TRAIN-FINDING"
+  | "E-TRAIN-TESTS-FAILING"
   | "E-COMMIT-SUBJECT"
   | "E-COMMIT-REFS"
   | "E-COMMIT-IMPACT"
@@ -113,6 +115,8 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-TRAIN-WAITING",
   "E-TRAIN-INSTALL",
   "E-TRAIN-VERIFY",
+  "E-TRAIN-FINDING",
+  "E-TRAIN-TESTS-FAILING",
   "E-COMMIT-SUBJECT",
   "E-COMMIT-REFS",
   "E-COMMIT-IMPACT",
@@ -326,8 +330,20 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-TRAIN-VERIFY": {
     title: "A consumer does not pass its check",
-    what: "A command of the consumer's commons-consumer.json ended with a failure after its pins moved.",
-    why: "The new version changes something the consumer relies on.",
+    what: "A command of the consumer's commons-consumer.json whose check blocks a release (a syntax or type error, a package that does not pack or import, a credential in a package) ended with a failure after its pins moved.",
+    why: "The new version breaks the build or the type safety of the consumer.",
+    fix: "repoctl release train --only PATH",
+  },
+  "E-TRAIN-FINDING": {
+    title: "A check of a consumer that does not block a release failed",
+    what: "A command of the consumer's commons-consumer.json whose check is a finding in the table of checks (commons libraries ci/policy) ended with a failure after its pins moved; the train went on and it is recorded here.",
+    why: "Style, coverage of requirements, the shape of the repository or another advisory check says something about the consumer.",
+    fix: "repoctl release train --only PATH",
+  },
+  "E-TRAIN-TESTS-FAILING": {
+    title: "Tests of a consumer fail",
+    what: "The tests command of the consumer's commons-consumer.json ended with a failure after its pins moved. The release is not blocked by it, and acceptance (opsfolio validate) is.",
+    why: "The new version changes behaviour a test of the consumer holds.",
     fix: "repoctl release train --only PATH",
   },
   "E-COMMIT-SUBJECT": {

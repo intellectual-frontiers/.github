@@ -13,7 +13,7 @@
  */
 import { type FindingsFile, deriveRows } from "./findings.ts";
 import { readHistory } from "./history.ts";
-import { heldLibraries, RELEASE_POLICY, releaseDecision, type ReleasePolicy } from "./policy.ts";
+import { blocksRelease, CHECKS, heldLibraries, RELEASE_POLICY, releaseDecision, type ReleasePolicy } from "./policy.ts";
 
 /** What the gate says on a day, with the open findings of each module of the history it was given and, from the day the policy holds, the libraries held. `distribution` is the mode of 0036-distribution: in `single` the one package is held while any library is. */
 export function gateReport(day: string, history: readonly FindingsFile[], distribution: "single" | "per-library" = "single", policy: ReleasePolicy = RELEASE_POLICY): { readonly proceed: boolean; readonly held: readonly string[]; readonly lines: readonly string[] } {
@@ -31,6 +31,7 @@ export function gateReport(day: string, history: readonly FindingsFile[], distri
     if (held.length === 0) lines.push("held: none");
     if (held.length > 0 && distribution === "single") lines.push("the distribution is single: the one package holds every library, so it is held while a library is");
   }
+  lines.push(`checks that block a release: ${CHECKS.filter((c) => blocksRelease(c)).join(", ")}; every other check is a finding that runs, is recorded and is printed, and stops nothing (a failing test also holds acceptance)`);
   const by = new Map<string, number>();
   for (const r of rows) by.set(r.finding.module, (by.get(r.finding.module) ?? 0) + 1);
   if (by.size === 0) lines.push("open findings: none recorded in the history");

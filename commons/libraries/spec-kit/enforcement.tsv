@@ -42,6 +42,7 @@ requirement	mechanism	by	note
 0002-libraries-ci-findings FR-007	check	.github: cd commons/libraries && bun test suite/	ci-history.test.ts: a real repository, a file added and never replaced, a moved branch retried
 0002-libraries-ci-findings FR-008	check	.github: cd commons/libraries && bun test suite/	ci-findings.test.ts: the release policy of a day
 0002-libraries-ci-findings FR-009	check	.github: cd commons/libraries && bun test suite/	ci-accepted.test.ts: each rule of an acceptance is found in real files and a good one passes
+0002-libraries-ci-findings FR-010	check	.github: cd commons/libraries && bun test suite/	ci-policy.test.ts: the table names exactly the four blocking checks and every other check is a finding with a reason
 0001-libraries FR-033	check	.github: cd commons/libraries && bun test suite/	registry-clean.test.ts: the selection of versions, its refusals and the program that deletes nothing
 0001-libraries FR-034	check	.github: cd commons/libraries && bun test suite/	shard.test.ts: every file is in exactly one of the shards and the shards are balanced; the plan gives a sharded library its cells
 0001-libraries FR-035	check	.github: cd commons/libraries && bun test suite/	shard.test.ts: a sharded cell carries its library and its slug; --list prints the files of the shard

@@ -106,3 +106,49 @@ export function releaseDecision(day: string, policy: ReleasePolicy = RELEASE_POL
 export function heldLibraries(open: readonly { readonly module: string; readonly severity: string }[]): readonly string[] {
   return [...new Set(open.filter((f) => f.severity === "error" && f.module !== "repository").map((f) => f.module))].sort();
 }
+
+/** The checks a repository runs before a release, closed (0002-libraries-ci-findings FR-010): what a person or a pipeline runs is one of these, whatever program runs it. */
+export const CHECKS = ["syntax", "types", "pack", "secret-scan", "tests", "lint", "format", "layers", "surface-thin", "ladder", "register", "trace", "citations", "specifiers", "versions", "names", "mizan", "changes", "capabilities", "kanon", "hygiene", "generated-files", "docs"] as const;
+/** A check. */
+export type Check = (typeof CHECKS)[number];
+
+/** What a failed check does to a release: `blocking` stops it; `finding` is recorded, printed and stops nothing. */
+export type ReleaseClass = "blocking" | "finding";
+
+/**
+ * The class of each check for a release (0002-libraries-ci-findings FR-010), the one table that Repoctl, Agora and the generated workflows read. Only what makes the thing released unbuildable or unsafe to run blocks: a file the parser refuses,
+ * a type error (the type surface of the exports included), a package that does not pack or cannot be imported once installed, and a credential in what is published. Everything else (size, style, coverage of requirements, the shape of the
+ * repository, a failing test) is a finding: it runs, it is recorded and it is printed, and the release goes on. A failing test also gates `opsfolio validate`, which is acceptance and a different stage. A hold decided by the owner (`RELEASE_POLICY`)
+ * and the approvals of a person are stages of a workflow and not checks, so they are not in this table.
+ */
+export const CHECK_CLASS: Readonly<Record<Check, { readonly class: ReleaseClass; readonly why: string }>> = {
+  syntax: { class: "blocking", why: "a file the parser refuses cannot be built, packed or run" },
+  types: { class: "blocking", why: "a type error is a crack in the type safety that every consumer relies on, the exported surface included" },
+  pack: { class: "blocking", why: "a package that does not pack, install or import is not a release at all" },
+  "secret-scan": { class: "blocking", why: "a credential in a published package cannot be taken back, so this is a safety rule and not a style rule (kept blocking until the owner decides otherwise)" },
+  tests: { class: "finding", why: "a failing test is said loudly in the release summary and holds acceptance (`opsfolio validate`), and the release is not a claim of acceptance" },
+  lint: { class: "finding", why: "style and the findings of the linter are recorded and fixed, and a release does not wait for them" },
+  format: { class: "finding", why: "the format of a file does not change what runs" },
+  layers: { class: "finding", why: "the layers of a ladder are architecture and are held by review of the finding" },
+  "surface-thin": { class: "finding", why: "the imports a renderer may make are architecture and are held by review of the finding" },
+  ladder: { class: "finding", why: "the generated blocks of the ladder are made again by the generator" },
+  register: { class: "finding", why: "the proof register of the requirements is made again by the generator" },
+  trace: { class: "finding", why: "a requirement without a proof is a finding of the requirement" },
+  citations: { class: "finding", why: "a citation that names no requirement is a finding of the text" },
+  specifiers: { class: "finding", why: "the way a library is named is a finding of the import" },
+  versions: { class: "finding", why: "a version that is not the one expected is a finding the release itself corrects" },
+  names: { class: "finding", why: "the names of things are held by review of the finding" },
+  mizan: { class: "finding", why: "the coverage of the specifications is a finding of each specification" },
+  changes: { class: "finding", why: "a change without its record is a finding of the change" },
+  capabilities: { class: "finding", why: "the trace of a capability by rung is a finding of the capability" },
+  kanon: { class: "finding", why: "the pattern of a library is a finding of the library" },
+  hygiene: { class: "finding", why: "the state of the installed packages is advice about a checkout" },
+  "generated-files": { class: "finding", why: "a generated file that is out of date is made again by the generator" },
+  docs: { class: "finding", why: "the documentation is a finding of the text" },
+};
+
+/** Whether a failed check stops a release. */
+export const blocksRelease = (check: Check): boolean => CHECK_CLASS[check].class === "blocking";
+
+/** The check named by a word of a declaration, or undefined where the word names none. */
+export const checkOf = (word: string): Check | undefined => CHECKS.find((c) => c === word);

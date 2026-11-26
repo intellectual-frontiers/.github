@@ -180,11 +180,12 @@ proves(["0017-repoctl-release-train FR-004"], "an exact pin below the record mov
   assert(underFolder("services/a", "services/a") && underFolder("services/a/x", "services/a") && !underFolder("services/ab", "services/a") && underFolder("anything", "."));
 });
 
-proves(["0017-repoctl-release-train FR-004", "0017-repoctl-release-train FR-005"], "the pins of a consumer move with its lockfile, are installed twice, and the checks it declares run in order and stop at the first that fails", async () => {
+proves(["0017-repoctl-release-train FR-004", "0017-repoctl-release-train FR-005", "0017-repoctl-release-train FR-008"], "the pins of a consumer move with its lockfile, are installed twice, and the checks it declares all run, and only a failing check that blocks a release ends the verb with a failure", async () => {
   if (!CAN_RUN) return;
   await withRelease("pushed", async (dir) => {
     await fs.withTempDir(async (root) => {
-      const checks = JSON.stringify({ verify: [["node", "-e", "require('fs').writeFileSync('first','1')"], ["node", "-e", "process.exit(3)"], ["node", "-e", "require('fs').writeFileSync('third','1')"]] });
+      const node = (check: string, code: string): { check: string; argv: string[] } => ({ check, argv: ["node", "-e", code] });
+      const checks = JSON.stringify({ verify: [node("types", "require('fs').writeFileSync('first','1')"), node("trace", "process.exit(3)"), node("tests", "process.exit(4)"), node("types", "process.exit(5)"), node("syntax", "require('fs').writeFileSync('last','1')")] });
       const c = await consumer(root, "product", {
         "services/a/package.json": manifest({ [PKG]: "0.1.0" }),
         "services/b/package.json": manifest({ [PKG]: "0.1.0" }),
@@ -199,10 +200,25 @@ proves(["0017-repoctl-release-train FR-004", "0017-repoctl-release-train FR-005"
       assertStringIncludes(await fs.readTextFile(path.join(c, "services/b/package.json")), `"${PKG}": "0.1.0"`);
       assertEquals(calls.map((x) => x.split(" @ ")[0]), ["install", "install --frozen-lockfile"], "the install that updates the lockfile, then the one that refuses a lockfile that is not up to date");
       assert(calls[0]?.endsWith(path.join(c, "services/a")), "installed in the folder of the manifest");
-      assertEquals(doc.data.consumers[0]?.verify.map((v) => v.code), [0, 3], "the third check is not run after the second fails");
-      assert(await fs.exists(path.join(c, "first")) && !(await fs.exists(path.join(c, "third"))));
-      assertEquals(doc.problems.map((p) => p.code), ["E-TRAIN-VERIFY"]);
+      assertEquals(doc.data.consumers[0]?.verify.map((v) => v.code), [0, 3, 4, 5, 0], "every check runs, whatever an earlier one said");
+      assert((await fs.exists(path.join(c, "first"))) && (await fs.exists(path.join(c, "last"))));
+      assertEquals(doc.problems.map((p) => p.code), ["E-TRAIN-FINDING", "E-TRAIN-TESTS-FAILING", "E-TRAIN-VERIFY"], "a failing trace and failing tests are findings, a failing type check blocks");
       assertEquals(out.code, 1);
+    });
+  });
+});
+
+proves(["0017-repoctl-release-train FR-008"], "a consumer whose only failing checks are findings passes: the train ends well and says each finding", async () => {
+  if (!CAN_RUN) return;
+  await withRelease("pushed", async (dir) => {
+    await fs.withTempDir(async (root) => {
+      const node = (check: string, code: string): { check: string; argv: string[] } => ({ check, argv: ["node", "-e", code] });
+      const c = await consumer(root, "product", { "package.json": manifest({ [PKG]: "0.1.0" }), "commons-consumer.json": JSON.stringify({ verify: [node("types", "process.exit(0)"), node("surface-thin", "process.exit(2)"), node("hygiene", "process.exit(2)"), node("tests", "process.exit(1)")] }) });
+      const out = await execute(hostOf(worldOf(dir, installer([], [{ code: 0 }]))), ["release", "train", "--consumer", c, "--json"]);
+      const doc = JSON.parse(out.out) as { problems: { code: string }[] };
+      assertEquals(doc.problems.map((p) => p.code), ["E-TRAIN-FINDING", "E-TRAIN-FINDING", "E-TRAIN-TESTS-FAILING"]);
+      assertEquals(out.code, 0, "no finding blocks");
+      assertStringIncludes(JSON.stringify(doc), "FAILING TESTS");
     });
   });
 });
@@ -270,7 +286,7 @@ proves(["0017-repoctl-release-train FR-004", "0017-repoctl-release-train FR-005"
       const plain = path.join(root, "plain");
       await fs.mkdir(plain, { recursive: true });
       await put(plain, "package.json", manifest({ [PKG]: "0.1.0" }));
-      const bad = await consumer(root, "bad", { "package.json": manifest({ [PKG]: "0.1.0" }), "commons-consumer.json": JSON.stringify({ verify: [[]] }) });
+      const bad = await consumer(root, "bad", { "package.json": manifest({ [PKG]: "0.1.0" }), "commons-consumer.json": JSON.stringify({ verify: [{ check: "types", argv: [] }] }) });
       const calls: string[] = [];
       const out = await execute(hostOf(worldOf(dir, installer(calls, [{ code: 0 }]))), ["release", "train", "--consumer", plain, "--consumer", bad, "--json"]);
       assertEquals(out.code, 1);
@@ -279,7 +295,8 @@ proves(["0017-repoctl-release-train FR-004", "0017-repoctl-release-train FR-005"
       assertStringIncludes(await fs.readTextFile(path.join(bad, "package.json")), `"${PKG}": "0.1.0"`);
     });
   });
-  assert(checksOf('{"verify":[["a","b"]]}').kind === "ok" && checksOf('{"verify":[]}').kind === "ok" && checksOf("{}").kind === "err" && checksOf('{"verify":[[1]]}').kind === "err" && checksOf("x").kind === "err");
+  const classOf = (c: string): "blocking" | "finding" | undefined => (c === "types" ? "blocking" : c === "trace" ? "finding" : undefined);
+  assert(checksOf('{"verify":[{"check":"types","argv":["a","b"]}]}', classOf).kind === "ok" && checksOf('{"verify":[]}', classOf).kind === "ok" && checksOf("{}", classOf).kind === "err" && checksOf('{"verify":[{"check":"types","argv":[1]}]}', classOf).kind === "err" && checksOf('{"verify":[{"check":"nope","argv":["a"]}]}', classOf).kind === "err" && checksOf('{"verify":[["a"]]}', classOf).kind === "err" && checksOf("x", classOf).kind === "err");
 });
 
 proves(["0017-repoctl-release-train FR-007"], "the summary names every phase and every pin as text and as data, and a phase that was not reached says why", async () => {

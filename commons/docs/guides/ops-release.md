@@ -14,6 +14,10 @@ The distribution mode is typed, `per-library | single`, one constant in `commons
 
 **`repoctl release publish`** publishes by hand instead, a destruction of the releaser tier: it needs a preview, `--yes` and the phrase the preview printed, it prints no credential, and from the tool server it is only a preview.
 
+## What blocks a release
+
+Only what makes the thing released unbuildable or unsafe to run: a file the parser refuses (`syntax`), a type error (`types`, the type surface of the exports included), a package that does not pack, install or import (`pack`) and a credential in a published package (`secret-scan`). Every other check, size and style, the coverage of requirements, the shape of the repository, a failing test, still runs, is recorded as a finding and printed, and stops nothing. A failing test is said loudly and still holds acceptance, which is a stage of its own. The one table is `CHECK_CLASS` in `commons/libraries/src/ci/policy.ts`; the release gate prints it, and `repoctl release train` reads each consumer's `commons-consumer.json` by it ([0002-libraries-ci-findings](../../libraries/spec-kit/specs/0002-libraries-ci-findings/spec.md) FR-010, [0017-repoctl-release-train](../../repoctl/spec-kit/specs/0017-repoctl-release-train/spec.md) FR-008).
+
 ## The details
 
 - What a version means and when it rises: [commons 0026-works-versioning](../../spec-kit/specs/0026-works-versioning/spec.md).

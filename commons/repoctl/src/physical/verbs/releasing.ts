@@ -14,6 +14,7 @@
  */
 import { type ConsumerReport, CONSUMER_FILE, checksOf, findingsOfHandoff, findingsOfPublish, finding, findingsOfSync, folderOf, gate, handoffOf, orderGenerators, type Pin, type PinState, pinsOf, planPublish, reportData, reportText, repinned, type Released, runPublish, runSync, STAGED_NOTE, type TrainReport, underFolder, type Verified, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
 import { activeMode, applyRelease, describe, offlinePublishedExports, offlineRegistry, type DistributionMode, type Plan, raiseOf, readRecord, MODE_VARIABLE, publishedOf, REAL, registryOf, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
+import { CHECK_CLASS, checkOf } from "@intellectual-frontiers/libraries/ci/policy";
 import { holdSentence } from "@intellectual-frontiers/libraries/libraries";
 import type { Outcome } from "@intellectual-frontiers/headless/logical";
 import { join, resolve } from "@intellectual-frontiers/system/path";
@@ -135,13 +136,19 @@ async function trackedManifests(w: World, dir: string): Promise<{ readonly files
 
 type TrainOptions = { readonly offline: boolean; readonly apply: boolean; readonly waitMs: number; readonly pollMs: number; readonly only: readonly string[] };
 
+/** What a failure of a named check does to a release, by the one table of checks (commons libraries `ci/policy`), and undefined for a name that is no check. */
+const classOfCheck = (check: string): "blocking" | "finding" | undefined => {
+  const c = checkOf(check);
+  return c === undefined ? undefined : CHECK_CLASS[c].class;
+};
+
 /** One consumer of the train: its pins found and, where the run applies and is not offline, moved, installed twice and checked. */
 async function trainConsumer(w: World, shown: string, dir: string, released: readonly Released[], o: TrainOptions): Promise<{ readonly report: ConsumerReport; readonly findings: readonly Finding[] }> {
   const refuse = (message: string): { readonly report: ConsumerReport; readonly findings: readonly Finding[] } => ({ report: { dir: shown, pins: [], declared: false, verify: [], note: "refused" }, findings: [finding("fail", "E-TRAIN-CONSUMER", message, "repoctl release train --help")] });
   const tracked = await trackedManifests(w, dir);
   if ("problem" in tracked) return refuse(tracked.problem);
   const declText = await w.files.read(join(dir, CONSUMER_FILE));
-  const declared = declText === undefined ? undefined : checksOf(declText);
+  const declared = declText === undefined ? undefined : checksOf(declText, classOfCheck);
   if (declared?.kind === "err") return refuse(`${shown}: ${declared.error}`);
   const found: Pin[] = [];
   const texts = new Map<string, string>();
@@ -208,13 +215,16 @@ async function trainConsumer(w: World, shown: string, dir: string, released: rea
   const pins = found.map((p) => ({ ...p, state: states.get(`${p.file}\n${p.package}`) ?? ("failed" as PinState) }));
   const verify: Verified[] = [];
   if (declared !== undefined && pins.every((p) => p.state === "moved")) {
-    for (const argv of declared.value) {
-      const r = await w.process.run(argv, { cwd: dir });
-      verify.push({ argv, code: r.code });
-      if (r.code !== 0) {
-        findings.push(finding("fail", "E-TRAIN-VERIFY", `${shown}: ${argv.join(" ")} ended with ${r.code}`, `cd ${shown} && ${argv.join(" ")}`));
-        break;
-      }
+    for (const c of declared.value) {
+      const r = await w.process.run(c.argv, { cwd: dir });
+      verify.push({ check: c.check, class: c.class, argv: c.argv, code: r.code });
+      if (r.code === 0) continue;
+      const where = `cd ${shown} && ${c.argv.join(" ")}`;
+      findings.push(
+        c.class === "blocking"
+          ? finding("fail", "E-TRAIN-VERIFY", `${shown}: the check ${c.check} blocks a release and ended with ${r.code}: ${c.argv.join(" ")}`, where)
+          : finding("warn", c.check === "tests" ? "E-TRAIN-TESTS-FAILING" : "E-TRAIN-FINDING", `${shown}: the check ${c.check} is a finding and does not block the release; it ended with ${r.code}${c.check === "tests" ? ": FAILING TESTS, which also hold acceptance (opsfolio validate)" : ""}: ${c.argv.join(" ")}`, where),
+      );
     }
   }
   return { report: { ...base, pins, verify, note: undefined }, findings };

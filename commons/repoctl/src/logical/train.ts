@@ -65,14 +65,20 @@ export function repinned(text: string, pins: readonly Pin[]): string {
   return out;
 }
 
-/** What a consumer says it checks: argument vectors, run with no shell from its root. */
-export type ConsumerChecks = readonly (readonly string[])[];
+/** What a failed check does to a release: the words of the one table of commons libraries `ci/policy` (0017-repoctl-release-train FR-010). */
+export type CheckClass = "blocking" | "finding";
+
+/** One check of a consumer: its name in the table of checks, what a failure of it does and the argument vector, run with no shell from the consumer's root. */
+export type ConsumerCheck = { readonly check: string; readonly class: CheckClass; readonly argv: readonly string[] };
+
+/** What a consumer says it checks. */
+export type ConsumerChecks = readonly ConsumerCheck[];
 
 /** The file of a consumer that declares its checks. */
 export const CONSUMER_FILE = "commons-consumer.json";
 
-/** The declaration of a consumer from the text of its file: `{ "verify": [[program, argument...], ...] }`. */
-export function checksOf(text: string): Result<ConsumerChecks, string> {
+/** The declaration of a consumer from the text of its file: `{ "verify": [{ "check": NAME, "argv": [program, argument...] }, ...] }`, where `classOf` says what a failure of a named check does (undefined for a name that is none). */
+export function checksOf(text: string, classOf: (check: string) => CheckClass | undefined): Result<ConsumerChecks, string> {
   let doc: unknown;
   try {
     doc = JSON.parse(text);
@@ -81,12 +87,18 @@ export function checksOf(text: string): Result<ConsumerChecks, string> {
   }
   const verify = typeof doc === "object" && doc !== null ? (doc as Record<string, unknown>)["verify"] : undefined;
   if (!Array.isArray(verify)) return err(`${CONSUMER_FILE} has no "verify" list`);
-  const lists: string[][] = [];
+  const checks: ConsumerCheck[] = [];
   for (const v of verify) {
-    if (!Array.isArray(v) || v.length === 0 || !v.every((a) => typeof a === "string" && a !== "")) return err(`${CONSUMER_FILE}: each "verify" entry is a list of words that begins with the program`);
-    lists.push(v as string[]);
+    const o = typeof v === "object" && v !== null && !Array.isArray(v) ? (v as Record<string, unknown>) : undefined;
+    const name = o?.["check"];
+    const argv = o?.["argv"];
+    if (typeof name !== "string") return err(`${CONSUMER_FILE}: each "verify" entry names its "check"`);
+    const cls = classOf(name);
+    if (cls === undefined) return err(`${CONSUMER_FILE}: "${name}" is not a check of the table (commons libraries ci/policy)`);
+    if (!Array.isArray(argv) || argv.length === 0 || !argv.every((a) => typeof a === "string" && a !== "")) return err(`${CONSUMER_FILE}: the "argv" of "${name}" is a list of words that begins with the program`);
+    checks.push({ check: name, class: cls, argv: argv as string[] });
   }
-  return ok(lists);
+  return ok(checks);
 }
 
 /** Where the hand-off of a release stands. */
@@ -122,7 +134,7 @@ export function findingsOfHandoff(h: Handoff, recordPath: string): readonly Find
 export type PinState = "moved" | "current" | "waiting" | "failed" | "planned";
 
 /** One verify command of a consumer and how it ended. */
-export type Verified = { readonly argv: readonly string[]; readonly code: number };
+export type Verified = { readonly check: string; readonly class: CheckClass; readonly argv: readonly string[]; readonly code: number };
 
 /** What the train did for one consumer. */
 export type ConsumerReport = {
@@ -160,7 +172,7 @@ export function reportText(r: TrainReport): string {
     for (const p of c.pins) lines.push(`  pin      ${p.state.padEnd(8)} ${p.file}  ${p.package} ${p.from} -> ${p.to}`);
     if (c.pins.length === 0) lines.push("  pin      current  nothing to move");
     if (c.pins.length > 0 && c.pins.every((p) => p.state === "moved") && !c.declared) lines.push("  check    declares no check");
-    for (const v of c.verify) lines.push(`  check    ${v.code === 0 ? "passed  " : `failed ${v.code}`} ${v.argv.join(" ")}`);
+    for (const v of c.verify) lines.push(`  check    ${v.code === 0 ? "passed  " : `failed ${v.code}`} ${v.check} (${v.class === "blocking" ? "blocks" : "finding"}) ${v.argv.join(" ")}`);
   }
   return lines.join("\n");
 }
