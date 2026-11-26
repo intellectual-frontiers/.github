@@ -5,8 +5,9 @@
     "": {
       "name": "@intellectual-frontiers/desired-os-state-dns",
       "devDependencies": {
-        "@intellectual-frontiers/desired-os-state": "link:..",
         "@intellectual-frontiers/core": "link:../../core",
+        "@intellectual-frontiers/desired-os-state": "link:..",
+        "@intellectual-frontiers/estate": "link:../../estate",
         "@intellectual-frontiers/headless": "link:../../headless",
         "@intellectual-frontiers/kanon": "link:../../kanon",
         "@intellectual-frontiers/libraries": "link:../../libraries",
@@ -22,9 +23,11 @@
     },
   },
   "packages": {
+    "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../../core", {}],
+
     "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:..", {}],
 
-    "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../../core", {}],
+    "@intellectual-frontiers/estate": ["@intellectual-frontiers/estate@link:../../estate", {}],
 
     "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../../headless", {}],
 

@@ -21,6 +21,9 @@ import {
   type Boundary,
   type Categorization,
   type Selector,
+  actsByRole,
+  PERSON_ROLES_OF,
+  ROLES_OF,
 } from "../src/governance/boundaries.ts";
 import { parseAssetId, type AssetId } from "../src/governance/ids.ts";
 import {
@@ -398,6 +401,25 @@ proves(["0010-estate-boundaries FR-030", "0010-estate-boundaries FR-011"], "the 
   assert(!changed.approved, "an approval of another plan is not an approval");
   const org = await approvedOf(emptyBoundary(7, { decisions: [{ asset: aid(4), disposition: { t: "in-scope", role: "owned" }, by: who, at: AT }] }));
   assert(permits("apply", aid(4), [org], NOW).kind === "ok" && permits("scan", aid(4), [org], NOW).kind === "err");
+});
+
+proves(["0010-estate-boundaries FR-033", "0045-boundaries FR-091"], "the scope of a system, an environment or a company carries the authority to act, and the scope of a privacy regime, a zone or a threat model, or a role that names another party's system, does not", async () => {
+  const NOW = "2026-06-01T00:00:00.000Z";
+  const kinds = ["authorization", "cui-environment", "ephi-environment", "cardholder-data-environment", "soc2-system", "organizational", "privacy", "network-zone", "trust"] as const;
+  for (const kind of kinds) {
+    for (const role of ROLES_OF[kind]) {
+      const b = { ...emptyBoundary(3), kind, roles: { [PERSON_ROLES_OF[kind][0]]: [who] }, decisions: [{ asset: aid(4), disposition: { t: "in-scope", role }, by: who, at: AT }] } as unknown as AnyBoundary;
+      const approved = await approve(b, (await planOf(b)).hash, b.owner, AT, true);
+      assert(approved.kind === "ok", `${kind} is approved by its owner`);
+      const v = await verified(approved.value);
+      for (const action of ["apply", "install", "enroll-active"] as const) {
+        const got = permits(action, aid(4), [v], NOW);
+        assertEquals(got.kind === "ok", actsByRole(kind, role as string), `${kind}/${role}/${action}`);
+      }
+      assert(permits("scan", aid(4), [v], NOW).kind === "err", "an acting scope never permits a scan or a pentest");
+    }
+  }
+  assert(actsByRole("authorization", "component") && !actsByRole("soc2-system", "subservice-system") && !actsByRole("ephi-environment", "business-associate-system") && !actsByRole("privacy", "processing-system"));
 });
 
 proves(["0010-estate-boundaries FR-005", "0010-estate-boundaries FR-012", "0045-boundaries FR-003"], "an out-of-scope decision needs its justification, a disposition is a person's decision, and a boundary of an unread regime or one approved by an agent or a stranger is refused", async () => {

@@ -109,6 +109,7 @@ requirement	mechanism	by	note
 0010-estate-boundaries FR-030	check	.github: cd commons/estate && bun run verify	suite/boundary-laws.test.ts
 0010-estate-boundaries FR-031	none	-	Deferred: stated before it is built; the algebra and its law tests are built in estate
 0010-estate-boundaries FR-032	none	-	Deferred: stated before it is built; the algebra and its law tests are built in estate
+0010-estate-boundaries FR-033	check	.github: cd commons/estate && bun run verify	suite/boundary-laws.test.ts
 0010-estate-boundaries FR-040	check	.github: cd commons/estate && bun run verify	suite/boundary-laws.test.ts
 0010-estate-boundaries FR-041	none	-	Deferred: stated before it is built; the algebra and its law tests are built in estate
 0010-estate-boundaries FR-042	none	-	Deferred: stated before it is built; the algebra and its law tests are built in estate

@@ -13,6 +13,7 @@
 - **FR-002**: `plan` MUST read the zone only (never a change), say each record to create, update and remove, and print the hash of the plan, ending with 4 where there is something to approve and 0 where the plan is empty.
 - **FR-003**: `apply` MUST carry out exactly the plan of the hash it is given and refuse another (`the plan changed`) with nothing changed, and refuse a plan that removes a record unless `--allow-removal yes` is given.
 - **FR-004**: After an apply the plan MUST be made again and, where it is not empty, the command MUST end with 1 and say so; a provider that fails MUST end the command with 3 and the reason, with no token in it.
+- **FR-005**: The plugin MUST NOT be given a provider that can change a zone: it MUST read through `provider.list` and MUST change a zone only through `change(plan, permit)` with the `Permit<"apply">` that the fleet's `permit` gave for that zone (a value made only by the estate's `permits`, commons estate 0010-estate-boundaries FR-030), so that a call with no permit does not type-check; `apply` MUST ask for the permit before it plans or calls the provider, and a refusal MUST end the command with the fleet's own code, exit and words and with the provider not called; `plan` is a read and MUST ask for none. Relies on audit rows: F2.
 
 ## Acceptance scenarios
 

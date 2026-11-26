@@ -62,12 +62,14 @@ export function dnsCommands(config: DnsPluginConfig): readonly Node[] {
       const name = String(o["zone"]);
       const subject = await config.subject(name, optionsOf(o));
       if (subject.kind === "err") return outcomeOf(null, { problems: [problem("fail", subject.error.message, { code: subject.error.code })], exit: subject.error.exit });
+      const permit = await config.permit(name, optionsOf(o));
+      if (permit.kind === "err") return outcomeOf(null, { problems: [problem("fail", permit.error.message, { code: permit.error.code })], exit: permit.error.exit });
       try {
         const planned = await planZone(subject.value);
         if (planned.hash === undefined) return outcomeOf({ outcome: "unchanged", planAfterIsEmpty: true }, { text: "the plan is empty: nothing to do" });
         if (planned.hash !== String(o["planHash"])) return outcomeOf(null, { problems: [problem("fail", `the plan changed: you approved ${String(o["planHash"])} and it is now ${planned.hash}; read it again with plan`, { code: "E-PLAN-CHANGED" })], exit: "findings" });
         if (planned.plan.remove.length > 0 && String(o["allowRemoval"]) !== "yes") return outcomeOf(null, { problems: [problem("fail", `the plan removes ${planned.plan.remove.length} record(s): approve that too with --allow-removal yes`, { code: "E-REMOVAL" })], exit: "usage" });
-        await subject.value.provider.apply(planned.plan);
+        await subject.value.change(planned.plan, permit.value);
         const after = await planZone(subject.value);
         const empty = after.hash === undefined;
         return outcomeOf({ outcome: "applied", planAfterIsEmpty: empty }, { text: `applied\n${empty ? "the plan after the apply is empty" : `the plan after the apply is not empty:\n${describe(after.plan, after.hash)}`}`, ...(empty ? {} : { problems: [problem("fail", "the plan after the apply is not empty", { code: "E-NOT-EMPTY" })], exit: "findings" as const }) });

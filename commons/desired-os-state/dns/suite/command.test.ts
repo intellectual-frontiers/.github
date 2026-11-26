@@ -8,6 +8,7 @@ import { createServer, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { assemble, main } from "@intellectual-frontiers/desired-os-state/cli";
 import { err, ok } from "@intellectual-frontiers/core";
+import type { Permit } from "@intellectual-frontiers/estate/governance";
 import { verbIds } from "@intellectual-frontiers/headless/logical";
 import { cloudflare } from "@intellectual-frontiers/linux-services/physical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -49,15 +50,22 @@ async function zoneServer(initial: Rec[], token: string) {
   return { zone, base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, close: () => server.close() };
 }
 
+/** A permit as the estate's interlock gives one: made here by hand, because this suite tests the plugin and not the interlock (its laws are the estate's). */
+const permitFor = (zone: string): Permit<"apply"> => ({ action: "apply", target: zone, boundaries: [], at: "2026-06-01T00:00:00.000Z", expires: "2099-01-01T00:00:00.000Z" }) as unknown as Permit<"apply">;
+
 const WANT = [{ type: "A" as const, name: "a.example.org", content: "192.0.2.1", ttl: 300, proxied: false }, { type: "A" as const, name: "b.example.org", content: "192.0.2.2", ttl: 300, proxied: false }];
 const config = (base: string, token: string, wanted = WANT): DnsPluginConfig => ({
   version: "0.1.0",
   options: { fleet: value<never>({ help: "The fleet's own option.", valueName: "NAME", default: "" }) },
-  subject: async () => ok({ wanted, provider: cloudflare({ zoneId: "z", token, base }) }),
+  subject: async () => {
+    const provider = cloudflare({ zoneId: "z", token, base });
+    return ok({ wanted, provider, change: (plan) => provider.apply(plan) });
+  },
+  permit: async (zone) => ok(permitFor(zone)),
 });
 
 proves(["0002-dns-command FR-001"], "the plugin composes with the verbs plan and apply, and a zone that is not for it to change is refused with the fleet's own code, exit and words, and the options the fleet gave reach its function", async () => {
-  const p = dnsPlugin({ version: "0.1.0", subject: async () => err({ message: "x", code: "E-X", exit: "findings" }) });
+  const p = dnsPlugin({ version: "0.1.0", subject: async () => err({ message: "x", code: "E-X", exit: "findings" }), permit: async () => err({ message: "x", code: "E-X", exit: "findings" }) });
   assert(p.kind === "ok");
   const composed = assemble([p.value], "0.1.0");
   assert(composed.kind === "ok");
@@ -108,5 +116,22 @@ proves(["0002-dns-command FR-004"], "a provider that fails ends the command with
     assert((r.out + r.err).includes("bad token") && !(r.out + r.err).includes("wrong-token-value"));
   } finally {
     s.close();
+  }
+});
+
+proves(["0002-dns-command FR-003", "0002-dns-command FR-005"], "an apply with no permit from the interlock is refused with the fleet's own code before the provider is called, and a plan, which is a read, needs none", async () => {
+  const api = await zoneServer([], "t");
+  try {
+    let asked = 0;
+    const refusing: DnsPluginConfig = { ...config(api.base, "t"), permit: async () => (asked++, err({ message: "E-BOUNDARY-NOT-IN-SCOPE: example.org is in scope of no approved boundary", code: "E-BOUNDARY-NOT-IN-SCOPE", exit: "findings" })) };
+    const planned = await run(refusing, ["dns", "plan", "--zone", "example.org", "--fleet", "lab"]);
+    assertEquals(asked, 0, "a plan asks for no permit");
+    const hash = /sha256:[0-9a-f]+/u.exec(planned.out)?.[0] ?? "";
+    const applied = await run(refusing, ["dns", "apply", "--zone", "example.org", "--fleet", "lab", "--plan-hash", hash]);
+    assertEquals(applied.code, 1);
+    assert((applied.out + applied.err).includes("E-BOUNDARY-NOT-IN-SCOPE") && asked === 1);
+    assertEquals(api.zone.length, 0, "the provider was not called");
+  } finally {
+    api.close();
   }
 });

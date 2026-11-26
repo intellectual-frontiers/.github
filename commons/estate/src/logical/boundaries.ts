@@ -32,6 +32,7 @@ import {
   type Finding,
   type Impact,
   type Party,
+  actsByRole,
   type Permit,
   type PrincipalId,
   type PrivacyRegime,
@@ -455,7 +456,7 @@ export type Consulted = Verified;
 
 /**
  * The interlock (0045-boundaries FR-090 to FR-094): a permit for an active action on a target, or the reason it is refused. A target is permitted when it is in scope in an approved boundary whose kind
- * allows the action (`scan` and `pentest` by an engagement-scope boundary inside its window; `apply`, `install` and `enroll-active` by an organizational boundary or by an engagement-scope that lists them),
+ * allows the action (`scan` and `pentest` by an engagement-scope boundary inside its window; `apply`, `install` and `enroll-active` by a boundary whose kind and role carry the authority to act (`ACT_ROLES_OF`: a system, an environment or a company) or by an engagement-scope that lists them),
  * and no approved boundary marks it `excluded-target` or out of scope: an exclusion wins, whatever the order of the boundaries. Pure: the caller records the permit or the refusal before the first effect.
  */
 export function permits<A extends AssetAction>(action: A, target: AssetId, boundaries: readonly Consulted[], at: string): Result<Permit<A>, Refusal> {
@@ -470,8 +471,7 @@ export function permits<A extends AssetAction>(action: A, target: AssetId, bound
     const d = dispositionOf(b, target);
     if (d.t !== "in-scope") return false;
     if (b.kind === "engagement-scope") return b.actions !== undefined && b.actions.includes(action) && (d.role as string) === "target";
-    if (b.kind === "organizational") return action === "apply" || action === "install" || action === "enroll-active";
-    return false;
+    return (action === "apply" || action === "install" || action === "enroll-active") && actsByRole(b.kind, d.role as string);
   });
   if (allowing.length === 0) {
     const unapproved = boundaries.filter((b) => !b.approved && dispositionOf(b.boundary, target).t === "in-scope");

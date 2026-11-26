@@ -98,6 +98,29 @@ export const INHERITANCE_KINDS = ["leveraged-authorization", "common-control", "
 /** An inheritance kind. */
 export type InheritanceKind = (typeof INHERITANCE_KINDS)[number];
 
+/**
+ * The kinds of boundary whose scope is also an authority to change what is in it, and the roles that carry that authority (0045-boundaries FR-091): the scope of a system, of an environment or of a company
+ * is the scope that answers for administering it, so an asset in one of these roles may be applied to, installed on and enrolled. The scope of a privacy regime, of a network zone and of a threat model says
+ * where data, traffic or a trust edge lies and not who may change a machine, so those kinds give no such authority, and neither does a role that names a system run by another party. The `engagement-scope`
+ * kind is not here: its authority is the actions it lists and the window it has.
+ */
+export const ACT_ROLES_OF = {
+  authorization: ["component", "subsystem-member", "security-function"],
+  "cui-environment": ["cui-asset", "security-protection-asset", "contractor-risk-managed-asset", "specialized-asset"],
+  "ephi-environment": ["ephi-system", "supporting-system"],
+  "cardholder-data-environment": ["cde-system", "connected-to-system", "security-impacting-system"],
+  "soc2-system": ["infrastructure", "software"],
+  organizational: ["owned", "managed-for-client", "leased"],
+} as const satisfies Partial<{ [K in BoundaryKind]: readonly AssetRoleOf<K>[] }>;
+/** The kinds whose scope carries the authority to act on what is in it. */
+export type ActingKind = keyof typeof ACT_ROLES_OF;
+
+/** Whether a role in a boundary of a kind carries the authority to apply to, install on or enroll an asset. */
+export function actsByRole(kind: BoundaryKind, role: string): boolean {
+  const roles: readonly string[] | undefined = (ACT_ROLES_OF as Partial<Record<BoundaryKind, readonly string[]>>)[kind];
+  return roles !== undefined && roles.includes(role);
+}
+
 /** The active actions the interlock guards (0045-boundaries FR-090). Reading is not in it. */
 export const ASSET_ACTIONS = ["scan", "pentest", "apply", "install", "enroll-active"] as const;
 /** An active action. */

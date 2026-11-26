@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/desired-os-state": "link:..",
+    "@intellectual-frontiers/estate": "link:../../estate",
     "@intellectual-frontiers/core": "link:../../core",
     "@intellectual-frontiers/headless": "link:../../headless",
     "@intellectual-frontiers/kanon": "link:../../kanon",
