@@ -1,7 +1,7 @@
 // Spec: 0007-machine-probe-enroll FR-001, FR-002, FR-003
 /**
- * Enrolling a machine for observation: the host keys it presents are shown by their fingerprints and nothing is done until the person gives the one they compared with the machine's own; then that host key, and only it, is pinned in a known-hosts file, a key is made for the
- * probe (kept outside any repository), and, over the person's own ssh, the probe and one line that restricts the key to it are installed in the person's own account. It changes nothing on the machine but those two. What is to be written where a program keeps its files (the reach, the
+ * Enrolling a machine for observation: the host keys it presents are shown by their fingerprints and nothing is done until the person gives the one they compared with the machine's own; then that host key, and only it, is pinned in a known-hosts file. In the mode `stdin` that is all: the
+ * probe is piped to the person's own login each time and nothing is left on the machine. In the mode `install` a key is made for the probe (kept outside any repository) and, over the person's own ssh, the probe and one line that restricts the key to it are installed in the person's own account, and nothing else on the machine is changed. What is to be written where a program keeps its files (the reach, the
  * observation) is the caller's: this gives the data. The probe is then asked with the restricted key by `probeExecutor` and `observe`.
  *
  * @example
@@ -18,7 +18,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { target, type Executor, type Target } from "@intellectual-frontiers/headless/logical";
 import { sshExecutor, type SshConfig } from "@intellectual-frontiers/headless/targets/ssh";
 import { fs, path, proc } from "@intellectual-frontiers/system";
-import type { ProbeReach } from "@intellectual-frontiers/machine-probe/governance";
+import type { ProbeReach, ReachMode } from "@intellectual-frontiers/machine-probe/governance";
 import { probeKeyLine } from "./key.ts";
 import { probeScriptPath } from "./scripts.ts";
 
@@ -35,7 +35,7 @@ export function parseSsh(text: string): Result<{ readonly user: string; readonly
 export type EnrollTarget = { readonly user: string; readonly address: string; readonly port?: number };
 
 /** What enrolling is given beyond the machine: a name for it, the file that pins host keys, the folder of the probe's keys, the key the person reaches the machine with (the agent or the default key where none) and the fingerprint they compared (none until they have). */
-export type EnrollOptions = { readonly asset: string; readonly knownHosts: string; readonly keys: string; readonly identity?: string; readonly fingerprint?: string };
+export type EnrollOptions = { readonly asset: string; readonly knownHosts: string; readonly keys: string; readonly mode: ReachMode; readonly credential?: string; readonly identity?: string; readonly fingerprint?: string };
 
 /** What enrolling came to: the fingerprints to compare and nothing done, or done, with the reach to keep, the file of the probe's private key and the line that was installed. */
 export type Enrolled =
@@ -75,6 +75,10 @@ export async function enrollProbe(ssh: EnrollTarget, o: EnrollOptions): Promise<
       await fs.writeTextFile(o.knownHosts, `${have}${have === "" || have.endsWith("\n") ? "" : "\n"}${fresh.join("\n")}\n`);
     }
 
+    if (o.mode === "stdin") {
+      const reach: ProbeReach = { address: ssh.address, ...(ssh.port === undefined ? {} : { port: ssh.port }), user: ssh.user, credential: o.credential ?? "person", mode: "stdin" };
+      return ok({ kind: "done", reach, keyFile: "", line: "", pinned });
+    }
     await fs.mkdir(o.keys, { recursive: true, mode: 0o700 });
     const credential = `${o.asset}-probe`;
     const keyFile = path.join(o.keys, credential);
@@ -85,7 +89,7 @@ export async function enrollProbe(ssh: EnrollTarget, o: EnrollOptions): Promise<
     const line = probeKeyLine((await fs.readTextFile(`${keyFile}.pub`)).trim());
     if (line.kind === "err") return line;
 
-    const reach: ProbeReach = { address: ssh.address, ...(ssh.port === undefined ? {} : { port: ssh.port }), user: ssh.user, credential };
+    const reach: ProbeReach = { address: ssh.address, ...(ssh.port === undefined ? {} : { port: ssh.port }), user: ssh.user, credential, mode: "install" };
     const person = targetOf(o.asset, reach, o.identity === undefined ? undefined : "person");
     if (person.kind === "err") return person;
     const config: SshConfig = { knownHostsRepository: o.knownHosts, knownHostsUser: o.knownHosts, ...(o.identity === undefined ? {} : { identityFor: (n: string) => (n === "person" ? o.identity : undefined) }) };
@@ -104,6 +108,13 @@ export async function enrollProbe(ssh: EnrollTarget, o: EnrollOptions): Promise<
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
+}
+
+/** The way to log in to a machine read in the mode `stdin`: the ssh client with the pinned host keys and the person's own key, a file where one is given and the agent or the default key where none is. */
+export function loginExecutor(reach: ProbeReach, knownHosts: string, identity?: string): Result<Executor, string> {
+  const t = targetOf(reach.credential, reach, reach.credential);
+  if (t.kind === "err") return t;
+  return ok(sshExecutor(t.value, [t.value], { knownHostsRepository: knownHosts, knownHostsUser: knownHosts, ...(identity === undefined ? {} : { identityFor: (n: string) => (n === reach.credential ? identity : undefined) }) }));
 }
 
 /** The way to run the probe of an enrolled machine: the ssh client with the restricted key and the pinned host keys, and nothing the person's own key can do. */

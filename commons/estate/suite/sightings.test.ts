@@ -1,12 +1,12 @@
 /**
- * Tests of sightings and levels (commons estate 0009-estate-sightings and 0041-telemetry-and-reach FR-001, FR-011): the smart constructors of keys, resolution that never merges, the fold of sightings of two relays into one
- * asset, what nobody declared, the staleness of what depends on a relay, the level and its fall, the minimums and the closed table of reach. Synthetic names and addresses only.
+ * Tests of sightings and tiers (commons estate 0009-estate-sightings and 0041-telemetry-and-reach FR-001, FR-011): the smart constructors of keys, resolution that never merges, the fold of sightings of two relays into one
+ * asset, what nobody declared, the staleness of what depends on a relay, the tier and its fall, the minimums and the closed table of reach. Synthetic names and addresses only.
  *
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import {
-  ASSET_LEVELS,
+  ASSET_TIERS,
   hostKeyKey,
   KEY_ORDER,
   KEY_STRENGTH,
@@ -22,8 +22,8 @@ import {
 import {
   decodeSighting,
   foldSightings,
-  levelFinding,
-  levelOf,
+  tierFinding,
+  tierOf,
   missingMinimums,
   relayDependentStatus,
   resolveIdentity,
@@ -140,18 +140,23 @@ proves([S("FR-001"), S("FR-002")], "a sighting has keys and a provenance and no 
   assertEquals(s.provenance, "relay:relay-01/syslog#mac:02:00:00:00:00:05");
 });
 
-proves([V("FR-001"), S("FR-012")], "the level is a total function of what is observed", () => {
-  assertEquals(levelOf({ identified: true, sshOut: true, osquery: true }), 3);
-  assertEquals(levelOf({ identified: true, sshOut: true, osquery: false }), 2);
-  assertEquals(levelOf({ identified: true, sshOut: false, osquery: false }), 1);
-  assertEquals(levelOf({ identified: false, sshOut: false, osquery: false }), 0);
-  assertEquals([...ASSET_LEVELS], [0, 1, 2, 3]);
+proves([V("FR-001"), S("FR-012")], "the tier is a total function of what is offered", () => {
+  const none = { identified: false, protocol: false, login: false, osquery: false, agent: false };
+  assertEquals(tierOf({ ...none, identified: true, protocol: true, login: true, osquery: true }), 3);
+  assertEquals(tierOf({ ...none, identified: true, login: true }), 2);
+  assertEquals(tierOf({ ...none, login: true }), 2);
+  assertEquals(tierOf({ ...none, identified: true, protocol: true }), 1);
+  assertEquals(tierOf({ ...none, identified: true }), 0);
+  assertEquals(tierOf({ ...none, identified: true, login: true, osquery: true, agent: true }), 4);
+  assertEquals(tierOf(none), 0);
+  assertEquals([...ASSET_TIERS], [0, 1, 2, 3, 4]);
 });
 
-proves([V("FR-002")], "a fall of level is a finding that names what was lost", () => {
-  const f = levelFinding({ identified: true, sshOut: true, osquery: true }, { identified: true, sshOut: true, osquery: false });
-  assertEquals(f, "the level fell from 3 to 2: osQuery lost");
-  assertEquals(levelFinding({ identified: true, sshOut: true, osquery: false }, { identified: true, sshOut: true, osquery: true }), undefined);
+proves([V("FR-002")], "a fall of tier is a finding that names what was lost", () => {
+  const three = { identified: true, protocol: false, login: true, osquery: true, agent: false };
+  assertEquals(tierFinding(three, { ...three, osquery: false }), "the tier fell from 3 to 2: osQuery lost");
+  assertEquals(tierFinding({ ...three, osquery: false }, three), undefined);
+  assertEquals(tierFinding(three, { ...three, login: false, osquery: false }), "the tier fell from 3 to 0: osQuery and the login lost");
 });
 
 proves([V("FR-011")], "an asset with an identity and no telemetry path is told to lack it", () => {
@@ -160,7 +165,7 @@ proves([V("FR-011")], "an asset with an identity and no telemetry path is told t
 });
 
 proves([V("FR-005"), V("FR-006")], "the table of reach is closed and no row needs an inbound port on a device", () => {
-  assertEquals(REACH.map((r) => r.row), ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"]);
-  assert(REACH.every((r) => r.openedBy !== "controller" || r.row === "R7"));
+  assertEquals(REACH.map((r) => r.row), ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9"]);
+  assert(REACH.every((r) => r.openedBy !== "controller" || r.row === "R7" || r.row === "R9"));
   assertEquals(REACH.find((r) => r.row === "R8")?.status, "optional-later");
 });

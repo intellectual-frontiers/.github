@@ -57,12 +57,15 @@ export function parseRequest(text: string): Result<ProbeRequest, string> {
 }
 
 /**
- * How to reach a machine for observation: the account the probe runs as, the address and port, and the name of the key made for the probe. The name is a reference: the key itself is kept outside the repository, where only the machine that observes has it.
+ * How to reach a machine for observation: the account the probe runs as, the address and port, the mode and the name of the key. The name is a reference: the key itself is kept outside the repository, where only the machine that observes has it.
  *
  * @example
  * ```ts
  * import type { ProbeReach } from "./requests.ts";
- * const reach: ProbeReach = { address: "synthetic-server-03.example", user: "admin", credential: "synthetic-server-03-probe" };
+ * const reach: ProbeReach = { address: "synthetic-server-03.example", user: "admin", credential: "synthetic-server-03-probe", mode: "install" };
  * ```
  */
-export type ProbeReach = { readonly address: string; readonly port?: number; readonly user: string; readonly credential: string };
+export type ProbeReach = { readonly address: string; readonly port?: number; readonly user: string; readonly credential: string; readonly mode: ReachMode };
+
+/** How a machine is read: `stdin` pipes the probe to the login each time and leaves nothing on the machine (the credential names the person's own key), `install` keeps the probe and one restricted key line on the machine (the credential names the key made for the probe). */
+export type ReachMode = "stdin" | "install";

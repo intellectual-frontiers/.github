@@ -28,6 +28,8 @@ requirement	mechanism	by	note
 0007-machine-probe-enroll FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/enroll.test.ts
 0007-machine-probe-enroll FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/enroll.test.ts
 0007-machine-probe-enroll FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/enroll.test.ts
+0007-machine-probe-enroll FR-005	check	.github: cd commons/machine-probe && bun run verify	suite/enroll.test.ts
+0007-machine-probe-enroll FR-006	check	.github: cd commons/machine-probe && bun run verify	suite/enroll.test.ts
 0008-machine-probe-agent-workspace FR-001	check	.github: cd commons/machine-probe && bun run verify	suite/workshop.test.ts
 0008-machine-probe-agent-workspace FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/workshop.test.ts
 0008-machine-probe-agent-workspace FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/workshop.test.ts

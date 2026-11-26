@@ -1,18 +1,18 @@
 // Spec: 0009-estate-sightings FR-005
 /**
  * The pure functions of sightings (0009-estate-sightings): the resolution of a set of keys to an asset that never merges by itself, the fold of sightings into the assets seen, what nobody declared and what a relay
- * no longer sees, the capability level and the minimums an enrolled asset has (commons 0041-telemetry-and-reach FR-001, FR-011), and the hash a person's approval names.
+ * no longer sees, the capability tier and the minimums an enrolled asset has (commons 0041-telemetry-and-reach FR-001, FR-011), and the hash a person's approval names.
  *
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import {
-  type AssetLevel,
+  type AssetTier,
   type EnrollmentMinimum,
   KEY_ORDER,
   KEY_STRENGTH,
   type IdentityKey,
-  type LevelFacts,
+  type TierFacts,
   type Minimum,
   type Sighting,
   SIGHTING_PROTOCOLS,
@@ -145,22 +145,25 @@ export async function sightingsHash(sightings: readonly Sighting[]): Promise<str
   return [...new Uint8Array(digest)].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
-/** The level of an asset, derived and never stored as an authority (0041 FR-001, FR-002); an exhaustive function of what is observed. */
-export function levelOf(facts: LevelFacts): AssetLevel {
-  if (facts.sshOut) return facts.osquery ? 3 : 2;
-  return facts.identified ? 1 : 0;
+/** The tier of an asset, derived and never stored as an authority (0041 FR-001, FR-002); an exhaustive function of what is observed. */
+export function tierOf(facts: TierFacts): AssetTier {
+  if (facts.agent) return 4;
+  if (facts.login) return facts.osquery ? 3 : 2;
+  return facts.identified && facts.protocol ? 1 : 0;
 }
 
-/** Whether the level fell, and what was lost: a fall is a finding that names the loss, never an error and never silent (0041 FR-002). */
-export function levelFinding(before: LevelFacts, after: LevelFacts): string | undefined {
-  const a = levelOf(before);
-  const b = levelOf(after);
+/** Whether the tier fell, and what was lost: a fall is a finding that names the loss, never an error and never silent (0041 FR-002). */
+export function tierFinding(before: TierFacts, after: TierFacts): string | undefined {
+  const a = tierOf(before);
+  const b = tierOf(after);
   if (b >= a) return undefined;
   const lost: string[] = [];
+  if (before.agent && !after.agent) lost.push("the exporter");
   if (before.osquery && !after.osquery) lost.push("osQuery");
-  if (before.sshOut && !after.sshOut) lost.push("the outbound SSH path");
+  if (before.login && !after.login) lost.push("the login");
+  if (before.protocol && !after.protocol) lost.push("the API or protocol");
   if (before.identified && !after.identified) lost.push("the identification");
-  return `the level fell from ${a} to ${b}: ${lost.join(" and ")} lost`;
+  return `the tier fell from ${a} to ${b}: ${lost.join(" and ")} lost`;
 }
 
 /** Which of the three minimums an asset lacks (0041 FR-011): an asset that lacks one is not called enrolled. */

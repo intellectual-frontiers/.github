@@ -11,7 +11,7 @@ import { acceptRisk } from "@intellectual-frontiers/estate/logical";
 import { fs, path } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { evaluate, judgeObserved, type Observed } from "../src/logical/mod.ts";
-import { enrollProbe, observe, parseSsh, probeExecutor, sendVia } from "../src/physical/mod.ts";
+import { enrollProbe, loginExecutor, observe, parseSsh, probeExecutor, probeScript, sendVia, sendViaStdin } from "../src/physical/mod.ts";
 
 const NOW = "2026-11-21T12:00:00Z";
 const BAD: Observed = {
@@ -50,7 +50,7 @@ proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"],
     const known = path.join(dir, "fleet", "known_hosts");
     const keys = path.join(dir, "keys");
     const ssh = { user: "admin", address: "127.0.0.1", port: m.port };
-    const o = { asset: "synthetic-server-03", knownHosts: known, keys, identity: m.identityFile };
+    const o = { asset: "synthetic-server-03", knownHosts: known, keys, mode: "install" as const, identity: m.identityFile };
 
     const shown = await enrollProbe(ssh, o);
     assert(shown.kind === "ok" && shown.value.kind === "show" && shown.value.fingerprint.includes("SHA256:"));
@@ -65,7 +65,7 @@ proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"],
     const done = await enrollProbe(ssh, { ...o, fingerprint });
     assert(done.kind === "ok" && done.value.kind === "done", done.kind === "err" ? done.error : "");
     const e = done.value;
-    assertEquals(e.reach, { address: "127.0.0.1", port: m.port, user: "admin", credential: "synthetic-server-03-probe" });
+    assertEquals(e.reach, { address: "127.0.0.1", port: m.port, user: "admin", credential: "synthetic-server-03-probe", mode: "install" });
     const pinned = (await fs.readTextFile(known)).trim().split("\n");
     assertEquals(pinned.length, 1, "exactly the one host key compared is pinned");
     assertEquals((await fs.stat(e.keyFile)).mode! & 0o077, 0, "the private key is for its owner alone");
@@ -83,6 +83,39 @@ proves(["0007-machine-probe-enroll FR-002", "0007-machine-probe-enroll FR-003"],
     const seen = await observe(sendVia(executor.value));
     assert(seen.kind === "ok", seen.kind === "err" ? seen.error.message : "");
     assertEquals(seen.value.os.family, "ubuntu");
+  });
+  await m.stop();
+});
+
+proves(["0007-machine-probe-enroll FR-005", "0007-machine-probe-enroll FR-006"], "in the mode stdin the host key is pinned and nothing is made or installed, and the probe piped to the login observes the machine each time", async (t) => {
+  if (reason !== undefined) return t.skip(reason);
+  const spec = readMachineSpec({ name: "synthetic-server-04", image: "ubuntu:24.04", users: [{ name: "admin", sudo: true }], packages: [] });
+  assert(spec.kind === "ok");
+  const started = await startMachine(spec.value);
+  assert(started.kind === "ok", started.kind === "err" ? started.error : "");
+  const m = started.value;
+  await fs.withTempDir(async (dir) => {
+    const known = path.join(dir, "fleet", "known_hosts");
+    const keys = path.join(dir, "keys");
+    const ssh = { user: "admin", address: "127.0.0.1", port: m.port };
+    const o = { asset: "synthetic-server-04", knownHosts: known, keys, mode: "stdin" as const, credential: "person", identity: m.identityFile };
+    const shown = await enrollProbe(ssh, o);
+    assert(shown.kind === "ok" && shown.value.kind === "show");
+    const fingerprint = shown.value.fingerprint.split(" | ")[0] ?? "";
+    const before = new TextDecoder().decode((await m.executor.exec(["cat", "/home/admin/.ssh/authorized_keys"])).stdout);
+    const done = await enrollProbe(ssh, { ...o, fingerprint });
+    assert(done.kind === "ok" && done.value.kind === "done", done.kind === "err" ? done.error : "");
+    assertEquals(done.value.reach, { address: "127.0.0.1", port: m.port, user: "admin", credential: "person", mode: "stdin" });
+    assertEquals((await fs.readTextFile(known)).trim().split("\n").length, 1, "one host key is pinned");
+    assertEquals(await fs.exists(keys), false, "no key is made");
+    assertEquals((await m.executor.exec(["test", "-e", "/home/admin/.local/bin/machine-probe"])).code, 1, "nothing is installed");
+    assertEquals(new TextDecoder().decode((await m.executor.exec(["cat", "/home/admin/.ssh/authorized_keys"])).stdout), before, "no key line is added");
+    const executor = loginExecutor(done.value.reach, known, m.identityFile);
+    assert(executor.kind === "ok");
+    const seen = await observe(sendViaStdin(executor.value, await probeScript("posix")));
+    assert(seen.kind === "ok", seen.kind === "err" ? seen.error.message : "");
+    assertEquals(seen.value.os.family, "ubuntu");
+    assertEquals((await m.executor.exec(["test", "-e", "/home/admin/.local/bin/machine-probe"])).code, 1, "and still nothing is left after asking");
   });
   await m.stop();
 });

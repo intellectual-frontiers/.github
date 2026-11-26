@@ -65,6 +65,17 @@ export async function query(send: Send, sql: string): Promise<Result<readonly Ro
   }
 }
 
+/** A way of sending requests to a machine that has no probe on it: the script is piped to `sh -s` on a login each time, the request its words, so that nothing is left on the machine. */
+export function sendViaStdin(executor: Executor, script: string): Send {
+  return async (request) => {
+    const parsed = parseRequest(request);
+    if (parsed.kind === "err") return { code: 2, stdout: "", stderr: parsed.error };
+    const out = await executor.exec(["sh", "-s", "--", ...encodeRequest(parsed.value).split(" ")], { input: script });
+    const text = new TextDecoder();
+    return { code: out.code, stdout: text.decode(out.stdout), stderr: text.decode(out.stderr) };
+  };
+}
+
 /** A way of sending requests through an executor of Headless: the ssh target (its host key checked against the repository's known hosts), a container or this machine. The request is the command, as the probe's forced command reads it. */
 export function sendVia(executor: Executor): Send {
   return async (request) => {
