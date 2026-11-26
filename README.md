@@ -114,7 +114,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/lang-sql`](https://www.npmjs.com/package/@intellectual-frontiers/lang-sql) | Program | A small, fast, portable multi-dialect SQL language library | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/linux-observe`](commons/linux-observe) | Program | What a Linux machine is, read with no change | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/linux-services`](commons/linux-services) | Program | The services a Linux machine runs | layers | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/linux-services`](commons/linux-services) | Program | The services a Linux machine runs | layers | L1 | GitHub |
 | [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | not released (owner-blocked) |
