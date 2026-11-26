@@ -1,0 +1,2051 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45752274589",
+    "workflow": "ci",
+    "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+    "at": "2026-11-26T04:02:41Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45752274589"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 249,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 31298,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "systems",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 3413,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-cli",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 19,
+      "durationMs": 543,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 328,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46211,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 1/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 46211,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 376,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143097,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 2/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143097,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 485,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 40529,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "anyfs-sql 3/3",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 40529,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5769,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 24465,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 148,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 439,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 61284,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29967,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29967,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 168,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 379,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 69114,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54645,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54645,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 94,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 378,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47428,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22291,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 22291,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 76,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 386,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 65434,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31146,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 31146,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 42,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 5,
+      "durationMs": 3278,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 32,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 59344,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 9,
+      "durationMs": 1030,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 10,
+      "durationMs": 1151,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "foundation",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 203,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lang-sql",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 14485,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 281,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "bun-test",
+      "outcome": "findings",
+      "findings": 1,
+      "durationMs": 20190,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "libraries",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 2493,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 201,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9666,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "mizan",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 4972,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "patterns",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 136,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 133,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2835,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2835,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "programs",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "programs",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 147,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 281,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 63427,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 63427,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 11636,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 14,
+      "durationMs": 42182,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 42182,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "standards",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 9,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "standards",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 147,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 324,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1196,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1196,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "workload",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 282,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "workload",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16293,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "workload",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 16293,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-00c5dac90d04bc52",
+      "tool": "bun-test",
+      "module": "libraries",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "the-tests-on-node-26-6",
+        "logSha256": "39448ff45d6e66a371da2f735afe653fe08258d72e6c3835a2876b81dd7ef1f0"
+      },
+      "at": "2026-11-26T04:00:16Z",
+      "code": "test-failed",
+      "severity": "error",
+      "message": "the test failed: 0001-libraries FR-017: the real README is what the real manifests make, with a role for every library",
+      "key": "0001-libraries FR-017: the real README is what the real manifests make, with a role for every library"
+    },
+    {
+      "id": "f-06cd0582206a8ad8",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/nfs3.ts",
+      "line": 34,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/logical' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/logical' or its corresponding type declarations."
+    },
+    {
+      "id": "f-077b87ad568848c3",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5d8a0b19c98011098b3ef213d09eef2b4a9f2ab4466bb145c0f4e30cf5199e73"
+      },
+      "at": "2026-11-26T04:00:08Z",
+      "code": "unhandled-error",
+      "file": "suite/kanon-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/kanon-guides.test.ts"
+    },
+    {
+      "id": "f-0855e2ab7460cdb8",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-086ebaed8c288542",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/grouping.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/grouping.test.ts"
+    },
+    {
+      "id": "f-0bffdbab04933f09",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/handler.ts",
+      "line": 49,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations."
+    },
+    {
+      "id": "f-0c7c6e6e363d5d57",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS7006",
+      "file": "../serve/src/logical/href.ts",
+      "line": 80,
+      "severity": "error",
+      "message": "Parameter 's' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 's' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-0e175ea646e12743",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-0f5cbc872f26b4a3",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS7006",
+      "file": "../serve/src/logical/props.ts",
+      "line": 77,
+      "severity": "error",
+      "message": "Parameter 's' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 's' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-0f8cd55d2dc2bfa7",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-10d850d3b5eefbe4",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-2053804d94654a9e",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2345",
+      "file": "../serve/src/governance/status.ts",
+      "line": 89,
+      "severity": "error",
+      "message": "Argument of type 'Errno' is not assignable to parameter of type 'never'.",
+      "key": "TS2345:Argument of type 'Errno' is not assignable to parameter of type 'never'."
+    },
+    {
+      "id": "f-21444d98e91ea3f2",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/docker.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-222ea52641741e7a",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    },
+    {
+      "id": "f-246571a3f6c55da2",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/nfs3.ts",
+      "line": 33,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-2a8c156f44fc74db",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-2ebf51ec694ab7fb",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-32cf6f820b51049e",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/physical/nfs.ts",
+      "line": 19,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations."
+    },
+    {
+      "id": "f-3fdbcc06cd2ce00b",
+      "tool": "verify",
+      "code": "no-output",
+      "module": "libraries",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of verify reads",
+      "key": "verify-its-packing-is-checked-where-the--4:no-output",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1021936943337764d7d38605c2ac2c0578bdd847e6e558cc208cdcff68961838"
+      },
+      "at": "2026-11-26T03:59:47Z"
+    },
+    {
+      "id": "f-49a1e5b80fd99d4d",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/declared.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-repoctl-governance FR-006: the checks of the repository's configuration have a command and a code for each",
+      "key": "0002-repoctl-governance FR-006: the checks of the repository's configuration have a command and a code for each"
+    },
+    {
+      "id": "f-4a09281032a76418",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-4ad83c6cf7328ae5",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5d8a0b19c98011098b3ef213d09eef2b4a9f2ab4466bb145c0f4e30cf5199e73"
+      },
+      "at": "2026-11-26T04:00:08Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-4c8dc9b1a5d9fc15",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-55c778124fa6adc9",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/governance.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-repoctl-governance FR-006: the checks of the repository's configuration have a command and a code for each",
+      "key": "0002-repoctl-governance FR-006: the checks of the repository's configuration have a command and a code for each"
+    },
+    {
+      "id": "f-5a3159aacb892b39",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    },
+    {
+      "id": "f-60758be1961c7384",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/handler.ts",
+      "line": 48,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-68549d5bc10920d3",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/respond.ts",
+      "line": 15,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-6bb22f9227c5660f",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-6eb1cd0e892187dc",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-repoctl-sync FR-007, 0003-repoctl-sync FR-008, 0003-repoctl-sync FR-010: one report over the real repository writes nothing, ends with 0 and has a section for every check",
+      "key": "0003-repoctl-sync FR-007, 0003-repoctl-sync FR-008, 0003-repoctl-sync FR-010: one report over the real repository writes nothing, ends with 0 and has a section for every check"
+    },
+    {
+      "id": "f-6f60b3c3aa1a778d",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-737f11367b53ab4f",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2379",
+      "file": "src/physical/verbs/serve.ts",
+      "line": 97,
+      "severity": "error",
+      "message": "Argument of type 'import(\"/home/runner/work/.github/.github/commons/anyfs/src/logical/store\").Store<import(\"/home/runner/work/.github/.github/commons/anyfs/posix/src/physical/posix\").Viewable>' is not assignable to parameter of type 'import(\"/home/runner/work/.github/.github/commons/anyfs/src/logical/store\").Store<Viewable>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.",
+      "key": "TS2379:Argument of type 'import(\"/home/runner/work/.github/.github/commons/anyfs/src/logical/store\").Store<import(\"/home/runner/work/.github/.github/commons/anyfs/posix/src/physical/posix\").Viewable>' is not assignable to parameter of type 'import(\"/home/runner/work/.github/.github/commons/anyfs/src/logical/store\").Store<Viewable>' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+    },
+    {
+      "id": "f-7786036edda36b23",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/mizan-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/mizan-guides.test.ts"
+    },
+    {
+      "id": "f-7d9d9784e3bec8ed",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/sync.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-repoctl-sync FR-003, 0003-repoctl-sync FR-004: the real repository is in step: sync --check ends with 0, --dry-run says what it would do, and an id that is no generator is a usage error",
+      "key": "0003-repoctl-sync FR-003, 0003-repoctl-sync FR-004: the real repository is in step: sync --check ends with 0, --dry-run says what it would do, and an id that is no generator is a usage error"
+    },
+    {
+      "id": "f-7fbbab4b6614990d",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-818247904fb81323",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-884660cff84f77a6",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-8ee01bd2fd04aaef",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-908cc3087365f188",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-9f599163d2f2583e",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/physical/serve.ts",
+      "line": 20,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/physical' or its corresponding type declarations."
+    },
+    {
+      "id": "f-a01e3f36de020210",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-a65c9bde05657266",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5d8a0b19c98011098b3ef213d09eef2b4a9f2ab4466bb145c0f4e30cf5199e73"
+      },
+      "at": "2026-11-26T04:00:08Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-a956f5ae8e935ff2",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-a9d28305b943dca8",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2345",
+      "file": "../serve/src/logical/respond.ts",
+      "line": 29,
+      "severity": "error",
+      "message": "Argument of type 'Fidelity' is not assignable to parameter of type 'never'.",
+      "key": "TS2345:Argument of type 'Fidelity' is not assignable to parameter of type 'never'."
+    },
+    {
+      "id": "f-aac69f73771835b4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-ab621f2d1b3eb7de",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/governance/nfs.ts",
+      "line": 16,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-ac1362453ea5a452",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/library-commit-doctor.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-repoctl-library-commit-doctor FR-001, 0005-repoctl-library-commit-doctor FR-003: a library made in a copy of the repository passes its own verify and leaves sync --check at 0",
+      "key": "0005-repoctl-library-commit-doctor FR-001, 0005-repoctl-library-commit-doctor FR-003: a library made in a copy of the repository passes its own verify and leaves sync --check at 0"
+    },
+    {
+      "id": "f-ac692524bb695fd3",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-acd9741f861e05b0",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-b1e7c5548bdb36f2",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-b3e99774e5c3d049",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/href.ts",
+      "line": 17,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-b4e3b96a01f82e28",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-021: a bare knock prints the code and says it was not checked against the host key",
+      "key": "0002-enrollment-protocol FR-021: a bare knock prints the code and says it was not checked against the host key"
+    },
+    {
+      "id": "f-b5179e92cc27dad4",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence-shards.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence-shards.test.ts"
+    },
+    {
+      "id": "f-b789be2230e4b169",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-c3c32c48a4ac7746",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    },
+    {
+      "id": "f-c80a9e77cf956c86",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-caf96cd43e958211",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS7006",
+      "file": "../serve/src/logical/handler.ts",
+      "line": 366,
+      "severity": "error",
+      "message": "Parameter 'f' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 'f' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-cb34a9ef1028583d",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/declared.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-repoctl-sync FR-007, 0003-repoctl-sync FR-008, 0003-repoctl-sync FR-010: one report over the real repository writes nothing, ends with 0 and has a section for every check",
+      "key": "0003-repoctl-sync FR-007, 0003-repoctl-sync FR-008, 0003-repoctl-sync FR-010: one report over the real repository writes nothing, ends with 0 and has a section for every check"
+    },
+    {
+      "id": "f-d27419413326f5a4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/agents-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/agents-guides.test.ts"
+    },
+    {
+      "id": "f-d50c9ab66df48da4",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/physical/nfs.ts",
+      "line": 20,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-d5b7ee2bb3456845",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5d8a0b19c98011098b3ef213d09eef2b4a9f2ab4466bb145c0f4e30cf5199e73"
+      },
+      "at": "2026-11-26T04:00:08Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-d882e5600b1ec85c",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5d8a0b19c98011098b3ef213d09eef2b4a9f2ab4466bb145c0f4e30cf5199e73"
+      },
+      "at": "2026-11-26T04:00:08Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-da539a4310d85f83",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/lock.ts",
+      "line": 17,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-dad27fbc718152cd",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/governance/status.ts",
+      "line": 16,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-ddbe08700bbec987",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-ded2d76a0a3dbcfa",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-e35a80429af81190",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "52a7718e66dd86db037526b5aa90636c1401b8e54923a93454b99ff0ad575d0d"
+      },
+      "at": "2026-11-26T04:00:51Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-ea11651d061049eb",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/server.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-021: a bare knock prints the code and says it was not checked against the host key",
+      "key": "0002-enrollment-protocol FR-021: a bare knock prints the code and says it was not checked against the host key"
+    },
+    {
+      "id": "f-ec268597660a8d6c",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/declared.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-repoctl-sync FR-003, 0003-repoctl-sync FR-004: the real repository is in step: sync --check ends with 0, --dry-run says what it would do, and an id that is no generator is a usage error",
+      "key": "0003-repoctl-sync FR-003, 0003-repoctl-sync FR-004: the real repository is in step: sync --check ends with 0, --dry-run says what it would do, and an id that is no generator is a usage error"
+    },
+    {
+      "id": "f-eddbc00bf6be51e3",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "1e541c4ebc94ddb42ad5fe5e677e032b59a85cf36622b1f35adea742f584791a"
+      },
+      "at": "2026-11-26T04:00:13Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-f24f6b5fd3eb5ec3",
+      "tool": "verify",
+      "module": "repoctl",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ab9e9815aeb11e6ee0ec2f599e2bbeac91967f384783c1bb1dd21ff832be36b9"
+      },
+      "at": "2026-11-26T04:01:20Z",
+      "code": "test-failed",
+      "file": "suite/declared.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-repoctl-library-commit-doctor FR-001, 0005-repoctl-library-commit-doctor FR-003: a library made in a copy of the repository passes its own verify and leaves sync --check at 0",
+      "key": "0005-repoctl-library-commit-doctor FR-001, 0005-repoctl-library-commit-doctor FR-003: a library made in a copy of the repository passes its own verify and leaves sync --check at 0"
+    },
+    {
+      "id": "f-f42a063c56216868",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/dialogue.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-fb3d12ee27330ec0",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f89886d1238b754504dee9b57cf8c559baa8a1f332bef30757a0275d79cb7f4e"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    },
+    {
+      "id": "f-fb73d4b87e115cb7",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "66677faf83dd4fdde5ecdfe844c56755e8e2c46a2e85e2e06fcfa3d833d66171"
+      },
+      "at": "2026-11-26T04:01:04Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-fe0a9dd2849a1384",
+      "tool": "verify",
+      "module": "anyfs-cli",
+      "evidence": {
+        "run": "45752274589",
+        "commit": "3d6cd1694f95fbcb8d7078842c8291a712b988d6",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "452cdda5053f07f87ee54f3c03204e2b89dfbcc56503fb26e0f974ca9850f675"
+      },
+      "at": "2026-11-26T03:59:33Z",
+      "code": "TS2307",
+      "file": "../serve/src/logical/props.ts",
+      "line": 15,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-posix/governance' or its corresponding type declarations."
+    }
+  ]
+}
