@@ -132,3 +132,10 @@ requirement	mechanism	by	note
 0015-describe FR-009	check	.github: cd commons/headless && bun run verify	suite/describe.test.ts: the trace goes from the action to the verb to each projection, every visible verb traces to a command, and a verb a tier hides is there with no projection and says why
 0015-describe FR-010	check	.github: cd commons/headless && bun run verify	suite/describe.test.ts: every annotation of every action, problem code and exit status ends in a disposition, so that the check of Kanon finds nothing dropped; suite/describe.test.ts: for any generated program, each model has unique ids, a trace between its elements, the tools and routes of the surfaces for its tier, a command for each visible verb and nothing dropped
 0015-describe FR-011	check	.github: cd commons/headless && bun run verify	suite/describe.test.ts: where an element is written is what the caller says, and the name of the program or of the plugin and the line 1 where it says nothing
+0016-headless-ssh-forward FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0016-headless-ssh-forward FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

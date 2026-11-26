@@ -76,3 +76,22 @@ requirement	mechanism	by	note
 0009-integrations-verbs FR-003	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: no payload value in the outcome of any verb over a document
 0009-integrations-verbs FR-004	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: explain covers every code
 0009-integrations-verbs FR-005	check	.github: cd commons/integrations && bun run verify	suite/verbs.test.ts: credential, delivery and state
+0010-integrations-network-observers FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-014	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-015	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-016	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-017	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-018	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0010-integrations-network-observers FR-019	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

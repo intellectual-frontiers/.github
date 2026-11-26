@@ -9,3 +9,4 @@ number	slug	state
 0008	anyfs-merge-logical	in force
 0009	anyfs-merge-physical	in force
 0010	anyfs-merge-signing	in force
+0011	anyfs-queue	in force

@@ -138,3 +138,9 @@ requirement	mechanism	by	note
 0016-grc-poam FR-005	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the controls of two frameworks in one document, the crosswalk to a framework, the findings and risks of the assessment kept, and the empty document
 0016-grc-poam FR-006	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: an option that is not planned findings is an invalid problem and writes nothing, and another model ignores it
 0016-grc-poam FR-007	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the document written with milestones, owners and two frameworks is valid against NIST's published schema where the schema and ajv are at hand
+0017-grc-sshsig-namespace FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

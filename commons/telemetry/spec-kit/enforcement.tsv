@@ -32,3 +32,25 @@ requirement	mechanism	by	note
 0002-telemetry-query FR-003	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-004	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-005	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
+0003-telemetry-reach FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-014	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-015	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-016	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-017	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-018	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-019	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-020	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-021	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-022	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

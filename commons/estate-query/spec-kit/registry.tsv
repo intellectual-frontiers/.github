@@ -4,3 +4,4 @@ number	slug	state
 0003	estate-query-run	in force
 0004	estate-query-checks	in force
 0005	estate-query-live	in force
+0006	estate-query-host-tables	in force

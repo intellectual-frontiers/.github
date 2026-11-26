@@ -806,3 +806,22 @@ requirement	mechanism	by	note
 0040-workload-pattern FR-005	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the registry of forms (commons-workload-pattern.test.ts)
 0040-workload-pattern FR-006	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the exports of the core (commons-workload-pattern.test.ts)
 0040-workload-pattern FR-007	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the members of the patterns metapackage (commons-workload-pattern.test.ts)
+0041-telemetry-and-reach FR-001	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-002	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-003	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-004	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-005	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-006	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-007	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-008	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-009	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-010	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-011	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-012	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-013	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-014	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-015	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-016	none	-	Deferred: a check that every requirement of a governed specification cites an audit row and that the counts of the audit's summary are those of its table
+0041-telemetry-and-reach FR-017	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-018	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-019	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line

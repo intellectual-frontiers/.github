@@ -21,3 +21,7 @@ requirement	mechanism	by	note
 0005-estate-query-live FR-004	check	.github: cd commons/estate-query && bun run verify	suite/live.test.ts
 0002-estate-query-relations FR-006	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
 0002-estate-query-relations FR-007	check	.github: cd commons/estate-query && bun run verify	suite/estate-query.test.ts
+0006-estate-query-host-tables FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0006-estate-query-host-tables FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0006-estate-query-host-tables FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0006-estate-query-host-tables FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
