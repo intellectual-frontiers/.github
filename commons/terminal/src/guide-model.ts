@@ -45,6 +45,11 @@ type Common = {
   readonly say: string;
   /** References that back the step: a path, an identifier, an address. */
   readonly evidence?: readonly string[];
+  /**
+   * What the person must type or run, as one text (a command line): the guide shows it as its own `Command:` paragraph, wrapped and never cut,
+   * and the full screen keeps it visible whatever the height (FR-016). A `run` step needs none: its verb is the command.
+   */
+  readonly command?: string;
 };
 
 /** A step that asks the person for values. */
@@ -134,7 +139,7 @@ function decodeVerb(input: unknown, path: string): Result<GuideVerb, DecodeError
   return ok({ id: id.value, inputs });
 }
 
-const COMMON = ["id", "kind", "summary", "say", "evidence"] as const;
+const COMMON = ["id", "kind", "summary", "say", "evidence", "command"] as const;
 
 /**
  * A step decoded from `unknown`: its `kind` decides which fields it has (a `question` has `ask`, a `run` has `verb`, a `human` has `gate` and
@@ -163,7 +168,19 @@ export function decodeStep(input: unknown, path = "$"): Result<GuideStep, Decode
     for (const [i, item] of e.entries()) if (typeof item !== "string") return fail(`${path}.evidence[${i}]`, "a string", describe(item));
     evidence = e as readonly string[];
   }
-  const common = { id: id.value, summary: summary.value, say: say.value, ...(evidence === undefined ? {} : { evidence }) };
+  let command: string | undefined;
+  if (input["command"] !== undefined) {
+    const c = text(input, "command", path, true);
+    if (c.kind === "err") return c;
+    command = c.value;
+  }
+  const common = {
+    id: id.value,
+    summary: summary.value,
+    say: say.value,
+    ...(evidence === undefined ? {} : { evidence }),
+    ...(command === undefined ? {} : { command }),
+  };
   switch (k) {
     case "question": {
       if (input["ask"] === undefined) return fail(`${path}.ask`, "an array of fields", "nothing");

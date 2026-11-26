@@ -131,8 +131,14 @@ export function renderStep(step: GuideStep, caps: GuideCaps): readonly string[] 
   return [...parts.head, ...parts.body];
 }
 
+/**
+ * A step as lines: `head` (pinned), `body`, and `command`, the indexes into `body` of the lines that hold what the person must type or run
+ * (FR-016): the `Command:` paragraph of `command`, a paragraph of `say` that begins `Command:`, and the `will run` and `inputs` lines of a `run`.
+ */
+export type StepParts = { readonly head: readonly string[]; readonly body: readonly string[]; readonly command: readonly number[] };
+
 /** A step as two runs of lines: `head`, the mark and the summary (what the full screen keeps pinned), and `body`, everything after it (FR-013). */
-export function renderStepParts(step: GuideStep, caps: GuideCaps): { readonly head: readonly string[]; readonly body: readonly string[] } {
+export function renderStepParts(step: GuideStep, caps: GuideCaps): StepParts {
   const cols = Math.max(20, caps.columns);
   const tag = tagOf(step.kind, caps);
   const lead = displayWidth(tag) + 1;
@@ -140,16 +146,36 @@ export function renderStepParts(step: GuideStep, caps: GuideCaps): { readonly he
   const lines: string[] = [];
   const roleOf = TAGS[step.kind].role;
   const headLines = [`${paint(roleOf, tag, caps)} ${(head[0] ?? "").slice(lead)}`, ...head.slice(1)];
-  const say = step.say.trim() === "" ? [] : wrap(step.say, cols, 2);
-  lines.push(...say);
+  const command: number[] = [];
+  const mine = (from: number): void => {
+    for (let i = from; i < lines.length; i++) command.push(i);
+  };
+  if (step.say.trim() !== "") {
+    // Paragraph by paragraph: one that begins `Command:` is what the person types, so it is marked and its continuation is indented.
+    for (const para of clean(step.say).split("\n")) {
+      const isCommand = para.trimStart().startsWith("Command:");
+      const at = lines.length;
+      lines.push(...(isCommand ? wrap(para.trim(), cols, 4, 2) : wrap(para, cols, 2)));
+      if (isCommand) mine(at);
+    }
+  }
+  if (step.command !== undefined && step.command.trim() !== "") {
+    const at = lines.length;
+    lines.push(...wrap(`Command: ${step.command}`, cols, 4, 2));
+    mine(at);
+  }
   const block = (title: string, items: readonly string[]): void => {
     lines.push(`  ${title}`);
     for (const item of items) lines.push(...wrap(item, cols, 6, 6).map((l, i) => (i === 0 ? `    - ${l.slice(6)}` : l)));
   };
   switch (step.kind) {
     case "run":
-      lines.push(...wrap(`will run: ${step.verb.id}`, cols, 4, 2));
-      lines.push(...wrap(`inputs: ${inputsOf(step.verb.inputs)}`, cols, 4, 2));
+      {
+        const at = lines.length;
+        lines.push(...wrap(`will run: ${step.verb.id}`, cols, 4, 2));
+        lines.push(...wrap(`inputs: ${inputsOf(step.verb.inputs)}`, cols, 4, 2));
+        mine(at);
+      }
       break;
     case "question":
       block("you are asked for:", step.ask.map(field));
@@ -167,7 +193,7 @@ export function renderStepParts(step: GuideStep, caps: GuideCaps): { readonly he
   }
   if (step.evidence !== undefined && step.evidence.length > 0) block("evidence:", step.evidence);
   const fit = (l: string): string => (displayWidth(l) > cols ? cutToWidth(l, cols) : l);
-  return { head: headLines.map(fit), body: lines.map(fit) };
+  return { head: headLines.map(fit), body: lines.map(fit), command };
 }
 
 /** The lines of a prompt for one field: its prompt and hint wrapped, and as the last line the mark of where to type, which is written without a line end. */

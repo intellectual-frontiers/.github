@@ -20,6 +20,7 @@ proves([FR], "each of the five kinds decodes, with only the fields it has", () =
     { ...base, kind: "human", gate: { who: "person" }, ask: [field] },
     { ...base, kind: "wait" },
     { ...base, kind: "done", evidence: ["synthetic-evidence-01"] },
+    { ...base, kind: "human", gate: { who: "person" }, command: "synthetic-tool run synthetic-order-01" },
   ];
   for (const c of cases) {
     const r = decodeStep(c);
@@ -59,6 +60,8 @@ proves([FR], "an unknown kind, a missing field and a field of the wrong type are
     [{ ...base, id: "", kind: "done" }, "$.id"],
     [{ ...base, kind: "done", summary: 3 }, "$.summary"],
     [{ ...base, kind: "done", evidence: "one" }, "$.evidence"],
+    [{ ...base, kind: "done", command: "" }, "$.command"],
+    [{ ...base, kind: "done", command: 7 }, "$.command"],
     [{ ...base, kind: "done", evidence: [1] }, "$.evidence[0]"],
     [{ ...base, kind: "question" }, "$.ask"],
     [{ ...base, kind: "question", ask: [] }, "$.ask"],

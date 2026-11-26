@@ -28,7 +28,7 @@
 import { err, ok, type DecodeError, type Result } from "@intellectual-frontiers/core";
 import { atMost, FULL_MIN_COLUMNS, FULL_MIN_ROWS, type GuideCaps } from "./guide-caps.ts";
 import { type AskField, decodeStep, type DoneStep, type GuideStep } from "./guide-model.ts";
-import { clean, renderPrompt, renderResult, renderStep, renderStepParts } from "./guide-render.ts";
+import { clean, renderPrompt, renderResult, renderStep, renderStepParts, wrap } from "./guide-render.ts";
 import { drawScreen, ENTER, frameOf, LEAVE, layoutOf, type PlanItem } from "./guide-screen.ts";
 import { paint } from "./palette.ts";
 
@@ -64,7 +64,16 @@ export type GuideClock = {
 export type GuideRunResult = { readonly summary: string; readonly lines?: readonly string[] };
 
 /** What the driver hands the caller to carry out: the step and the answers the person gave (empty for a `run`). */
-export type GuideCall = { readonly step: GuideStep; readonly answers: Readonly<Record<string, string>>; readonly signal: AbortSignal | undefined };
+export type GuideCall = {
+  readonly step: GuideStep;
+  readonly answers: Readonly<Record<string, string>>;
+  readonly signal: AbortSignal | undefined;
+  /**
+   * Tells the guide the last line of output of the work in progress (FR-018): scrubbed text, one line (control characters are removed and only
+   * the first line is kept). The full screen shows it dimmed under the keys, and `plain` prints it as `  | line` at most every 15 seconds.
+   */
+  readonly progress: (line: string) => void;
+};
 
 /**
  * The typed ends of a guide that did not finish; each has `message`, a sentence for a person, and `reported: true`: the driver has already
@@ -123,13 +132,39 @@ export type GuideOptions = {
    * the first frame (FR-011). An id that is not in the plan is ignored; the current step is never ticked until it is done.
    */
   readonly done?: readonly string[];
+  /**
+   * The ids of the steps of `plan` that were skipped and not done, drawn `[-]` (FR-011) so that a skipped step is not mistaken for one not
+   * done yet; an id that is also in `done` is done. An id that is not in the plan is ignored.
+   */
+  readonly skipped?: readonly string[];
+  /**
+   * The last line of what the person keeps where the guide ends in a failure or an abort, after the short transcript (FR-015), as a sentence
+   * from the caller such as "run it again to retry". Not shown where the guide finishes.
+   */
+  readonly closing?: string;
   /** The title of the full screen (default "Guide"). */
   readonly title?: string;
   readonly clock?: GuideClock;
   readonly poll?: GuidePoll;
   /** How many times a field is asked again after a refusal (default 5). */
   readonly attempts?: number;
+  /** The pace of the sign of life while the caller's `run` works, in milliseconds (default: the footer every 1000, a line in `plain` every 15000). */
+  readonly heartbeat?: { readonly footerMs?: number; readonly plainEveryMs?: number };
 };
+
+/** The time elapsed as a person reads it: `45s`, `3m10s`, `1h02m05s`. */
+export function elapsedOf(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  if (h > 0) return `${h}h${String(m).padStart(2, "0")}m${String(sec).padStart(2, "0")}s`;
+  if (m > 0) return `${m}m${String(sec).padStart(2, "0")}s`;
+  return `${sec}s`;
+}
+
+/** How many of the last steps the transcript of a guide that ends in a failure or an abort holds (FR-015). */
+export const TRANSCRIPT_STEPS = 5;
 
 /** The clock of the host: `Date.now` and the web standard timer; a sleep ends at once on an abort. */
 export const systemClock: GuideClock = {
@@ -249,6 +284,7 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
   const plan = o.plan ?? [];
   const title = o.title ?? "Guide";
   const done = new Set<string>(o.done ?? []);
+  const skipped = new Set<string>((o.skipped ?? []).filter((id) => !done.has(id)));
   const failed = new Set<string>();
   /** Everything shown, in order: the transcript the person keeps. The full screen's pane draws only the group of the current step. */
   const entries: Entry[] = [];
@@ -257,6 +293,8 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
   /** The last step shown, to see that the same one is asked again. */
   let lastKey = "";
   let position = 0;
+  /** The last line of output of the work in progress, shown dimmed under the keys in full. */
+  let progressLine = "";
   let status = "";
   let keys = "";
   let typing = false;
@@ -296,8 +334,15 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     const lead = group[0]?.step === undefined ? undefined : renderStepParts(group[0].step, pc);
     const foot = group.slice(lead === undefined ? 0 : 1).flatMap((e) => e.block(pc));
     const pane = [...(lead?.head ?? []), ...(lead?.body ?? []), ...foot];
+    const protect = (lead?.command ?? []).map((i) => (lead?.head.length ?? 0) + i);
     o.out.write(
-      frameOf(drawScreen({ title, plan, done, failed, position, pinned: lead?.head.length ?? 0, keep: foot.length, current, pane, status, keys, typing }, size(), c)),
+      frameOf(
+        drawScreen(
+          { title, plan, done, skipped, failed, position, pinned: lead?.head.length ?? 0, keep: foot.length, protect, progress: progressLine, current, pane, status, keys, typing },
+          size(),
+          c,
+        ),
+      ),
     );
   };
   const writeLines = (lines: readonly string[]): void => {
@@ -322,10 +367,16 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
   const showStep = (s: GuideStep): boolean => {
     current = s.id;
     done.delete(s.id);
+    skipped.delete(s.id);
     failed.delete(s.id);
     const idx = plan.findIndex((p) => p.id === s.id);
-    position =
-      idx >= 0 ? Math.max(position, idx + 1) : Math.max(position, Math.min(plan.length, plan.filter((p) => done.has(p.id)).length + 1));
+    // FR-011: the position of a plan step is its place in the plan; a step that is not in the plan keeps the last known place, which at the
+    // first step shown is the step after the last one done or skipped.
+    if (idx >= 0) position = Math.max(position, idx + 1);
+    else if (position === 0) {
+      const last = plan.reduce((m, p, i) => (done.has(p.id) || skipped.has(p.id) ? i + 1 : m), 0);
+      position = Math.min(plan.length, last + 1);
+    }
     const key = JSON.stringify(s);
     if (key === lastKey && entries.length > groupStart) {
       dropPrompts(groupStart);
@@ -389,9 +440,9 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
         if (stopped()) return abort();
         if (attempt > 1) dropPrompts(fieldStart);
         const prompt = renderPrompt(f, capsNow());
-        const lead = prompt.slice(0, -1);
         const last = prompt.at(-1) ?? "  > ";
-        if (lead.length > 0) show(() => lead, "prompt");
+        // Wrapped again at each drawing, to the width of the pane then (FR-016): a prompt wrapped for the whole screen is cut in the pane.
+        if (prompt.length > 1) show((c) => renderPrompt(f, c).slice(0, -1), "prompt");
         entries.push({ role: "prompt", block: () => [last] });
         typing = true;
         if (capsNow().level === "full") {
@@ -445,8 +496,56 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     return ok(answers);
   };
 
+  /**
+   * Runs the caller's work with a sign of life (FR-018): in full the footer says `working... 12s` and is drawn every second with the last
+   * line of output under the keys; elsewhere a line `still working: VERB, 3m10s elapsed` every 15 seconds and the last line of output as
+   * `  | line`, at most as often. The ticker ends with the work, and never keeps the process waiting.
+   */
+  const withHeartbeat = async <T>(step: GuideStep, work: (progress: (line: string) => void) => Promise<T>): Promise<T> => {
+    const label = step.kind === "run" ? step.verb.id : step.id;
+    const started = clock.now();
+    const footerMs = Math.max(1, o.heartbeat?.footerMs ?? 1000);
+    const everyMs = Math.max(1, o.heartbeat?.plainEveryMs ?? 15_000);
+    const stop = new AbortController();
+    const relay = (): void => stop.abort();
+    signal?.addEventListener("abort", relay, { once: true });
+    let latest = "";
+    let printed = "";
+    let lastPrint = started;
+    const base = step.kind === "run" ? `working... running ${step.verb.id}` : "working...";
+    const progress = (line: string): void => {
+      latest = clean(line).split("\n").map((l) => l.trim()).find((l) => l !== "") ?? "";
+    };
+    const tick = async (): Promise<void> => {
+      while (!stop.signal.aborted) {
+        await clock.sleep(footerMs, stop.signal);
+        if (stop.signal.aborted) return;
+        const now = clock.now();
+        if (capsNow().level === "full") {
+          progressLine = latest;
+          setStatus(`${base} ${elapsedOf(now - started)}`, "Ctrl+C stop");
+        } else if (now - lastPrint >= everyMs) {
+          lastPrint = now;
+          o.out.write(`still working: ${clean(label)}, ${elapsedOf(now - started)} elapsed\n`);
+          if (latest !== "" && latest !== printed) {
+            printed = latest;
+            o.out.write(`  | ${latest}\n`);
+          }
+        }
+      }
+    };
+    void tick();
+    try {
+      return await work(progress);
+    } finally {
+      stop.abort();
+      signal?.removeEventListener("abort", relay);
+      progressLine = "";
+    }
+  };
+
   const carry = async (step: GuideStep, answers: Record<string, string>): Promise<Result<GuideRunResult, GuideError>> => {
-    const r = await o.run({ step, answers, signal });
+    const r = await withHeartbeat(step, (progress) => o.run({ step, answers, signal, progress }));
     if (stopped()) return abort();
     if (r.kind === "err") {
       return failure({ code: "E-GUIDE-RUN-FAILED", step, reason: r.error, message: `${step.summary}: ${r.error}` });
@@ -590,16 +689,24 @@ export async function runGuide(o: GuideOptions): Promise<Result<GuideFinished, G
     }
   };
 
+  let ended: "done" | "stopped" = "stopped";
   try {
-    return await loop();
+    const r = await loop();
+    if (r.kind === "ok") ended = "done";
+    return r;
   } finally {
     unsubscribe?.();
     const wasFull = inAlt;
     restore();
     // A full screen is gone when it is left: what was shown is written once more, on the screen the person keeps.
+    const c = atMost({ ...o.caps, columns: size().columns, rows: size().rows }, "ansi");
     if (wasFull) {
-      const c = atMost({ ...o.caps, columns: size().columns, rows: size().rows }, "ansi");
-      for (const e of entries) writeLines(e.block(c));
+      // Short: the last steps and what came of the last one, not the whole run (FR-015).
+      const starts = entries.flatMap((e, i) => (e.role === "step" ? [i] : []));
+      const from = starts.length > TRANSCRIPT_STEPS ? (starts[starts.length - TRANSCRIPT_STEPS] ?? 0) : 0;
+      if (from > 0) writeLines([`(${starts.length - TRANSCRIPT_STEPS} earlier steps are not shown)`]);
+      for (const e of entries.slice(from)) writeLines(e.block(c));
     }
+    if (ended !== "done" && o.closing !== undefined && clean(o.closing).trim() !== "") writeLines(wrap(o.closing, c.columns, 0));
   }
 }
