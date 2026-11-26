@@ -236,12 +236,12 @@ fetch() {
 }
 
 downloader_hint() {
-  if have apt-get; then echo "install one (as root: apt-get install curl), then ask for the plan again"
-  elif have dnf; then echo "install one (as root: dnf install curl), then ask for the plan again"
-  elif have yum; then echo "install one (as root: yum install curl), then ask for the plan again"
-  elif have zypper; then echo "install one (as root: zypper install curl), then ask for the plan again"
-  elif have apk; then echo "install one (as root: apk add curl), then ask for the plan again"
-  else echo "install curl or wget with this system's package manager, then ask for the plan again"; fi
+  if have apt-get; then echo "install one (as root: apt-get install curl), then run this enrollment again (every step is safe to repeat)"
+  elif have dnf; then echo "install one (as root: dnf install curl), then run this enrollment again (every step is safe to repeat)"
+  elif have yum; then echo "install one (as root: yum install curl), then run this enrollment again (every step is safe to repeat)"
+  elif have zypper; then echo "install one (as root: zypper install curl), then run this enrollment again (every step is safe to repeat)"
+  elif have apk; then echo "install one (as root: apk add curl), then run this enrollment again (every step is safe to repeat)"
+  else echo "install curl or wget with this system's package manager, then run this enrollment again (every step is safe to repeat)"; fi
 }
 
 step_install_package() {
@@ -445,7 +445,7 @@ main() {
   done < "$plan"
   rm -f "$plan"
   if [ "$failed" = false ] && [ "$kept" = false ]; then (keep_device_key) || failed=true; fi
-  if [ "$failed" = true ]; then okjson=false; else okjson=true; fi
+  if [ "$failed" = true ]; then okjson=false; else okjson=true; left=; cleanup=; fi
   printf '{"type":"result","ok":%s,"steps":[%s],"left":[%s],"cleanup":[%s]}\n' "$okjson" "$results" "$left" "$cleanup" | ssh_s "done" "$SESSION" > /dev/null
   if [ "$failed" = true ]; then
     say "a required step failed, so this machine is not enrolled."

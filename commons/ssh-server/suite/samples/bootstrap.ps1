@@ -284,6 +284,7 @@ foreach ($fields in $steps) {
 if (-not $failed -and -not $kept) {
     try { Save-DeviceKey } catch { Say "  failed: $($_.Exception.Message)"; $failed = $true }
 }
+if (-not $failed) { $left = @(); $cleanup = @() }
 $result = [ordered]@{ type = 'result'; ok = (-not $failed); steps = @($results); left = @($left); cleanup = @($cleanup) } | ConvertTo-Json -Compress -Depth 6
 $null = Invoke-Door -Words @('done', $Session) -Text $result
 if ($failed) { Say 'a required step failed, so this machine is not enrolled. What it left here, and how to remove it, is recorded on the controller.'; throw 'a step failed: see above' }
