@@ -15,7 +15,7 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Rendered } from "@intellectual-frontiers/archon/dialect";
 import { executionPlanOf } from "@intellectual-frontiers/archon/dialect";
 import { parseSubjectName, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/archon/governance";
-import { buildOrder, planOrder, type Order, type Plan } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf, type Order, type Plan } from "@intellectual-frontiers/archon/logical";
 import type { ExecutionPlan } from "@intellectual-frontiers/headless/logical";
 import { PHASES, type Phase } from "@intellectual-frontiers/toolchain/governance";
 import { requirementsFor, resolveTools, type Resolution, type ResolveProblem } from "@intellectual-frontiers/toolchain/logical";
@@ -74,7 +74,7 @@ export async function analyse(config: ToolPluginConfig, names: readonly string[]
   if (subject.kind === "err") return err([`the name of this computer is not a subject name: ${subject.error}`]);
   const order = buildOrder({ subject: { name: subject.value, class: "workstation" }, assurance: config.assurance, layers: [{ layer: "baseline", requirements: reqs.value }] });
   if (order.kind === "err") return err(order.error.map((p) => JSON.stringify(p)));
-  const plan = planOrder(order.value, observed);
+  const plan = planOf(order.value, observed);
   const shares: Share[] = [];
   const problems: string[] = [];
   for (const rt of config.runtimes) {

@@ -44,7 +44,7 @@ export type CommandSpec = {
 
 /** How a manager writes an exact version: joined to the name (`pkg=1.2`, `pkg@1.2`), as flags after the name (`--id pkg --exact --version 1.2`), or not at all. */
 export type Versioning =
-  | { readonly kind: "joined"; readonly joiner: "=" | "@" }
+  | { readonly kind: "joined"; readonly joiner: "=" | "@" | "-" }
   | { readonly kind: "flags"; readonly packageFlags: readonly string[]; readonly exactFlags: readonly string[]; readonly versionFlag: string }
   | { readonly kind: "none"; readonly reason: string };
 

@@ -16,9 +16,7 @@
 - **FR-005**: `executionPlanOf` MUST make the plan of steps for the executor of headless from the entries of a plan that change something: each step MUST carry the argument vector of an apply and, where the tool has a check mode, the argument vector of a check, a step for a destructive entry MUST be refused where it has no check, and the argument vectors MUST name the digest of the rendered files so that the hash of the plan covers what is rendered.
 - **FR-006**: What a dialect renders MUST be generated: `renderHeader` MUST give the line that says so for a kind of file, `isGenerated` MUST find it, and the digest of a rendered set of files MUST be the SHA-256 of the files in the order of their paths, so that it does not depend on the order they were made.
 - **FR-007**: A step of a dialect MUST be an `ArgvStep` of `@intellectual-frontiers/core` (the words, `as` `user` or `root`, and the exit codes expected), never a shell string; `executionPlanOf` MUST carry the steps as argument vectors and a test MUST find no shell string in the output of any dialect.
-- **FR-008**: The operating system package managers MUST be ONE table-driven adapter keyed by the package manager fact (`apt`, `dnf`, `yum`, `zypper`, `apk`, `pacman`, `brew`, `winget`, `mise`), each row the data of the manager (what it guarantees, how it writes an exact version, the exit code of a missing package, whether it needs the administrator), and the adapter MUST give the steps of a plan as `ArgvStep`s; a manager that is not a key of the table MUST be refused naming the keys.
-- **FR-009**: The dialect of pinned native tools MUST keep in TypeScript only the choice of the pin, the typed fetch step (url, SHA-256 and destination) and the verify step (the hash check), and MUST leave the extraction of an archive to the tools of the operating system as `ArgvStep`s (`tar`, `unzip`, `msiexec`, `installer`).
-- **FR-010**: Archon MUST have no dialect of a first-boot hook (cloud-init, kickstart, preseed) (0006-archon-on-workload FR-012).
+- **FR-008**: Archon MUST have no dialect of a first-boot hook (cloud-init, kickstart, preseed) (0006-archon-on-workload FR-012).
 
 ## Acceptance scenarios
 
@@ -31,7 +29,7 @@
 
 ## Out of scope
 
-- The dialects: each is a package of its own with its own specification kit, and each runs its real tool.
+- The dialects: each is a package of its own with its own specification kit, and each runs its real tool; the operating system package managers are one table-driven adapter in the kit of the managers (commons package-managers 0005-package-managers-adapter), and the dialect of pinned native tools keeps in TypeScript only the choice of the pin, the typed fetch step and the verify step.
 - Running the plan: the executor of headless.
 
 ## Edge cases

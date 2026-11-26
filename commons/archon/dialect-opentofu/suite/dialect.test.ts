@@ -7,7 +7,7 @@
  */
 import { isGenerated } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
-import { buildOrder, planOrder } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf } from "@intellectual-frontiers/archon/logical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { changesOf, checkPlan, configurationOf, DIALECT_ID, KINDS_CARRIED, opentofu, optionProblems, planDigest, resourcesOf, type OpenTofuOptions } from "../src/dialect.ts";
 
@@ -56,9 +56,9 @@ proves(["0002-opentofu-dialect FR-002"], "the options are refused with every rea
   assert(optionProblems({ ...OPTIONS, stateDir: "/srv/../etc" }).some((m) => m.includes("no ..")));
   assertEquals(optionProblems({ ...OPTIONS, backend: { type: "s3", config: { bucket: "synthetic-network-01-tfstate", key: "govcloud.tfstate", region: "us-gov-west-1", encrypt: true } } }), []);
   const order = orderOf([BUCKET]);
-  const r = await opentofu({ ...OPTIONS, stateDir: "relative" }).render(order, planOrder(order, new Map()));
+  const r = await opentofu({ ...OPTIONS, stateDir: "relative" }).render(order, planOf(order, new Map()));
   assert(r.kind === "err" && r.error.some((m) => m.includes("absolute")), "a dialect made with bad options renders nothing");
-  assertEquals(opentofu({ ...OPTIONS, stateDir: "relative" }).steps(planOrder(order, new Map()), { files: new Map([["opentofu/main.tf.json", "{}"]]), digest: "a".repeat(64) } as never), []);
+  assertEquals(opentofu({ ...OPTIONS, stateDir: "relative" }).steps(planOf(order, new Map()), { files: new Map([["opentofu/main.tf.json", "{}"]]), digest: "a".repeat(64) } as never), []);
 });
 
 proves(["0002-opentofu-dialect FR-003"], "an order is refused with every reason: a kind not carried, a desired of the wrong shape, an unpinned provider, a type of another provider, a bad name, settings that are not an object and a resource stated twice", () => {
@@ -97,7 +97,7 @@ proves(["0002-opentofu-dialect FR-004"], "a secret, a reference to a secret, a c
 
 proves(["0002-opentofu-dialect FR-005"], "the render is one generated file in OpenTofu's JSON syntax, the same every time, with exact versions, the provider's settings, the local state outside the repository, the resources and their dependencies, and nothing for a resource that is to be absent", async () => {
   const order = orderOf([BUCKET, POLICY, req("bucket.old", { provider: "aws", type: "aws_s3_bucket", name: "old", settings: { bucket: "synthetic-network-01-old" } }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" })]);
-  const plan = planOrder(order, new Map());
+  const plan = planOf(order, new Map());
   const a = await opentofu(OPTIONS).render(order, plan);
   const b = await opentofu(OPTIONS).render(order, plan);
   assert(a.kind === "ok" && b.kind === "ok");
@@ -123,7 +123,7 @@ proves(["0002-opentofu-dialect FR-005"], "the render is one generated file in Op
 
 proves(["0002-opentofu-dialect FR-006"], "the steps are none where nothing changes, and otherwise an init that is its own check and a saved plan that is applied as it was planned, every vector a list that names the digest and keeps the data and the plan in the state folder", async () => {
   const order = orderOf([BUCKET, POLICY]);
-  const plan = planOrder(order, new Map());
+  const plan = planOf(order, new Map());
   const d = opentofu(OPTIONS);
   const rendered = await d.render(order, plan);
   assert(rendered.kind === "ok");
@@ -144,7 +144,7 @@ proves(["0002-opentofu-dialect FR-006"], "the steps are none where nothing chang
     for (const x of [...s.apply, ...(s.check ?? [])]) assert(!/[;&|$`]/.test(x.replace("$", "")) || x.startsWith("TF_"), x);
     assert(!s.apply.includes("-auto-approve") && !s.apply.includes("sh") && !s.apply.includes("-c"), "the saved plan is applied, never an auto-approved new one");
   }
-  const settled = planOrder(order, new Map([[BUCKET.id, BUCKET.desired], [POLICY.id, POLICY.desired]]));
+  const settled = planOf(order, new Map([[BUCKET.id, BUCKET.desired], [POLICY.id, POLICY.desired]]));
   assertEquals(d.steps(settled, rendered.value), [], "nothing to do where nothing changes");
   assertEquals(d.steps(plan, { files: new Map(), digest: rendered.value.digest } as never), []);
 });

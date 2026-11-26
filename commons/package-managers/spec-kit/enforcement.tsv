@@ -25,3 +25,8 @@ requirement	mechanism	by	note
 0004-package-managers-dialect FR-006	check	.github: cd commons/package-managers && bun run verify	suite/dialect.test.ts
 0004-package-managers-dialect FR-007	check	.github: cd commons/package-managers && bun run verify	suite/dialect.test.ts
 0004-package-managers-dialect FR-008	check	.github: cd commons/package-managers && bun run verify	suite/ontology.test.ts
+0005-package-managers-adapter FR-001	check	.github: cd commons/package-managers && bun run verify	suite/adapter.test.ts
+0005-package-managers-adapter FR-002	check	.github: cd commons/package-managers && bun run verify	suite/adapter.test.ts
+0005-package-managers-adapter FR-003	check	.github: cd commons/package-managers && bun run verify	suite/adapter.test.ts
+0005-package-managers-adapter FR-004	check	.github: cd commons/package-managers && bun run verify	suite/adapter.test.ts
+0005-package-managers-adapter FR-005	check	.github: cd commons/package-managers && bun run verify	suite/adapter.test.ts

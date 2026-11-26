@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { buildOrder, planOrder } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf as planOfOrder } from "@intellectual-frontiers/archon/logical";
 import { executionPlanOf, isGenerated } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/archon/governance";
 import { defineCatalog, defineTool, meetsIntegrity, requirementsFor, resolveTools } from "@intellectual-frontiers/toolchain";
@@ -70,7 +70,7 @@ proves(["0004-package-managers-dialect FR-002"], "the plan file is rendered with
   const foreign = defineRequirement({ id: "tool.other", summary: "o", why: ["x"], subject: { by: "all" }, kind: "tool", desired: { dialect: "homebrew", tool: "other", program: "other", source: { kind: "package", manager: "manager-brew", packages: ["other"] } }, change: "additive" });
   assert(foreign.kind === "ok");
   const order = orderOf([...mine, foreign.value]);
-  const plan = planOrder(order, new Map());
+  const plan = planOfOrder(order, new Map());
   const rendered = await managerDialect(FAKE, commandsOf()).render(order, plan);
   assert(rendered.kind === "ok");
   const text = rendered.value.files.get("fakepm/plan.json") ?? "";
@@ -78,14 +78,14 @@ proves(["0004-package-managers-dialect FR-002"], "the plan file is rendered with
   assertEquals((JSON.parse(text).tools as { tool: string }[]).map((t) => t.tool), ["git", "jq"], "the tools are in the order of Archon");
   assertEquals(/-----BEGIN|password|token/i.test(text), false);
   const bad = orderOf(toolRequirements(FAKE, [{ name: "a", packages: ["-x"] }, { name: "b", packages: ["c;d"] }]));
-  const refused = await managerDialect(FAKE, commandsOf()).render(bad, planOrder(bad, new Map()));
+  const refused = await managerDialect(FAKE, commandsOf()).render(bad, planOfOrder(bad, new Map()));
   assert(refused.kind === "err" && refused.error.length === 2, JSON.stringify(refused));
 });
 
 proves(["0004-package-managers-dialect FR-003"], "one step runs the program of the kit on the plan file that names the digest, and a plan that changes nothing has none", async () => {
   const reqs = toolRequirements(FAKE, [{ name: "jq", version: "1.7.1" }, { name: "git" }]);
   const order = orderOf(reqs);
-  const plan = planOrder(order, new Map());
+  const plan = planOfOrder(order, new Map());
   const dialect = managerDialect(FAKE, commandsOf());
   const rendered = await dialect.render(order, plan);
   assert(rendered.kind === "ok");
@@ -100,7 +100,7 @@ proves(["0004-package-managers-dialect FR-003"], "one step runs the program of t
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const adminReqs = toolRequirements(ADMIN, [{ name: "git" }]);
   const adminOrder = orderOf(adminReqs);
-  const adminPlan = planOrder(adminOrder, new Map());
+  const adminPlan = planOfOrder(adminOrder, new Map());
   const admin = managerDialect(ADMIN, commandsOf());
   const adminRendered = await admin.render(adminOrder, adminPlan);
   assert(adminRendered.kind === "ok");
@@ -108,7 +108,7 @@ proves(["0004-package-managers-dialect FR-003"], "one step runs the program of t
   const r0 = reqs[0];
   const r1 = reqs[1];
   assert(r0 !== undefined && r1 !== undefined);
-  const none = planOrder(order, new Map<RequirementId, JsonValue>([[r0.id, r0.desired], [r1.id, r1.desired]]));
+  const none = planOfOrder(order, new Map<RequirementId, JsonValue>([[r0.id, r0.desired], [r1.id, r1.desired]]));
   assertEquals(dialect.steps(none, rendered.value), []);
 });
 
@@ -153,7 +153,7 @@ proves(["0004-package-managers-dialect FR-005"], "Archon is given the desired st
 
 proves(["0004-package-managers-dialect FR-006"], "the program that raises the rights comes from the options and is put before only the commands of a manager that needs rights", async () => {
   const order = orderOf(toolRequirements(ADMIN, [{ name: "git", version: "2.43.0" }]));
-  const plan = planOrder(order, new Map());
+  const plan = planOfOrder(order, new Map());
   const withSudo = managerDialect(ADMIN, commandsOf(), { elevate: ["sudo", "-n"] });
   const r1 = await withSudo.render(order, plan);
   assert(r1.kind === "ok");
@@ -169,7 +169,7 @@ proves(["0004-package-managers-dialect FR-006"], "the program that raises the ri
   assertEquals(p2.value.lines[0]?.install, ["env", "ADMINPM_QUIET=1", "adminpm", "install", "-y", "git=2.43.0"]);
   const plain = managerDialect(FAKE, commandsOf(), { elevate: ["sudo", "-n"] });
   const fakeOrder = orderOf(toolRequirements(FAKE, [{ name: "git" }]));
-  const fakePlan = planOrder(fakeOrder, new Map());
+  const fakePlan = planOfOrder(fakeOrder, new Map());
   const r3 = await plain.render(fakeOrder, fakePlan);
   assert(r3.kind === "ok");
   const p3 = readPlanFile(r3.value.files.get("fakepm/plan.json") ?? "");
@@ -193,7 +193,7 @@ proves(["0004-package-managers-dialect FR-007"], "the program runs only a plan f
     const odd = await script("odd", "exit 7");
     const reqs = toolRequirements(FAKE, [{ name: "git" }, { name: "jq", version: "1.7.1" }]);
     const order = orderOf(reqs);
-    const plan = planOrder(order, new Map());
+    const plan = planOfOrder(order, new Map());
     const commands = commandsOf({ Install: put, QueryInstalled: has });
     const rendered = await managerDialect(FAKE, commands).render(order, plan);
     assert(rendered.kind === "ok");
@@ -213,13 +213,13 @@ proves(["0004-package-managers-dialect FR-007"], "the program runs only a plan f
     assertEquals(await program(["check", file], io), 0);
 
     const broken = orderOf(toolRequirements(FAKE, [{ name: "broken" }]));
-    const brokenRendered = await managerDialect(FAKE, commands).render(broken, planOrder(broken, new Map()));
+    const brokenRendered = await managerDialect(FAKE, commands).render(broken, planOfOrder(broken, new Map()));
     assert(brokenRendered.kind === "ok");
     await fs.writeTextFile(file, brokenRendered.value.files.get("fakepm/plan.json") ?? "");
     out.length = 0;
     assertEquals(await program(["apply", file], io), 1);
     assert(out.some((l) => l.startsWith("❌ broken: install:") && l.includes("status 9") && l.includes("no space left") && l.includes("Next:")), out.join("\n"));
-    const oddRendered = await managerDialect(FAKE, commandsOf({ Install: put, QueryInstalled: odd })).render(broken, planOrder(broken, new Map()));
+    const oddRendered = await managerDialect(FAKE, commandsOf({ Install: put, QueryInstalled: odd })).render(broken, planOfOrder(broken, new Map()));
     assert(oddRendered.kind === "ok");
     await fs.writeTextFile(file, oddRendered.value.files.get("fakepm/plan.json") ?? "");
     out.length = 0;
@@ -227,7 +227,7 @@ proves(["0004-package-managers-dialect FR-007"], "the program runs only a plan f
     assert(out.some((l) => l.startsWith("❌ broken: check:") && l.includes("status 7")), out.join("\n"));
 
     const noCheck = orderOf(toolRequirements(ADMIN, [{ name: "git" }]));
-    const noCheckRendered = await managerDialect(ADMIN, commandsOf({ Install: put })).render(noCheck, planOrder(noCheck, new Map()));
+    const noCheckRendered = await managerDialect(ADMIN, commandsOf({ Install: put })).render(noCheck, planOfOrder(noCheck, new Map()));
     assert(noCheckRendered.kind === "ok");
     await fs.writeTextFile(file, (noCheckRendered.value.files.get("adminpm/plan.json") ?? "").replace('"env",', "").replace('"ADMINPM_QUIET=1",', "").replace(/"sudo",?/, ""));
     out.length = 0;

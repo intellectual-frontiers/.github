@@ -16,7 +16,7 @@
 - **FR-005**: `observedFromRows(order, rows)` MUST return, for each requirement of the order, the observed state or nothing: it MUST read only the rows of the tables of the pack, MUST say a package observed at the version the rows say, a user, group, service or file by the fields the rows say, and MUST leave a requirement unobserved where no row names it, so that a requirement with `ensure` absent and no row is converged.
 - **FR-006**: The drift of an order MUST be the plan of the order against `observedFromRows`, so that desired versus osQuery is one comparison and is the same plan and the same hash the reconcile loop makes.
 - **FR-007**: A fallback observation (`observedFromFacts`) MUST take the same shape of facts a package manager's own query gives (a name and a version for each installed package) and MUST give the same observed state for packages as osQuery would, so that a platform without osQuery has the same drift for packages.
-- **FR-008**: Real osQuery output on a real host MUST be said to be unverified until it has been checked, and the fixtures of the tests MUST be synthetic.
+- **FR-008**: The decoder and the observation MUST be proved against a capture of the real output of `osqueryi` (its version, platform and image named in the capture) as well as against synthetic rows, and what no capture proves (Red Hat, Alpine, macOS and Windows tables, systemd units and the registry) MUST be said in this specification as unverified on a real host; the other fixtures MUST be synthetic.
 
 ## Acceptance scenarios
 
@@ -33,6 +33,10 @@
 
 - No row for a package: unobserved, so a `create` in the plan, per FR-005.
 - Two rows for a package of two architectures: the first in the order of the rows, per FR-005.
+
+## Verification status
+
+Proved against real output: osqueryi 5.12.1 on Linux x86_64 in a Debian 13 container (`deb_packages`, `users`, `groups`, `file`; `suite/fixtures/osquery-5.12.1-debian-trixie.json`), run on 2026-11-26. Unverified on a real host: `rpm_packages`, `apk_packages`, `homebrew_packages`, `programs`, `systemd_units` (the container has no D-Bus), `launchd`, `services`, `system_controls` and `registry`.
 
 ## Assumptions
 

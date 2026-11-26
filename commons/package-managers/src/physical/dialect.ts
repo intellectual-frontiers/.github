@@ -12,12 +12,12 @@
  *
  * @module
  */
-import { err, type Result } from "@intellectual-frontiers/core";
+import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { renderedOf, type Dialect, type DialectStep, type Rendered } from "@intellectual-frontiers/archon/dialect";
 import { parseDialectId, parseKindId, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/archon/governance";
 import type { Order, Plan } from "@intellectual-frontiers/archon/logical";
 import type { ToolDialect } from "@intellectual-frontiers/toolchain/logical";
-import { sameVersion, versionIn, jobArgv, jobOf, planFileText, planLines, readPlanFile, type CommandSource, type ManagerSpec, type PackageJob } from "@intellectual-frontiers/package-managers/logical";
+import { sameVersion, specOf, versionIn, jobArgv, jobOf, planFileText, planLines, readPlanFile, type CommandSource, type ManagerSpec, type PackageJob } from "@intellectual-frontiers/package-managers/logical";
 import * as path from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
 import { runWithin, type Run } from "./runner.ts";
@@ -102,3 +102,15 @@ export async function observeRequirements(spec: ManagerSpec, commands: CommandSo
   return out;
 }
 
+
+/** The dialect of a manager of the table by its key: the dialect of the kit made from the data of its row, or the keys of the table where the key is not one. */
+export function packageDialect(key: string, commands: CommandSource, options: DialectOptions = {}): Result<Dialect, string> {
+  const spec = specOf(key);
+  return spec.kind === "err" ? spec : ok(managerDialect(spec.value, commands, options));
+}
+
+/** The dialect of a manager of the table as Toolchain reads it. */
+export function toolDialectOfKey(key: string): Result<ToolDialect, string> {
+  const spec = specOf(key);
+  return spec.kind === "err" ? spec : ok(toolDialectOf(spec.value));
+}

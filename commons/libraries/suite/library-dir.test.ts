@@ -51,7 +51,7 @@ proves([`${SPEC} FR-026`, "0033-kanon FR-035"], "the folder a manifest derives: 
     return derivedDir(r.value, hosts);
   };
   assertEquals(of("anyfs-s3", family("anyfs", "plugin")), "anyfs/s3");
-  assertEquals(of("archon-dialect-apt", family("archon", "dialect")), "archon/dialect-apt");
+  assertEquals(of("archon-dialect-ansible", family("archon", "dialect")), "archon/dialect-ansible");
   assertEquals(of("anyfs", family("anyfs", "host")), "anyfs");
   assertEquals(of("core"), "core");
   assertEquals(of("catalog-soc2"), "catalog-soc2");
@@ -75,14 +75,14 @@ proves([`${SPEC} FR-026`, `${SPEC} FR-011`], "the number a library keeps is read
     "",
     "<!-- libraries:begin -->",
     "",
-    "- **FR-140**: `commons/archon/dialect-apt` MUST be a library",
+    "- **FR-140**: `commons/archon/dialect-ansible` MUST be a library",
     "- **FR-141**: `commons/core` MUST be a library",
     "",
     "<!-- libraries:end -->",
     "",
   ].join("\n");
   const ids = idsIn(spec);
-  assertEquals(ids.get("archon-dialect-apt"), "FR-140");
+  assertEquals(ids.get("archon-dialect-ansible"), "FR-140");
   assertEquals(ids.get("core"), "FR-141");
   assertEquals(ids.has("archon"), false);
 });

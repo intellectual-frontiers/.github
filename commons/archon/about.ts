@@ -13,7 +13,7 @@ export const about: About = {
   title: "Archon",
   summary:
     "A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account. GOVERNANCE: requirements (what must hold, why, for whom, of which kind of resource, how much a change to it matters, how it is verified), the catalogue of kinds, the guard against a secret in a model and the assurance profiles (solo, team, regulated) with the floor that none lowers. " +
-    "LOGICAL: the order of a subject from layers of requirements, and the plan between what is observed and the order, with a canonical form, a digest and the approvals it needs. PHYSICAL: the port that a dialect (Ansible, OpenTofu, Microsoft DSC, cloud-init) implements, the matrix of what each expresses, and the plan of steps for the executor of headless. " +
+    "LOGICAL: the order of a subject from layers of requirements, and the plan between what is observed and the order (workload's diff and hash), the order as a workload of the reconcile form, and the approvals that are Archon's and not workload's. PHYSICAL: the port that a dialect (Ansible, OpenTofu, Microsoft DSC) implements, the matrix of what each expresses, and the plan of steps for the executor of headless. " +
     "It builds no convergence engine: the tools are the engines.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },

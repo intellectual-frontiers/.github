@@ -1,0 +1,21 @@
+{
+ "_capture": "osqueryi 5.12.1 (osqueryd -S --json), linux x86_64, in the container debian:trixie, 2026-11-26; the packages, users and files are those of that image",
+ "queries": {
+  "deb_packages": {
+   "sql": "SELECT name, version, arch FROM deb_packages WHERE name IN ('bash', 'coreutils', 'nonexistent-pkg');",
+   "output": "[\n  {\"arch\":\"amd64\",\"name\":\"bash\",\"version\":\"5.2.37-2+b10\"},\n  {\"arch\":\"amd64\",\"name\":\"coreutils\",\"version\":\"9.7-3\"}\n]\n"
+  },
+  "users": {
+   "sql": "SELECT username, uid, gid, shell, directory FROM users WHERE username IN ('root');",
+   "output": "[\n  {\"directory\":\"/root\",\"gid\":\"0\",\"shell\":\"/bin/bash\",\"uid\":\"0\",\"username\":\"root\"}\n]\n"
+  },
+  "groups": {
+   "sql": "SELECT groupname, gid FROM groups WHERE groupname IN ('root');",
+   "output": "[\n  {\"gid\":\"0\",\"groupname\":\"root\"}\n]\n"
+  },
+  "file": {
+   "sql": "SELECT path, type, mode, uid, gid FROM file WHERE path IN ('/etc/passwd', '/etc');",
+   "output": "[\n  {\"gid\":\"0\",\"mode\":\"0755\",\"path\":\"/etc\",\"type\":\"directory\",\"uid\":\"0\"},\n  {\"gid\":\"0\",\"mode\":\"0644\",\"path\":\"/etc/passwd\",\"type\":\"regular\",\"uid\":\"0\"}\n]\n"
+  }
+ }
+}

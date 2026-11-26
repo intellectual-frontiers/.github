@@ -7,7 +7,7 @@
  */
 import { executionPlanOf, isGenerated } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
-import { buildOrder, planOrder, type Observed } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf, type Observed } from "@intellectual-frontiers/archon/logical";
 import { readMachineSpec } from "@intellectual-frontiers/lab/logical";
 import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -53,7 +53,7 @@ proves(["0002-ansible-dialect FR-001"], "the data says what the dialect guarante
 
 proves(["0002-ansible-dialect FR-002", "0002-ansible-dialect FR-003"], "the render is generated, the same text every time, only for what changes, and an observed resource that is as it must be is left out", async () => {
   const order = orderOf(REQS);
-  const plan = planOrder(order, new Map());
+  const plan = planOf(order, new Map());
   const a = await ansible().render(order, plan);
   const b = await ansible().render(order, plan);
   assert(a.kind === "ok" && b.kind === "ok");
@@ -64,7 +64,7 @@ proves(["0002-ansible-dialect FR-002", "0002-ansible-dialect FR-003"], "the rend
   for (const word of ["ansible.builtin.group", "ansible.builtin.user", "ansible.builtin.copy", "ansible.builtin.lineinfile", "ansible_check_mode"]) assert(playbook.includes(word), word);
   assert(!playbook.includes("community.") && !playbook.includes("ansible.posix"), "only ansible-core's own modules");
   const observed: Observed = new Map([[REQS[0]!.id, REQS[0]!.desired]]);
-  const partly = await ansible().render(order, planOrder(order, observed));
+  const partly = await ansible().render(order, planOf(order, observed));
   assert(partly.kind === "ok" && !(partly.value.files.get("ansible/playbook.yml") ?? "").includes("ansible.builtin.group"));
 });
 
@@ -75,7 +75,7 @@ proves(["0002-ansible-dialect FR-004"], "a secret, a kind that is not carried an
   assertEquals(defineRequirement({ id: "file.secret", summary: "x.", why: ["a reason"], subject: { by: "all" }, kind: "file", desired: { path: "/etc/x", content: pem }, change: "additive" }).kind, "err", "a secret is refused before the dialect sees it");
   const tooBad = [req("sysctl.x", "sysctl", { key: "net.ipv4.ip_forward", value: "1" }), req("dir.bad", "directory", { path: "relative/path" }), req("svc.bad", "service", { name: "cron" })];
   const order = orderOf(tooBad);
-  const r = await ansible().render(order, planOrder(order, new Map()));
+  const r = await ansible().render(order, planOf(order, new Map()));
   assert(r.kind === "err");
   assertEquals(r.error.length, 3, r.error.join("\n"));
   const all = r.error.join("\n");
@@ -84,7 +84,7 @@ proves(["0002-ansible-dialect FR-004"], "a secret, a kind that is not carried an
 
 proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and name the exit that means a change, name the digest of what was rendered, cover only what changes, and a plan that changes nothing has none; a removal is destructive and has a check", async () => {
   const order = orderOf(REQS);
-  const plan = planOrder(order, new Map());
+  const plan = planOf(order, new Map());
   const d = ansible({ renderRoot: "/var/lib/archon" });
   const rendered = await d.render(order, plan);
   assert(rendered.kind === "ok");
@@ -98,13 +98,13 @@ proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and
   const exec = executionPlanOf(plan, rendered.value, steps);
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const done: Observed = new Map(REQS.map((r) => [r.id, r.desired]));
-  const nothing = planOrder(order, done);
+  const nothing = planOf(order, done);
   const none = await d.render(order, nothing);
   assert(none.kind === "ok");
   assertEquals(d.steps(nothing, none.value), []);
   const gone = req("user.gone", "user", { name: "labuser" }, { ensure: "absent", change: "destructive", rollback: "restore-from-backup" });
   const o2 = orderOf([gone]);
-  const p2 = planOrder(o2, new Map([[gone.id, { name: "labuser" }]]));
+  const p2 = planOf(o2, new Map([[gone.id, { name: "labuser" }]]));
   const r2 = await d.render(o2, p2);
   assert(r2.kind === "ok");
   const e2 = executionPlanOf(p2, r2.value, d.steps(p2, r2.value));
@@ -134,7 +134,7 @@ proves(["0002-ansible-dialect FR-006"], "on a disposable machine with the real a
     };
     const converge = async (reqs: readonly Requirement[], observed: Observed, mode: "check" | "apply") => {
       const order = orderOf(reqs);
-      const plan = planOrder(order, observed);
+      const plan = planOf(order, observed);
       const rendered = await d.render(order, plan);
       assert(rendered.kind === "ok", JSON.stringify(rendered));
       const steps = d.steps(plan, rendered.value);

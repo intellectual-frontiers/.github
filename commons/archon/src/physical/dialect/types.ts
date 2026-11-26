@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { err, ok, type Result } from "@intellectual-frontiers/core";
+import { argvFindings, err, ok, type ArgvStep, type Result } from "@intellectual-frontiers/core";
 import { sha256, type Sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { canonicalJson, type DialectId, type RequirementId, type ResourceKindId, type SubjectClass } from "@intellectual-frontiers/archon/governance";
 import type { Order } from "@intellectual-frontiers/archon/logical";
@@ -46,7 +46,23 @@ export type DialectStep = {
   readonly check: readonly string[] | undefined;
   /** The exit status of the check that means something would change. */
   readonly changedExit?: number;
+  /** Who runs it: `root` where the tool needs the administrator; `user` where it says nothing. */
+  readonly as?: "user" | "root";
 };
+
+/** The step as two `ArgvStep`s of core, the apply and the check: words only, the identity it runs as and the exit codes that are a success (a check also succeeds with the exit code that says it would change). */
+export function argvStepsOf(step: DialectStep): { readonly apply: ArgvStep; readonly check?: ArgvStep } {
+  const as = step.as ?? "user";
+  const apply: ArgvStep = { argv: step.apply, as, expect: [0] };
+  if (step.check === undefined) return { apply };
+  return { apply, check: { argv: step.check, as, expect: step.changedExit === undefined ? [0] : [0, step.changedExit] } };
+}
+
+/** Every reason a step of a dialect is not safe to run: a shell string, an empty vector, a bad exit code. */
+export function stepFindings(step: DialectStep): readonly string[] {
+  const { apply, check } = argvStepsOf(step);
+  return [...argvFindings(apply), ...(check === undefined ? [] : argvFindings(check))];
+}
 
 /** A dialect. */
 export type Dialect = {

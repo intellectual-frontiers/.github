@@ -1,21 +1,20 @@
 /**
  * Tests of the Logical layer of Archon (commons archon 0003-archon-logical FR-001 to FR-007): the order of a subject from layers and everything that refuses it, the plan between what is
- * observed and the order, its canonical form and digest, and the approvals a plan needs by the assurance of the fleet. Everything is made up: no real host or person is in this file.
+ * observed and the order (workload's diff), its hash, and the approvals a plan needs by the assurance of the fleet. Everything is made up: no real host or person is in this file.
  *
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import {
-  approvalsNeeded,
   buildOrder,
-  canonicalPlan,
   changesOf,
   defineRequirement,
-  destructiveGate,
   parseRequirementId,
   parseSubjectName,
-  planDigest,
-  planOrder,
+  planHashOf,
+  planOf,
+  archonGate,
+  gateNeeded,
   resolveAssurance,
   type Assurance,
   type JsonValue,
@@ -116,57 +115,52 @@ proves(["0003-archon-logical FR-004"], "the plan says none, create, update or re
     [rid("p.change"), { name: "old" }],
     [rid("p.gone"), { name: "present" }],
   ]);
-  const plan = planOrder(o, observed);
+  const plan = planOf(o, observed);
   const actions = Object.fromEntries(plan.entries.map((e) => [e.id, e.action]));
   assertEquals(actions, { "p.keep": "none", "p.new": "create", "p.change": "update", "p.gone": "remove", "p.already-gone": "none" });
   assertEquals(changesOf(plan).length, 3);
   assertEquals(plan.entries.map((e) => e.id), o.requirements.map((r) => r.id));
 });
 
-proves(["0003-archon-logical FR-005"], "the canonical text and digest of a plan are the same on every run, and any change of any entry changes them", async () => {
-  const a = planOrder(orderOf([req("d.one", { desired: { x: 1, y: 2 } })]), new Map());
-  const b = planOrder(orderOf([req("d.one", { desired: { y: 2, x: 1 } })]), new Map());
-  assertEquals(canonicalPlan(a), canonicalPlan(b));
-  const da = await planDigest(a);
-  assertEquals(da, await planDigest(b));
-  assert(/^[0-9a-f]{64}$/.test(da));
-  const changed = planOrder(orderOf([req("d.one", { desired: { x: 1, y: 3 } })]), new Map());
-  assert((await planDigest(changed)) !== da);
-  const other = planOrder(orderOf([req("d.one", { desired: { x: 1, y: 2 } })], "baseline", subject("web-02.example.test")), new Map());
-  assert((await planDigest(other)) !== da);
-  const empty = planOrder(orderOf([]), new Map());
-  assert(/^[0-9a-f]{64}$/.test(await planDigest(empty)));
+proves(["0003-archon-logical FR-005", "0006-archon-on-workload FR-005"], "the hash of a plan is workload's, the same on every run whatever the order of keys, and any change of any entry changes it", async () => {
+  const a = planOf(orderOf([req("d.one", { desired: { x: 1, y: 2 } })]), new Map());
+  const b = planOf(orderOf([req("d.one", { desired: { y: 2, x: 1 } })]), new Map());
+  const ha = await planHashOf(a);
+  assertEquals(ha, await planHashOf(b));
+  assert(/^[0-9a-f]{64}$/.test(ha));
+  const changed = planOf(orderOf([req("d.one", { desired: { x: 1, y: 3 } })]), new Map());
+  assert((await planHashOf(changed)) !== ha);
+  const renamed = planOf(orderOf([req("d.two", { desired: { x: 1, y: 2 } })]), new Map());
+  assert((await planHashOf(renamed)) !== ha);
+  const observed = planOf(orderOf([req("d.one", { desired: { x: 1, y: 2 } })]), new Map<RequirementId, JsonValue>([[rid("d.one"), { x: 0 }]]));
+  assert((await planHashOf(observed)) !== ha, "an update is another plan than a create");
+  const empty = planOf(orderOf([]), new Map());
+  assert(/^[0-9a-f]{64}$/.test(await planHashOf(empty)));
+  assertEquals(a.changes, [{ action: "create", key: "d.one", to: '{"x":1,"y":2}' }]);
 });
 
-proves(["0003-archon-logical FR-006"], "the approvals a plan needs follow its destructive entries, its tiers and the assurance of the fleet", () => {
+proves(["0003-archon-logical FR-006", "0006-archon-on-workload FR-007"], "the confirmations and the second approver a plan needs follow its destructive entries, its tiers and the assurance of the fleet", () => {
   const o = orderOf([req("e.pkg"), req("e.remove", { ensure: "absent", change: "destructive", rollback: "restore-from-backup", desired: null }), req("e.admin", { tier: "administrator", desired: { name: "admin" } })]);
-  const plan = planOrder(o, new Map<RequirementId, JsonValue>([[rid("e.remove"), { name: "present" }]]));
-  const solo = approvalsNeeded(plan, assurance("solo"));
-  assertEquals(plain(solo), { typedConfirmations: ["e.remove"], secondApprover: false, planDigestRequired: false });
-  const regulated = approvalsNeeded(plan, assurance("regulated"));
-  assertEquals(plain(regulated), { typedConfirmations: ["e.remove"], secondApprover: true, planDigestRequired: true });
-  const quiet = planOrder(orderOf([req("e.pkg")]), new Map<RequirementId, JsonValue>([[rid("e.pkg"), { name: "e.pkg" }]]));
-  assertEquals(approvalsNeeded(quiet, assurance("regulated")), { typedConfirmations: [], secondApprover: false, planDigestRequired: false });
-  const tiered = planOrder(orderOf([req("e.admin", { tier: "administrator" })]), new Map());
-  assertEquals(approvalsNeeded(tiered, assurance("regulated")).secondApprover, true);
-  assertEquals(approvalsNeeded(tiered, assurance("team")).secondApprover, false);
+  const plan = planOf(o, new Map<RequirementId, JsonValue>([[rid("e.remove"), { name: "present" }]]));
+  assertEquals(plain(gateNeeded(plan, assurance("solo"))), { typedConfirmations: ["e.remove"], secondApprover: false });
+  assertEquals(plain(gateNeeded(plan, assurance("regulated"))), { typedConfirmations: ["e.remove"], secondApprover: true });
+  const quiet = planOf(orderOf([req("e.pkg")]), new Map<RequirementId, JsonValue>([[rid("e.pkg"), { name: "e.pkg" }]]));
+  assertEquals(gateNeeded(quiet, assurance("regulated")), { typedConfirmations: [], secondApprover: false });
+  const tiered = planOf(orderOf([req("e.admin", { tier: "administrator" })]), new Map());
+  assertEquals(gateNeeded(tiered, assurance("regulated")).secondApprover, true);
+  assertEquals(gateNeeded(tiered, assurance("team")).secondApprover, false);
 });
 
-proves(["0003-archon-logical FR-007"], "the gate opens only when each destructive entry is confirmed by its exact id and every approval needed is given", async () => {
+proves(["0003-archon-logical FR-007", "0006-archon-on-workload FR-007"], "the gate opens only when each destructive entry is confirmed by its exact id and a second approver is given where one is needed", () => {
   const o = orderOf([req("g.remove", { ensure: "absent", change: "destructive", rollback: "restore-from-backup", desired: null })]);
-  const plan = planOrder(o, new Map<RequirementId, JsonValue>([[rid("g.remove"), { name: "present" }]]));
-  const digest = await planDigest(plan);
+  const plan = planOf(o, new Map<RequirementId, JsonValue>([[rid("g.remove"), { name: "present" }]]));
   const solo = assurance("solo");
-  const none = destructiveGate(plan, solo, { confirmations: [], secondApprover: false, planDigest: undefined }, digest);
-  assertEquals(plain(none), { kind: "blocked", missing: [{ kind: "confirmation", id: "g.remove" }] });
-  const wrong = destructiveGate(plan, solo, { confirmations: ["yes"], secondApprover: false, planDigest: undefined }, digest);
-  assertEquals(wrong.kind, "blocked");
-  assertEquals(destructiveGate(plan, solo, { confirmations: ["g.remove"], secondApprover: false, planDigest: undefined }, digest), { kind: "open" });
+  assertEquals(plain(archonGate(plan, solo, { confirmations: [], secondApprover: false })), { kind: "blocked", missing: [{ kind: "confirmation", id: "g.remove" }] });
+  assertEquals(archonGate(plan, solo, { confirmations: ["yes"], secondApprover: false }).kind, "blocked");
+  assertEquals(archonGate(plan, solo, { confirmations: ["g.remove"], secondApprover: false }), { kind: "open" });
   const regulated = assurance("regulated");
-  const partial = destructiveGate(plan, regulated, { confirmations: ["g.remove"], secondApprover: false, planDigest: undefined }, digest);
-  assertEquals(partial, { kind: "blocked", missing: [{ kind: "second-approver" }, { kind: "plan-digest" }] });
-  assertEquals(destructiveGate(plan, regulated, { confirmations: ["g.remove"], secondApprover: true, planDigest: digest }, digest), { kind: "open" });
-  assertEquals(destructiveGate(plan, regulated, { confirmations: ["g.remove"], secondApprover: true, planDigest: "0".repeat(64) }, digest), { kind: "blocked", missing: [{ kind: "plan-changed" }] });
-  const quiet = planOrder(orderOf([req("g.pkg")]), new Map<RequirementId, JsonValue>([[rid("g.pkg"), { name: "g.pkg" }]]));
-  assertEquals(destructiveGate(quiet, solo, { confirmations: [], secondApprover: false, planDigest: undefined }, await planDigest(quiet)), { kind: "open" });
+  assertEquals(archonGate(plan, regulated, { confirmations: ["g.remove"], secondApprover: false }), { kind: "blocked", missing: [{ kind: "second-approver" }] });
+  assertEquals(archonGate(plan, regulated, { confirmations: ["g.remove"], secondApprover: true }), { kind: "open" });
+  const quiet = planOf(orderOf([req("g.pkg")]), new Map<RequirementId, JsonValue>([[rid("g.pkg"), { name: "g.pkg" }]]));
+  assertEquals(archonGate(quiet, solo, { confirmations: [], secondApprover: false }), { kind: "open" });
 });

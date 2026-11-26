@@ -20,7 +20,7 @@ import {
   parseDialectId,
   parseKindId,
   parseSubjectName,
-  planOrder,
+  planOf as planOfOrder,
   renderHeader,
   renderedOf,
   unexpressedOf,
@@ -32,6 +32,8 @@ import {
   type Requirement,
   type RequirementId,
   type RequirementInput,
+  argvStepsOf,
+  stepFindings,
 } from "../src/mod.ts";
 
 function req(id: string, more: Partial<RequirementInput> = {}): Requirement {
@@ -71,7 +73,7 @@ function planOf(requirements: readonly Requirement[], observed: Observed = new M
   if (n.kind === "err") throw new Error(n.error);
   const o = buildOrder({ subject: { name: n.value, class: "machine" }, assurance: "solo", layers: [{ layer: "baseline", requirements }] });
   if (o.kind === "err") throw new Error(JSON.stringify(o.error));
-  return planOrder(o.value, observed);
+  return planOfOrder(o.value, observed);
 }
 
 proves(["0004-archon-dialects FR-001", "0004-archon-dialects FR-002"], "a dialect is a value of the port with its tool and its guarantees as data, and renders and gives steps", async () => {
@@ -161,4 +163,13 @@ proves(["0004-archon-dialects FR-006"], "rendered files say they are generated, 
   assert(c.kind === "ok" && c.value.digest !== ra.value.digest);
   assertEquals((await renderedOf(new Map([["x.yml", "no mark"]]))).kind, "err");
   assertEquals((await renderedOf(new Map([["../x.yml", `${renderHeader("yaml")}\n`]]))).kind, "err");
+});
+
+proves(["0004-archon-dialects FR-007", "0006-archon-on-workload FR-009"], "a step of a dialect is two ArgvSteps of core: words, who runs it and the exit codes expected, and a shell string is found", () => {
+  const step = { covers: [], summary: "install", apply: ["apt-get", "install", "-y", "git"], check: ["apt-get", "install", "-s", "git"], changedExit: 2, as: "root" as const };
+  assertEquals(argvStepsOf(step), { apply: { argv: ["apt-get", "install", "-y", "git"], as: "root", expect: [0] }, check: { argv: ["apt-get", "install", "-s", "git"], as: "root", expect: [0, 2] } });
+  assertEquals(argvStepsOf({ covers: [], summary: "install", apply: ["apt-get", "install", "-y", "git"], check: undefined }), { apply: { argv: ["apt-get", "install", "-y", "git"], as: "user", expect: [0] } });
+  assertEquals(stepFindings(step), []);
+  assertEquals(stepFindings({ ...step, apply: ["sh", "-c", "apt-get install -y git"] }).length, 1);
+  assertEquals(stepFindings({ ...step, check: ["powershell", "-Command", "x"] }).length, 1);
 });

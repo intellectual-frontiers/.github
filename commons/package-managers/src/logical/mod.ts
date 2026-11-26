@@ -6,3 +6,4 @@
  */
 export * from "./argv.ts";
 export * from "./manager.ts";
+export * from "./table.ts";

@@ -7,7 +7,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
-import { buildOrder, planOrder } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf } from "@intellectual-frontiers/archon/logical";
 import { readMachineSpec } from "@intellectual-frontiers/lab/logical";
 import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -43,7 +43,7 @@ const SHARED = [
 
 async function render(family: "debian" | "rhel" | "suse" | "arch", reqs: readonly Requirement[]) {
   const order = orderOf(reqs);
-  return await ansible({ family }).render(order, planOrder(order, new Map()));
+  return await ansible({ family }).render(order, planOf(order, new Map()));
 }
 
 proves(["0003-ansible-families FR-001", "0003-ansible-families FR-002"], "a package is carried by apt on debian and dnf on rhel, the version is written as each writes it, and a service is carried by the module systemd that every version of ansible-core has", async () => {
@@ -97,7 +97,7 @@ for (const [image, family, version, ssh] of [["debian:13", "debian", "2.19", "ss
       const d = ansible({ family, version, renderRoot: "/var/lib/archon" });
       const converge = async (mode: "check" | "apply") => {
         const order = orderOf(reqs);
-        const plan = planOrder(order, new Map());
+        const plan = planOf(order, new Map());
         const rendered = await d.render(order, plan);
         assert(rendered.kind === "ok", JSON.stringify(rendered));
         const steps = d.steps(plan, rendered.value);

@@ -5,15 +5,20 @@
     "": {
       "name": "@intellectual-frontiers/archon",
       "devDependencies": {
+        "@intellectual-frontiers/anyfs": "link:../anyfs",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
+        "@intellectual-frontiers/grc": "link:../grc",
         "@intellectual-frontiers/headless": "link:../headless",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
+        "@intellectual-frontiers/planning": "link:../planning",
         "@intellectual-frontiers/system": "link:../system",
         "@intellectual-frontiers/test": "link:../test",
+        "@intellectual-frontiers/workbench": "link:../workbench",
+        "@intellectual-frontiers/workload": "link:../workload",
         "@types/node": "26.6.6",
         "fast-check": "4.10.2",
         "typescript": "7.0.2",
@@ -21,11 +26,15 @@
     },
   },
   "packages": {
+    "@intellectual-frontiers/anyfs": ["@intellectual-frontiers/anyfs@link:../anyfs", {}],
+
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
+
+    "@intellectual-frontiers/grc": ["@intellectual-frontiers/grc@link:../grc", {}],
 
     "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../headless", {}],
 
@@ -35,9 +44,15 @@
 
     "@intellectual-frontiers/mizan": ["@intellectual-frontiers/mizan@link:../mizan", {}],
 
+    "@intellectual-frontiers/planning": ["@intellectual-frontiers/planning@link:../planning", {}],
+
     "@intellectual-frontiers/system": ["@intellectual-frontiers/system@link:../system", {}],
 
     "@intellectual-frontiers/test": ["@intellectual-frontiers/test@link:../test", {}],
+
+    "@intellectual-frontiers/workbench": ["@intellectual-frontiers/workbench@link:../workbench", {}],
+
+    "@intellectual-frontiers/workload": ["@intellectual-frontiers/workload@link:../workload", {}],
 
     "@types/node": ["@types/node@26.6.6", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog=="],
 

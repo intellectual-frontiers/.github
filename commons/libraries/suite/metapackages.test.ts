@@ -49,7 +49,7 @@ proves([`${DIST} FR-004`], "a manifest of github alone is read (a private packag
 });
 
 proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in ROLE_OF, commons holds the four, a library held back is in none and a library with no role is a problem", () => {
-  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("repoctl", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("archon-dialect-apt"), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
+  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("repoctl", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("archon-dialect-ansible", { distribution: ["github"] }), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
   const names = (b: (typeof BUNDLES)[number]): readonly string[] => {
     const m = membersOf(b, libs);
     assert(m.kind === "ok");
@@ -59,8 +59,8 @@ proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in
   assertEquals(names("patterns"), ["kanon"]);
   assertEquals(names("programs"), ["data", "repoctl"], "ordered by package: arcactl, repoctl");
   assertEquals(names("standards"), ["mizan"]);
-  assertEquals(names("commons"), ["data", "core", "kanon", "mizan", "repoctl"], "ordered by package name; archon-dialect-apt is held back");
-  assert(HELD_BACK.has("archon-dialect-apt") && !isConsumerFacing(lib("archon-dialect-apt")));
+  assertEquals(names("commons"), ["data", "core", "kanon", "mizan", "repoctl"], "ordered by package name; archon-dialect-ansible declares github only and is in none");
+  assert(HELD_BACK instanceof Map && !isConsumerFacing(lib("archon-dialect-ansible", { distribution: ["github"] })));
   assertEquals(isConsumerFacing(lib("p", { distribution: ["github"] })), false, "a private package is in no set");
   assertEquals(isConsumerFacing(lib("foundation", { bundle: "foundation" })), false);
   const none = membersOf("commons", [lib("brand-new")]);

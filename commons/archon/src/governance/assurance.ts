@@ -105,6 +105,22 @@ export const PROFILES: Readonly<Record<ProfileName, Controls>> = {
   },
 };
 
+/** Where a control is held: by the reconcile form of workload (its semantics are identical) or by Archon (it encodes more, or something else). */
+export type ControlMapping = { readonly control: ControlName; readonly where: "workload" | "archon"; readonly because: string };
+
+/** The table of each control, said once (0002-archon-governance FR-009): the only control mapped onto workload is the one whose semantics are identical. */
+export const CONTROL_MAPPING: readonly ControlMapping[] = [
+  { control: "planHash", where: "workload", because: "workload approves a plan only by its hash, which is `required`; `optional` is weaker than workload and never lower than what workload enforces" },
+  { control: "secondApprover", where: "archon", because: "workload has one approver for a plan; a second one for a destructive entry or a tier above operator is kept in archonGate" },
+  { control: "approval", where: "archon", because: "how a change is approved in the repository (a push, a signed commit, a second approver) is not how a plan is approved" },
+  { control: "keyCustody", where: "archon", because: "where the key of an approver is held is a fact of the fleet" },
+  { control: "tipAccept", where: "archon", because: "what a machine accepts as the tip to follow is a fact of the fleet" },
+  { control: "recovery", where: "archon", because: "how a fleet recovers from a lost key is a fact of the fleet" },
+  { control: "audit", where: "archon", because: "what is kept of what happened is a fact of the fleet; workload keeps the receipts of a run" },
+  { control: "exposure", where: "archon", because: "how remote access is exposed is a fact of the fleet" },
+  { control: "toolIntegrity", where: "archon", because: "how strictly tools are pinned is chosen by the dialect of the tools" },
+];
+
 /** One rule of the floor. */
 export type FloorRule = { readonly id: string; readonly rule: string };
 

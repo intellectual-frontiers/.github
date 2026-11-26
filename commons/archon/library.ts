@@ -16,21 +16,16 @@ export const library = {
   exports: [".", "./governance", "./logical", "./dialect", "./cli"],
   family: { host: "archon", role: "host" },
   summary:
-    "Archon in the layers of Kanon: what a server, a device, a workstation or a cloud account must be, said once as requirements, the order and the plan made from them, and the port that a package for each tool (Ansible, OpenTofu, Microsoft DSC, cloud-init) implements; assurance profiles match the approval of a change to the fleet.",
+    "Archon in the layers of Kanon: what a server, a device, a workstation or a cloud account must be, said once as requirements, the order and the plan made from them, and the port that a package for each tool (Ansible, OpenTofu, Microsoft DSC) implements; assurance profiles match the approval of a change to the fleet.",
   kanon: {
     package: "@intellectual-frontiers/archon",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
     instances: [
       { name: "native-pinned", instanceOf: "src/physical/dialect/", placement: "package" },
-      { name: "apt", instanceOf: "src/physical/dialect/", placement: "package" },
-      { name: "homebrew", instanceOf: "src/physical/dialect/", placement: "package" },
-      { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
-      { name: "winget", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "ansible", instanceOf: "src/physical/dialect/", placement: "package" },
-      { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "opentofu", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
-    plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "dns" }],
+    plugins: [{ noun: "tool" }, { noun: "dns" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {
@@ -39,6 +34,7 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
+          { name: "@intellectual-frontiers/workload", subpaths: ["governance", "forms/reconcile"] },
         ],
       },
       {

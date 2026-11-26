@@ -9,7 +9,7 @@ When Archon or Toolchain should reach one more tool (a package manager, a conver
 - `AGENTS.md`.
 - The port a dialect fills: `commons/archon/spec-kit/specs/0004-archon-dialects/spec.md`.
 - For a dialect of tools, how Toolchain chooses one: `commons/toolchain/spec-kit/specs/0003-toolchain-logical/spec.md`.
-- The nearest existing dialect as the pattern: `commons/archon/dialect-apt/` for a package manager, with the code it shares in `commons/package-managers/`.
+- The nearest existing dialect as the pattern: `commons/archon/dialect-ansible/` for a tool, and for a package manager a row of the table of `commons/package-managers/` (its spec 0005-package-managers-adapter).
 - What the tool guarantees, from its own documentation, with the page.
 
 ## The prompt
@@ -17,7 +17,7 @@ When Archon or Toolchain should reach one more tool (a package manager, a conver
 ```prompt
 Read AGENTS.md. Add a dialect `archon-dialect-<tool>` for <tool>.
 
-Use commons/archon/dialect-apt/ as the pattern and the specifications named above as the rules. Work spec first.
+Use commons/archon/dialect-ansible/ as the pattern and the specifications named above as the rules. Work spec first.
 1. State what the dialect guarantees as data: what it pins, how it checks what it installs, the scopes and platforms it reaches, whether it can build from source, and whether applying twice changes nothing. Claim only what its documentation says, mark anything not run as unproven, and say what it cannot do.
 2. Take every command from the packaging ontology's reader. Do not write a command line in the dialect, and do not build a command as a string for a shell: a command is a list of words.
 3. Keep the code in the dialect to its data and one call. If it needs logic, put it in the shared library and say so.

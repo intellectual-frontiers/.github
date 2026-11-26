@@ -28,9 +28,6 @@ import { ROLE_OF, type Role } from "./readme.ts";
 
 /** The libraries that are not in any set yet, each with why: they declare npm and are not ready to be installed (commons 0036-distribution FR-006). A library leaves this list when its owner releases it. */
 export const HELD_BACK: ReadonlyMap<string, string> = new Map([
-  ["archon-dialect-apt", "a dialect of Archon, which is not released yet"],
-  ["archon-dialect-homebrew", "a dialect of Archon, which is not released yet"],
-  ["archon-dialect-winget", "a dialect of Archon, which is not released yet"],
 ]);
 
 /** The roles' sets: a role is in exactly one. */

@@ -330,7 +330,7 @@ const onMainOrSchedule =
 /** The night's run, which adds the mutation score of a few small libraries to the evidence. */
 const MUTATION_CRON = "43 3 * * *";
 /** The libraries whose mutation score is kept: small ones, since a run makes the suite run once for each change to the code (docs 0001-docs FR-027). */
-const MUTATION_LIBRARIES = ["archon-dialect-apt", "archon-dialect-homebrew", "archon-dialect-mise", "archon-dialect-winget", "integrations-github", "catalog-nist-csf-2", "archon-dns", "catalog-nist-sp800", "archon-converge", "integrations-x12", "lab"];
+const MUTATION_LIBRARIES = ["integrations-github", "catalog-nist-csf-2", "archon-dns", "catalog-nist-sp800", "integrations-x12", "lab"];
 const evidence: Workflow = {
   file: "evidence",
   name: "evidence",

@@ -19,8 +19,7 @@
 - **FR-008**: A run of `reconcileOf` through workload's native reconcile runner, given fixtures for the observe, apply and verify verbs, MUST observe, plan, park for approval, apply nothing before the plan is approved, apply once for the approved hash, verify and finish converged, and a second pass with nothing to change MUST apply nothing.
 - **FR-009**: Where a dialect gives steps, each step MUST be an `ArgvStep` of `@intellectual-frontiers/core` (commons core 0001-core FR-009): words, the identity it runs as and the exit codes it expects, never a shell string, and a test MUST find no `sh -c`, `bash -c`, `cmd /c` or `powershell -Command` in what the dialects output.
 - **FR-010**: The converge plugin, `approvals.ts`, `plan.ts` and their tests MUST be removed in favour of this specification, and what remains unique of the converge plugin MUST be said where it is removed.
-- **FR-011**: An integration of a foreign engine (Ansible, OpenTofu) MUST be a runner of workload that renders an artifact from the plan, names the plan hash in it, can check drift and ingests a receipt; it MUST NOT hold a plan, an approval or a hash of its own.
-- **FR-012**: Archon MUST NOT carry a first-boot or install hook of a machine (the former dialect of cloud-init): enrolment and the first-boot hook belong to the ssh-server library.
+- **FR-011**: Archon MUST NOT carry a first-boot or install hook of a machine (the former dialect of cloud-init): enrolment and the first-boot hook belong to the ssh-server library.
 
 ## Acceptance scenarios
 
@@ -47,7 +46,7 @@
 
 ## Open questions
 
-- None.
+- The integration of Ansible and OpenTofu as runners of workload (a runner of the kind `integration` that renders an artifact from the plan, names the plan hash in it, checks drift and ingests a receipt) is not built: the dialects `ansible` and `opentofu` stay as they are, with their own plan digest, until it is. Decision: they will be separate small libraries (`runner-ansible`, `runner-opentofu`), because workload's registry of runners is closed data owned by workload and an emitter is registered by a package that depends on workload, not the reverse.
 
 ## Key entities
 

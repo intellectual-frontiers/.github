@@ -79,3 +79,38 @@ proves(["0001-archon-layers FR-005"], "the release record agrees with the manife
   assertEquals(release.kind, "Software");
   assertEquals(library.distribution, ["github", "npm"]);
 });
+
+/** The files of a folder, below it, as paths relative to it, without the folders that are not source. */
+async function filesUnder(root: string, from = ""): Promise<string[]> {
+  const out: string[] = [];
+  for await (const entry of fs.readDir(path.join(root, from))) {
+    if (["node_modules", "dist", "artifacts", ".git"].includes(entry.name)) continue;
+    const rel = from === "" ? entry.name : `${from}/${entry.name}`;
+    if (entry.isDirectory) out.push(...(await filesUnder(root, rel)));
+    else out.push(rel);
+  }
+  return out;
+}
+
+proves(["0001-archon-layers FR-006", "0006-archon-on-workload FR-001"], "Archon depends on workload and workload imports nothing of Archon, in its sources, its manifest or its tests", async () => {
+  const pkg = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { devDependencies: Record<string, string> };
+  assertEquals(pkg.devDependencies["@intellectual-frontiers/workload"], "link:../workload");
+  const logical = table().units.find((u) => u.folder === "src/logical/");
+  assert(logical !== undefined && "packages" in logical && logical.packages.some((p) => p.name === "@intellectual-frontiers/workload"), "the logical unit may import workload");
+  const workload = path.resolve(ROOT, "..", "workload");
+  const files = (await filesUnder(workload)).filter((f) => /\.(ts|json|md|tsv)$/u.test(f) && !f.startsWith("spec-kit/") && f !== "bun.lock");
+  assert(files.length > 100, "the tree of workload is read");
+  const found: string[] = [];
+  for (const f of files) {
+    const text = await fs.readTextFile(path.join(workload, f));
+    if (/@intellectual-frontiers\/archon|commons\/archon/u.test(text)) found.push(f);
+  }
+  assertEquals(found, []);
+});
+
+proves(["0006-archon-on-workload FR-010", "0006-archon-on-workload FR-011", "0004-archon-dialects FR-008"], "the plan and approvals of Archon, its converge plugin and its first-boot dialect are gone", async () => {
+  for (const gone of ["src/logical/plan.ts", "src/logical/approvals.ts", "converge", "dialect-cloud-init", "dialect-boot"]) assertEquals(await fs.stat(path.join(ROOT, gone)).then(() => true, () => false), false, gone);
+  const plugins = (library.kanon.plugins ?? []).map((p) => p.noun);
+  assertEquals(plugins, ["tool", "dns"]);
+  assert(!library.kanon.instances.some((i) => /cloud-init|boot/u.test(i.name)));
+});

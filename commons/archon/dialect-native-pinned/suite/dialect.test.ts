@@ -10,7 +10,7 @@ import { createServer, type Server } from "node:http";
 import { Retries } from "@intellectual-frontiers/net/net";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { gzip, tar } from "@intellectual-frontiers/formats/archive";
-import { buildOrder, planOrder } from "@intellectual-frontiers/archon/logical";
+import { buildOrder, planOf as planOfOrder } from "@intellectual-frontiers/archon/logical";
 import { isGenerated, executionPlanOf, matrixOf } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type RequirementId, type JsonValue } from "@intellectual-frontiers/archon/governance";
 import { defineCatalog, defineTool, meetsIntegrity, requirementsFor, resolveTools, parseManagerId } from "@intellectual-frontiers/toolchain";
@@ -157,7 +157,7 @@ proves(["0004-native-pinned-dialect FR-003"], "the plan file is rendered from Ar
   assert(name.kind === "ok");
   const order = buildOrder({ subject: { name: name.value, class: "workstation" }, assurance: "regulated", layers: [{ layer: "baseline", requirements }] });
   assert(order.kind === "ok");
-  const plan = planOrder(order.value, new Map());
+  const plan = planOfOrder(order.value, new Map());
   assertEquals(plan.entries.map((e) => e.action), ["create"]);
   const dialect = nativePinned({ policy: POLICY, platform });
   const rendered = await dialect.render(order.value, plan);
@@ -179,7 +179,7 @@ proves(["0004-native-pinned-dialect FR-003"], "the plan file is rendered from Ar
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const r0 = requirements[0];
   assert(r0 !== undefined);
-  const none = planOrder(order.value, new Map<RequirementId, JsonValue>([[r0.id, r0.desired]]));
+  const none = planOfOrder(order.value, new Map<RequirementId, JsonValue>([[r0.id, r0.desired]]));
   assertEquals(none.entries.map((e) => e.action), ["none"]);
   assertEquals(dialect.steps(none, rendered.value), [], "a plan that changes nothing has no step");
   const m = matrixOf(requirements, [dialect]);

@@ -41,8 +41,7 @@ requirement	mechanism	by	note
 0006-archon-on-workload FR-008	check	.github: cd commons/archon && bun run verify	suite/reconcile.test.ts: end to end through workload's runtime
 0006-archon-on-workload FR-009	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: no shell string in a dialect's output
 0006-archon-on-workload FR-010	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: the removed files and the plugin are gone
-0006-archon-on-workload FR-011	none	-	Deferred: the runners of Ansible and OpenTofu on workload's integration runners
-0006-archon-on-workload FR-012	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: no dialect of a first-boot hook
+0006-archon-on-workload FR-011	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: no dialect of a first-boot hook
 0007-archon-observe-osquery FR-001	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: the pack
 0007-archon-observe-osquery FR-002	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: the tables by kind and platform
 0007-archon-observe-osquery FR-003	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: names are quoted or refused
@@ -50,10 +49,8 @@ requirement	mechanism	by	note
 0007-archon-observe-osquery FR-005	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: observed from rows
 0007-archon-observe-osquery FR-006	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: drift is the plan
 0007-archon-observe-osquery FR-007	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: the fallback
-0007-archon-observe-osquery FR-008	none	-	Unverified: osqueryi on a real host has not been run
+0007-archon-observe-osquery FR-008	check	.github: cd commons/archon && bun run verify	suite/osquery.test.ts: the capture of real osqueryi 5.12.1 decodes and is observed
 0001-archon-layers FR-006	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: archon depends on workload and workload does not import archon
 0002-archon-governance FR-009	check	.github: cd commons/archon && bun run verify	suite/governance.test.ts: each control is mapped or kept
 0004-archon-dialects FR-007	check	.github: cd commons/archon && bun run verify	suite/dialects.test.ts: argv steps
-0004-archon-dialects FR-008	check	.github: cd commons/archon/dialect-packages && bun run verify	suite/adapter.test.ts: the table
-0004-archon-dialects FR-009	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite: pin, fetch and verify
-0004-archon-dialects FR-010	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: no first-boot dialect
+0004-archon-dialects FR-008	check	.github: cd commons/archon && bun run verify	suite/layers.test.ts: no first-boot dialect

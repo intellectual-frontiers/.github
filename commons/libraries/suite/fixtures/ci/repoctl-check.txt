@@ -28,15 +28,9 @@ ok    The specification kit of anyfs-serve
 ok    The specification kit of anyfs-sql
 ok    The specification kit of anyfs-ssh
 ok    The specification kit of archon
-ok    The specification kit of archon-converge
 ok    The specification kit of archon-dialect-ansible
-ok    The specification kit of archon-dialect-apt
-ok    The specification kit of archon-dialect-cloud-init
-ok    The specification kit of archon-dialect-homebrew
-ok    The specification kit of archon-dialect-mise
 ok    The specification kit of archon-dialect-native-pinned
 ok    The specification kit of archon-dialect-opentofu
-ok    The specification kit of archon-dialect-winget
 ok    The specification kit of archon-dns
 ok    The specification kit of archon-tool
 ok    The specification kit of assessment
