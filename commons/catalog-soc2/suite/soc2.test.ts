@@ -8,11 +8,13 @@ import { standardKinds } from "@intellectual-frontiers/grc/logical";
 import { readCatalogPackage } from "@intellectual-frontiers/grc/physical";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { CATEGORY_OF, COMMON_FAMILIES, CRITERIA, LICENCE, REFERENCE, SOURCE_FILE } from "../src/governance/mod.ts";
+import { CATEGORY_OF, COMMON_FAMILIES, CRITERIA, LICENCE, REFERENCE, SOURCE_FILES } from "../src/governance/mod.ts";
 import { convert } from "../src/logical/mod.ts";
 import { digestOf, makePackage, PACKAGE_DIR } from "../src/physical/mod.ts";
 
 type Fw = { id: string; version: string; controls: { id: string; title: string; statement: string; family: string }[] };
+
+const zeros = Object.fromEntries(SOURCE_FILES.map((f) => [f, "0".repeat(64)]));
 
 proves(["0002-soc2-package FR-001", "0002-soc2-package FR-004"], "the conversion keeps each criterion with its series as family, the same every time, and says which identifier a source repeats", () => {
   const one = { id: "CC1.1", title: "t", statement: "s", family: "CC1" };
@@ -22,17 +24,17 @@ proves(["0002-soc2-package FR-001", "0002-soc2-package FR-004"], "the conversion
 });
 
 proves(["0002-soc2-package FR-004"], "the same criteria give the same files, byte for byte", async () => {
-  const a = await makePackage("0".repeat(64));
-  const b = await makePackage("0".repeat(64));
+  const a = await makePackage(zeros);
+  const b = await makePackage(zeros);
   assertEquals([...a], [...b]);
 });
 
 proves(["0002-soc2-package FR-001", "0002-soc2-package FR-002"], "the real package loads through the catalog loader with the 61 criteria in the 20 series, and every series is of a category", async () => {
   const r = await readCatalogPackage(PACKAGE_DIR, standardKinds());
   assert(r.kind === "ok", r.kind === "err" ? JSON.stringify(r.error) : "");
-  const fws = r.value.documents as unknown as Fw[];
-  assertEquals(fws.map((f) => [f.id, f.version]), [["soc2-tsc", "2017"]]);
-  const cs = fws[0]?.controls ?? [];
+  const fws = r.value.documents.filter((d) => d.kind === "grc.framework") as unknown as Fw[];
+  assertEquals(fws.map((f) => [f.id, f.version]), [["soc2-tsc", "2017"], ["soc2-focus", "2017"]]);
+  const cs = fws.find((f) => f.id === "soc2-tsc")?.controls ?? [];
   assertEquals(cs.length, 61);
   assertEquals(new Set(cs.map((c) => c.id)).size, 61);
   assertEquals(new Set(cs.map((c) => c.family)).size, 20);
@@ -50,10 +52,10 @@ proves(["0002-soc2-package FR-002"], "the manifest records the reference, the di
   const m = JSON.parse(await fs.readTextFile(path.join(PACKAGE_DIR, "manifest.json"))) as { source: { url: string; edition: string }; sources: { url: string; sha256: string }[]; licence: string; redistributable: boolean };
   assertEquals(m.source.url, REFERENCE.url);
   assert(m.source.edition.includes("2022") && m.redistributable && m.licence === LICENCE);
-  assertEquals(m.sources, [{ url: SOURCE_FILE, sha256: await digestOf(await fs.readFile(path.join(PACKAGE_DIR, "..", SOURCE_FILE))) }]);
+  assertEquals(m.sources, await Promise.all(SOURCE_FILES.map(async (url) => ({ url, sha256: await digestOf(await fs.readFile(path.join(PACKAGE_DIR, "..", url))) }))));
 });
 
-proves(["0002-soc2-package FR-003"], "the generator finds no difference between the package on disk and the source, and reports a file that was edited", async () => {
+proves(["0002-soc2-package FR-003", "0003-soc2-focus FR-002"], "the generator finds no difference between the package on disk and the source, and reports a file that was edited", async () => {
   const tool = path.resolve(PACKAGE_DIR, "..", "tools", "generate.ts");
   const ok = await proc.run(["bun", tool, "--check"], {});
   assert(ok.success, ok.stderr);
@@ -65,6 +67,15 @@ proves(["0002-soc2-package FR-003"], "the generator finds no difference between 
     assert(!bad.success && bad.stderr.includes("differs: data/frameworks/soc2-tsc-2017.json"), bad.stderr);
   } finally {
     await fs.writeTextFile(file, was);
+  }
+  const focus = path.join(PACKAGE_DIR, "frameworks", "soc2-focus-2017.json");
+  const wasFocus = await fs.readTextFile(focus);
+  try {
+    await fs.writeTextFile(focus, wasFocus.replace("CC6.1-1", "CC6.1-9"));
+    const bad = await proc.run(["bun", tool, "--check"], {});
+    assert(!bad.success && bad.stderr.includes("differs: data/frameworks/soc2-focus-2017.json"), bad.stderr);
+  } finally {
+    await fs.writeTextFile(focus, wasFocus);
   }
 });
 

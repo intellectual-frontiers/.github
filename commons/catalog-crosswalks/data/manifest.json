@@ -1,0 +1,67 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-crosswalks",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-crosswalks",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/soc2.ts",
+      "src/governance/iso.ts",
+      "src/governance/hipaa.ts"
+    ]
+  },
+  "version": "1",
+  "title": "Crosswalks of SOC 2, ISO/IEC 27001 and the HIPAA Security Rule to NIST SP 800-53, and of ISO/IEC 27001 to SOC 2, as proposals for a person to decide",
+  "source": {
+    "publisher": "Intellectual Frontiers LLC, from the catalogs of this repository",
+    "edition": "Mapping of SP 800-53 Revision 5 to ISO/IEC 27001 (Online Informative References program) (unread); Mapping of the Trust Services Criteria to NIST SP 800-53 (unread); Mapping of the HIPAA Security Rule to NIST SP 800-53 (NIST SP 800-66 Revision 2) (unread)",
+    "url": "https://github.com/intellectual-frontiers/.github"
+  },
+  "licence": "Own words of Intellectual Frontiers LLC under the PolyForm Noncommercial License 1.0.0. Every mapping is a proposal of ours that names two controls that exist in the catalogs of this repository and says why they are said to meet; it is not a mapping published by NIST, the AICPA, ISO or the Department of Health and Human Services, none of which was read. A row that still carries the words person-decision-required MUST NOT be counted.",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.crosswalk",
+      "id": "soc2-tsc-to-nist-800-53",
+      "file": "crosswalks/soc2-tsc-to-nist-800-53.json",
+      "digest": "a86d47e6f8a7ed2162a9c6d3325681b79ddd0b1efade2751936359d6514b8aaa"
+    },
+    {
+      "kind": "grc.crosswalk",
+      "id": "iso-27001-to-nist-800-53",
+      "file": "crosswalks/iso-27001-to-nist-800-53.json",
+      "digest": "98149710301d843bcb2a263976ad09c23119a46ccddd670844032dd749fb5d36"
+    },
+    {
+      "kind": "grc.crosswalk",
+      "id": "hipaa-security-to-nist-800-53",
+      "file": "crosswalks/hipaa-security-to-nist-800-53.json",
+      "digest": "dd47e661431d813a2a051039b281824ebdac9ab01fa9a52a259177f581034582"
+    },
+    {
+      "kind": "grc.crosswalk",
+      "id": "iso-27001-to-soc2-tsc",
+      "file": "crosswalks/iso-27001-to-soc2-tsc.json",
+      "digest": "b80d315550cc1830b05a549c07a501e3788ff83200b956741fad0c37ba92211f"
+    }
+  ],
+  "sources": [
+    {
+      "url": "src/governance/soc2.ts",
+      "sha256": "63f39a1d1ad57ebc098744952652ee0d06cf95d95c34e4e4a5df2767ab50a1ba"
+    },
+    {
+      "url": "src/governance/iso.ts",
+      "sha256": "fde74b33a7c754f0aaac9a6577fd89daeda0ea100c1e40446391baf93cb66ddf"
+    },
+    {
+      "url": "src/governance/hipaa.ts",
+      "sha256": "bd48cd146e0d1a7a0464a0f24a28dce8b3d27634ec5c7b83451cb76715ecec6a"
+    }
+  ],
+  "notice": "No published mapping was read: the mappings of NIST SP 800-53 to ISO/IEC 27001, of the Trust Services Criteria to SP 800-53 and of the Security Rule to SP 800-53 were not fetched. Every row is our proposal, intersects-with at strength 1, and carries the words person-decision-required and its reason; a consumer MUST NOT count a row that still carries them. The crosswalk of ISO/IEC 27001 to SOC 2 is derived through the controls of SP 800-53 that both sides share. The clauses 4 to 10 of ISO/IEC 27001 are not mapped."
+}

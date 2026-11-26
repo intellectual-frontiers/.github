@@ -10,11 +10,13 @@
  * @module
  */
 import { fs, path } from "@intellectual-frontiers/system";
-import { SOURCE_FILE } from "../src/governance/source.ts";
+import { SOURCE_FILES } from "../src/governance/source.ts";
 import { digestOf, makePackage, PACKAGE_DIR } from "../src/physical/package.ts";
 
 const root = path.resolve(PACKAGE_DIR, "..");
-const files = await makePackage(await digestOf(await fs.readFile(path.join(root, SOURCE_FILE))));
+const digests: Record<string, string> = {};
+for (const file of SOURCE_FILES) digests[file] = await digestOf(await fs.readFile(path.join(root, file)));
+const files = await makePackage(digests);
 const check = process.argv.slice(2).includes("--check");
 let differs = 0;
 for (const [name, text] of files) {

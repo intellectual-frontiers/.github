@@ -1,0 +1,55 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-iso27001",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-iso27001",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/clauses.ts",
+      "src/governance/annex.ts",
+      "src/governance/themes.ts"
+    ]
+  },
+  "version": "1",
+  "title": "ISO/IEC 27001:2022 and ISO/IEC 27002:2022: the clauses, the controls of Annex A and the themes and attributes, in our own words, unread",
+  "source": {
+    "publisher": "Intellectual Frontiers LLC, from what is published about ISO and IEC standards that it has not read",
+    "edition": "ISO/IEC 27001:2022, Information security, cybersecurity and privacy protection: information security management systems, requirements, unread, https://www.iso.org/standard/27001; ISO/IEC 27002:2022, Information security, cybersecurity and privacy protection: information security controls, unread, https://www.iso.org/standard/75652.html",
+    "url": "https://www.iso.org/standard/27001"
+  },
+  "licence": "Own words of Intellectual Frontiers LLC under the PolyForm Noncommercial License 1.0.0. The identifiers (the numbers of the clauses and of the controls of Annex A) refer to ISO/IEC 27001:2022 and ISO/IEC 27002:2022, which are licensed works of ISO and IEC that were not read; the titles and statements are our understanding of what each asks, written from what is widely published about the structure of the two standards, not a quotation and not a substitute for them. A person who holds the standards MUST check every row before the package is relied on for a certification.",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "iso-27001",
+      "file": "frameworks/iso-27001-2022.json",
+      "digest": "8a1fab012102ac94dd41db6bc84af3045701f8e05e264f7bc03caedf52710938"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "iso-27002",
+      "file": "frameworks/iso-27002-2022.json",
+      "digest": "7304fd84843ff9d6e14e1ac6484645bd62a080a32d0120ea11654bd9f1a60696"
+    }
+  ],
+  "sources": [
+    {
+      "url": "src/governance/clauses.ts",
+      "sha256": "3cc90cd6d6838136b30d8e58e60bdd369eb093bcce9ef7610440a16e6eabc01c"
+    },
+    {
+      "url": "src/governance/annex.ts",
+      "sha256": "db42b40a4c5d656e1b86513bfb60daf155a8fdde4dff2a942a5095656d66aee9"
+    },
+    {
+      "url": "src/governance/themes.ts",
+      "sha256": "2194b704f4a852d193f1fa8ce4d77508853a2161281080b23612ec4b8ea81f0f"
+    }
+  ],
+  "notice": "ISO/IEC 27001:2022 and ISO/IEC 27002:2022 have not been read: the publisher's page refused the fetch and the text is a licensed work, so every title and statement here is our own understanding of what each clause and control asks, and a person who holds the standards must check every row before the package is relied on for a certification. The value of each attribute of ISO/IEC 27002 for each control is not in the package."
+}

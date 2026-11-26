@@ -1,0 +1,752 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "soc2-focus",
+  "createdAt": "2026-11-21T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-soc2",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/criteria.ts",
+      "src/governance/focus.ts"
+    ]
+  },
+  "version": "2017",
+  "title": "SOC 2: what an organization shows for each criterion, in our own words (shaped like the points of focus, which were not read)",
+  "controls": [
+    {
+      "id": "CC1.1-1",
+      "title": "Integrity and ethics, matter 1",
+      "statement": "A written code of conduct or set of values exists, and people acknowledge it.",
+      "family": "CC1.1"
+    },
+    {
+      "id": "CC1.1-2",
+      "title": "Integrity and ethics, matter 2",
+      "statement": "Departures from the values are noticed and dealt with, and leadership is seen to apply the same rules to itself.",
+      "family": "CC1.1"
+    },
+    {
+      "id": "CC1.2-1",
+      "title": "Independent oversight, matter 1",
+      "statement": "The oversight body has members who are free of day-to-day management and has stated what it oversees.",
+      "family": "CC1.2"
+    },
+    {
+      "id": "CC1.2-2",
+      "title": "Independent oversight, matter 2",
+      "statement": "The oversight body meets, reviews the state of internal control and records what it asked for.",
+      "family": "CC1.2"
+    },
+    {
+      "id": "CC1.3-1",
+      "title": "Structure and authority, matter 1",
+      "statement": "Reporting lines, roles and authority for security are written down and kept current.",
+      "family": "CC1.3"
+    },
+    {
+      "id": "CC1.3-2",
+      "title": "Structure and authority, matter 2",
+      "statement": "Each security objective and control has a named owner who knows they own it.",
+      "family": "CC1.3"
+    },
+    {
+      "id": "CC1.4-1",
+      "title": "Competent people, matter 1",
+      "statement": "Roles state the skills they need, and hiring and training follow that.",
+      "family": "CC1.4"
+    },
+    {
+      "id": "CC1.4-2",
+      "title": "Competent people, matter 2",
+      "statement": "The organization plans for succession and for the skills it will need next.",
+      "family": "CC1.4"
+    },
+    {
+      "id": "CC1.5-1",
+      "title": "Accountability, matter 1",
+      "statement": "Performance of staff is judged against their part in control, with consequences when they fall short.",
+      "family": "CC1.5"
+    },
+    {
+      "id": "CC1.5-2",
+      "title": "Accountability, matter 2",
+      "statement": "Pressure to meet targets is balanced so that it does not reward cutting corners.",
+      "family": "CC1.5"
+    },
+    {
+      "id": "CC2.1-1",
+      "title": "Useful information, matter 1",
+      "statement": "The organization knows which information its controls depend on and checks that it is complete and right.",
+      "family": "CC2.1"
+    },
+    {
+      "id": "CC2.1-2",
+      "title": "Useful information, matter 2",
+      "statement": "Information is made available to the people who run controls when they need it.",
+      "family": "CC2.1"
+    },
+    {
+      "id": "CC2.2-1",
+      "title": "Internal communication, matter 1",
+      "statement": "Staff are told the policies and their duties, and can ask questions and raise concerns without penalty.",
+      "family": "CC2.2"
+    },
+    {
+      "id": "CC2.2-2",
+      "title": "Internal communication, matter 2",
+      "statement": "Changes to responsibilities and to the system are communicated to those affected.",
+      "family": "CC2.2"
+    },
+    {
+      "id": "CC2.3-1",
+      "title": "External communication, matter 1",
+      "statement": "Customers and partners are told what the organization commits to, and how to report problems or incidents.",
+      "family": "CC2.3"
+    },
+    {
+      "id": "CC2.3-2",
+      "title": "External communication, matter 2",
+      "statement": "Messages from outside are collected and reach the people who must act on them.",
+      "family": "CC2.3"
+    },
+    {
+      "id": "CC3.1-1",
+      "title": "Clear objectives, matter 1",
+      "statement": "Objectives are written, measurable where possible and tied to the risks they imply.",
+      "family": "CC3.1"
+    },
+    {
+      "id": "CC3.1-2",
+      "title": "Clear objectives, matter 2",
+      "statement": "Objectives are reviewed when the business or its environment changes.",
+      "family": "CC3.1"
+    },
+    {
+      "id": "CC3.2-1",
+      "title": "Risk identification, matter 1",
+      "statement": "A risk assessment is done at a stated interval across the whole entity, with owners for each risk.",
+      "family": "CC3.2"
+    },
+    {
+      "id": "CC3.2-2",
+      "title": "Risk identification, matter 2",
+      "statement": "Each risk has a decision on how it is handled and the decision is recorded.",
+      "family": "CC3.2"
+    },
+    {
+      "id": "CC3.3-1",
+      "title": "Fraud risk, matter 1",
+      "statement": "Ways in which fraud, abuse or misuse could occur are considered in the risk assessment.",
+      "family": "CC3.3"
+    },
+    {
+      "id": "CC3.3-2",
+      "title": "Fraud risk, matter 2",
+      "statement": "Incentives, pressures and opportunities that could lead to fraud are looked at.",
+      "family": "CC3.3"
+    },
+    {
+      "id": "CC3.4-1",
+      "title": "Change and risk, matter 1",
+      "statement": "Changes in the business, the technology, the law and the leadership are watched for their effect on risk.",
+      "family": "CC3.4"
+    },
+    {
+      "id": "CC3.4-2",
+      "title": "Change and risk, matter 2",
+      "statement": "The risk assessment is revisited when such a change happens.",
+      "family": "CC3.4"
+    },
+    {
+      "id": "CC4.1-1",
+      "title": "Evaluating controls, matter 1",
+      "statement": "Controls are tested on a plan, by people who do not run them where that is practical.",
+      "family": "CC4.1"
+    },
+    {
+      "id": "CC4.1-2",
+      "title": "Evaluating controls, matter 2",
+      "statement": "The scope and frequency of the testing follow the risk of what is tested.",
+      "family": "CC4.1"
+    },
+    {
+      "id": "CC4.2-1",
+      "title": "Reporting deficiencies, matter 1",
+      "statement": "Deficiencies are logged with an owner and a date.",
+      "family": "CC4.2"
+    },
+    {
+      "id": "CC4.2-2",
+      "title": "Reporting deficiencies, matter 2",
+      "statement": "Leadership and the oversight body are told of the serious ones, and the fixes are followed to the end.",
+      "family": "CC4.2"
+    },
+    {
+      "id": "CC5.1-1",
+      "title": "Control activities, matter 1",
+      "statement": "Controls are chosen to bring each assessed risk to an accepted level, and the choice is traceable.",
+      "family": "CC5.1"
+    },
+    {
+      "id": "CC5.1-2",
+      "title": "Control activities, matter 2",
+      "statement": "Separation of duties is considered in how controls are built.",
+      "family": "CC5.1"
+    },
+    {
+      "id": "CC5.2-1",
+      "title": "Technology controls, matter 1",
+      "statement": "The technology the controls rely on is identified and its general controls are chosen.",
+      "family": "CC5.2"
+    },
+    {
+      "id": "CC5.2-2",
+      "title": "Technology controls, matter 2",
+      "statement": "Controls over access, change and operation of technology are in place and automated where sensible.",
+      "family": "CC5.2"
+    },
+    {
+      "id": "CC5.3-1",
+      "title": "Policies and procedures, matter 1",
+      "statement": "Policies exist for the areas of risk, are approved and are reviewed on a schedule.",
+      "family": "CC5.3"
+    },
+    {
+      "id": "CC5.3-2",
+      "title": "Policies and procedures, matter 2",
+      "statement": "Procedures say who does what, and the people who run them have the competence and the time.",
+      "family": "CC5.3"
+    },
+    {
+      "id": "CC6.1-1",
+      "title": "Logical access protection, matter 1",
+      "statement": "Systems and data that matter are inventoried, and access to each is controlled by an enforced rule.",
+      "family": "CC6.1"
+    },
+    {
+      "id": "CC6.1-2",
+      "title": "Logical access protection, matter 2",
+      "statement": "Authentication is required, and the strength of it is set by what is protected.",
+      "family": "CC6.1"
+    },
+    {
+      "id": "CC6.2-1",
+      "title": "Access provisioning, matter 1",
+      "statement": "A new user is registered and authorized by someone who may do so before access is given.",
+      "family": "CC6.2"
+    },
+    {
+      "id": "CC6.2-2",
+      "title": "Access provisioning, matter 2",
+      "statement": "Access is reviewed and removed when a person leaves, changes role or no longer needs it.",
+      "family": "CC6.2"
+    },
+    {
+      "id": "CC6.3-1",
+      "title": "Least privilege, matter 1",
+      "statement": "Access is given by role with the least needed, and sensitive duties are split between people.",
+      "family": "CC6.3"
+    },
+    {
+      "id": "CC6.3-2",
+      "title": "Least privilege, matter 2",
+      "statement": "Changes to access are approved, recorded and periodically reviewed.",
+      "family": "CC6.3"
+    },
+    {
+      "id": "CC6.4-1",
+      "title": "Physical access, matter 1",
+      "statement": "Access to the places that hold systems and data is limited to those authorized and the access is logged.",
+      "family": "CC6.4"
+    },
+    {
+      "id": "CC6.4-2",
+      "title": "Physical access, matter 2",
+      "statement": "Visitors and physical access rights are managed and reviewed.",
+      "family": "CC6.4"
+    },
+    {
+      "id": "CC6.5-1",
+      "title": "Retiring assets, matter 1",
+      "statement": "Assets that held data are wiped or destroyed so the data cannot be read, and this is recorded.",
+      "family": "CC6.5"
+    },
+    {
+      "id": "CC6.5-2",
+      "title": "Retiring assets, matter 2",
+      "statement": "The organization knows when an asset is retired and who handled it.",
+      "family": "CC6.5"
+    },
+    {
+      "id": "CC6.6-1",
+      "title": "Outside threats, matter 1",
+      "statement": "The system's boundary is protected against threats from outside, with controls on what may enter and leave.",
+      "family": "CC6.6"
+    },
+    {
+      "id": "CC6.6-2",
+      "title": "Outside threats, matter 2",
+      "statement": "Remote and external access is limited, authenticated and monitored.",
+      "family": "CC6.6"
+    },
+    {
+      "id": "CC6.7-1",
+      "title": "Information in motion, matter 1",
+      "statement": "Information moved, sent or received is protected, for example by encryption in transit.",
+      "family": "CC6.7"
+    },
+    {
+      "id": "CC6.7-2",
+      "title": "Information in motion, matter 2",
+      "statement": "Who may move data out, and by which means, is restricted and checked.",
+      "family": "CC6.7"
+    },
+    {
+      "id": "CC6.8-1",
+      "title": "Malicious software, matter 1",
+      "statement": "Software and devices are protected against malicious code, and the protection is kept current.",
+      "family": "CC6.8"
+    },
+    {
+      "id": "CC6.8-2",
+      "title": "Malicious software, matter 2",
+      "statement": "Unauthorized or unapproved software is prevented or noticed.",
+      "family": "CC6.8"
+    },
+    {
+      "id": "CC7.1-1",
+      "title": "Detecting weaknesses, matter 1",
+      "statement": "Configurations are baselined and changes against the baseline are detected.",
+      "family": "CC7.1"
+    },
+    {
+      "id": "CC7.1-2",
+      "title": "Detecting weaknesses, matter 2",
+      "statement": "Vulnerabilities are scanned for on a schedule and the results are acted on by risk.",
+      "family": "CC7.1"
+    },
+    {
+      "id": "CC7.2-1",
+      "title": "Monitoring for anomalies, matter 1",
+      "statement": "Systems and networks are monitored for unusual activity, with logs kept and reviewed.",
+      "family": "CC7.2"
+    },
+    {
+      "id": "CC7.2-2",
+      "title": "Monitoring for anomalies, matter 2",
+      "statement": "Alerts reach a person who is expected to look at them and who records what they decided.",
+      "family": "CC7.2"
+    },
+    {
+      "id": "CC7.3-1",
+      "title": "Judging events, matter 1",
+      "statement": "Events are judged against a stated test of what counts as an incident, and the judgement is recorded.",
+      "family": "CC7.3"
+    },
+    {
+      "id": "CC7.3-2",
+      "title": "Judging events, matter 2",
+      "statement": "The people who judge events have the information and the authority to do so.",
+      "family": "CC7.3"
+    },
+    {
+      "id": "CC7.4-1",
+      "title": "Incident response, matter 1",
+      "statement": "An incident response plan names roles, steps and contacts, and is tested.",
+      "family": "CC7.4"
+    },
+    {
+      "id": "CC7.4-2",
+      "title": "Incident response, matter 2",
+      "statement": "Incidents are contained, remedied and communicated, and what was learnt changes the controls.",
+      "family": "CC7.4"
+    },
+    {
+      "id": "CC7.5-1",
+      "title": "Recovery from incidents, matter 1",
+      "statement": "Plans exist to recover from incidents and are exercised.",
+      "family": "CC7.5"
+    },
+    {
+      "id": "CC7.5-2",
+      "title": "Recovery from incidents, matter 2",
+      "statement": "After an incident the organization restores service and records what changed.",
+      "family": "CC7.5"
+    },
+    {
+      "id": "CC8.1-1",
+      "title": "Change management, matter 1",
+      "statement": "Changes are requested, assessed, approved, tested and recorded before they reach production.",
+      "family": "CC8.1"
+    },
+    {
+      "id": "CC8.1-2",
+      "title": "Change management, matter 2",
+      "statement": "Emergency changes follow a defined path and are reviewed afterwards.",
+      "family": "CC8.1"
+    },
+    {
+      "id": "CC9.1-1",
+      "title": "Business disruption, matter 1",
+      "statement": "The organization has assessed which business disruptions matter and how each would be handled.",
+      "family": "CC9.1"
+    },
+    {
+      "id": "CC9.1-2",
+      "title": "Business disruption, matter 2",
+      "statement": "Insurance or other means of transferring risk are considered where they fit.",
+      "family": "CC9.1"
+    },
+    {
+      "id": "CC9.2-1",
+      "title": "Vendors and partners, matter 1",
+      "statement": "Vendors and partners are assessed for risk before they are used and on a schedule after.",
+      "family": "CC9.2"
+    },
+    {
+      "id": "CC9.2-2",
+      "title": "Vendors and partners, matter 2",
+      "statement": "Obligations of vendors are in contract and their performance and reports are reviewed.",
+      "family": "CC9.2"
+    },
+    {
+      "id": "A1.1-1",
+      "title": "Capacity, matter 1",
+      "statement": "Capacity of the systems is watched and compared with what demand is expected to be.",
+      "family": "A1.1"
+    },
+    {
+      "id": "A1.1-2",
+      "title": "Capacity, matter 2",
+      "statement": "Capacity is added or reduced before a shortfall causes a failure.",
+      "family": "A1.1"
+    },
+    {
+      "id": "A1.2-1",
+      "title": "Protection of availability, matter 1",
+      "statement": "Protections against environmental threats, power and similar loss are in place and maintained.",
+      "family": "A1.2"
+    },
+    {
+      "id": "A1.2-2",
+      "title": "Protection of availability, matter 2",
+      "statement": "Backups and the means to recover are made on a schedule and kept safe.",
+      "family": "A1.2"
+    },
+    {
+      "id": "A1.3-1",
+      "title": "Testing recovery, matter 1",
+      "statement": "Recovery plans are tested on a schedule and the results are recorded.",
+      "family": "A1.3"
+    },
+    {
+      "id": "A1.3-2",
+      "title": "Testing recovery, matter 2",
+      "statement": "Gaps found in a test are fixed and the plan is changed.",
+      "family": "A1.3"
+    },
+    {
+      "id": "C1.1-1",
+      "title": "Confidential information, matter 1",
+      "statement": "Confidential information is identified and kept apart from other information.",
+      "family": "C1.1"
+    },
+    {
+      "id": "C1.1-2",
+      "title": "Confidential information, matter 2",
+      "statement": "Access to it and its protection in storage and transit follow its confidentiality needs.",
+      "family": "C1.1"
+    },
+    {
+      "id": "C1.2-1",
+      "title": "Disposing of confidential information, matter 1",
+      "statement": "Confidential information is deleted or destroyed at the end of its need, with proof that it was.",
+      "family": "C1.2"
+    },
+    {
+      "id": "C1.2-2",
+      "title": "Disposing of confidential information, matter 2",
+      "statement": "Requests to destroy it are tracked to completion.",
+      "family": "C1.2"
+    },
+    {
+      "id": "PI1.1-1",
+      "title": "Processing specifications, matter 1",
+      "statement": "The organization states what the processing is meant to do and what makes its output correct.",
+      "family": "PI1.1"
+    },
+    {
+      "id": "PI1.1-2",
+      "title": "Processing specifications, matter 2",
+      "statement": "Definitions of the data and of the outputs are kept current.",
+      "family": "PI1.1"
+    },
+    {
+      "id": "PI1.2-1",
+      "title": "Input checks, matter 1",
+      "statement": "Inputs are checked for completeness and validity as they arrive.",
+      "family": "PI1.2"
+    },
+    {
+      "id": "PI1.2-2",
+      "title": "Input checks, matter 2",
+      "statement": "Rejected inputs are logged and dealt with.",
+      "family": "PI1.2"
+    },
+    {
+      "id": "PI1.3-1",
+      "title": "Processing checks, matter 1",
+      "statement": "Processing is checked to make sure it is complete, accurate and on time.",
+      "family": "PI1.3"
+    },
+    {
+      "id": "PI1.3-2",
+      "title": "Processing checks, matter 2",
+      "statement": "Errors in processing are found and corrected, and the cause is looked at.",
+      "family": "PI1.3"
+    },
+    {
+      "id": "PI1.4-1",
+      "title": "Output checks, matter 1",
+      "statement": "Outputs are checked to be complete and right before they are released.",
+      "family": "PI1.4"
+    },
+    {
+      "id": "PI1.4-2",
+      "title": "Output checks, matter 2",
+      "statement": "Outputs go only to those intended.",
+      "family": "PI1.4"
+    },
+    {
+      "id": "PI1.5-1",
+      "title": "Stored data checks, matter 1",
+      "statement": "Stored data is protected from change and loss, and is checked to be whole.",
+      "family": "PI1.5"
+    },
+    {
+      "id": "PI1.5-2",
+      "title": "Stored data checks, matter 2",
+      "statement": "Changes to stored data leave a record.",
+      "family": "PI1.5"
+    },
+    {
+      "id": "P1.1-1",
+      "title": "Privacy notice, matter 1",
+      "statement": "A notice of privacy practices is given to the people whose information is held.",
+      "family": "P1.1"
+    },
+    {
+      "id": "P1.1-2",
+      "title": "Privacy notice, matter 2",
+      "statement": "The notice is kept current and tells people what is collected, why, and who gets it.",
+      "family": "P1.1"
+    },
+    {
+      "id": "P2.1-1",
+      "title": "Choice and consent, matter 1",
+      "statement": "People are given choices about the collection and use of their information, and their consent is recorded where it is needed.",
+      "family": "P2.1"
+    },
+    {
+      "id": "P2.1-2",
+      "title": "Choice and consent, matter 2",
+      "statement": "A person's choice is honoured in later use.",
+      "family": "P2.1"
+    },
+    {
+      "id": "P3.1-1",
+      "title": "Limited collection, matter 1",
+      "statement": "Only the personal information the stated purposes need is collected.",
+      "family": "P3.1"
+    },
+    {
+      "id": "P3.1-2",
+      "title": "Limited collection, matter 2",
+      "statement": "The sources and methods of collection are known.",
+      "family": "P3.1"
+    },
+    {
+      "id": "P3.2-1",
+      "title": "Explicit consent for sensitive data, matter 1",
+      "statement": "Sensitive information is collected only with the person's explicit consent.",
+      "family": "P3.2"
+    },
+    {
+      "id": "P3.2-2",
+      "title": "Explicit consent for sensitive data, matter 2",
+      "statement": "The consent is recorded and can be withdrawn.",
+      "family": "P3.2"
+    },
+    {
+      "id": "P4.1-1",
+      "title": "Limited use, matter 1",
+      "statement": "Personal information is used only for the purposes stated.",
+      "family": "P4.1"
+    },
+    {
+      "id": "P4.1-2",
+      "title": "Limited use, matter 2",
+      "statement": "A new use is checked against the notice and the consent first.",
+      "family": "P4.1"
+    },
+    {
+      "id": "P4.2-1",
+      "title": "Retention, matter 1",
+      "statement": "Personal information is kept no longer than its purposes and the law need.",
+      "family": "P4.2"
+    },
+    {
+      "id": "P4.2-2",
+      "title": "Retention, matter 2",
+      "statement": "Retention periods are set and applied.",
+      "family": "P4.2"
+    },
+    {
+      "id": "P4.3-1",
+      "title": "Disposal of personal information, matter 1",
+      "statement": "Personal information is disposed of securely at the end of its retention.",
+      "family": "P4.3"
+    },
+    {
+      "id": "P4.3-2",
+      "title": "Disposal of personal information, matter 2",
+      "statement": "Disposal is recorded.",
+      "family": "P4.3"
+    },
+    {
+      "id": "P5.1-1",
+      "title": "Access by the person, matter 1",
+      "statement": "People can ask for the personal information held about them and can have it.",
+      "family": "P5.1"
+    },
+    {
+      "id": "P5.1-2",
+      "title": "Access by the person, matter 2",
+      "statement": "Requests are authenticated, answered in time, and refusals are explained.",
+      "family": "P5.1"
+    },
+    {
+      "id": "P5.2-1",
+      "title": "Correction, matter 1",
+      "statement": "People can ask to correct or update their information, and the changes are made.",
+      "family": "P5.2"
+    },
+    {
+      "id": "P5.2-2",
+      "title": "Correction, matter 2",
+      "statement": "Those who got the information before are told where the correction matters.",
+      "family": "P5.2"
+    },
+    {
+      "id": "P6.1-1",
+      "title": "Disclosure with consent, matter 1",
+      "statement": "Information is disclosed to third parties only where the person has agreed or the law requires it.",
+      "family": "P6.1"
+    },
+    {
+      "id": "P6.1-2",
+      "title": "Disclosure with consent, matter 2",
+      "statement": "The purposes of the disclosure match what the person was told.",
+      "family": "P6.1"
+    },
+    {
+      "id": "P6.2-1",
+      "title": "Record of authorized disclosures, matter 1",
+      "statement": "Authorized disclosures are recorded.",
+      "family": "P6.2"
+    },
+    {
+      "id": "P6.2-2",
+      "title": "Record of authorized disclosures, matter 2",
+      "statement": "The record is kept for as long as it is needed to answer a request.",
+      "family": "P6.2"
+    },
+    {
+      "id": "P6.3-1",
+      "title": "Record of unauthorized disclosures, matter 1",
+      "statement": "Disclosures that were not authorized are recorded and followed up.",
+      "family": "P6.3"
+    },
+    {
+      "id": "P6.3-2",
+      "title": "Record of unauthorized disclosures, matter 2",
+      "statement": "The organization learns from them.",
+      "family": "P6.3"
+    },
+    {
+      "id": "P6.4-1",
+      "title": "Third parties' obligations, matter 1",
+      "statement": "Third parties who get personal information agree in writing to protect it as the organization has promised.",
+      "family": "P6.4"
+    },
+    {
+      "id": "P6.4-2",
+      "title": "Third parties' obligations, matter 2",
+      "statement": "The organization checks that they do.",
+      "family": "P6.4"
+    },
+    {
+      "id": "P6.5-1",
+      "title": "Third parties report incidents, matter 1",
+      "statement": "Third parties must tell the organization of incidents that touch the information it gave them.",
+      "family": "P6.5"
+    },
+    {
+      "id": "P6.5-2",
+      "title": "Third parties report incidents, matter 2",
+      "statement": "The organization acts on such reports.",
+      "family": "P6.5"
+    },
+    {
+      "id": "P6.6-1",
+      "title": "Notifying of breaches, matter 1",
+      "statement": "The organization has a process to tell the people and the authorities concerned of a breach in the time required.",
+      "family": "P6.6"
+    },
+    {
+      "id": "P6.6-2",
+      "title": "Notifying of breaches, matter 2",
+      "statement": "The process is practised.",
+      "family": "P6.6"
+    },
+    {
+      "id": "P6.7-1",
+      "title": "Accounting of disclosures, matter 1",
+      "statement": "The organization can give a person an account of the disclosures of their information.",
+      "family": "P6.7"
+    },
+    {
+      "id": "P6.7-2",
+      "title": "Accounting of disclosures, matter 2",
+      "statement": "The account is complete for the period asked.",
+      "family": "P6.7"
+    },
+    {
+      "id": "P7.1-1",
+      "title": "Quality of personal information, matter 1",
+      "statement": "Personal information is kept accurate, complete and relevant for the purposes it is used for.",
+      "family": "P7.1"
+    },
+    {
+      "id": "P7.1-2",
+      "title": "Quality of personal information, matter 2",
+      "statement": "The organization checks it at points where errors enter.",
+      "family": "P7.1"
+    },
+    {
+      "id": "P8.1-1",
+      "title": "Privacy monitoring and enforcement, matter 1",
+      "statement": "Complaints and questions about privacy are received, handled and answered.",
+      "family": "P8.1"
+    },
+    {
+      "id": "P8.1-2",
+      "title": "Privacy monitoring and enforcement, matter 2",
+      "statement": "Compliance with the privacy commitments is monitored and what is found is fixed.",
+      "family": "P8.1"
+    }
+  ]
+}

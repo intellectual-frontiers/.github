@@ -1,0 +1,39 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-hipaa",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-hipaa",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/security-rule.ts"
+    ]
+  },
+  "version": "2026",
+  "title": "HIPAA Security Rule, 45 CFR 164 Subpart C: the standards and implementation specifications, in our own words",
+  "source": {
+    "publisher": "Intellectual Frontiers LLC, reading a regulation of the United States government",
+    "edition": "45 CFR Part 164, Subpart C (Security Standards for the Protection of Electronic Protected Health Information), sections 164.308, 164.310, 164.312, 164.314 and 164.316 and Appendix A, as published in the eCFR, read on 2026-11-26",
+    "url": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C"
+  },
+  "licence": "Own words of Intellectual Frontiers LLC under the PolyForm Noncommercial License 1.0.0. The identifiers and the names of the standards and implementation specifications refer to 45 CFR Part 164 Subpart C, a regulation of the United States government that is in the public domain; the statements are a reading of each, not a quotation and not a substitute for the regulation, which stays the authority. Whether an addressable specification is met, met another way or not needed is a decision to be documented by the covered entity or business associate under 164.306(d).",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "hipaa-security",
+      "file": "frameworks/hipaa-security-2026.json",
+      "digest": "b3e6acfa4c34bd971344428b4836e487000f5eec10ff3fb5050544525e723ae9"
+    }
+  ],
+  "sources": [
+    {
+      "url": "src/governance/security-rule.ts",
+      "sha256": "7bfe983ede2d0c8e95303fa8bcfa51889b8ce00d3eba18032a9c17f845b58b52"
+    }
+  ],
+  "notice": "The text of the regulation is not carried: the statements are our own reading, and the regulation at the address of the reference stays the authority. The crosswalk to NIST SP 800-53 is in commons catalog-crosswalks. The rule's proposals to make every addressable specification required are not in force and are not here."
+}

@@ -1,0 +1,971 @@
+{
+  "kind": "grc.crosswalk",
+  "schema": "1",
+  "id": "hipaa-security-to-nist-800-53",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-crosswalks",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/soc2.ts",
+      "src/governance/iso.ts",
+      "src/governance/hipaa.ts"
+    ]
+  },
+  "mappings": [
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.D",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.D",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.1.ii.D",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.3.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.4.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.5.ii.D",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.6.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.A",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.B",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.C",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.D",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.E",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.7.ii.E",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.8",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.a.8",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.b.1",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.b.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.b.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.b.3",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.308.b.3",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.a.2.iv",
+      "to": "urn:grc:nist-800-53:5.2.0:MA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.b",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.b",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.b",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.c",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.c",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.1",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.1",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.310.d.2.iv",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.1",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.iv",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.a.2.iv",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-28",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.b",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.b",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.b",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.c.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.c.2",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the control are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.d",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.d",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.d",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.312.e.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.a.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.b",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-21",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.b",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.b.2",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.314.b.2",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.a",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.a",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.i",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.ii",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:hipaa-security:2026:164.316.b.2.iii",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the paragraph of the rule and the controls are about the same matter, as the paragraph's own title and the names of the controls say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    }
+  ]
+}

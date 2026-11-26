@@ -1,0 +1,411 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "hipaa-security",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-hipaa",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/security-rule.ts"
+    ]
+  },
+  "version": "2026",
+  "title": "HIPAA Security Rule, 45 CFR 164 Subpart C: the standards and implementation specifications, in our own words",
+  "controls": [
+    {
+      "id": "164.308.a.1",
+      "title": "Security management process",
+      "statement": "Standard. Put in place policies and procedures to prevent, detect, contain and correct security violations.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.1.ii.A",
+      "title": "Risk analysis",
+      "statement": "Required specification. Assess accurately and thoroughly the risks to the confidentiality, integrity and availability of the electronic health information the organization holds.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.1.ii.B",
+      "title": "Risk management",
+      "statement": "Required specification. Put in place security measures that bring those risks down to a reasonable and appropriate level.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.1.ii.C",
+      "title": "Sanction policy",
+      "statement": "Required specification. Apply sanctions to workforce members who do not follow the organization's security policies.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.1.ii.D",
+      "title": "Information system activity review",
+      "statement": "Required specification. Review records of system activity, such as audit logs, access reports and incident reports, regularly.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.2",
+      "title": "Assigned security responsibility",
+      "statement": "Standard. Name the one security official responsible for developing and carrying out the security policies and procedures.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.3",
+      "title": "Workforce security",
+      "statement": "Standard. Make sure that workforce members who should have access to electronic health information have it, and that those who should not are kept from it.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.3.ii.A",
+      "title": "Authorization and supervision",
+      "statement": "Addressable specification. Have procedures for authorizing or supervising workforce members who work with the information or in places where it may be.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.3.ii.B",
+      "title": "Workforce clearance procedure",
+      "statement": "Addressable specification. Have procedures to decide that a workforce member's access is appropriate.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.3.ii.C",
+      "title": "Termination procedures",
+      "statement": "Addressable specification. Have procedures to end access when employment or an arrangement ends or when the determination of the previous item says so.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.4",
+      "title": "Information access management",
+      "statement": "Standard. Have policies and procedures for authorizing access to electronic health information that fit the privacy rule's limits.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.4.ii.A",
+      "title": "Isolating clearinghouse functions",
+      "statement": "Required specification. Where a clearinghouse is part of a larger organization, protect its information from unauthorized access by the rest of it.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.4.ii.B",
+      "title": "Access authorization",
+      "statement": "Addressable specification. Have policies and procedures for granting access to the information, for example to a workstation, a transaction, a program or a process.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.4.ii.C",
+      "title": "Access establishment and modification",
+      "statement": "Addressable specification. Have policies and procedures that set up, document, review and change a user's right of access.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.5",
+      "title": "Security awareness and training",
+      "statement": "Standard. Run a security awareness and training programme for all workforce members, management included.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.5.ii.A",
+      "title": "Security reminders",
+      "statement": "Addressable specification. Send periodic security updates.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.5.ii.B",
+      "title": "Protection from malicious software",
+      "statement": "Addressable specification. Have procedures to guard against, detect and report malicious software.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.5.ii.C",
+      "title": "Log-in monitoring",
+      "statement": "Addressable specification. Have procedures to watch log-in attempts and report discrepancies.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.5.ii.D",
+      "title": "Password management",
+      "statement": "Addressable specification. Have procedures for creating, changing and safeguarding passwords.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.6",
+      "title": "Security incident procedures",
+      "statement": "Standard. Have policies and procedures to deal with security incidents.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.6.ii",
+      "title": "Response and reporting",
+      "statement": "Required specification. Identify and respond to suspected or known incidents, reduce their harmful effects where practicable, and document the incidents and their outcomes.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7",
+      "title": "Contingency plan",
+      "statement": "Standard. Have policies and procedures to respond to an emergency or other event, such as a fire, a system failure or a natural disaster, that damages systems holding electronic health information.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7.ii.A",
+      "title": "Data backup plan",
+      "statement": "Required specification. Create and keep retrievable exact copies of electronic health information.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7.ii.B",
+      "title": "Disaster recovery plan",
+      "statement": "Required specification. Have procedures to restore any loss of data.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7.ii.C",
+      "title": "Emergency mode operation plan",
+      "statement": "Required specification. Have procedures to keep critical business processes running, and the information protected, while operating in emergency mode.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7.ii.D",
+      "title": "Testing and revision procedures",
+      "statement": "Addressable specification. Test and revise the contingency plans periodically.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.7.ii.E",
+      "title": "Applications and data criticality analysis",
+      "statement": "Addressable specification. Assess how critical each application and body of data is to the other parts of the contingency plan.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.a.8",
+      "title": "Evaluation",
+      "statement": "Standard. Evaluate periodically, technically and otherwise, how well the policies and procedures meet the rule's requirements, and again when the environment or operations change in a way that affects the security of the information.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.b.1",
+      "title": "Business associate contracts and other arrangements",
+      "statement": "Standard. Allow a business associate to create, receive, maintain or transmit electronic health information for the organization only on satisfactory assurances that it will protect it.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.308.b.3",
+      "title": "Written contract or other arrangement",
+      "statement": "Required specification. Document the assurances in a written contract or other arrangement that meets the requirements of the organizational section.",
+      "family": "164.308"
+    },
+    {
+      "id": "164.310.a.1",
+      "title": "Facility access controls",
+      "statement": "Standard. Limit physical access to the electronic information systems and the facilities they are in, while allowing the access that is authorized.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.a.2.i",
+      "title": "Contingency operations",
+      "statement": "Addressable specification. Have procedures that allow facility access to support restoring lost data under the disaster recovery plan and the emergency mode operation plan.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.a.2.ii",
+      "title": "Facility security plan",
+      "statement": "Addressable specification. Have policies and procedures to safeguard the facility and the equipment in it from unauthorized physical access, tampering and theft.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.a.2.iii",
+      "title": "Access control and validation procedures",
+      "statement": "Addressable specification. Have procedures to control and validate a person's access to facilities based on role or function, including visitors and software testing.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.a.2.iv",
+      "title": "Maintenance records",
+      "statement": "Addressable specification. Document repairs and modifications to the physical parts of a facility that relate to security, such as hardware, walls, doors and locks.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.b",
+      "title": "Workstation use",
+      "statement": "Standard. Have policies and procedures that say the proper functions of a workstation, how they are done and the surroundings of a workstation that can reach electronic health information.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.c",
+      "title": "Workstation security",
+      "statement": "Standard. Put physical safeguards on all workstations that reach electronic health information so that only authorized users reach them.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.d.1",
+      "title": "Device and media controls",
+      "statement": "Standard. Have policies and procedures for the movement of hardware and electronic media that hold electronic health information into, out of and within the facility.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.d.2.i",
+      "title": "Disposal",
+      "statement": "Required specification. Have policies and procedures for the final disposition of the information and of the hardware or media it was on.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.d.2.ii",
+      "title": "Media re-use",
+      "statement": "Required specification. Have procedures to remove the information from media before they are used again.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.d.2.iii",
+      "title": "Accountability",
+      "statement": "Addressable specification. Keep a record of the movements of hardware and media and of who is responsible for them.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.310.d.2.iv",
+      "title": "Data backup and storage",
+      "statement": "Addressable specification. Create a retrievable exact copy of the information, when needed, before moving equipment.",
+      "family": "164.310"
+    },
+    {
+      "id": "164.312.a.1",
+      "title": "Access control",
+      "statement": "Standard. Have technical policies and procedures that allow only authorized persons or software programs to reach systems that hold electronic health information.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.a.2.i",
+      "title": "Unique user identification",
+      "statement": "Required specification. Give each user a unique name or number for identifying and tracking identity.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.a.2.ii",
+      "title": "Emergency access procedure",
+      "statement": "Required specification. Have procedures for getting the information in an emergency.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.a.2.iii",
+      "title": "Automatic logoff",
+      "statement": "Addressable specification. End an electronic session after a set time of inactivity.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.a.2.iv",
+      "title": "Encryption and decryption",
+      "statement": "Addressable specification. Have a mechanism to encrypt and decrypt the information.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.b",
+      "title": "Audit controls",
+      "statement": "Standard. Have hardware, software or procedures that record and examine activity in systems that hold or use electronic health information.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.c.1",
+      "title": "Integrity",
+      "statement": "Standard. Have policies and procedures to protect the information from improper change or destruction.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.c.2",
+      "title": "Mechanism to authenticate the information",
+      "statement": "Addressable specification. Have electronic mechanisms to confirm that the information has not been altered or destroyed in an unauthorized way.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.d",
+      "title": "Person or entity authentication",
+      "statement": "Standard. Have procedures to verify that a person or entity seeking access is the one claimed.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.e.1",
+      "title": "Transmission security",
+      "statement": "Standard. Have technical measures to guard against unauthorized access to information sent over an electronic network.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.e.2.i",
+      "title": "Integrity controls",
+      "statement": "Addressable specification. Have measures so that information sent electronically is not improperly changed without detection until it is disposed of.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.312.e.2.ii",
+      "title": "Encryption in transmission",
+      "statement": "Addressable specification. Encrypt the information whenever that is appropriate.",
+      "family": "164.312"
+    },
+    {
+      "id": "164.314.a",
+      "title": "Business associate contracts or other arrangements",
+      "statement": "Standard. A contract or other arrangement with a business associate meets the requirements of the items below.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.314.a.2.i",
+      "title": "Business associate contracts",
+      "statement": "Required specification. The contract has the business associate comply with the security rule, make sure its subcontractors that handle the information agree to the same, and report to the organization any security incident it learns of, including breaches of unsecured information.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.314.a.2.ii",
+      "title": "Other arrangements",
+      "statement": "Required specification. Where the organization and the business associate are both governmental entities, a memorandum of understanding or the law can give the same assurances.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.314.a.2.iii",
+      "title": "Business associate contracts with subcontractors",
+      "statement": "Required specification. A business associate's contract with its subcontractor meets the same requirements.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.314.b",
+      "title": "Requirements for group health plans",
+      "statement": "Standard. A group health plan may give electronic health information to the plan sponsor only if the plan documents say what the sponsor will do to protect it.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.314.b.2",
+      "title": "Plan documents",
+      "statement": "Required specification. The plan documents require the sponsor to implement safeguards for the information, keep the plan's information separate from the rest of its business, make its agents agree to the same safeguards and report security incidents to the plan.",
+      "family": "164.314"
+    },
+    {
+      "id": "164.316.a",
+      "title": "Policies and procedures",
+      "statement": "Standard. Implement reasonable and appropriate policies and procedures to comply with the standards and implementation specifications, taking changes in the rule into account.",
+      "family": "164.316"
+    },
+    {
+      "id": "164.316.b.1",
+      "title": "Documentation",
+      "statement": "Standard. Keep the policies and procedures in written form, which may be electronic, and keep a written record of any action, activity or assessment the rule requires to be documented.",
+      "family": "164.316"
+    },
+    {
+      "id": "164.316.b.2.i",
+      "title": "Time limit",
+      "statement": "Required specification. Keep the documentation for six years from when it was created or last in effect, whichever is later.",
+      "family": "164.316"
+    },
+    {
+      "id": "164.316.b.2.ii",
+      "title": "Availability",
+      "statement": "Required specification. Make the documentation available to the people responsible for the procedures it describes.",
+      "family": "164.316"
+    },
+    {
+      "id": "164.316.b.2.iii",
+      "title": "Updates",
+      "statement": "Required specification. Review the documentation periodically and update it in response to environmental or operational changes that affect the security of the information.",
+      "family": "164.316"
+    }
+  ],
+  "publisher": "United States Department of Health and Human Services, in the Code of Federal Regulations",
+  "source": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C"
+}

@@ -1,0 +1,1020 @@
+{
+  "kind": "grc.crosswalk",
+  "schema": "1",
+  "id": "iso-27001-to-soc2-tsc",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-crosswalks",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/soc2.ts",
+      "src/governance/iso.ts",
+      "src/governance/hipaa.ts"
+    ]
+  },
+  "mappings": [
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.1",
+      "to": "urn:grc:soc2-tsc:2017:CC5.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-1, PM-1), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:soc2-tsc:2017:CC1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:soc2-tsc:2017:CC1.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:soc2-tsc:2017:CC2.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:soc2-tsc:2017:CC5.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.12",
+      "to": "urn:grc:soc2-tsc:2017:CC3.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (RA-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.13",
+      "to": "urn:grc:soc2-tsc:2017:C1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.14",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-4, SC-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.15",
+      "to": "urn:grc:soc2-tsc:2017:C1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.15",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.15",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.16",
+      "to": "urn:grc:soc2-tsc:2017:CC6.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-2, IA-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.17",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IA-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.17",
+      "to": "urn:grc:soc2-tsc:2017:CC6.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IA-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.18",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-2, AC-3, AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.19",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9, SR-2, SR-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.2",
+      "to": "urn:grc:soc2-tsc:2017:CC1.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PM-2, PS-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.20",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-7, SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.20",
+      "to": "urn:grc:soc2-tsc:2017:P6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-7, SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.21",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SR-2, SR-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.22",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9, SR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.23",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.23",
+      "to": "urn:grc:soc2-tsc:2017:P6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.23",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.24",
+      "to": "urn:grc:soc2-tsc:2017:CC7.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.24",
+      "to": "urn:grc:soc2-tsc:2017:P6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.25",
+      "to": "urn:grc:soc2-tsc:2017:CC7.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4, IR-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.26",
+      "to": "urn:grc:soc2-tsc:2017:CC7.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4, IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.27",
+      "to": "urn:grc:soc2-tsc:2017:CC7.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4, IR-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.28",
+      "to": "urn:grc:soc2-tsc:2017:CC7.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.28",
+      "to": "urn:grc:soc2-tsc:2017:CC7.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.28",
+      "to": "urn:grc:soc2-tsc:2017:CC7.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.29",
+      "to": "urn:grc:soc2-tsc:2017:A1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.29",
+      "to": "urn:grc:soc2-tsc:2017:CC7.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.29",
+      "to": "urn:grc:soc2-tsc:2017:CC9.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.3",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.30",
+      "to": "urn:grc:soc2-tsc:2017:A1.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-10, CP-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.30",
+      "to": "urn:grc:soc2-tsc:2017:CC7.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-10, CP-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.31",
+      "to": "urn:grc:soc2-tsc:2017:CC5.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-1), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:soc2-tsc:2017:C1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:soc2-tsc:2017:CC2.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:soc2-tsc:2017:P4.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:soc2-tsc:2017:P4.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:soc2-tsc:2017:PI1.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:soc2-tsc:2017:P3.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PT-2, PT-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:soc2-tsc:2017:P4.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PT-2, PT-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:soc2-tsc:2017:P6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PT-2, PT-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.35",
+      "to": "urn:grc:soc2-tsc:2017:CC4.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CA-2, CA-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.36",
+      "to": "urn:grc:soc2-tsc:2017:CC4.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CA-2, CA-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.4",
+      "to": "urn:grc:soc2-tsc:2017:CC1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4, PS-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.4",
+      "to": "urn:grc:soc2-tsc:2017:CC1.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PL-4, PS-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.5",
+      "to": "urn:grc:soc2-tsc:2017:CC2.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6, PM-15), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.5",
+      "to": "urn:grc:soc2-tsc:2017:CC2.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6, PM-15), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.6",
+      "to": "urn:grc:soc2-tsc:2017:CC2.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PM-15), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.6",
+      "to": "urn:grc:soc2-tsc:2017:CC2.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PM-15), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.8",
+      "to": "urn:grc:soc2-tsc:2017:CC5.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.8",
+      "to": "urn:grc:soc2-tsc:2017:CC5.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.8",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.9",
+      "to": "urn:grc:soc2-tsc:2017:CC2.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PM-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.1",
+      "to": "urn:grc:soc2-tsc:2017:CC1.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.2",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.2",
+      "to": "urn:grc:soc2-tsc:2017:P6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.3",
+      "to": "urn:grc:soc2-tsc:2017:CC1.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AT-2, AT-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.4",
+      "to": "urn:grc:soc2-tsc:2017:CC1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.4",
+      "to": "urn:grc:soc2-tsc:2017:CC1.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PS-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.7",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-17), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:CC2.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:CC2.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:CC7.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:P6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:P6.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:soc2-tsc:2017:P6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IR-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.1",
+      "to": "urn:grc:soc2-tsc:2017:CC6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-2, PE-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:soc2-tsc:2017:C1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:soc2-tsc:2017:CC6.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:soc2-tsc:2017:P4.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.11",
+      "to": "urn:grc:soc2-tsc:2017:A1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-11), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.14",
+      "to": "urn:grc:soc2-tsc:2017:CC6.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6, SR-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.2",
+      "to": "urn:grc:soc2-tsc:2017:CC6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-2, PE-3, PE-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.3",
+      "to": "urn:grc:soc2-tsc:2017:CC6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.4",
+      "to": "urn:grc:soc2-tsc:2017:CC6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-3, PE-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:soc2-tsc:2017:A1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-13, PE-14), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.6",
+      "to": "urn:grc:soc2-tsc:2017:CC6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (PE-2, PE-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.9",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.1",
+      "to": "urn:grc:soc2-tsc:2017:C1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-28), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.1",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-28), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.1",
+      "to": "urn:grc:soc2-tsc:2017:PI1.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-28), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.10",
+      "to": "urn:grc:soc2-tsc:2017:C1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6, SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.10",
+      "to": "urn:grc:soc2-tsc:2017:P4.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (MP-6, SI-12), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.12",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-7, SI-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:soc2-tsc:2017:A1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:soc2-tsc:2017:A1.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-10), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:soc2-tsc:2017:CC7.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-10), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:soc2-tsc:2017:PI1.5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.14",
+      "to": "urn:grc:soc2-tsc:2017:A1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-6, CP-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:soc2-tsc:2017:CC7.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AU-2, AU-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.16",
+      "to": "urn:grc:soc2-tsc:2017:CC7.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AU-6, CA-7, SI-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.18",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.18",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.18",
+      "to": "urn:grc:soc2-tsc:2017:CC6.8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.19",
+      "to": "urn:grc:soc2-tsc:2017:CC6.8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-11, CM-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.2",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-2, AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.20",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.20",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.21",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.21",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.21",
+      "to": "urn:grc:soc2-tsc:2017:P6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.22",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-7), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.22",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.23",
+      "to": "urn:grc:soc2-tsc:2017:CC6.6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-7, SI-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.24",
+      "to": "urn:grc:soc2-tsc:2017:CC6.7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SC-13), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:soc2-tsc:2017:CC5.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:soc2-tsc:2017:CC5.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.26",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-4, SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.27",
+      "to": "urn:grc:soc2-tsc:2017:CC5.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.27",
+      "to": "urn:grc:soc2-tsc:2017:CC5.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.27",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:soc2-tsc:2017:CC5.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:soc2-tsc:2017:CC5.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-8), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:soc2-tsc:2017:PI1.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-10), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:soc2-tsc:2017:PI1.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-10), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.3",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3, AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.3",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3, AC-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:soc2-tsc:2017:CC8.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-10), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:soc2-tsc:2017:CC9.2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:soc2-tsc:2017:P6.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-9), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:soc2-tsc:2017:PI1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SA-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.31",
+      "to": "urn:grc:soc2-tsc:2017:CC3.4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.31",
+      "to": "urn:grc:soc2-tsc:2017:CC8.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-4), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.32",
+      "to": "urn:grc:soc2-tsc:2017:CC8.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-3, CM-4, CM-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.34",
+      "to": "urn:grc:soc2-tsc:2017:CC4.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CA-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:soc2-tsc:2017:C1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:soc2-tsc:2017:CC6.3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (AC-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:soc2-tsc:2017:CC8.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.5",
+      "to": "urn:grc:soc2-tsc:2017:CC6.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (IA-2, IA-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.6",
+      "to": "urn:grc:soc2-tsc:2017:A1.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CP-2, SC-5), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.7",
+      "to": "urn:grc:soc2-tsc:2017:CC6.8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (SI-3), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.8",
+      "to": "urn:grc:soc2-tsc:2017:CC7.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (RA-5, SI-2), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.9",
+      "to": "urn:grc:soc2-tsc:2017:CC7.1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: derived through the controls of NIST SP 800-53 that both sides are proposed to meet (CM-2, CM-6), which is weaker than a proposal; neither side was read against the other, so a person decides whether this pair holds and how strongly"
+    }
+  ]
+}

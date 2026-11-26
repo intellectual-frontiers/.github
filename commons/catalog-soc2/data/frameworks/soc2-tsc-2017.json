@@ -9,7 +9,8 @@
       "version": "1"
     },
     "inputs": [
-      "src/governance/criteria.ts"
+      "src/governance/criteria.ts",
+      "src/governance/focus.ts"
     ]
   },
   "version": "2017",

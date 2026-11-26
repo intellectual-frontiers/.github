@@ -1,0 +1,227 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "iso-27002",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-iso27001",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/clauses.ts",
+      "src/governance/annex.ts",
+      "src/governance/themes.ts"
+    ]
+  },
+  "version": "2022",
+  "title": "ISO/IEC 27002:2022: the four themes of the controls and the values of the five attributes, in our own words",
+  "controls": [
+    {
+      "id": "organizational",
+      "title": "Organizational controls",
+      "statement": "Controls on how the organization governs and runs security: policies, roles, assets, access, suppliers, incidents, continuity and compliance. In Annex A they are the first 37.",
+      "family": "theme"
+    },
+    {
+      "id": "people",
+      "title": "People controls",
+      "statement": "Controls on the people who work for or with the organization: screening, terms, awareness, discipline, remote work and reporting. In Annex A they are 8 controls.",
+      "family": "theme"
+    },
+    {
+      "id": "physical",
+      "title": "Physical controls",
+      "statement": "Controls on places and equipment: perimeters, entry, monitoring, environmental threats, utilities, cabling, maintenance and disposal. In Annex A they are 14 controls.",
+      "family": "theme"
+    },
+    {
+      "id": "technological",
+      "title": "Technological controls",
+      "statement": "Controls on systems and networks: endpoints, privileged access, authentication, malware, vulnerabilities, configuration, logging, network security, cryptography and secure development. In Annex A they are 34 controls.",
+      "family": "theme"
+    },
+    {
+      "id": "preventive",
+      "title": "Preventive",
+      "statement": "The control acts before an event, to keep it from happening.",
+      "family": "control-type"
+    },
+    {
+      "id": "detective",
+      "title": "Detective",
+      "statement": "The control acts when an event happens, to notice it.",
+      "family": "control-type"
+    },
+    {
+      "id": "corrective",
+      "title": "Corrective",
+      "statement": "The control acts after an event, to limit its effect and restore.",
+      "family": "control-type"
+    },
+    {
+      "id": "confidentiality",
+      "title": "Confidentiality",
+      "statement": "The control serves keeping information from those who may not see it.",
+      "family": "information-security-property"
+    },
+    {
+      "id": "integrity",
+      "title": "Integrity",
+      "statement": "The control serves keeping information accurate and whole.",
+      "family": "information-security-property"
+    },
+    {
+      "id": "availability",
+      "title": "Availability",
+      "statement": "The control serves keeping information and services usable when needed.",
+      "family": "information-security-property"
+    },
+    {
+      "id": "identify",
+      "title": "Identify",
+      "statement": "The control helps the organization know its assets, risks and context.",
+      "family": "cybersecurity-concept"
+    },
+    {
+      "id": "protect",
+      "title": "Protect",
+      "statement": "The control helps put safeguards in place.",
+      "family": "cybersecurity-concept"
+    },
+    {
+      "id": "detect",
+      "title": "Detect",
+      "statement": "The control helps find events as they happen.",
+      "family": "cybersecurity-concept"
+    },
+    {
+      "id": "respond",
+      "title": "Respond",
+      "statement": "The control helps act on an event.",
+      "family": "cybersecurity-concept"
+    },
+    {
+      "id": "recover",
+      "title": "Recover",
+      "statement": "The control helps restore what an event disturbed.",
+      "family": "cybersecurity-concept"
+    },
+    {
+      "id": "governance",
+      "title": "Governance",
+      "statement": "The capability of setting direction and holding people to it.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "asset-management",
+      "title": "Asset management",
+      "statement": "The capability of knowing and looking after assets.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "information-protection",
+      "title": "Information protection",
+      "statement": "The capability of protecting information by its kind.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "human-resource-security",
+      "title": "Human resource security",
+      "statement": "The capability of managing security across the working life of people.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "physical-security",
+      "title": "Physical security",
+      "statement": "The capability of protecting places and equipment.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "system-and-network-security",
+      "title": "System and network security",
+      "statement": "The capability of securing systems and the networks that join them.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "application-security",
+      "title": "Application security",
+      "statement": "The capability of building and running secure applications.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "secure-configuration",
+      "title": "Secure configuration",
+      "statement": "The capability of setting up and keeping systems in a secure state.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "identity-and-access-management",
+      "title": "Identity and access management",
+      "statement": "The capability of knowing who and what may reach what.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "threat-and-vulnerability-management",
+      "title": "Threat and vulnerability management",
+      "statement": "The capability of finding and acting on threats and weaknesses.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "continuity",
+      "title": "Continuity",
+      "statement": "The capability of carrying on through disruption.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "supplier-relationships-security",
+      "title": "Supplier relationships security",
+      "statement": "The capability of keeping security across the suppliers the organization depends on.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "legal-and-compliance",
+      "title": "Legal and compliance",
+      "statement": "The capability of meeting the rules that apply.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "information-security-event-management",
+      "title": "Information security event management",
+      "statement": "The capability of handling events and incidents.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "information-security-assurance",
+      "title": "Information security assurance",
+      "statement": "The capability of showing that security works.",
+      "family": "operational-capability"
+    },
+    {
+      "id": "governance-and-ecosystem",
+      "title": "Governance and ecosystem",
+      "statement": "The domain of security governance and of the relations with others in the ecosystem.",
+      "family": "security-domain"
+    },
+    {
+      "id": "protection",
+      "title": "Protection",
+      "statement": "The domain of safeguards that protect assets.",
+      "family": "security-domain"
+    },
+    {
+      "id": "defence",
+      "title": "Defence",
+      "statement": "The domain of detecting and responding to attacks.",
+      "family": "security-domain"
+    },
+    {
+      "id": "resilience",
+      "title": "Resilience",
+      "statement": "The domain of withstanding and recovering from adverse events.",
+      "family": "security-domain"
+    }
+  ],
+  "publisher": "International Organization for Standardization (ISO) and International Electrotechnical Commission (IEC)",
+  "source": "https://www.iso.org/standard/75652.html"
+}

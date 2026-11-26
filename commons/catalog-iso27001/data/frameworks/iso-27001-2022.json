@@ -1,0 +1,761 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "iso-27001",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-iso27001",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/clauses.ts",
+      "src/governance/annex.ts",
+      "src/governance/themes.ts"
+    ]
+  },
+  "version": "2022",
+  "title": "ISO/IEC 27001:2022: the clauses of the management system and the controls of Annex A, in our own words",
+  "controls": [
+    {
+      "id": "C4.1",
+      "title": "Know the organization and its context",
+      "statement": "The organization works out the outside and inside matters that affect whether its information security management system can reach its intended results.",
+      "family": "C4"
+    },
+    {
+      "id": "C4.2",
+      "title": "Know the interested parties",
+      "statement": "The organization names the parties with a stake in its information security and the requirements of theirs that it takes on, including legal and contractual ones.",
+      "family": "C4"
+    },
+    {
+      "id": "C4.3",
+      "title": "Set the scope",
+      "statement": "The organization decides and records what the management system covers, using the context, the parties' requirements and the interfaces and dependencies on what is outside the scope.",
+      "family": "C4"
+    },
+    {
+      "id": "C4.4",
+      "title": "Run a management system",
+      "statement": "The organization establishes, runs, maintains and keeps improving the management system and the processes it needs.",
+      "family": "C4"
+    },
+    {
+      "id": "C5.1",
+      "title": "Leadership and commitment",
+      "statement": "Top management shows commitment: it ties security to the direction of the business, supplies resources, communicates why it matters, backs the people who carry it out and promotes improvement.",
+      "family": "C5"
+    },
+    {
+      "id": "C5.2",
+      "title": "Information security policy",
+      "statement": "Top management sets a policy that fits the purpose of the organization, gives a frame for objectives, commits to meet the requirements and to improve, and makes the policy known and available.",
+      "family": "C5"
+    },
+    {
+      "id": "C5.3",
+      "title": "Roles, responsibilities and authorities",
+      "statement": "Top management assigns and communicates who is responsible and has authority for the conformity of the system and for reporting on its performance.",
+      "family": "C5"
+    },
+    {
+      "id": "C6.1.1",
+      "title": "Actions on risks and opportunities, in general",
+      "statement": "The organization plans actions for the risks and opportunities that bear on the intended results of the system, on preventing unwanted effects and on improvement, and plans how to integrate and evaluate them.",
+      "family": "C6"
+    },
+    {
+      "id": "C6.1.2",
+      "title": "Information security risk assessment",
+      "statement": "The organization defines and applies a risk assessment process with criteria, repeatable and comparable results, identification of risks to confidentiality, integrity and availability, owners, and analysis and evaluation against the criteria, and keeps what it records.",
+      "family": "C6"
+    },
+    {
+      "id": "C6.1.3",
+      "title": "Information security risk treatment",
+      "statement": "The organization defines and applies a treatment process: it picks treatment options, determines the controls it needs, compares them with the reference list of controls so that none is overlooked, states which are applied and why with the justification for leaving others out, writes a treatment plan and has the owners accept it and the residual risk.",
+      "family": "C6"
+    },
+    {
+      "id": "C6.2",
+      "title": "Objectives and plans to reach them",
+      "statement": "The organization sets information security objectives at the relevant functions and levels that are measurable where possible and consistent with the policy, and plans what will be done, with what, by whom, by when and how the result is evaluated.",
+      "family": "C6"
+    },
+    {
+      "id": "C6.3",
+      "title": "Planning of changes",
+      "statement": "When the organization finds the need to change the management system, it makes the change in a planned way.",
+      "family": "C6"
+    },
+    {
+      "id": "C7.1",
+      "title": "Resources",
+      "statement": "The organization decides and provides the resources the system needs to be established, run, maintained and improved.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.2",
+      "title": "Competence",
+      "statement": "The organization decides what competence the people who affect its security performance need, makes sure they have it through education, training or experience, acts where it is lacking and keeps evidence.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.3",
+      "title": "Awareness",
+      "statement": "People who work under the organization's control know the policy, how they contribute to the system and what follows if they do not conform.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.4",
+      "title": "Communication",
+      "statement": "The organization decides what to communicate about the system, when, to whom, how and who does it, inside and outside.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.5.1",
+      "title": "Documented information, in general",
+      "statement": "The system includes the documented information the standard requires and what the organization decides it needs.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.5.2",
+      "title": "Creating and updating documented information",
+      "statement": "Documents are identified and described, in a suitable format and medium, and reviewed and approved for suitability and adequacy.",
+      "family": "C7"
+    },
+    {
+      "id": "C7.5.3",
+      "title": "Control of documented information",
+      "statement": "Documented information is available where and when it is needed and protected from loss of confidentiality, improper use and loss of integrity, with distribution, access, storage, change control and retention handled, and with documents of external origin that the system needs controlled too.",
+      "family": "C7"
+    },
+    {
+      "id": "C8.1",
+      "title": "Operational planning and control",
+      "statement": "The organization plans, implements and controls the processes it needs to meet its requirements and carry out its plans, keeps documented information that the processes ran as planned, controls planned changes and reviews the consequences of unintended ones, and makes sure outsourced processes and products are controlled.",
+      "family": "C8"
+    },
+    {
+      "id": "C8.2",
+      "title": "Risk assessment in operation",
+      "statement": "The organization carries out information security risk assessments at planned intervals or when significant changes are proposed or occur, and keeps the results.",
+      "family": "C8"
+    },
+    {
+      "id": "C8.3",
+      "title": "Risk treatment in operation",
+      "statement": "The organization implements its risk treatment plan and keeps the results of the treatment.",
+      "family": "C8"
+    },
+    {
+      "id": "C9.1",
+      "title": "Monitoring, measurement, analysis and evaluation",
+      "statement": "The organization decides what needs to be monitored and measured, by which methods so that results are valid, when, who does it and when the results are analysed and evaluated, and evaluates the performance and the effectiveness of the system.",
+      "family": "C9"
+    },
+    {
+      "id": "C9.2.1",
+      "title": "Internal audit, in general",
+      "statement": "The organization audits the system at planned intervals to see whether it conforms to its own requirements and to the standard and is effectively implemented and maintained.",
+      "family": "C9"
+    },
+    {
+      "id": "C9.2.2",
+      "title": "The internal audit programme",
+      "statement": "The organization plans, establishes, implements and maintains an audit programme with frequency, methods, responsibilities and reporting, defines the criteria and scope of each audit, chooses auditors who are objective and impartial, reports results to the relevant management and keeps evidence.",
+      "family": "C9"
+    },
+    {
+      "id": "C9.3.1",
+      "title": "Management review, in general",
+      "statement": "Top management reviews the system at planned intervals to confirm that it stays suitable, adequate and effective.",
+      "family": "C9"
+    },
+    {
+      "id": "C9.3.2",
+      "title": "Inputs to the management review",
+      "statement": "The review considers the status of earlier actions, changes in external and internal matters, feedback on performance (nonconformities, monitoring and measurement results, audit results and the fulfilment of objectives), feedback from interested parties, results of risk assessment and the status of the treatment plan, and opportunities for improvement.",
+      "family": "C9"
+    },
+    {
+      "id": "C9.3.3",
+      "title": "Results of the management review",
+      "statement": "The outputs of the review include decisions on opportunities for improvement and on any need to change the system, and are kept as documented information.",
+      "family": "C9"
+    },
+    {
+      "id": "C10.1",
+      "title": "Continual improvement",
+      "statement": "The organization keeps improving the suitability, adequacy and effectiveness of the management system.",
+      "family": "C10"
+    },
+    {
+      "id": "C10.2",
+      "title": "Nonconformity and corrective action",
+      "statement": "When a nonconformity occurs the organization reacts and, where it applies, takes action to control and correct it and to deal with the consequences, decides whether to remove the causes so that it does not recur, carries out and reviews the action taken, changes the system if needed, and keeps evidence.",
+      "family": "C10"
+    },
+    {
+      "id": "A.5.1",
+      "title": "Policies for information security",
+      "statement": "Management defines and approves a security policy and topic-specific policies, publishes them to staff and relevant parties and reviews them at planned intervals and when things change.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.2",
+      "title": "Roles and responsibilities",
+      "statement": "Security roles and responsibilities are defined and allocated to fit the organization's needs.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.3",
+      "title": "Segregation of duties",
+      "statement": "Conflicting duties and areas of responsibility are kept apart so that no one person can misuse or bypass a process alone.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.4",
+      "title": "Management responsibilities",
+      "statement": "Management requires all personnel to apply security according to the policies and procedures.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.5",
+      "title": "Contact with authorities",
+      "statement": "The organization keeps contact with the authorities relevant to security, such as regulators and law enforcement.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.6",
+      "title": "Contact with special interest groups",
+      "statement": "The organization keeps contact with security forums and professional associations.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.7",
+      "title": "Threat intelligence",
+      "statement": "Information about threats is collected and analysed to produce intelligence the organization can act on.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.8",
+      "title": "Security in project management",
+      "statement": "Security is part of every project, whatever its kind.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.9",
+      "title": "Inventory of information and assets",
+      "statement": "An inventory of information and the assets associated with it, with their owners, is made and kept current.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.10",
+      "title": "Acceptable use of information and assets",
+      "statement": "Rules for the acceptable use and handling of information and assets are set, documented and applied.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.11",
+      "title": "Return of assets",
+      "statement": "Personnel and other parties return the assets they hold when their employment, contract or agreement changes or ends.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.12",
+      "title": "Classification of information",
+      "statement": "Information is classified by what it needs in confidentiality, integrity and availability and by what interested parties require.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.13",
+      "title": "Labelling of information",
+      "statement": "Information is labelled according to the classification scheme in use.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.14",
+      "title": "Information transfer",
+      "statement": "Rules, procedures or agreements protect information in every kind of transfer, inside the organization and to others.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.15",
+      "title": "Access control",
+      "statement": "Rules to control physical and logical access to information and assets are set and applied from business and security requirements.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.16",
+      "title": "Identity management",
+      "statement": "The whole life cycle of identities is managed.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.17",
+      "title": "Authentication information",
+      "statement": "The allocation and handling of authentication information is controlled by a process that includes advising people how to handle it.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.18",
+      "title": "Access rights",
+      "statement": "Rights of access to information and assets are provided, reviewed, changed and removed according to the access control rules.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.19",
+      "title": "Security in supplier relationships",
+      "statement": "The organization sets and applies processes to manage the security risks of using suppliers' products and services.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.20",
+      "title": "Security in supplier agreements",
+      "statement": "Security requirements are set and agreed with each supplier according to the kind of relationship.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.21",
+      "title": "Security in the supply chain of information and communication technology",
+      "statement": "The organization manages the security risks in the supply chain of products and services of information and communication technology.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.22",
+      "title": "Monitoring and change of supplier services",
+      "statement": "The organization regularly monitors, reviews and evaluates changes in suppliers' security practices and service delivery.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.23",
+      "title": "Security for the use of cloud services",
+      "statement": "Acquisition, use, management and exit from cloud services follow the organization's security requirements.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.24",
+      "title": "Planning and preparing for incident management",
+      "statement": "The organization plans and prepares for incidents by defining, establishing and communicating a process, roles and responsibilities.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.25",
+      "title": "Assessing and deciding on events",
+      "statement": "The organization assesses security events and decides whether they are incidents.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.26",
+      "title": "Responding to incidents",
+      "statement": "Incidents are responded to according to the documented procedures.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.27",
+      "title": "Learning from incidents",
+      "statement": "Knowledge gained from incidents is used to strengthen and improve the controls.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.28",
+      "title": "Collecting evidence",
+      "statement": "The organization sets and applies procedures to identify, collect, acquire and preserve evidence related to security events.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.29",
+      "title": "Security during disruption",
+      "statement": "The organization plans how to keep security at an appropriate level during a disruption.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.30",
+      "title": "Readiness of information and communication technology for continuity",
+      "statement": "Readiness is planned, implemented, maintained and tested against business continuity objectives and the requirements for the technology.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.31",
+      "title": "Legal, statutory, regulatory and contractual requirements",
+      "statement": "The requirements that bear on security, and the way the organization meets them, are identified, documented and kept up to date.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.32",
+      "title": "Intellectual property rights",
+      "statement": "The organization implements procedures to protect intellectual property rights.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.33",
+      "title": "Protection of records",
+      "statement": "Records are protected from loss, destruction, falsification, unauthorized access and release.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.34",
+      "title": "Privacy and protection of personal information",
+      "statement": "The organization identifies and meets the requirements on the preservation of privacy and the protection of personal information under the law and contracts.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.35",
+      "title": "Independent review of information security",
+      "statement": "The organization's approach to managing security and its implementation is reviewed independently at planned intervals and when significant changes occur.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.36",
+      "title": "Compliance with policies, rules and standards",
+      "statement": "Compliance with the organization's policies, topic-specific policies, rules and standards is regularly reviewed.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.5.37",
+      "title": "Documented operating procedures",
+      "statement": "Operating procedures are documented and made available to the personnel who need them.",
+      "family": "organizational"
+    },
+    {
+      "id": "A.6.1",
+      "title": "Screening",
+      "statement": "Background checks on candidates are carried out before they join and on an ongoing basis, in proportion to the law, the business needs, the classification of information and the risks.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.2",
+      "title": "Terms and conditions of employment",
+      "statement": "Employment agreements state the personnel's and the organization's security responsibilities.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.3",
+      "title": "Awareness, education and training",
+      "statement": "Personnel and relevant parties get suitable awareness, education and training and regular updates of the policies and procedures relevant to their role.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.4",
+      "title": "Disciplinary process",
+      "statement": "A disciplinary process is formalized and communicated to act against personnel who commit a security policy violation.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.5",
+      "title": "Responsibilities after termination or change",
+      "statement": "Security responsibilities and duties that remain valid after termination or change of employment are defined, enforced and communicated.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.6",
+      "title": "Confidentiality or non-disclosure agreements",
+      "statement": "Agreements that reflect the organization's needs to protect information are identified, documented, reviewed and signed.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.7",
+      "title": "Remote working",
+      "statement": "Security measures are in place when personnel work remotely to protect information accessed, processed or stored outside the premises.",
+      "family": "people"
+    },
+    {
+      "id": "A.6.8",
+      "title": "Reporting of security events",
+      "statement": "The organization provides a mechanism for personnel to report observed or suspected security events promptly through appropriate channels.",
+      "family": "people"
+    },
+    {
+      "id": "A.7.1",
+      "title": "Physical security perimeters",
+      "statement": "Perimeters are defined and used to protect areas that hold information and assets.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.2",
+      "title": "Physical entry",
+      "statement": "Secure areas are protected by entry controls and access points.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.3",
+      "title": "Securing offices, rooms and facilities",
+      "statement": "Physical security for offices, rooms and facilities is designed and implemented.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.4",
+      "title": "Physical security monitoring",
+      "statement": "Premises are continuously monitored for unauthorized physical access.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.5",
+      "title": "Protecting against physical and environmental threats",
+      "statement": "Protection against physical and environmental threats, such as natural disasters and deliberate or accidental ones, is designed and implemented.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.6",
+      "title": "Working in secure areas",
+      "statement": "Security measures for working in secure areas are designed and implemented.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.7",
+      "title": "Clear desk and clear screen",
+      "statement": "Rules for a clear desk for papers and removable media and a clear screen for information processing facilities are defined and enforced.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.8",
+      "title": "Equipment siting and protection",
+      "statement": "Equipment is sited securely and protected.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.9",
+      "title": "Security of assets off premises",
+      "statement": "Off-site assets are protected.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.10",
+      "title": "Storage media",
+      "statement": "Storage media are managed through their life cycle of acquisition, use, transportation and disposal in line with the classification and handling rules.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.11",
+      "title": "Supporting utilities",
+      "statement": "Information processing facilities are protected from power failures and other disruptions caused by failures in supporting utilities.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.12",
+      "title": "Cabling security",
+      "statement": "Cables carrying power, data or supporting services are protected from interception, interference or damage.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.13",
+      "title": "Equipment maintenance",
+      "statement": "Equipment is maintained correctly so that information stays available, whole and confidential.",
+      "family": "physical"
+    },
+    {
+      "id": "A.7.14",
+      "title": "Secure disposal or re-use of equipment",
+      "statement": "Items of equipment that hold storage media are checked so that sensitive data and licensed software are removed or securely overwritten before disposal or re-use.",
+      "family": "physical"
+    },
+    {
+      "id": "A.8.1",
+      "title": "User endpoint devices",
+      "statement": "Information stored on, processed by or accessible through user endpoint devices is protected.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.2",
+      "title": "Privileged access rights",
+      "statement": "The allocation and use of privileged access rights is restricted and managed.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.3",
+      "title": "Restriction of access to information",
+      "statement": "Access to information and other associated assets is restricted according to the access control policy.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.4",
+      "title": "Access to source code",
+      "statement": "Read and write access to source code, development tools and software libraries is appropriately managed.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.5",
+      "title": "Secure authentication",
+      "statement": "Secure authentication technologies and procedures are implemented according to access restrictions and the access control policy.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.6",
+      "title": "Capacity management",
+      "statement": "The use of resources is monitored and adjusted in line with current and expected capacity requirements.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.7",
+      "title": "Protection against malware",
+      "statement": "Protection against malware is implemented and supported by appropriate user awareness.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.8",
+      "title": "Management of technical vulnerabilities",
+      "statement": "Information about technical vulnerabilities of systems in use is obtained, the organization's exposure is evaluated and appropriate measures are taken.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.9",
+      "title": "Configuration management",
+      "statement": "Configurations, including security configurations, of hardware, software, services and networks are established, documented, implemented, monitored and reviewed.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.10",
+      "title": "Deletion of information",
+      "statement": "Information stored in systems, devices or any other storage media is deleted when no longer required.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.11",
+      "title": "Data masking",
+      "statement": "Data masking is used in accordance with the access control policy and other related policies and business requirements, taking legislation into consideration.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.12",
+      "title": "Prevention of data leakage",
+      "statement": "Measures to prevent data leakage are applied to systems, networks and any other devices that process, store or transmit sensitive information.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.13",
+      "title": "Backup of information",
+      "statement": "Backup copies of information, software and systems are maintained and regularly tested in line with the agreed backup policy.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.14",
+      "title": "Redundancy of information processing facilities",
+      "statement": "Information processing facilities are implemented with enough redundancy to meet availability requirements.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.15",
+      "title": "Logging",
+      "statement": "Logs that record activities, exceptions, faults and other relevant events are produced, stored, protected and analysed.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.16",
+      "title": "Monitoring activities",
+      "statement": "Networks, systems and applications are monitored for anomalous behaviour and appropriate action is taken to evaluate potential incidents.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.17",
+      "title": "Clock synchronization",
+      "statement": "The clocks of information processing systems used by the organization are synchronized to approved time sources.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.18",
+      "title": "Use of privileged utility programs",
+      "statement": "The use of utility programs that can override system and application controls is restricted and tightly controlled.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.19",
+      "title": "Installation of software on operational systems",
+      "statement": "Procedures and measures are implemented to manage the installation of software on operational systems securely.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.20",
+      "title": "Security of networks",
+      "statement": "Networks and network devices are secured, managed and controlled to protect information in systems and applications.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.21",
+      "title": "Security of network services",
+      "statement": "Security mechanisms, service levels and service requirements of network services are identified, implemented and monitored.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.22",
+      "title": "Segregation of networks",
+      "statement": "Groups of information services, users and information systems are segregated in the organization's networks.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.23",
+      "title": "Web filtering",
+      "statement": "Access to external websites is managed to reduce exposure to malicious content.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.24",
+      "title": "Use of cryptography",
+      "statement": "Rules for the effective use of cryptography, including cryptographic key management, are defined and implemented.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.25",
+      "title": "Secure development life cycle",
+      "statement": "Rules for the secure development of software and systems are established and applied.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.26",
+      "title": "Application security requirements",
+      "statement": "Security requirements are identified, specified and approved when developing or acquiring applications.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.27",
+      "title": "Secure system architecture and engineering principles",
+      "statement": "Principles for engineering secure systems are established, documented, maintained and applied to any development activities.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.28",
+      "title": "Secure coding",
+      "statement": "Secure coding principles are applied to software development.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.29",
+      "title": "Security testing in development and acceptance",
+      "statement": "Security testing processes are defined and implemented in the development life cycle.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.30",
+      "title": "Outsourced development",
+      "statement": "The organization directs, monitors and reviews the activities related to outsourced system development.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.31",
+      "title": "Separation of development, test and production environments",
+      "statement": "Development, testing and production environments are separated and secured.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.32",
+      "title": "Change management",
+      "statement": "Changes to information processing facilities and information systems follow change management procedures.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.33",
+      "title": "Test information",
+      "statement": "Test information is appropriately selected, protected and managed.",
+      "family": "technological"
+    },
+    {
+      "id": "A.8.34",
+      "title": "Protection of systems during audit testing",
+      "statement": "Audit tests and other assurance activities involving assessment of operational systems are planned and agreed between the tester and the appropriate management.",
+      "family": "technological"
+    }
+  ],
+  "publisher": "International Organization for Standardization (ISO) and International Electrotechnical Commission (IEC)",
+  "source": "https://www.iso.org/standard/27001"
+}

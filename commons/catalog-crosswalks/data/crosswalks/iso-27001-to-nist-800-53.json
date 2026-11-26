@@ -1,0 +1,1524 @@
+{
+  "kind": "grc.crosswalk",
+  "schema": "1",
+  "id": "iso-27001-to-nist-800-53",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-crosswalks",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/soc2.ts",
+      "src/governance/iso.ts",
+      "src/governance/hipaa.ts"
+    ]
+  },
+  "mappings": [
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-20",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.10",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.11",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.11",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.12",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.13",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.13",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.14",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-21",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.14",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.14",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.16",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.16",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.17",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.18",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.18",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.18",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.19",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.19",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.19",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.20",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.20",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.20",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.21",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.21",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.21",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.22",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.22",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.23",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.23",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.24",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.24",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.24",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.25",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.25",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.26",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.26",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.27",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.27",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.28",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.28",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.29",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.29",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.30",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.30",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.30",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.31",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.31",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.32",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.33",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-18",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:nist-800-53:5.2.0:PT-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.34",
+      "to": "urn:grc:nist-800-53:5.2.0:PT-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.35",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.35",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.36",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.36",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.37",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.37",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.4",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.4",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.5",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-15",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.6",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-15",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.6",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.7",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.7",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.7",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.8",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.8",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.9",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.5.9",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AT-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.4",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.6",
+      "to": "urn:grc:nist-800-53:5.2.0:PS-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.7",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.7",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-19",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.7",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.6.8",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.1",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.11",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.11",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.11",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.12",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.12",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.13",
+      "to": "urn:grc:nist-800-53:5.2.0:MA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.13",
+      "to": "urn:grc:nist-800-53:5.2.0:MA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.13",
+      "to": "urn:grc:nist-800-53:5.2.0:MA-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.14",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.14",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.2",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.3",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.3",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.4",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.4",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-14",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-15",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-18",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.5",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.6",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.6",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.7",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.7",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.8",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-18",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.8",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.9",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.7.9",
+      "to": "urn:grc:nist-800-53:5.2.0:PE-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.1",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-19",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.1",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-28",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.10",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.10",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.11",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-19",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.12",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.12",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.12",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.13",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.14",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.14",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.14",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.15",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.16",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.16",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.16",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.17",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the control are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.18",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.18",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.19",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.19",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.19",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.2",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.2",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.20",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.20",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.21",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.21",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.22",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.22",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.23",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.23",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.24",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.24",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.24",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-15",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.25",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.26",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.26",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.27",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.27",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.28",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.29",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.29",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.30",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.31",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.31",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.32",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.32",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.32",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.33",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.33",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.34",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.34",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.4",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.5",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.5",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.5",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.5",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.6",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.6",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.6",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.7",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.7",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.8",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.8",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.8",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.9",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.9",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:iso-27001:2022:A.8.9",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the control and the controls are about the same matter, as the names of the two sides say; the published mapping has not been read, so a person decides whether this pair holds and how strongly"
+    }
+  ]
+}

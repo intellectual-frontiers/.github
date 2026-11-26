@@ -9,7 +9,8 @@
       "version": "1"
     },
     "inputs": [
-      "src/governance/criteria.ts"
+      "src/governance/criteria.ts",
+      "src/governance/focus.ts"
     ]
   },
   "version": "2017",
@@ -26,13 +27,24 @@
       "kind": "grc.framework",
       "id": "soc2-tsc",
       "file": "frameworks/soc2-tsc-2017.json",
-      "digest": "f651a7072dd4e4e2d817afd44dea0a6a09bd165b06ac4ef008b5d23a1f286685"
+      "digest": "e3b9667f9d6135ccb8e3581cc50cbbc4f15bd57e59ab5c6fdb168eb3bd873acc"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "soc2-focus",
+      "file": "frameworks/soc2-focus-2017.json",
+      "digest": "393b13a1190e9360e1372e8a1789e6351ed652c7641840fad3dcc3599a91e726"
     }
   ],
   "sources": [
     {
       "url": "src/governance/criteria.ts",
       "sha256": "d2f5f4d90e0003b238022b54cede961c863fb13e8256ba629c1b878a7697e42c"
+    },
+    {
+      "url": "src/governance/focus.ts",
+      "sha256": "38dd79b4c24527e0644417f4e3b2358068b6bf918a26582663ceafef816154ee"
     }
-  ]
+  ],
+  "notice": "The points of focus the AICPA prints under each criterion are not carried and were not read. The framework soc2-focus is our own list of what an organization shows for each criterion; it is not a reading of the points of focus, and a person who holds the AICPA's publication decides which of its points of focus a matter answers."
 }

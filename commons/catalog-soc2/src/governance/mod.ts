@@ -5,4 +5,5 @@
  * @module
  */
 export * from "./criteria.ts";
+export * from "./focus.ts";
 export * from "./source.ts";

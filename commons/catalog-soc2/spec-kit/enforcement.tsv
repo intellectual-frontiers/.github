@@ -8,3 +8,8 @@ requirement	mechanism	by	note
 0002-soc2-package FR-003	check	.github: cd commons/catalog-soc2 && bun run verify	suite/soc2.test.ts
 0002-soc2-package FR-004	check	.github: cd commons/catalog-soc2 && bun run verify	suite/soc2.test.ts
 0002-soc2-package FR-005	check	.github: cd commons/catalog-soc2 && bun run verify	suite/soc2.test.ts
+0003-soc2-focus FR-001	check	.github: cd commons/catalog-soc2 && bun run verify	suite/focus.test.ts
+0003-soc2-focus FR-002	check	.github: cd commons/catalog-soc2 && bun run verify	suite/focus.test.ts
+0003-soc2-focus FR-003	check	.github: cd commons/catalog-soc2 && bun run verify	suite/focus.test.ts
+0003-soc2-focus FR-004	check	.github: cd commons/catalog-soc2 && bun run verify	suite/focus.test.ts
+0003-soc2-focus FR-005	check	.github: cd commons/catalog-soc2 && bun run verify	suite/focus.test.ts

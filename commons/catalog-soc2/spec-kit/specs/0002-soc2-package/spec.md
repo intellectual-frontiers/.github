@@ -13,7 +13,7 @@
 - **FR-002**: The manifest MUST record the publication the identifiers refer to (publisher, edition, address), the SHA-256 of the source file the package was made from, the licence wording, and that the content may be redistributed; the package MUST load through `readCatalogPackage` of grc with no problem.
 - **FR-003**: The package MUST be made by `tools/generate.ts` from `src/governance/criteria.ts` and never edited by hand; `--check` MUST find any file of the package that differs from what the source gives, including a source whose digest is not the one recorded.
 - **FR-004**: The conversion MUST be a pure function of the criteria: the same criteria give the same documents, byte for byte, with no clock and no network; the conversion MUST say which identifier a source repeats, and the package MUST NOT be made from a source that repeats one.
-- **FR-005**: The package MUST NOT carry text of the AICPA's publication: the titles and statements are our own reading, the licence wording MUST say so, and no statement may be a sentence the publication prints (the points of focus and illustrative controls are not carried at all).
+- **FR-005**: The package MUST NOT carry text of the AICPA's publication: the titles and statements are our own reading, the licence wording MUST say so, and no statement may be a sentence the publication prints (the points of focus and illustrative controls are not carried at all; commons catalog-soc2 0003-soc2-focus holds our own list of what an organization shows, which is not them).
 
 ## Acceptance scenarios
 

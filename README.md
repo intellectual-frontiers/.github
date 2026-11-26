@@ -124,6 +124,9 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/scanners`](commons/scanners) | Program | Runs security scanners (a built-in TLS and header check, nuclei, nmap, trivy, grype, semgrep, checkov and ZAP's baseline scan) the safe way | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/ssh-server`](commons/ssh-server) | Program | The SSH server of enrollment, built in three layers (Kanon) | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/toolchain`](https://www.npmjs.com/package/@intellectual-frontiers/toolchain) | Program | A Kanon library of the tools a computer needs | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/catalog-crosswalks`](commons/catalog-crosswalks) | Standard | Crosswalks between frameworks as grc catalog packages | layers | L1 | GitHub |
+| [`@intellectual-frontiers/catalog-hipaa`](commons/catalog-hipaa) | Standard | The HIPAA Security Rule as a grc catalog package | layers | L1 | GitHub |
+| [`@intellectual-frontiers/catalog-iso27001`](commons/catalog-iso27001) | Standard | ISO/IEC 27001:2022 as a grc catalog package | layers | L1 | GitHub |
 | [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/catalog-soc2`](commons/catalog-soc2) | Standard | SOC 2 Trust Services Criteria as a grc catalog package | layers | L1 | not released (owner-blocked) |
