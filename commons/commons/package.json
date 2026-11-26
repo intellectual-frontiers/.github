@@ -1,7 +1,7 @@
 {
   "name": "@intellectual-frontiers/commons",
   "private": true,
-  "version": "0.35.0",
+  "version": "0.36.0",
   "description": "Every library of commons as one package (single distribution), or the metapackage of the set (per-library distribution): the folder that packs it.",
   "type": "module",
   "engines": {
