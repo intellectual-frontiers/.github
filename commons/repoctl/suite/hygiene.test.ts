@@ -138,6 +138,23 @@ proves(["0007-repoctl-hygiene FR-003", "0036-distribution FR-011"], "bun.lock an
   assertEquals(relativeImports(`import a from "./a.ts"; export * from "../b"; const c = await import("${far}"); import d from "pkg"; require("./e.cjs");`), ["./a.ts", "../b", far, "./e.cjs"]);
 });
 
+proves(["0007-repoctl-hygiene FR-008"], "each consumer workspace may pin its own version of commons, and only two versions within one consumer's tree are a duplicate", () => {
+  const ws = (name: string): { path: string; name: string; dependencies: [] } => ({ path: `services/${name}/package.json`, name, dependencies: [] });
+  const packages = [{ path: "package.json", name: "root", dependencies: [] as const }, ws("a"), ws("b"), ws("c")];
+  const facts = (l: ReturnType<typeof parseBunLock> | ReturnType<typeof parseNpmLock>): HygieneFacts => ({ ...none, packages, workspaces: ["services/*"], locks: [l] });
+  const entry = (v: string): string => `["${CORE}@${v}", "", {}, "sha512-x"]`;
+  const bun = parseBunLock(`{ "packages": { "${CORE}": ${entry("0.17.0")}, "a/${CORE}": ${entry("0.16.0")}, "b/${CORE}": ${entry("0.15.0")}, "c/${CORE}": ${entry("0.17.0")} } }`, "bun.lock", POLICY.scope);
+  assertEquals(hygiene(facts(bun), POLICY).map((f) => f.code), []);
+  const npm = parseNpmLock(JSON.stringify({ packages: { [`node_modules/${CORE}`]: { version: "0.17.0" }, [`services/a/node_modules/${CORE}`]: { version: "0.16.0" }, [`services/b/node_modules/${CORE}`]: { version: "0.15.0" } } }), "package-lock.json", POLICY.scope);
+  assertEquals(hygiene(facts(npm), POLICY).map((f) => f.code), []);
+  const within = parseNpmLock(JSON.stringify({ packages: { [`services/a/node_modules/${CORE}`]: { version: "0.16.0" }, [`services/a/node_modules/x/node_modules/${CORE}`]: { version: "0.15.0" } } }), "package-lock.json", POLICY.scope);
+  const found = hygiene(facts(within), POLICY);
+  assertEquals(found.map((f) => f.code), ["E-HYGIENE-DUPLICATE"]);
+  assertStringIncludes(found[0]?.message ?? "", "for services/a");
+  const top = parseBunLock(`{ "packages": { "${CORE}": ${entry("0.17.0")}, "x/${CORE}": ${entry("0.16.0")} } }`, "bun.lock", POLICY.scope);
+  assertEquals(hygiene(facts(top), POLICY).map((f) => f.code), ["E-HYGIENE-DUPLICATE"]);
+});
+
 /** A repository on disk: a consumer with every way of breaking the rule, and what it installed. */
 async function broken(dir: string): Promise<void> {
   await put(dir, "package.json", JSON.stringify({ name: "app", dependencies: { [CORE]: "github:intellectual-frontiers/.github#abc", "@intellectual-frontiers/net": "link:../commons/net", "@intellectual-frontiers/kanon": "^0.2.1" } }));

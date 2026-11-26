@@ -404,9 +404,9 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-HYGIENE-DUPLICATE": {
     title: "Two installed copies of one library",
-    what: "The lockfile or node_modules holds one package of the policy's scope at two versions.",
-    why: "Two dependencies ask for different versions of it, or one is pinned and another is a range.",
-    fix: "pin one version with overrides in package.json and install again",
+    what: "The lockfile or node_modules holds one package of the policy's scope at two versions within the tree of one consumer (the top of the tree, or one workspace).",
+    why: "Two dependencies of that consumer ask for different versions of it, or one is pinned and another is a range. Two workspaces that pin their own versions are not a duplicate.",
+    fix: "pin one version with overrides in the package.json of that consumer and install again",
   },
   "E-HYGIENE-RANGE": {
     title: "A dependency that is not an exact version",

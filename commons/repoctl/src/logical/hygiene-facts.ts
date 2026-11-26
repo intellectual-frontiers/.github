@@ -61,7 +61,7 @@ export function parseBunLock(source: string, file: string, scope: string): LockF
     if (head === undefined || at <= 0) continue;
     const name = head.slice(0, at);
     const version = head.slice(at + 1);
-    if (name.startsWith(scope) && /^\d/.test(version)) add(copies, name, { version, where: `${file}: ${key}` });
+    if (name.startsWith(scope) && /^\d/.test(version)) add(copies, name, { version, where: `${file}: ${key}`, owner: key.endsWith(`/${name}`) ? key.slice(0, key.length - name.length - 1).split("/node_modules/")[0] ?? "" : "" });
   }
   return { kind: "read", file, copies };
 }
@@ -81,7 +81,7 @@ export function parseNpmLock(source: string, file: string, scope: string): LockF
     if (at < 0) continue;
     const name = key.slice(at + "node_modules/".length);
     const version = text(record(value)["version"]);
-    if (name.startsWith(scope) && version !== undefined) add(copies, name, { version, where: `${file}: ${key}` });
+    if (name.startsWith(scope) && version !== undefined) add(copies, name, { version, where: `${file}: ${key}`, owner: at > 0 ? key.slice(0, at).split("node_modules/")[0]?.replace(/\/$/, "") ?? "" : "" });
   }
   return { kind: "read", file, copies };
 }
