@@ -113,7 +113,7 @@ proves(["0014-grc-sshsig FR-005"], "the fingerprint is OpenSSH's, a signature ma
 const N = (n: string): string => `0017-grc-sshsig-namespace ${n}`;
 
 proves([N("FR-002")], "a namespace is made only by parseNamespace, which refuses an empty text, a space, a comma, a control character and a text over 64; the known ones are one table", () => {
-  assertEquals([...NAMESPACES], ["grc-evidence", "ifc-telemetry"]);
+  assertEquals([...NAMESPACES], ["grc-evidence", "ifc-telemetry", "ifc-approval"]);
   for (const bad of ["", "a b", "a,b", "a\nb", "x".repeat(65)]) assertEquals(parseNamespace(bad).kind, "err");
   assertEquals(parseNamespace("ifc-telemetry").kind, "ok");
 });

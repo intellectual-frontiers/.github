@@ -16,13 +16,14 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { pae } from "@intellectual-frontiers/crypto/dsse";
 import { proc } from "@intellectual-frontiers/system";
+import type { SignatureFacts } from "@intellectual-frontiers/grc/logical";
 import type { Envelope, SignProblem, Signer } from "@intellectual-frontiers/grc/physical";
 
 /** The namespace of the evidence of grc: a signature made for something else does not verify here. */
 export const NAMESPACE = "grc-evidence";
 
 /** The known namespaces, one closed table (0017-grc-sshsig-namespace FR-002). */
-export const NAMESPACES = ["grc-evidence", "ifc-telemetry"] as const;
+export const NAMESPACES = ["grc-evidence", "ifc-telemetry", "ifc-approval"] as const;
 
 /** A namespace, made only by `parseNamespace`. */
 export type Namespace = string & { readonly "@grc/namespace": true };
@@ -95,7 +96,7 @@ export { pae };
 /** The blob of a public key line, or why not. */
 function keyBlob(line: string): Result<Uint8Array, string> {
   const parts = line.trim().split(/\s+/);
-  if (parts.length < 2 || parts[0] !== "ssh-ed25519") return err(`${parts[0] ?? "this"} is not a key type that is verified: only ssh-ed25519`);
+  if (parts.length < 2 || (parts[0] !== "ssh-ed25519" && parts[0] !== SK_ED25519)) return err(`${parts[0] ?? "this"} is not a key type that is verified: only ssh-ed25519 and ${SK_ED25519} (ecdsa-sk and the rest are not verified)`);
   const blob = unb64(parts[1] ?? "");
   return blob === undefined ? err("the public key is not base64") : ok(blob);
 }
@@ -108,10 +109,13 @@ export async function fingerprintOf(publicKey: string): Promise<Result<string, s
   return ok(`SHA256:${b64(h).replace(/=+$/, "")}`);
 }
 
+/** The key type of an Ed25519 key held in a FIDO2 token (PROTOCOL.u2f of OpenSSH): its signature carries the flags and the counter the token wrote. */
+export const SK_ED25519 = "sk-ssh-ed25519@openssh.com";
+
 const ARMOR_BEGIN = "-----BEGIN SSH SIGNATURE-----";
 const ARMOR_END = "-----END SSH SIGNATURE-----";
 
-type Parsed = { readonly publicKey: Uint8Array; readonly namespace: string; readonly hash: string; readonly signature: Uint8Array };
+type Parsed = { readonly publicKey: Uint8Array; readonly namespace: string; readonly hash: string; readonly signature: Uint8Array; readonly type: string; readonly flags?: number; readonly counter?: number };
 
 function parseSignature(armored: string): Result<Parsed, string> {
   const lines = armored.trim().split("\n").map((l) => l.trim());
@@ -128,11 +132,21 @@ function parseSignature(armored: string): Result<Parsed, string> {
   const hash = w.string();
   const sig = w.string();
   if (version !== 1 || publicKey === undefined || namespace === undefined || reserved === undefined || hash === undefined || sig === undefined) return err("the signature is not of the format of version 1");
+  if (w.at !== blob.length) return err("the signature has bytes after its last field");
   const inner = new Wire(sig);
   const type = inner.string();
   const raw = inner.string();
-  if (type === undefined || raw === undefined || new TextDecoder().decode(type) !== "ssh-ed25519" || raw.length !== 64) return err("only ssh-ed25519 signatures are verified");
-  return ok({ publicKey, namespace: new TextDecoder().decode(namespace), hash: new TextDecoder().decode(hash), signature: raw });
+  if (type === undefined || raw === undefined || raw.length !== 64) return err("only ssh-ed25519 and sk-ssh-ed25519 signatures are verified");
+  const name = new TextDecoder().decode(type);
+  const base = { publicKey, namespace: new TextDecoder().decode(namespace), hash: new TextDecoder().decode(hash), signature: raw, type: name };
+  if (name === "ssh-ed25519") return inner.at === sig.length ? ok(base) : err("the signature has bytes after its last field");
+  if (name !== SK_ED25519) return err("only ssh-ed25519 and sk-ssh-ed25519 signatures are verified");
+  const flags = inner.b[inner.at];
+  inner.at += 1;
+  const counter = inner.u32();
+  if (flags === undefined || counter === undefined) return err("the signature of a token has no flags and counter");
+  if (inner.at !== sig.length) return err("the signature has bytes after its last field");
+  return ok({ ...base, flags, counter });
 }
 
 async function hashOf(algorithm: string, message: Uint8Array): Promise<Uint8Array | undefined> {
@@ -140,7 +154,9 @@ async function hashOf(algorithm: string, message: Uint8Array): Promise<Uint8Arra
   return name === undefined ? undefined : new Uint8Array(await crypto.subtle.digest(name, new Uint8Array(message)));
 }
 
-async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKey, namespace: string): Promise<Result<void, SignProblem>> {
+export type { SignatureFacts };
+
+async function verifyFacts(armored: string, message: Uint8Array, key: VerifyKey, namespace: string): Promise<Result<SignatureFacts, SignProblem>> {
   const parsed = parseSignature(armored);
   if (parsed.kind === "err") return err({ kind: "signature", message: parsed.error });
   const trusted = keyBlob(key.publicKey);
@@ -151,12 +167,39 @@ async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKe
   if (digest === undefined) return err({ kind: "signature", message: `the hash ${parsed.value.hash} is not sha256 or sha512` });
   const data = concat(enc.encode("SSHSIG"), str(enc.encode(namespace)), str(new Uint8Array()), str(enc.encode(parsed.value.hash)), str(digest));
   const raw = new Wire(trusted.value);
-  raw.string();
+  const blobType = raw.string();
   const pub = raw.string();
   if (pub === undefined || pub.length !== 32) return err({ kind: "key", message: "the public key is not an Ed25519 key" });
+  const isSk = parsed.value.type === SK_ED25519;
+  if (isSk !== (blobType !== undefined && new TextDecoder().decode(blobType) === SK_ED25519)) return err({ kind: "key", message: "the kind of the key and the kind of the signature differ" });
+  let signed: Uint8Array = data;
+  if (isSk) {
+    const application = raw.string();
+    if (application === undefined) return err({ kind: "key", message: "the public key of a token has no application" });
+    const sha = async (b: Uint8Array): Promise<Uint8Array> => new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array(b)));
+    signed = concat(await sha(application), new Uint8Array([parsed.value.flags ?? 0]), u32(parsed.value.counter ?? 0), await sha(data));
+  }
   const cryptoKey = await crypto.subtle.importKey("raw", new Uint8Array(pub), { name: "Ed25519" }, false, ["verify"]);
-  const good = await crypto.subtle.verify({ name: "Ed25519" }, cryptoKey, new Uint8Array(parsed.value.signature), new Uint8Array(data));
-  return good ? ok(undefined) : err({ kind: "signature", message: "the signature does not verify" });
+  const good = await crypto.subtle.verify({ name: "Ed25519" }, cryptoKey, new Uint8Array(parsed.value.signature), new Uint8Array(signed));
+  if (!good) return err({ kind: "signature", message: "the signature does not verify" });
+  return ok(isSk ? { keyType: SK_ED25519, flags: { userPresent: ((parsed.value.flags ?? 0) & 1) !== 0, userVerified: ((parsed.value.flags ?? 0) & 4) !== 0 }, counter: parsed.value.counter ?? 0 } : { keyType: "ssh-ed25519" });
+}
+
+async function verifyArmored(armored: string, message: Uint8Array, key: VerifyKey, namespace: string): Promise<Result<void, SignProblem>> {
+  const r = await verifyFacts(armored, message, key, namespace);
+  return r.kind === "ok" ? ok(undefined) : r;
+}
+
+/** A signature verified, with what it says of itself: the kind of key and, for a token, the flags and counter (spec 0020-grc-approval FR-013). Pure, with Web Crypto. */
+export function verifySshsigFacts(armored: string, message: Uint8Array, publicKey: string, namespace: string): Promise<Result<SignatureFacts, SignProblem>> {
+  return verifyFacts(armored, message, { publicKey }, namespace);
+}
+
+/** The line of the public key that made an armored signature (`ssh-ed25519 AAAA...`), or why the signature cannot be read. */
+export function signerLineOf(armored: string): Result<string, string> {
+  const parsed = parseSignature(armored);
+  if (parsed.kind === "err") return parsed;
+  return ok(`${parsed.value.type === SK_ED25519 ? SK_ED25519 : "ssh-ed25519"} ${b64(parsed.value.publicKey)}`);
 }
 
 /** A signature verified without a program, for a message that is not the encoding of DSSE (the bytes of a Git object, for instance): the armored signature, the message, the public key line and the namespace it must be in. */
@@ -199,3 +242,13 @@ export function sshsigSignerFor(namespace: Namespace | typeof NAMESPACE): Signer
 
 /** The `sshsig` signer of the evidence of grc, in the namespace `grc-evidence`. */
 export const sshsigSigner: Signer = sshsigSignerFor(NAMESPACE);
+
+/** The verifier that the registry of keys and the approvals take as their port (spec 0020-grc-approval FR-013): the fingerprint of a key line, the key line that signed, and the verification with its facts. */
+export const approvalVerifier = {
+  fingerprint: fingerprintOf,
+  signerOf: (armored: string): Promise<Result<string, string>> => Promise.resolve(signerLineOf(armored)),
+  async verify(armored: string, message: Uint8Array, publicKey: string, namespace: string): Promise<Result<SignatureFacts, string>> {
+    const r = await verifyFacts(armored, message, { publicKey }, namespace);
+    return r.kind === "ok" ? r : err(r.error.message);
+  },
+};

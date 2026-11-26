@@ -157,3 +157,27 @@ requirement	mechanism	by	note
 0019-grc-access-decision FR-005	check	.github: cd commons/grc && bun test suite/	access-decision.test.ts
 0019-grc-access-decision FR-006	check	.github: cd commons/grc && bun test suite/	access-decision.test.ts
 0019-grc-access-decision FR-007	check	.github: cd commons/grc && bun test suite/	access-decision.test.ts
+0020-grc-approval FR-001	check	.github: cd commons/grc && bun test suite/	approval.test.ts: statements are decoded and refused
+0020-grc-approval FR-002	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the namespace and the signature of a statement
+0020-grc-approval FR-003	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the request and its threshold
+0020-grc-approval FR-004	check	.github: cd commons/grc && bun test suite/	approval.test.ts: a signed statement approves; the refusals have codes
+0020-grc-approval FR-005	check	.github: cd commons/grc && bun test suite/	approval.test.ts: mismatches name what differs
+0020-grc-approval FR-006	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the window, the lifetime and the skew
+0020-grc-approval FR-007	check	.github: cd commons/grc && bun test suite/	approval.test.ts: a replayed nonce is refused
+0020-grc-approval FR-008	check	.github: cd commons/grc && bun test suite/	approval.test.ts: unknown, not yet valid, ended and revoked keys
+0020-grc-approval FR-009	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the role
+0020-grc-approval FR-010	check	.github: cd commons/grc && bun test suite/	approval.test.ts: custody, presence and verification
+0020-grc-approval FR-011	check	.github: cd commons/grc && bun test suite/	approval.test.ts: distinct persons, threshold and proposer
+0020-grc-approval FR-012	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the result names approvers, nonces and counters
+0020-grc-approval FR-013	check	.github: cd commons/grc && bun test suite/	approval.test.ts: a token signature is verified; other types and namespaces refused
+0020-grc-approval FR-014	check	.github: cd commons/grc && bun test suite/	approval.test.ts: ecdsa-sk is refused saying it is not verified; the token signature is UNVERIFIED against a real device
+0020-grc-approval FR-015	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the registry is decoded and refused
+0020-grc-approval FR-016	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the chain rules
+0020-grc-approval FR-017	check	.github: cd commons/grc && bun test suite/	approval.test.ts: a replacing key and the one replaced
+0020-grc-approval FR-018	check	.github: cd commons/grc && bun test suite/	approval.test.ts: a version only adds
+0020-grc-approval FR-019	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the logical files import no program
+0020-grc-approval FR-020	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the signer is sshsig in ifc-approval
+0020-grc-approval FR-021	check	.github: cd commons/grc && bun test suite/	approval.test.ts: the binding
+0020-grc-approval FR-022	check	.github: cd commons/grc && bun test suite/	approval.test.ts: no private key material in the logical files
+0020-grc-approval FR-023	check	.github: cd commons/grc && bun test suite/	approval.test.ts: order and window laws
+0020-grc-approval FR-024	check	.github: cd commons/grc && bun test suite/	approval.test.ts: deterministic verification

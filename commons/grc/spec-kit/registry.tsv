@@ -18,3 +18,4 @@ number	slug	state
 0017	grc-sshsig-namespace	in force
 0018	grc-acceptance-attestation	in force
 0019	grc-access-decision	in force
+0020	grc-approval	in force

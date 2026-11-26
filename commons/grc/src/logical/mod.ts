@@ -6,6 +6,7 @@
  * @module
  */
 export * from "./access-decision.ts";
+export * from "./approval.ts";
 export * from "./as-of.ts";
 export * from "./assemble.ts";
 export * from "./canonical.ts";
@@ -14,6 +15,7 @@ export * from "./evaluate.ts";
 export * from "./group.ts";
 export * from "./kinds.ts";
 export * from "./ledger.ts";
+export * from "./person-keys.ts";
 export * from "./planned.ts";
 export * from "./serializer.ts";
 export * from "./standard-kinds.ts";
