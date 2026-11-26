@@ -14,7 +14,7 @@
 - **FR-010**: An act MUST record the actors that held these roles, and only these words MUST name them: `initiatedBy`, `preparedBy`, `assistedBy`, `executedBy`, `reviewedBy` and `approvedBy`. Where a flow is regulated, the record MUST name an initiator, an executor and a preparer, and the roles reviewer and approver as the flow requires. Relies on audit rows: A1.
 - **FR-011**: The library MUST enforce in its types which kind of actor may hold which role: the initiator MUST be a person or a directive owned by a person (FR-021); the reviewer and the approver MUST be persons; the executor MUST be a person or a system; the preparer MUST be any kind; the assistant MUST be an agent or a system. A program that builds an act with an agent as initiator, reviewer or approver MUST NOT type check, and a value that arrives from outside MUST be refused when it is decoded, with the error that names the role. Relies on audit rows: A1.
 - **FR-012**: The meaning of a signature on a regulated record MUST be one of `review`, `approval`, `responsibility` or `authorship`, recorded with the signer, the time and the record it is linked to; an actor of the kind agent MUST NOT hold a signature of any meaning, and a system MAY sign only a record that it made, with the meaning authorship. Relies on audit rows: A4.
-- **FR-013**: For a regulated act the reviewer MUST be a person who is not the preparer and who is not the person who tasked the agent that prepared the artifact (separation of duties, SP 800-53 AC-5); the approver MUST be a person with a key of their own (the approval specification of the platform names the signature); where the same person is initiator, reviewer and approver, the record MUST say so as a finding that a person with the authority accepts. Relies on audit rows: A4.
+- **FR-013**: For a regulated act the reviewer MUST be a person who is not the preparer and who is not the person who tasked the agent that prepared the artifact (separation of duties, SP 800-53 AC-5); the approver MUST be a person with a key of their own, whose signature `grc 0020-grc-approval` verifies against the registry of keys of persons; where the same person is initiator, reviewer and approver, the record MUST say so as a finding that a person with the authority accepts. Relies on audit rows: A4.
 - **FR-014**: The words that name what an agent did MUST be `prepared`, `assisted` and `drafted`. The words `wrote`, `completed`, `approved`, `signed`, `confirmed`, `initiated` and `owns` MUST NOT be used of an agent in a record, a rendering, a trailer or a document of the library, and a vocabulary lint MUST find them (FR-064). Relies on audit rows: A1.
 
 ## Directives
@@ -92,7 +92,7 @@
 
 ## Out of scope
 
-- The signature of an approval, the registry of keys of persons and the signing step: the approval specification of the platform and its worker own them; this specification states only that an agent holds no signature (FR-012).
+- The signature of an approval and the registry of keys of persons: `grc 0020-grc-approval` owns them; this specification adds the meaning of a signature and states that an agent holds none (FR-012).
 - The evidence side (source class, lineage and the prepared marker as an evidence state): `quality` quality 0001-quality-evidence FR-071 to FR-077.
 - Content credentials for media (C2PA): a later version.
 - Detecting the use of an agent by analysis of a text: refused by FR-065.
@@ -106,7 +106,7 @@
 ## Assumptions
 
 - Qualification evidence is produced by the same acceptance machinery as any other case (`test` and `validate`), so no second harness is needed.
-- The approval specification gives a person a key of their own; until it is built, FR-013 and FR-030 rest on the person's local signature and are marked so.
+- `grc 0020-grc-approval` gives a person a key of their own and a registry of keys; until a fleet declares the signed mode, FR-013 and FR-030 rest on the person's presence and are marked so.
 
 ## Open questions
 

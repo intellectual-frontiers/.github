@@ -89,7 +89,7 @@ All rows are from the catalog of this repository (`catalog-nist-sp800`, SP 800-5
 | Assistant | An agent or a system that operated a tool during a step, under a directive and a tasking. |
 | Executor | The person or the validated mechanism that carried the step out. |
 | Reviewer | A person, independent of the preparer for a regulated act, who read the artifact and signed that review, with the meaning review. |
-| Approver | A person with a key whose signature, with the meaning approval, bound the plan hash. See the approval specification. |
+| Approver | A person with a key whose signature, with the meaning approval, bound the plan hash. See `grc` 0020-grc-approval. |
 | Directive | A controlled instruction that an act is done under: a work order, a specification, a procedure, or a person's request kept by its digest; with an owner who is a person, a version and a digest. The instruction sets of an agent (AGENTS.md, CLAUDE.md, the system prompt) are directives, and their digest is part of what is recorded. |
 | Tasking | A person signed authority for an agent configuration: the scope (verbs, assets, boundaries), the tasking level, the expiry, the qualification it relies on, and its revocation. Tasking is not delegation: the person keeps the initiative and the accountability. |
 | Tasking level | T0 suggest; T1 prepare drafts in a branch or a sandbox; T2 assist execution with a per step plan hash approval; T3 assist reversible, low risk steps under a standing directive and a current qualification. At every level the initiator stays the owner of the directive and the executor stays the engine. |
