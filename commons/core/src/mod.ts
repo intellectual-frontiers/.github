@@ -19,6 +19,8 @@
  *
  * @module
  */
+export { argvFindings, argvStep } from "./argv.ts";
+export type { ArgvEvidence, ArgvStep } from "./argv.ts";
 export { absurd } from "./absurd.ts";
 export type { Brand } from "./brand.ts";
 export {
