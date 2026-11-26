@@ -40,8 +40,12 @@ pkg() {
     have brew || fail "Homebrew is not installed" "install it from https://brew.sh and run this again"
     brew install "$@"
   elif have apt-get; then
-    if (( APT_UPDATED == 0 )); then as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq; APT_UPDATED=1; fi
-    as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@"
+    local out
+    if (( APT_UPDATED == 0 )); then
+      out="$(as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq 2>&1)" || { printf '%s\n' "$out" >&2; return 1; }
+      APT_UPDATED=1
+    fi
+    out="$(as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@" 2>&1)" || { printf '%s\n' "$out" >&2; return 1; }
   elif have dnf; then
     as_root dnf install -y -q "$@"
   elif have pacman; then
@@ -54,14 +58,14 @@ pkg() {
 ensure_git() {
   if have git; then st_ok "git $(git --version | cut -d' ' -f3)"; return; fi
   did "installing git"
-  pkg git
+  pkg git || fail "git could not be installed" "the message above says why; install git by hand and run this again"
   have git || fail "git did not install" "install it by hand and run this again"
 }
 
 ensure_gh() {
   if have gh; then st_ok "gh $(gh --version | head -n 1 | cut -d' ' -f3)"; return; fi
   did "installing the GitHub CLI (gh)"
-  if [[ "$OS" == linux ]] && have pacman && ! have apt-get && ! have dnf; then pkg github-cli; else pkg gh; fi
+  if [[ "$OS" == linux ]] && have pacman && ! have apt-get && ! have dnf; then pkg github-cli || fail "the GitHub CLI could not be installed" "the message above says why"; else pkg gh || fail "the GitHub CLI could not be installed" "the message above says why"; fi
   have gh || fail "gh did not install" "install the GitHub CLI from https://cli.github.com and run this again"
 }
 

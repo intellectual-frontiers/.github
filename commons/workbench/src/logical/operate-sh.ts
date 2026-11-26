@@ -60,8 +60,12 @@ pkg() {
     have brew || fail "Homebrew is not installed" "install it from https://brew.sh and run this again"
     brew install "$@"
   elif have apt-get; then
-    if (( APT_UPDATED == 0 )); then as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq; APT_UPDATED=1; fi
-    as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@"
+    local out
+    if (( APT_UPDATED == 0 )); then
+      out="$(as_root env DEBIAN_FRONTEND=noninteractive apt-get update -qq 2>&1)" || { printf '%s\n' "$out" >&2; return 1; }
+      APT_UPDATED=1
+    fi
+    out="$(as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq "$@" 2>&1)" || { printf '%s\n' "$out" >&2; return 1; }
   elif have dnf; then
     as_root dnf install -y -q "$@"
   elif have pacman; then
@@ -74,14 +78,14 @@ pkg() {
 ensure_git() {
   if have git; then st_ok "git $(git --version | cut -d' ' -f3)"; return; fi
   did "installing git"
-  pkg git
+  pkg git || fail "git could not be installed" "the message above says why; install git by hand and run this again"
   have git || fail "git did not install" "install it by hand and run this again"
 }
 
 ensure_gh() {
   if have gh; then st_ok "gh $(gh --version | head -n 1 | cut -d' ' -f3)"; return; fi
   did "installing the GitHub CLI (gh)"
-  if [[ "$OS" == linux ]] && have pacman && ! have apt-get && ! have dnf; then pkg github-cli; else pkg gh; fi
+  if [[ "$OS" == linux ]] && have pacman && ! have apt-get && ! have dnf; then pkg github-cli || fail "the GitHub CLI could not be installed" "the message above says why"; else pkg gh || fail "the GitHub CLI could not be installed" "the message above says why"; fi
   have gh || fail "gh did not install" "install the GitHub CLI from https://cli.github.com and run this again"
 }
 
@@ -146,8 +150,8 @@ ${pins}
   esac
   if [[ -n "$BUN_URL" ]]; then
     did "installing bun ${spec.bun.version} from its pinned download (SHA-256 checked)"
-    have curl || pkg curl
-    have unzip || pkg unzip
+    have curl || pkg curl || fail "curl could not be installed" "the message above says why"
+    have unzip || pkg unzip || fail "unzip could not be installed" "the message above says why"
     local tmp got
     tmp="$(mktemp -d)"
     curl -fsSL "$BUN_URL" -o "$tmp/bun.zip" || { rm -rf "$tmp"; fail "the download of bun failed" "check the network and run this again"; }
@@ -158,12 +162,13 @@ ${pins}
     install -m 0755 "$tmp/$BUN_ENTRY/bun" "$BUN_BIN/bun"
     rm -rf "$tmp"
     if ! grep -qs '\.bun/bin' "$HOME/.bashrc"; then
+      # shellcheck disable=SC2016
       printf '\n# bun (added by ${spec.name} operate)\nexport PATH="$HOME/.bun/bin:$PATH"\n' >> "$HOME/.bashrc"
       did "added ~/.bun/bin to the PATH of new shells (~/.bashrc)"
     fi
   elif [[ "$OS" == macos ]]; then
     did "installing bun with Homebrew"
-    pkg oven-sh/bun/bun
+    pkg oven-sh/bun/bun || fail "bun could not be installed" "the message above says why"
   else
     fail "there is no pinned download of bun for $OS-$ARCH" "install bun ${spec.bun.minimum} or newer from https://bun.sh and run this again"
   fi
@@ -199,7 +204,7 @@ install_deps() {
   if [[ -d "$ROOT/node_modules" && -f "$STAMP" && "$(cat "$STAMP")" == "$want" ]]; then st_ok "the dependencies are installed (nothing changed since the last run)"; return; fi
   did "installing the dependencies (bun install)"
   if [[ -f "$ROOT/bun.lock" ]]; then flag=(--frozen-lockfile); fi
-  ( cd "$ROOT" && bun install "$@{flag[@]}" ) || fail "bun install failed" "a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again"
+  ( cd "$ROOT" && bun install "$@{flag[@]}" ) || fail "bun install failed" "its message is above; a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again"
   mkdir -p "$(dirname "$STAMP")"
   printf '%s\n' "$want" > "$STAMP"
 }
@@ -224,6 +229,7 @@ main() {
 ${calls}  if (( CHANGED == 0 )); then say "Nothing to do. ${spec.name} is ready."; else say "Done: $CHANGED change(s) made."; fi
   say ""
   say ${shq(`Next: ${spec.next.say}`)}
+  printf '  cd %q\n' "$ROOT"
   say ${shq(`  ${spec.next.argv.join(" ")}`)}
 }
 main "$@"; exit

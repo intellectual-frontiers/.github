@@ -151,7 +151,7 @@ function Get-Stamp {
   if (Test-Path $lock) { $bytes += [IO.File]::ReadAllBytes($lock) }
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
 }
-function Install-Dependencies {
+function Install-DependencyTree {
   $want = Get-Stamp
   if ((Test-Path (Join-Path $script:Root 'node_modules')) -and (Test-Path $script:Stamp) -and ((Get-Content -Raw $script:Stamp).Trim() -eq $want)) {
     Write-Ok 'the dependencies are installed (nothing changed since the last run)'; return
@@ -160,7 +160,7 @@ function Install-Dependencies {
   $argv = @('bun', 'install')
   if (Test-Path (Join-Path $script:Root 'bun.lock')) { $argv += '--frozen-lockfile' }
   if (-not (Invoke-Native $argv $script:Root)) {
-    Exit-Step 'bun install failed' 'a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again'
+    Exit-Step 'bun install failed' 'its message is above; a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again'
   }
   New-Item -ItemType Directory -Force -Path (Split-Path $script:Stamp) | Out-Null
   Set-Content -Path $script:Stamp -Value $want
@@ -186,10 +186,11 @@ function Invoke-Main {
   # step update
   Sync-Repository
   # step install
-  Install-Dependencies
+  Install-DependencyTree
 ${converge}  if ($script:Changed -eq 0) { Write-Say 'Nothing to do. ${spec.name} is ready.' } else { Write-Say "Done: $($script:Changed) change(s) made." }
   Write-Say ''
   Write-Say ${shq(`Next: ${spec.next.say}`)}
+  Write-Say ("  cd '" + $script:Root + "'")
   Write-Say ${shq(`  ${spec.next.argv.join(" ")}`)}
 }
 try { Invoke-Main } catch { $Host.UI.WriteErrorLine("$($script:IBad) $($_.Exception.Message)"); exit 1 }

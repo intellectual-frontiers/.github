@@ -151,6 +151,12 @@ proves(["0007-workbench-operate FR-002", "0007-workbench-operate FR-011"], "the 
       assertEquals(r.status, 0, r.stderr);
     }
   }
+  if (process.platform !== "win32" && spawnSync("shellcheck", ["--version"]).status === 0) {
+    for (const script of [operateSh(spec, DIGEST), bootstrapSh()]) {
+      const r = spawnSync("shellcheck", ["--shell=bash", "-"], { input: script, encoding: "utf8" });
+      assertEquals(r.status, 0, r.stdout);
+    }
+  }
   const root = fileURLToPath(new URL("../../../", import.meta.url));
   assertEquals(readFileSync(`${root}bin/bootstrap.sh`, "utf8"), bootstrapSh());
   assertEquals(readFileSync(`${root}bin/bootstrap.ps1`, "utf8"), bootstrapPs1());
