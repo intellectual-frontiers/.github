@@ -1,0 +1,53 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45839482630",
+    "workflow": "site",
+    "commit": "35f430f19bfe6bfb7ac666ff6456c53706276c6e",
+    "at": "2026-11-26T14:33:44Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45839482630"
+  },
+  "steps": [
+    {
+      "id": "build",
+      "job": "site",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33353,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-evidence-the-build-reads-the-test-re-5",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47564,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-packages-of-the-one-package-s-own-to-4",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 6308,
+      "exitStatus": 0
+    },
+    {
+      "id": "typescript-7-1-beta-shiki-beautiful-merm-3",
+      "job": "site",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 34,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
