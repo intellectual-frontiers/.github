@@ -2,7 +2,7 @@
 /**
  * The vocabulary lint (commons 0048-actors FR-014, FR-064): in a text, the words that must not be used of an agent (`wrote`, `completed`, `approved`, `signed`, `confirmed`, `initiated`, `owns`) where an agent is their
  * subject, in the active (`the agent approved`) and in the passive (`approved by the agent`). It looks at what a text says, never at its style (FR-065): it does not try to tell that an agent wrote a text. Code, in a block or
- * in backticks, is not read.
+ * in backticks, is not read, and neither is a sentence that denies it (`Nothing is approved by an agent.`): that states the rule.
  *
  * @example
  * ```ts
@@ -23,7 +23,9 @@ export interface VocabularyFinding {
 }
 
 const AGENT = "(?:AI agents?|agents?|AI assistants?|assistants?|AI|LLMs?|bots?|Claude|Codex|models?)";
-const WORDS = FORBIDDEN_AGENT_WORDS.map((w) => (w === "owns" ? "owns?" : w)).join("|");
+const WORDS = FORBIDDEN_AGENT_WORDS.join("|");
+/** A sentence that says what an agent does not do, or that nothing is done by one, states the rule and is not a breach of it. */
+const NEGATED = /\b(?:no|nothing|never|not|cannot|without|neither|nor)\b|n't/i;
 const PASSIVE_WORDS = "wrote|written|completed|approved|signed|confirmed|initiated|owned";
 const ACTIVE = new RegExp(`\\b${AGENT}\\b(?:\\s+(?!and\\b|or\\b)[\\w'-]+){0,2}?\\s+(${WORDS})\\b`, "gi");
 const PASSIVE = new RegExp(`\\b(${PASSIVE_WORDS})\\s+by\\s+(?:the\\s+|an?\\s+|our\\s+)?${AGENT}\\b`, "gi");
@@ -47,6 +49,7 @@ export function lintVocabulary(text: string): readonly VocabularyFinding[] {
     if (fenced) continue;
     const line = raw.replace(/`[^`]*`/g, " ");
     for (const sentence of line.split(/(?<=[.!?;:])\s+/)) {
+      if (NEGATED.test(sentence)) continue;
       const hits = [...sentence.matchAll(ACTIVE), ...sentence.matchAll(PASSIVE)].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
       for (const m of hits) {
         const word = normal(m[1] ?? "");

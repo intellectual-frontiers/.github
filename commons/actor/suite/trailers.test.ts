@@ -56,6 +56,9 @@ proves(["0004-actor-trailers FR-005"], "the words of FR-014 are found of an agen
   assertEquals(found("The reviewer approved the plan."), []);
   assertEquals(found("Alice wrote the test and Bob signed it."), []);
   assertEquals(found("The agent prepared it. The person approved it."), []);
+  assertEquals(found("The agent works through its own tool and records a proposal."), [], "own is not owns");
+  assertEquals(found("Nothing is approved by an agent."), [], "a sentence that denies it states the rule");
+  assertEquals(found("An agent never signed anything and does not approve a plan."), []);
 });
 
 proves(["0004-actor-trailers FR-006"], "the lint skips code and does not judge style", () => {
