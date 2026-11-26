@@ -7,7 +7,7 @@
  *
  * @example
  * ```ts
- * import { uuid7OfUlid } from "./legacy-id.ts";
+ * import { uuid7OfUlid } from "./external-id.ts";
  * uuid7OfUlid("01ARZ3NDEKTSV4RRFFQ69G5FAV"); // { kind: "ok", value: "01563e3a-b5d3-7..." }
  * ```
  *

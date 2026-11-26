@@ -757,7 +757,7 @@ requirement	mechanism	by	note
 0037-planning FR-041	check	.github: cd commons/planning && bun run verify	commons/planning suite/typing.test.ts (0002-planning-core FR-009): no any, non-null assertion, enum or cast but brand, readonly and exact optional fields held by the compiler, every switch closed
 0037-planning FR-042	none	-	Planned: phase 5
 0037-planning FR-043	none	-	Planned: the ontology names every list of the library, held by commons/planning suite/vocabulary.test.ts; the rule over every term of the model waits for phase 4
-0037-planning FR-044	check	.github: cd commons/planning && bun run verify	commons/planning suite/legacy-ids.test.ts (0002-planning-core FR-010): the id of a ULID and of another scheme, the external ids and the actors of a file by the rule of the configuration
+0037-planning FR-044	check	.github: cd commons/planning && bun run verify	commons/planning suite/external-ids.test.ts (0002-planning-core FR-010): the id of a ULID and of another scheme, the external ids and the actors of a file by the rule of the configuration
 0037-planning FR-045	none	-	Planned, phase 1 in part: a run's context makes an agent's actor with the basis stored and refuses a person or an agent where there is no person (commons/planning suite/actors.test.ts); the tool server, the headless run and the commit-author case over a real Git repository wait for phase 6
 0037-planning FR-046	none	-	Planned, phase 2 in part: an issue file's every key is carried or found (commons/planning suite/records.test.ts); the other sources wait for phase 5
 0037-planning FR-047	none	-	Planned: phase 5

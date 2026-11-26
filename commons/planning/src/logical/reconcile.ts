@@ -47,7 +47,7 @@ import {
 } from "@intellectual-frontiers/planning/governance";
 import { canonical } from "./canonical.ts";
 import { type Clock, type ClockProblem, mintEventId, mintItemId, seeId } from "./clock.ts";
-import { eventIdOfExternal, itemIdOfExternal } from "./legacy-id.ts";
+import { eventIdOfExternal, itemIdOfExternal } from "./external-id.ts";
 
 /** The fields of a place that are merged three ways. */
 export type MergedField = "title" | "body" | "severity" | "state";
