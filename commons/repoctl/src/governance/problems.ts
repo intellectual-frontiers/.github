@@ -41,6 +41,12 @@ export type ProblemCode =
   | "E-NO-TOKEN"
   | "E-NO-TARBALL"
   | "E-PUBLISH-FAILED"
+  | "E-TRAIN-NOT-COMMITTED"
+  | "E-TRAIN-NOT-PUSHED"
+  | "E-TRAIN-CONSUMER"
+  | "E-TRAIN-WAITING"
+  | "E-TRAIN-INSTALL"
+  | "E-TRAIN-VERIFY"
   | "E-COMMIT-SUBJECT"
   | "E-COMMIT-REFS"
   | "E-COMMIT-IMPACT"
@@ -101,6 +107,12 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-NO-TOKEN",
   "E-NO-TARBALL",
   "E-PUBLISH-FAILED",
+  "E-TRAIN-NOT-COMMITTED",
+  "E-TRAIN-NOT-PUSHED",
+  "E-TRAIN-CONSUMER",
+  "E-TRAIN-WAITING",
+  "E-TRAIN-INSTALL",
+  "E-TRAIN-VERIFY",
   "E-COMMIT-SUBJECT",
   "E-COMMIT-REFS",
   "E-COMMIT-IMPACT",
@@ -282,6 +294,42 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     why: "The version is on npm already with other files, the token may not publish the package, or the network failed.",
     fix: "repoctl status",
   },
+  "E-TRAIN-NOT-COMMITTED": {
+    title: "The release is not committed",
+    what: "`release train` found a release waiting for its publication, and the release record is not tracked by Git or the working tree has a change.",
+    why: "What `release apply` made was not committed with its record, and a publication asked for now would run on a commit that lacks it.",
+    fix: "repoctl commit",
+  },
+  "E-TRAIN-NOT-PUSHED": {
+    title: "The release commit is not on origin/main",
+    what: "The commit at HEAD holds the release record, and `origin/main` as this checkout knows it does not contain it.",
+    why: "The commit was not pushed, or this clone has not fetched the push.",
+    fix: "git push origin HEAD:main",
+  },
+  "E-TRAIN-CONSUMER": {
+    title: "A consumer cannot be read",
+    what: "A directory given with `--consumer` is not a Git checkout, a tracked package.json is not JSON, or its commons-consumer.json is not what the specification says.",
+    why: "A wrong path or a file that was edited by hand.",
+    fix: "repoctl release train --help",
+  },
+  "E-TRAIN-WAITING": {
+    title: "A consumer waits for the publication",
+    what: "The install of a consumer cannot find the version of the release, so the consumer was left as it was.",
+    why: "The release is not published yet, or the registry has not shown it yet.",
+    fix: "repoctl release train --wait 300",
+  },
+  "E-TRAIN-INSTALL": {
+    title: "A consumer could not install the release",
+    what: "The install of a consumer failed for a reason other than a version that is not there yet; its manifest and lockfiles are as they were.",
+    why: "A registry credential is missing in the environment, or a dependency of the consumer is wrong.",
+    fix: "repoctl release train --help",
+  },
+  "E-TRAIN-VERIFY": {
+    title: "A consumer does not pass its check",
+    what: "A command of the consumer's commons-consumer.json ended with a failure after its pins moved.",
+    why: "The new version changes something the consumer relies on.",
+    fix: "repoctl release train --only PATH",
+  },
   "E-COMMIT-SUBJECT": {
     title: "The commit subject is not valid",
     what: "The subject is empty, has more than one line, is longer than 100 characters or ends with a full stop.",
@@ -404,9 +452,9 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-HYGIENE-DUPLICATE": {
     title: "Two installed copies of one library",
-    what: "The lockfile or node_modules holds one package of the policy's scope at two versions.",
-    why: "Two dependencies ask for different versions of it, or one is pinned and another is a range.",
-    fix: "pin one version with overrides in package.json and install again",
+    what: "The lockfile or node_modules holds one package of the policy's scope at two versions within the tree of one consumer (the top of the tree, or one workspace).",
+    why: "Two dependencies of that consumer ask for different versions of it, or one is pinned and another is a range. Two workspaces that pin their own versions are not a duplicate.",
+    fix: "pin one version with overrides in the package.json of that consumer and install again",
   },
   "E-HYGIENE-RANGE": {
     title: "A dependency that is not an exact version",

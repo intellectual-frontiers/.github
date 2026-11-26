@@ -25,6 +25,7 @@ export * from "./pool.ts";
 export * from "./ports.ts";
 export * from "./prove.ts";
 export * from "./publish.ts";
+export * from "./train.ts";
 export * from "./docs.ts";
 export * from "./scaffold.ts";
 export * from "./select.ts";

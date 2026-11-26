@@ -366,7 +366,7 @@ export function enabledVerbs(config: Config): readonly VerbId[] {
   const capability = (name: keyof Capabilities): void => {
     switch (name) {
       case "release":
-        out.push("release plan", "release apply", "release publish");
+        out.push("release plan", "release apply", "release train", "release publish");
         return;
       case "newLibrary":
         out.push("new library");

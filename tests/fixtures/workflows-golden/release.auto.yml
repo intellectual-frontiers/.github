@@ -127,21 +127,9 @@ jobs:
       - uses: ./.github/actions/bun
         continue-on-error: true
       - name: "The packages the command reads, from the root's bun.lock"
-        id: the-packages-the-command-reads-from-the--3
-        shell: bash
-        run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-packages-the-command-reads-from-the--3 --job "publish" --module "repository" --tool install --timeout 18 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
-        env:
-          IFC_STEP_SCRIPT: bun install --frozen-lockfile
-        continue-on-error: true
+        run: bun install --frozen-lockfile
       - name: "The libraries, linked by name before any of them is imported"
-        id: the-libraries-linked-by-name-before-any--4
-        shell: bash
-        run: |
-          bun "$GITHUB_WORKSPACE/commons/libraries/src/ci/step.ts" --id the-libraries-linked-by-name-before-any--4 --job "publish" --module "repository" --tool exit-status --timeout 48 --out "$RUNNER_TEMP/findings" -- bash -e -o pipefail -c "$IFC_STEP_SCRIPT"
-        env:
-          IFC_STEP_SCRIPT: bun commons/libraries/src/link.ts
-        continue-on-error: true
+        run: bun commons/libraries/src/link.ts
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -163,22 +151,13 @@ jobs:
           NPM_TOKEN: ${{ secrets.INFRO_NPMJS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "The findings of this job, kept for the job that gathers them"
-        if: "always()"
-        uses: actions/upload-artifact@v4
-        with:
-          name: findings-release-publish-${{ strategy.job-index }}
-          path: ${{ runner.temp }}/findings
-          if-no-files-found: ignore
-          retention-days: 7
-        continue-on-error: true
 
   # the findings of this workflow, gathered: it passes if and only if the pipeline is sound (0038-build-policy FR-005); a failing test, a type error or a crashed command in any cell is a finding here and never a red job
   findings:
     name: findings
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    needs: [plan, build, publish]
+    needs: [plan, build]
     if: "always()"
     permissions:
       contents: read
@@ -189,6 +168,8 @@ jobs:
         with:
           fetch-depth: 1
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
       - name: The findings every job kept
         uses: actions/download-artifact@v4
         with:
@@ -207,7 +188,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           WORKFLOW: release
           PLAN_RESULT: ${{ needs.plan.result }}
-          PLAN_LINUX: ${{ needs.plan.outputs.linux }}
       - name: "The merged findings, kept for the site"
         if: "always()"
         uses: actions/upload-artifact@v4
@@ -231,6 +211,8 @@ jobs:
       - uses: actions/checkout@v4
         continue-on-error: true
       - uses: ./.github/actions/bun
+        with:
+          tools: "false"
         continue-on-error: true
       - name: The merged findings of this workflow
         uses: actions/download-artifact@v4

@@ -33,8 +33,11 @@ export type Dependency = { readonly name: string; readonly spec: string };
 /** A `package.json` of the repository: its path from the root, its name and its dependencies (of every section). */
 export type PackageFacts = { readonly path: string; readonly name: string | undefined; readonly dependencies: readonly Dependency[] };
 
-/** One installed copy of a package: its version and where it is (a path from the root, or a key of the lockfile). */
-export type Copy = { readonly version: string; readonly where: string };
+/**
+ * One installed copy of a package: its version and where it is (a path from the root, or a key of the lockfile). `owner` is what a lockfile says the copy is nested under (the folder or the name of a package, `""` where it is
+ * at the top): where that is a workspace, the copy is the workspace's own pin (0007-repoctl-hygiene FR-008).
+ */
+export type Copy = { readonly version: string; readonly where: string; readonly owner?: string };
 
 /** What reading a lockfile gave: the copies of each package of commons it holds, or why it could not be read. */
 export type LockFacts =
@@ -113,6 +116,13 @@ function isOwn(p: PackageFacts, workspaces: readonly string[]): boolean {
   return workspaces.some((w) => matches(w.replace(/^\.\//, "").replace(/\/$/, ""), dir));
 }
 
+/** The consumer a copy belongs to: the workspace (a member of the root's workspaces, by folder or by name) the lockfile nests it under, or `""` for the root's own tree. Two workspaces may pin their own version of one package. */
+function consumerOf(facts: HygieneFacts, c: Copy): string {
+  const o = c.owner ?? "";
+  if (o === "") return "";
+  return facts.packages.some((p) => p.path !== "package.json" && isOwn(p, facts.workspaces) && (dirOf(p.path) === o || p.name === o)) ? o : "";
+}
+
 const ORDER: readonly string[] = ["E-HYGIENE-GIT", "E-HYGIENE-PATH", "E-HYGIENE-IMPORT", "E-HYGIENE-VENDORED", "E-HYGIENE-DUPLICATE", "E-HYGIENE-RANGE", "E-ENVIRONMENT"];
 
 /** The findings of a repository, in the order of the codes and then of the paths. */
@@ -140,14 +150,22 @@ export function hygiene(facts: HygieneFacts, policy: HygienePolicy): readonly Hy
   const trees: readonly TreeFacts[] = [{ folder: "", locks: facts.locks, installed: facts.installed }, ...facts.folders];
   for (const tree of trees) {
     const copies = new Map<string, Copy[]>();
-    const add = (pkg: string, c: Copy): void => void copies.set(pkg, [...(copies.get(pkg) ?? []), c]);
+    const add = (pkg: string, c: Copy): void => void copies.set(`${pkg}\0${consumerOf(facts, c)}`, [...(copies.get(`${pkg}\0${consumerOf(facts, c)}`) ?? []), c]);
     for (const l of tree.locks) if (l.kind === "read") for (const [pkg, cs] of l.copies) for (const c of cs) add(pkg, c);
     for (const [pkg, cs] of tree.installed) for (const c of cs) add(pkg, c);
-    for (const [pkg, cs] of [...copies].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    for (const [key, cs] of [...copies].sort(([a], [b]) => (a < b ? -1 : 1))) {
+      const pkg = key.slice(0, key.indexOf("\0"));
       const versions = [...new Set(cs.map((c) => c.version))].sort();
       if (versions.length < 2) continue;
       const where = versions.map((v) => `${v} (${cs.find((c) => c.version === v)?.where ?? "?"})`).join(", ");
-      out.push({ level: "fail", code: "E-HYGIENE-DUPLICATE", path: cs[0]?.where ?? pkg, message: `${pkg} is installed ${versions.length} times, at ${where}: make the tree hold one copy`, fix: `add "overrides": { "${pkg}": "${versions[versions.length - 1] ?? ""}" } to package.json and install again` });
+      const owner = key.slice(key.indexOf("\0") + 1);
+      out.push({
+        level: "fail",
+        code: "E-HYGIENE-DUPLICATE",
+        path: cs[0]?.where ?? pkg,
+        message: `${pkg} is installed ${versions.length} times${owner === "" ? "" : ` for ${owner}`}, at ${where}: make the tree hold one copy`,
+        fix: `pin one version${owner === "" ? "" : ` in ${owner}`}: add "overrides": { "${pkg}": "${versions[versions.length - 1] ?? ""}" } to its package.json and install again`,
+      });
     }
     for (const l of tree.locks)
       if (l.kind === "unreadable") out.push({ level: "fail", code: "E-ENVIRONMENT", path: l.file, message: `${l.file} could not be read (${l.why}), so the installed copies are not known`, fix: "bun install" });

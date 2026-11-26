@@ -16,7 +16,7 @@
 import { classify } from "../ci/inventory.ts";
 import { gatherJob, keepJob, wrapWorkflow } from "../ci/wrap.ts";
 import { isWrapped } from "../ci/inventory.ts";
-import { type CompositeAction, expr, job, run, type Step, use, type Workflow } from "./model.ts";
+import { type CompositeAction, expr, type Job, job, run, type Step, use, type Workflow } from "./model.ts";
 
 /** The versions the workflows pin (FR-005): each once. */
 export const PIN = {
@@ -233,6 +233,50 @@ const ci: Workflow = {
     }),
   },
 };
+
+/** The condition of a job that runs only where the commit it runs for was not proved already (commons 0030-generated-workflows FR-015). */
+export const NOT_PROVED = "needs.seen.outputs.proved != 'true'";
+
+/**
+ * The job that says whether a commit was proved already (FR-015): for a push to a branch other than main, whether this workflow has an earlier run on the same commit that ended in success or is still going (the run of main that the push of the branch follows); for anything else, never. It reads the runs of the
+ * workflow through the API with the token of the run, installs nothing and checks nothing out, and where it cannot ask it says not proved, so that a failure of the guard runs the workflow and never leaves a commit unproved.
+ */
+function seenJob(file: string): Job {
+  return job({
+    name: "seen",
+    comment: "whether this commit was proved already by a run of this workflow (0030-generated-workflows FR-015): only a push to a branch other than main can be, and the answer is not proved where GitHub cannot be asked",
+    runsOn: "ubuntu-latest",
+    timeoutMinutes: 5,
+    permissions: { actions: "read" },
+    outputs: { proved: expr("steps.seen.outputs.proved") },
+    steps: [
+      run(
+        lines(
+          "proved=false",
+          'if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" != refs/heads/main ]; then',
+          "  # an earlier run of this workflow on the same commit that succeeded or is still going (the run of main that the push of the branch follows); the earliest run is never skipped, so two pushes at once do not skip each other",
+          '  n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&per_page=50" --jq "[.workflow_runs[] | select(.id < $GITHUB_RUN_ID) | select(.conclusion == \\"success\\" or .status != \\"completed\\")] | length" 2>/dev/null) || n=0',
+          '  case "$n" in ""|*[!0-9]*) n=0 ;; esac',
+          '  if [ "$n" -gt 0 ]; then proved=true; fi',
+          "fi",
+          'echo "proved=$proved" >> "$GITHUB_OUTPUT"',
+          'echo "commit $GITHUB_SHA on $GITHUB_REF: proved before = $proved" >> "$GITHUB_STEP_SUMMARY"',
+        ),
+        { name: "Whether this commit has a run of this workflow that succeeded", id: "seen", shell: "bash", continueOnError: true, env: { GH_TOKEN: expr("github.token"), WORKFLOW_FILE: `${file}.auto.yml` } },
+      ),
+    ],
+  });
+}
+
+/** The workflow with the job `seen` first, and every job that needs no other job waiting for it and skipped where the commit was proved (FR-015). */
+function provedOnce(w: Workflow): Workflow {
+  const jobs: Record<string, Job> = { seen: seenJob(w.file) };
+  for (const [id, j] of Object.entries(w.jobs)) {
+    const root = (j.needs ?? []).length === 0;
+    jobs[id] = root ? { ...j, needs: ["seen"], when: j.when === undefined ? NOT_PROVED : `${NOT_PROVED} && (${j.when})` } : j;
+  }
+  return { ...w, jobs };
+}
 
 const conformancePaths = ["commons/telemetry/**", "commons/system/**", "commons/generated/pins.auto.env", BUN_ACTION, own("conformance")];
 
@@ -932,10 +976,13 @@ function underPolicy(w: Workflow): Workflow {
   const wrapped = wrapWorkflow(classify(w));
   const makers = Object.entries(wrapped.jobs).filter(([, j]) => j.steps.some((st) => isWrapped(st))).map(([id]) => id);
   if (makers.length === 0) return wrapped;
-  const all = Object.keys(wrapped.jobs);
+  // the findings wait for the plan and for the jobs that make findings, and for no other job (0030-generated-workflows FR-016); where the commit was proved already they are skipped with the rest (FR-015)
+  const waits = [...("plan" in wrapped.jobs ? ["plan"] : []), ...makers];
+  const guarded = "seen" in wrapped.jobs;
   const id = w.file === "ci" ? "ci" : "findings";
-  const gather = { ...gatherJob(wrapped, all, gatherScript(wrapped)), name: w.file === "ci" ? "ci" : "findings" };
-  const planResults = "plan" in wrapped.jobs ? { PLAN_RESULT: expr("needs.plan.result"), PLAN_LINUX: expr("needs.plan.outputs.linux"), ...(w.file === "ci" ? { PLAN_SYSTEMS: expr("needs.plan.outputs.systems") } : {}) } : {};
+  const base = gatherJob(wrapped, guarded ? ["seen", ...waits] : waits, gatherScript(wrapped));
+  const gather = { ...base, name: w.file === "ci" ? "ci" : "findings", ...(guarded ? { when: `always() && ${NOT_PROVED}` } : {}) };
+  const planResults = "plan" in wrapped.jobs ? { PLAN_RESULT: expr("needs.plan.result"), ...(w.file === "ci" || w.file === "evidence" ? { PLAN_LINUX: expr("needs.plan.outputs.linux") } : {}), ...(w.file === "ci" ? { PLAN_SYSTEMS: expr("needs.plan.outputs.systems") } : {}) } : {};
   const steps = gather.steps.map((st) => (st.kind === "run" && st.env?.["WORKFLOW"] !== undefined ? { ...st, env: { ...st.env, ...planResults } } : st)) as unknown as typeof gather.steps;
   return { ...wrapped, jobs: { ...wrapped.jobs, [id]: { ...gather, steps }, "keep-findings": keepJob(wrapped, id) } };
 }
@@ -943,11 +990,11 @@ function underPolicy(w: Workflow): Workflow {
 /** Every workflow, the libraries' made from their manifests, in the order of their files' names, under the build policy. */
 export function workflows(): readonly Workflow[] {
   return [
-    ci,
+    provedOnce(ci),
     evidence,
     release,
     site,
-    conformance,
+    provedOnce(conformance),
     tests,
     maintenance,
   ].map(underPolicy).sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0));
@@ -960,7 +1007,10 @@ export const ACTIONS: readonly CompositeAction[] = [
     name: "Pinned Bun",
     description:
       "Bun at the version commons pins (commons/generated/pins.auto.env, commons 0005-typescript-practice FR-026), fetched with retries, kept only where its SHA-256 is the pinned one, unpacked by IFC TypeScript's own zip reader (commons/libraries/src/install-bun.ts, run by Node) and put on the PATH. Linux, macOS and Windows; no shell script, no Python, no unzip.",
-    inputs: { "node-version": { description: "The Node that runs the installer.", default: NODE_VERSION } },
+    inputs: {
+      "node-version": { description: "The Node that runs the installer.", default: NODE_VERSION },
+      tools: { description: "Whether the development tools of the root's lockfile are installed too; a job whose programs read no package says false.", default: "true" },
+    },
     steps: [
       use(PIN.setupNode, { with: { "node-version": expr("inputs.node-version") } }),
       use(PIN.cache, {
@@ -978,7 +1028,7 @@ export const ACTIONS: readonly CompositeAction[] = [
         },
       ),
       run('node commons/libraries/src/install-bun.ts "$RUNNER_TEMP/bun"', { name: "Bun, pinned and checked", shell: "bash" }),
-      run("bun install --frozen-lockfile", { name: "Install shared tooling from the root lockfile", shell: "bash" }),
+      run("bun install --frozen-lockfile", { name: "Install shared tooling from the root lockfile", when: "inputs.tools == 'true'", shell: "bash" }),
     ],
   },
 ];

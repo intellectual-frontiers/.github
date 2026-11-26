@@ -116,8 +116,8 @@ proves(["0016-ci-on-graph FR-004"], "for a thin graph the emitter writes exactly
 
 /** What the measure finds in the real definitions: the kinds of blocker of each workflow, which the record of the specification names. */
 const RECORD: Readonly<Record<string, { readonly jobs: number; readonly kinds: readonly BlockerKind[] }>> = {
-  ci: { jobs: 5, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "matrix-from-output", "output", "runner", "step-id", "trigger", "working-directory"] },
-  conformance: { jobs: 4, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "runner", "shell-logic", "step-id", "trigger", "working-directory"] },
+  ci: { jobs: 6, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "matrix-from-output", "output", "runner", "step-id", "trigger", "working-directory"] },
+  conformance: { jobs: 5, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "output", "runner", "shell-logic", "step-id", "trigger", "working-directory"] },
   evidence: { jobs: 7, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "matrix-from-output", "output", "step-id", "working-directory"] },
   maintenance: { jobs: 2, kinds: ["checkout-options", "condition", "continue-on-error", "inline-script"] },
   release: { jobs: 5, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "matrix-from-output", "output", "step-id", "working-directory"] },

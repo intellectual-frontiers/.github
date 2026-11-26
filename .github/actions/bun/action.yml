@@ -5,6 +5,9 @@ inputs:
   node-version:
     description: The Node that runs the installer.
     default: "26.13.1"
+  tools:
+    description: "Whether the development tools of the root's lockfile are installed too; a job whose programs read no package says false."
+    default: "true"
 runs:
   using: composite
   steps:
@@ -23,5 +26,6 @@ runs:
       shell: bash
       run: "node commons/libraries/src/install-bun.ts \"$RUNNER_TEMP/bun\""
     - name: Install shared tooling from the root lockfile
+      if: "inputs.tools == 'true'"
       shell: bash
       run: bun install --frozen-lockfile

@@ -97,6 +97,8 @@ export type Running = {
   readonly stop: () => Promise<void>;
   /** Stops the server at once, where there is no time to wait for it: the process of the tests is ending. */
   readonly kill: () => void;
+  /** Lets the process of the caller end while the server still runs (Node waits for a child it has not let go; Bun does not): the caller stops or kills it as it ends. */
+  readonly unref: () => void;
 };
 
 async function freePort(): Promise<number> {
@@ -151,7 +153,7 @@ export async function startRustfs(binary: string, options: { readonly readyMs?: 
     }
     await proc.sleep(100);
   }
-  return ok({ endpoint: `http://127.0.0.1:${port}`, accessKey, secretKey, stop, kill: () => controller.abort() });
+  return ok({ endpoint: `http://127.0.0.1:${port}`, accessKey, secretKey, stop, kill: () => controller.abort(), unref: () => child.unref() });
 }
 
 if (import.meta.main) {

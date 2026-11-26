@@ -44,6 +44,7 @@ export function rustfs(): Promise<Server | string> {
     const run = await startRustfs(bin.value);
     if (run.kind === "err") return run.error;
     process.once("exit", () => run.value.kill());
+    run.value.unref();
     return { name: "rustfs" as const, endpoint: run.value.endpoint, credentials: credentialsOf(run.value.accessKey, run.value.secretKey), stop: run.value.stop };
   })();
   return shared;

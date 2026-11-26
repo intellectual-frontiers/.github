@@ -21,8 +21,8 @@ No job is thin. Every job of every workflow has at least one blocker, so `ci.aut
 
 | Workflow | Jobs | Jobs that are thin | What blocks them |
 | --- | --- | --- | --- |
-| ci | 5 | 0 | triggers push, pull request and the CI paths; a matrix a job gives at run time; job outputs; conditions; `continue-on-error`; scripts of several lines; the upload and download of artifacts; macOS and Windows runners |
-| conformance | 4 | 0 | triggers; conditions; `continue-on-error`; scripts of several lines and with shell logic; the upload of artifacts; macOS and Windows runners |
+| ci | 6 | 0 | triggers push, pull request and the CI paths; a matrix a job gives at run time; job outputs; conditions; `continue-on-error`; scripts of several lines; the upload and download of artifacts; macOS and Windows runners |
+| conformance | 5 | 0 | triggers; job outputs; conditions; `continue-on-error`; scripts of several lines and with shell logic; the upload of artifacts; macOS and Windows runners |
 | evidence | 7 | 0 | a matrix a job gives at run time; job outputs; step ids; conditions; `continue-on-error`; scripts; the upload and download of artifacts; checkouts with a depth |
 | maintenance | 2 | 0 | conditions on the jobs; `continue-on-error` on the checkout; the two scripts of several lines; a checkout with a depth |
 | release | 5 | 0 | a matrix a job gives at run time; job outputs; conditions; `continue-on-error`; scripts; the upload and download of artifacts; checkouts with options |
