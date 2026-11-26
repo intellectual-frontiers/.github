@@ -108,7 +108,7 @@ export function heldLibraries(open: readonly { readonly module: string; readonly
 }
 
 /** The checks a repository runs before a release, closed (0002-libraries-ci-findings FR-010): what a person or a pipeline runs is one of these, whatever program runs it. */
-export const CHECKS = ["syntax", "types", "pack", "secret-scan", "tests", "lint", "format", "layers", "surface-thin", "agentless", "ladder", "register", "trace", "citations", "specifiers", "versions", "names", "mizan", "changes", "capabilities", "kanon", "hygiene", "generated-files", "docs"] as const;
+export const CHECKS = ["syntax", "types", "pack", "secret-scan", "tests", "lint", "format", "layers", "surface-thin", "agentless", "actors", "ladder", "register", "trace", "citations", "specifiers", "versions", "names", "mizan", "changes", "capabilities", "kanon", "hygiene", "generated-files", "docs"] as const;
 /** A check. */
 export type Check = (typeof CHECKS)[number];
 
@@ -132,6 +132,7 @@ export const CHECK_CLASS: Readonly<Record<Check, { readonly class: ReleaseClass;
   layers: { class: "finding", why: "the layers of a ladder are architecture and are held by review of the finding" },
   "surface-thin": { class: "finding", why: "the imports a renderer may make are architecture and are held by review of the finding" },
   agentless: { class: "finding", why: "a requirement that an asset must run software of ours is a finding of the requirement: every asset is complete without it, and the software is an optional accelerator" },
+  actors: { class: "finding", why: "a commit that an agent prepared with no directive, an agent named as author or reviewer, and a document that says an agent approved are findings first (commons 0048-actors FR-022): they are recorded and fixed, and a release does not wait for them" },
   ladder: { class: "finding", why: "the generated blocks of the ladder are made again by the generator" },
   register: { class: "finding", why: "the proof register of the requirements is made again by the generator" },
   trace: { class: "finding", why: "a requirement without a proof is a finding of the requirement" },
