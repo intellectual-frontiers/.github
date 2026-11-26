@@ -35,7 +35,7 @@ import type { StoreDecl } from "./effect.ts";
 import { nodeId, parseCite, type SpecCite, storeRef, workloadId } from "./ids.ts";
 import type { Effect } from "./effect.ts";
 import type { Expectation, FieldType, InputValue, Inputs, OutputSchema, ScheduleSlot, Trigger } from "./node.ts";
-import { CADENCES, MODES, OUTCOMES, STORE_CLASSES } from "./terms.ts";
+import { AUDIENCES, CADENCES, MODES, OUTCOMES, STORE_CLASSES, type Audience } from "./terms.ts";
 import { INPUT_TYPES, type InputSpec } from "./verbs.ts";
 
 /** A decode failure at a path. */
@@ -121,6 +121,9 @@ export const trigger: Decoder<Trigger> = tagged({
 /** The outcome a run is expected to have. */
 export const expectation: Decoder<Expectation> = object({ outcome: literal(...OUTCOMES) });
 
+/** Who a task is for: a closed list, `all` where it is not said (0003-workload-forms FR-008). */
+export const audience: Decoder<Audience> = literal(...AUDIENCES);
+
 /** One input of a workload. */
 export const inputSpec: Decoder<InputSpec> = object({ name: string, type: literal(...INPUT_TYPES), required: boolean });
 
@@ -131,7 +134,7 @@ export const storeDecl: Decoder<StoreDecl> = object({ ref: viaId(storeRef), clas
 export const workloadHead = { id: viaId(workloadId), title: string, version: string, summary: string, given: array(string), needs, inputs: array(inputSpec), stores: array(storeDecl), trigger } as const;
 
 /** The optional fields of the head of a workload. */
-export const workloadOptional = { expect: expectation } as const;
+export const workloadOptional = { expect: expectation, audience } as const;
 
 /** Whether an input names a judge with an effect: a judge is refused with its own code. */
 export const hasEffect: Decoder<unknown> = (input, path = "$") =>

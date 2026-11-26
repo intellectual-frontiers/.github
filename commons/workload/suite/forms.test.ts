@@ -7,7 +7,7 @@
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { decodeTable } from "@intellectual-frontiers/kanon";
 import { fs, path } from "@intellectual-frontiers/system";
-import { BUILT_FORM_IDS, CADENCES, FORM_IDS, FORMS, isBuiltForm, OUTCOMES, TRIGGER_KINDS, trigger } from "@intellectual-frontiers/workload/governance";
+import { AUDIENCES, audienceOf, BUILT_FORM_IDS, CADENCES, FORM_IDS, FORMS, isBuiltForm, OUTCOMES, TRIGGER_KINDS, trigger } from "@intellectual-frontiers/workload/governance";
 import { meets } from "@intellectual-frontiers/workload/logical";
 import { CONVERGE_SETTINGS, decodeReconcile, RECONCILE_FORM, outcomeOf as reconcileOutcome } from "@intellectual-frontiers/workload/forms/reconcile";
 import { decodeRunbook, outcomeOf as runbookOutcome, RESTORE_DRILL, RUNBOOK_FORM, STEP_KINDS } from "@intellectual-frontiers/workload/forms/runbook";
@@ -125,6 +125,22 @@ proves(["0003-workload-forms FR-006"], "a workload may say the outcome a run is 
   const converged = (f: "converged" | "failed" | "parked" | undefined) => reconcileOutcome({ run: ITEM_FOR_TEST, loop: undefined, passes: 1, nodes: {}, plan: undefined, approved: [], declined: [], applied: [], planApproved: false, parked: [], finished: f, refused: [] });
   assertEquals([converged("converged"), converged("parked"), converged("failed"), converged(undefined)], ["completes", "parks", "fails", undefined]);
   assertEquals(decodeRunbook({ ...JSON.parse(JSON.stringify(RESTORE_DRILL)), expect: { outcome: "explodes" } }).kind, "err");
+});
+
+proves(["0003-workload-forms FR-008"], "a workload and a verb may name an audience of three, `all` where they name none, and a decoder refuses any other", () => {
+  assertEquals(AUDIENCES, ["engineer", "compliance", "all"]);
+  const plain = decodeRunbook(JSON.parse(JSON.stringify(RESTORE_DRILL)));
+  assert(plain.kind === "ok");
+  assertEquals(plain.value.audience, undefined);
+  assertEquals(audienceOf(plain.value), "all");
+  const named = decodeRunbook({ ...JSON.parse(JSON.stringify(RESTORE_DRILL)), audience: "compliance" });
+  assert(named.kind === "ok");
+  assertEquals(audienceOf(named.value), "compliance");
+  assertEquals(decodeRunbook({ ...JSON.parse(JSON.stringify(RESTORE_DRILL)), audience: "everyone" }).kind, "err");
+  assertEquals(decodeReconcile({ ...JSON.parse(JSON.stringify(CONVERGE_SETTINGS)), audience: "engineer" }).kind, "ok");
+  assertEquals(decodeReconcile({ ...JSON.parse(JSON.stringify(CONVERGE_SETTINGS)), audience: 3 }).kind, "err");
+  assertEquals(audienceOf({}), "all");
+  assertEquals(audienceOf({ audience: "engineer" }), "engineer");
 });
 
 proves(["0003-workload-forms FR-007"], "the form campaign is a named slot with the criterion for building it and has no code: no folder, no entry and no source names it but the registry; the form graph was built by the decision of 0013-form-graph", async () => {

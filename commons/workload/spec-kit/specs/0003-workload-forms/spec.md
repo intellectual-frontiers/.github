@@ -16,6 +16,7 @@
 - **FR-005**: A workload MUST have a trigger, a field of its head and never a form: one of `manual`, `schedule` (with a cadence of `hourly`, `daily`, `weekly`, `monthly`, `quarterly` or `yearly` and an optional slot in UTC, 0015-schedule-realization FR-001), `event` (a name) or `alert` (a name), a closed sum decoded at the boundary; the trigger MUST NOT change what a form does, so that the same workload is started by any trigger.
 - **FR-006**: A workload MAY say the outcome a run is expected to have, one of `completes`, `parks` and `fails`, so that a drill or a game day is a workload with a schedule trigger and an expected outcome and not a form of its own; each form MUST say what its run finished with in those three words (the runbook's `succeeded`, `parked` and `failed`; the reconcile form's `converged`, `parked` and `failed`) so that a run can be judged against the expectation.
 - **FR-007**: The form `campaign` MUST be specified here as a named slot and MUST have no code: it is a collection over a period with sampling, built only where a second concrete user needs it, with the criterion in the registry of the core, and no folder, no entry of the package and no source MAY name it but the registry. The form `graph`, which was a slot of this kind (a directed acyclic graph of jobs for an integration runner, whose first consumer is CI/CD and the generated GitHub workflows), was built by the decision of the owner on ticket 29 and is specified in 0013-form-graph, which replaces the rule of two for it.
+- **FR-008**: A workload, as a task, and a verb of the registry MAY name an `audience`, one of `engineer`, `compliance` and `all`, and one that names none MUST be `all` (`audienceOf`); a head that names any other audience MUST be refused by its decoder. The audience is who the task is for and MUST NOT be the audience of an action of headless (headless 0010-audience-tiers: who may call it); a renderer MAY offer a task only to the audiences it is made for, and the command line and every JSON output MUST offer every task, whatever its audience.
 
 ## Acceptance scenarios
 
@@ -26,6 +27,7 @@
 5. **Given** a trigger of each kind and a trigger that is none, **When** they are decoded, **Then** the four are workloads' triggers and the others are refused, and no form is a trigger, per FR-005.
 6. **Given** the starter drill, **When** it is read, **Then** it has a schedule trigger and an expected outcome, and a run is judged against it in the three words every form shares, per FR-006.
 7. **Given** the reserved form, **When** the registry, the folders and the spec are read, **Then** the campaign has its criterion and no code, and the graph is the form of 0013-form-graph, per FR-007.
+8. **Given** a workload with no audience, one with `compliance` and one with `everyone`, **When** they are decoded, **Then** the first is `all` by `audienceOf`, the second is `compliance` and the third is refused, per FR-008.
 
 ## Out of scope
 

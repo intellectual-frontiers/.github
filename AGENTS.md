@@ -16,7 +16,16 @@ This file is an index: each rule is one or two sentences and names where it is s
 - **Documentation is the code's** (0011-documentation): a module's TSDoc and an area's `about.ts`; change them in the same commit as the code; `bun run verify` in `commons/docs` before you push; the explanation of Mizan is the group Mizan of the documentation.
 - **License**: every part of this repository is under `PolyForm-Noncommercial-1.0.0` (0035-licensing); `bun commons/libraries/src/license.ts` writes every `LICENSE`, so never write a license text by hand.
 - **Never put a secret, a token or a person's data in this repository: it is public.**
+- **Renderers render, the SDK decides** (headless 0001-headless-layers FR-009): all functionality and capability is in the algebraically and strongly typed TypeScript SDK (commons); the REST API, command line, MCP server, terminal UI and GUI only collect typed inputs, call the SDK, render typed results and relay a person's explicit act, are generated from one command definition and decide nothing; every domain decision is an SDK function.
 - **A fact a program owns is a generated block between marks** (the libraries map of the README, the workbench block below): never edit inside the marks. What a check can enforce is a requirement with an enforcement row, not prose here.
+
+## Building something a person will use
+
+- Write the person's instruction set first, in three steps or fewer, before any code.
+- Show the owner a plan, then screenshots of the surface early; real terminal or browser captures, never mock-ups.
+- Rehearse as a junior with only the README, against a real container, before you ask the owner to test.
+- No acceptance-specific logic and no real names in platform code.
+- Surfaces carry no logic: they call the SDK.
 
 <!-- workbench:begin -->
 ## The workbench

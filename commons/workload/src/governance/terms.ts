@@ -16,7 +16,7 @@
  */
 
 /** The terms of the library: a closed list. */
-export const TERMS = ["workload", "form", "trigger", "node", "runbook", "reconcile", "graph", "verb", "effect", "store", "attachment", "workshop", "run", "work-order", "judge", "proposal", "evidence", "gate", "autonomy", "dialect", "harness-policy", "skill", "finding", "runner", "native-runner", "integration-runner", "runner-policy", "handoff", "receipt", "schedule"] as const;
+export const TERMS = ["workload", "form", "trigger", "audience", "node", "runbook", "reconcile", "graph", "verb", "effect", "store", "attachment", "workshop", "run", "work-order", "judge", "proposal", "evidence", "gate", "autonomy", "dialect", "harness-policy", "skill", "finding", "runner", "native-runner", "integration-runner", "runner-policy", "handoff", "receipt", "schedule"] as const;
 /** One term. */
 export type Term = (typeof TERMS)[number];
 
@@ -25,6 +25,7 @@ export const DEFINITIONS: Readonly<Record<Term, string>> = {
   workload: "A unit of operated work, not running software: typed data of one form, with a trigger, whose every effect is a verb and whose autonomy is derived from its effects.",
   form: "What kind of work a workload is and how it executes: a closed sum of node kinds with its checks, its dry run, its fold of run events and a native runner behind a port. A form is never a dialect and never a runner.",
   trigger: "What starts a workload: manual, a schedule, an event or an alert. A field of a workload, never a form.",
+  audience: "Who a workload (a task) or a verb is for: an engineer, compliance or all, the default. A field of the head, never a form; a renderer offers a task only to the audiences it is made for and the command line and every JSON output offer every task.",
   node: "One element of a workload: what a form calls a step or a phase. The kinds of node are the form's own closed list.",
   runbook: "The form of a procedure: an ordered algebra of steps that a person or an agent orchestrates.",
   reconcile: "The form of a loop toward a desired state: it observes, diffs, plans, has a person approve the plan by its hash, applies and verifies, and is level-triggered.",
@@ -81,6 +82,16 @@ export type EvidenceKind = (typeof EVIDENCE_KINDS)[number];
 export const VERB_ROLES = ["attach", "detach", "dispose", "checkpoint"] as const;
 /** One role of a verb. */
 export type VerbRole = (typeof VERB_ROLES)[number];
+
+/** Who a task or a verb is for: a closed list. It is the group of people it serves, and has nothing to do with the audience of an action of headless (who may call it: a person, a machine or both). */
+export const AUDIENCES = ["engineer", "compliance", "all"] as const;
+/** One audience. */
+export type Audience = (typeof AUDIENCES)[number];
+/** The audience of a task or a verb that names none (0003-workload-forms FR-008). */
+export const DEFAULT_AUDIENCE: Audience = "all";
+
+/** The audience of a task or a verb: what it says, or `all` where it says none. */
+export const audienceOf = (x: { readonly audience?: Audience | undefined }): Audience => x.audience ?? DEFAULT_AUDIENCE;
 
 /** What starts a workload: a closed list. */
 export const TRIGGER_KINDS = ["manual", "schedule", "event", "alert"] as const;

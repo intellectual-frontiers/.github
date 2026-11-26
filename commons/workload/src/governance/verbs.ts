@@ -16,7 +16,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Requirement } from "@intellectual-frontiers/workbench/governance";
 import { type VerbId, verbId } from "./ids.ts";
-import type { Mode, StoreClass, VerbRole } from "./terms.ts";
+import type { Audience, Mode, StoreClass, VerbRole } from "./terms.ts";
 
 /** What type an input of a verb has. */
 export const INPUT_TYPES = ["text", "integer", "flag", "store", "digest", "path"] as const;
@@ -38,6 +38,8 @@ export type VerbSpec = {
   /** The greatest mode the verb does; a node declares at most this. */
   readonly maxMode: Mode;
   readonly role?: VerbRole;
+  /** Who the verb is for; `all` where it says none (`audienceOf`, 0003-workload-forms FR-008). */
+  readonly audience?: Audience;
   /** What the workbench must find for the verb to run. */
   readonly needs: readonly Requirement[];
 };

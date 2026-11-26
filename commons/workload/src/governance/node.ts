@@ -15,7 +15,7 @@ import type { ControlRef } from "@intellectual-frontiers/grc/governance";
 import type { Requirement } from "@intellectual-frontiers/workbench/governance";
 import type { StoreDecl } from "./effect.ts";
 import type { NodeId, SpecCite, StoreRef, WorkloadId } from "./ids.ts";
-import type { Cadence, FormId, Outcome } from "./terms.ts";
+import type { Audience, Cadence, FormId, Outcome } from "./terms.ts";
 import type { InputSpec } from "./verbs.ts";
 
 /** The value of an input of a verb node: a literal, a store, the output of an earlier node or an input of the workload. */
@@ -87,4 +87,6 @@ export type WorkloadHead = {
   readonly trigger: Trigger;
   /** The outcome a run is expected to have, where it is a drill or a game day. */
   readonly expect?: Expectation;
+  /** Who the workload, as a task, is for; `all` where it says none (`audienceOf`, 0003-workload-forms FR-008). */
+  readonly audience?: Audience;
 };

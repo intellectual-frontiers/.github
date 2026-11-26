@@ -20,6 +20,7 @@
 
 - **FR-007**: The table of the layers MUST be the `kanon` field of the manifest `library.ts` (commons 0033-kanon FR-010) and the library MUST keep no checker of its own: `bun run verify` MUST run the shared checker of Kanon (`bun ../kanon/src/check.ts`, finding keys of the form `layers/<code> <file> <about>`, held by `kanon.baseline.txt`) and `tools/check.ts`, which MUST hold the trace of the sources and tests to these specifications against `trace.baseline.txt`; both baselines only shrink. Taken from: commons data `tools/check.ts` and its layers specification (the check held against a baseline).
 - **FR-008**: Headless MUST be published as compiled modules with their declarations as `@intellectual-frontiers/headless` (commons 0032-libraries-by-concern FR-005), with an entry for the package (`.`) and one for each layer (`./governance`, `./logical`, `./cli`, `./targets/local`, `./targets/ssh`, `./ssh-inbound`, `./otel`), for Node 26 and Bun, and its manifest (`library.ts`) MUST agree with its folder; its `package.json` MUST stay private so that nothing is published from the folder by hand. Taken from: the packaging of terminal, system and quality (commons 0032-libraries-by-concern FR-005, commons 0032-libraries-by-concern FR-013).
+- **FR-009**: Renderers render and the SDK decides: every surface (the command line, the tool server, the REST interface, the terminal UI and a graphical interface) MUST be generated from one command definition of the program and MUST hold no domain decision (what is allowed, who may, the next step, whether a value is valid, what a gate requires, what an effect is), which is a function of the logical layer or of the program's own SDK; a surface MUST only collect typed inputs, call the command, render its typed result and relay a person's explicit act. One definition MUST give the same typed result through the command line and the tool server, and the REST document MUST name the same command and options.
 
 ## Acceptance scenarios
 
@@ -29,6 +30,7 @@
 4. **Given** a file of the command-line surface that imports the telemetry, **When** the check runs, **Then** it reports `layers/external`, per FR-004 and FR-005.
 5. **Given** a folder under `src/surfaces/` with no row in the table, **When** the library's tests run, **Then** they fail, per FR-006.
 6. **Given** the packed package, **When** a consumer on Node 26 and on Bun type-checks and imports each entry, **Then** both succeed, per FR-008.
+7. **Given** one command definition, **When** it is run through the command line with `--json` and called through the tool server, **Then** both give the same typed document, and the REST document names the same command and options, per FR-009.
 
 ## Out of scope
 

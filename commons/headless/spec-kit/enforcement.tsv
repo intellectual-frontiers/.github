@@ -9,6 +9,7 @@ requirement	mechanism	by	note
 0001-headless-layers FR-006	check	.github: cd commons/headless && bun run verify	suite/layers.test.ts: a surface is one folder with one row of the table; a folder with no row is layers/unclassified, and its row says what it may import
 0001-headless-layers FR-007	check	.github: cd commons/headless && bun run verify	suite/layers.test.ts: the check holds the findings of the layers and of the trace against the baseline, which only shrinks, and verify runs it
 0001-headless-layers FR-008	check	.github: cd commons/headless && bun run verify	suite/layers.test.ts: the manifest agrees with the folder: the entries, the name, the level, the version and the distribution
+0001-headless-layers FR-009	check	.github: cd commons/headless && bun run verify	suite/surface-parity.test.ts: one command definition gives the same typed result through the command line and the tool server, and the REST document names the same command and options
 0002-headless-governance FR-001	check	.github: cd commons/headless && bun run verify	suite/governance-action.test.ts: an action has the facts of its kind by default, and defaults can be overridden
 0002-headless-governance FR-002	check	.github: cd commons/headless && bun run verify	suite/governance-action.test.ts: a report only reads, and an action that only reads is a report
 0002-headless-governance FR-003	check	.github: cd commons/headless && bun run verify	suite/governance-action.test.ts: a destructive action must preview and is not idempotent; a check needs a change to look for
