@@ -223,7 +223,7 @@ async function trainConsumer(w: World, shown: string, dir: string, released: rea
       findings.push(
         c.class === "blocking"
           ? finding("fail", "E-TRAIN-VERIFY", `${shown}: the check ${c.check} blocks a release and ended with ${r.code}: ${c.argv.join(" ")}`, where)
-          : finding("warn", c.check === "tests" ? "E-TRAIN-TESTS-FAILING" : "E-TRAIN-FINDING", `${shown}: the check ${c.check} is a finding and does not block the release; it ended with ${r.code}${c.check === "tests" ? ": FAILING TESTS, which also hold acceptance (opsfolio validate)" : ""}: ${c.argv.join(" ")}`, where),
+          : finding("warn", c.check === "tests" ? "E-TRAIN-TESTS-FAILING" : "E-TRAIN-FINDING", `${shown}: the check ${c.check} is a finding and does not block the release; it ended with ${r.code}${c.check === "tests" ? ": FAILING TESTS, which also hold acceptance" : ""}: ${c.argv.join(" ")}`, where),
       );
     }
   }

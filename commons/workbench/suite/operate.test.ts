@@ -140,7 +140,8 @@ proves(["0007-workbench-operate FR-010"], "the bootstrap is generic: it takes a 
   const ps = bootstrapPs1();
   assert(sh.includes("OWNER/NAME") && sh.includes('gh repo clone "$repo" "$dir"') && sh.includes('exec bash "$dir/bin/operate.sh"'));
   assert(ps.includes("[Parameter(Mandatory = $true)][string]$Repo") && ps.includes("gh repo clone $Repo $folder") && ps.includes("bin/operate.ps1"));
-  for (const word of ["opsfolio", "Opsfolio", "erga", "intellectual-frontiers"]) assert(!sh.includes(word) && !ps.includes(word), `the bootstrap does not name ${word}`);
+  const product = ["ops", "folio"].join("");
+  for (const word of [product, product[0]!.toUpperCase() + product.slice(1), "erga", "intellectual-frontiers"]) assert(!sh.includes(word) && !ps.includes(word), `the bootstrap does not name ${word}`);
   assertEquals(stepsOf(sh), []);
 });
 

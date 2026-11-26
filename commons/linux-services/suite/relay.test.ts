@@ -111,14 +111,14 @@ proves([S("FR-006")], "the program is a pin of our own release by SHA-256 for pi
   assertEquals(program?.kind, "tool");
   const desired = program?.desired as { dialect: string; source: { sha256: string; pin: string } };
   assertEquals([desired.dialect, desired.source.sha256, desired.source.pin], ["pinned-downloads", "a".repeat(64), "pin-ifc-relay"]);
-  const own = parseOtelSiteRelay(good({ program: { kind: "command", argv: ["/usr/local/bin/opsfolio", "relay", "run"] }, receivers: [{ kind: "syslog", port: 6514, transport: "tcp", format: "rfc5424" }, { kind: "otlp", port: 4318 }] }));
+  const own = parseOtelSiteRelay(good({ program: { kind: "command", argv: ["/usr/local/bin/synthetic-relay", "run"] }, receivers: [{ kind: "syslog", port: 6514, transport: "tcp", format: "rfc5424" }, { kind: "otlp", port: 4318 }] }));
   assert(own.kind === "ok", own.kind === "err" ? own.error.join("|") : "");
   if (own.kind === "ok") {
     const q = otelSiteRelayRequirements(own.value);
     assert(q.kind === "ok" && !q.value.some((x) => String(x.id).endsWith(".program") || String(x.id).endsWith(".config")), "a command installs no program and has no collector configuration");
-    assert(relayUnit(own.value).includes("ExecStart=/usr/local/bin/opsfolio relay run"));
+    assert(relayUnit(own.value).includes("ExecStart=/usr/local/bin/synthetic-relay run"));
   }
-  assert(parseOtelSiteRelay(good({ program: { kind: "command", argv: ["/usr/local/bin/opsfolio", "relay", "run"] } })).kind === "err", "snmp and the others are not for the relay's own program");
+  assert(parseOtelSiteRelay(good({ program: { kind: "command", argv: ["/usr/local/bin/synthetic-relay", "run"] } })).kind === "err", "snmp and the others are not for the relay's own program");
   assert(parseOtelSiteRelay(good({ program: { kind: "command", argv: ["relative", "x"] }, receivers: [{ kind: "otlp", port: 4318 }] })).kind === "err", "a command is an absolute path");
   assert(parseOtelSiteRelay(good({ program: { kind: "command", argv: ["/bin/sh", "-c", "x;y"] }, receivers: [{ kind: "otlp", port: 4318 }] })).kind === "err", "a word with shell syntax");
 });

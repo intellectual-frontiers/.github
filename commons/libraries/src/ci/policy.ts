@@ -118,7 +118,7 @@ export type ReleaseClass = "blocking" | "finding";
 /**
  * The class of each check for a release (0002-libraries-ci-findings FR-010), the one table that Repoctl, Agora and the generated workflows read. Only what makes the thing released unbuildable or unsafe to run blocks: a file the parser refuses,
  * a type error (the type surface of the exports included), a package that does not pack or cannot be imported once installed, and a credential in what is published. Everything else (size, style, coverage of requirements, the shape of the
- * repository, a failing test) is a finding: it runs, it is recorded and it is printed, and the release goes on. A failing test also gates `opsfolio validate`, which is acceptance and a different stage. A hold decided by the owner (`RELEASE_POLICY`)
+ * repository, a failing test) is a finding: it runs, it is recorded and it is printed, and the release goes on. A failing test also gates the acceptance of a product, which is a different stage. A hold decided by the owner (`RELEASE_POLICY`)
  * and the approvals of a person are stages of a workflow and not checks, so they are not in this table.
  */
 export const CHECK_CLASS: Readonly<Record<Check, { readonly class: ReleaseClass; readonly why: string }>> = {
@@ -126,7 +126,7 @@ export const CHECK_CLASS: Readonly<Record<Check, { readonly class: ReleaseClass;
   types: { class: "blocking", why: "a type error is a crack in the type safety that every consumer relies on, the exported surface included" },
   pack: { class: "blocking", why: "a package that does not pack, install or import is not a release at all (how big it is does not decide that: a size budget is an advisory)" },
   "secret-scan": { class: "blocking", why: "a credential in a published package cannot be taken back, so this is a safety rule and not a style rule (kept blocking until the owner decides otherwise)" },
-  tests: { class: "finding", why: "a failing test is said loudly in the release summary and holds acceptance (`opsfolio validate`), and the release is not a claim of acceptance" },
+  tests: { class: "finding", why: "a failing test is said loudly in the release summary and holds acceptance, and the release is not a claim of acceptance" },
   lint: { class: "finding", why: "style and the findings of the linter are recorded and fixed, and a release does not wait for them" },
   format: { class: "finding", why: "the format of a file does not change what runs" },
   layers: { class: "finding", why: "the layers of a ladder are architecture and are held by review of the finding" },

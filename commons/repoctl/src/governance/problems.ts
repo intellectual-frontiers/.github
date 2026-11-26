@@ -342,7 +342,7 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
   },
   "E-TRAIN-TESTS-FAILING": {
     title: "Tests of a consumer fail",
-    what: "The tests command of the consumer's commons-consumer.json ended with a failure after its pins moved. The release is not blocked by it, and acceptance (opsfolio validate) is.",
+    what: "The tests command of the consumer's commons-consumer.json ended with a failure after its pins moved. The release is not blocked by it, and acceptance is.",
     why: "The new version changes behaviour a test of the consumer holds.",
     fix: "repoctl release train --only PATH",
   },

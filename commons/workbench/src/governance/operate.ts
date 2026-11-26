@@ -28,9 +28,9 @@ export type ConvergeStep = { readonly id: string; readonly say: string; readonly
 
 /** The operate plan. */
 export type OperateSpec = {
-  /** What a person calls the product (`Opsfolio`). */
+  /** What a person calls the product (`Synthetic Product`). */
   readonly name: string;
-  /** A plain word: the folder of the stamp and the prefix of the variables (`opsfolio`). */
+  /** A plain word: the folder of the stamp and the prefix of the variables (`synthetic-product`). */
   readonly slug: string;
   /** The Bun the scripts leave or install: `minimum` is the oldest left as it is, `version` the one installed, with a pin for each platform that has one. */
   readonly bun: { readonly version: string; readonly minimum: string; readonly pins: readonly BunPin[] };
