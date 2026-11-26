@@ -93,6 +93,8 @@ export type WorldOptions = {
   readonly pid?: number;
   readonly observer?: Io["observer"];
   readonly marks?: Io["marks"];
+  readonly caps?: Io["caps"];
+  readonly outCaps?: Io["outCaps"];
   readonly tier?: TierName;
 };
 
@@ -118,6 +120,8 @@ export function world(o: WorldOptions = {}): Io & { readonly asked: string[] } {
     ...(o.timer === undefined ? {} : { timer: o.timer }),
     ...(o.observer === undefined ? {} : { observer: o.observer }),
     ...(o.marks === undefined ? {} : { marks: o.marks }),
+    ...(o.caps === undefined ? {} : { caps: o.caps }),
+    ...(o.outCaps === undefined ? {} : { outCaps: o.outCaps }),
     ...(o.tier === undefined ? {} : { tier: o.tier }),
   };
 }

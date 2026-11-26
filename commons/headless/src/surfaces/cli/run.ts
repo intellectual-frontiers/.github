@@ -26,7 +26,7 @@
 import { isErr } from "@intellectual-frontiers/core";
 import { formatUsageError, parseArgs, type Args, type Spec } from "@intellectual-frontiers/terminal/args";
 import { formatCommandError, resolveCommand } from "@intellectual-frontiers/terminal/commands";
-import { tty } from "@intellectual-frontiers/system";
+import { atMost, capabilitiesOf, colourDepthOf, type UiCaps } from "@intellectual-frontiers/terminal/ui";
 import {
   decide,
   tierMessage,
@@ -80,23 +80,33 @@ import { Reporter } from "./reporter.ts";
 import { guarded } from "./signals.ts";
 import { dueHints, hintsFileOf, logDirOf, logName, pruneLogs, RunLog, stateDirOf } from "./state.ts";
 import type { Look } from "./style.ts";
+import { styleHelp } from "./view.ts";
 
-/** The variables the look of the terminal depends on. */
-const LOOK_VARS = ["NO_COLOR", "FORCE_COLOR", "TERM", "LC_ALL", "LC_CTYPE", "LANG", "WT_SESSION", "TERM_PROGRAM", "ConEmuANSI"] as const;
+/** The variables the capabilities of the terminal depend on. */
+const LOOK_VARS = ["NO_COLOR", "FORCE_COLOR", "CI", "COLORTERM", "TERM", "LC_ALL", "LC_CTYPE", "LANG", "WT_SESSION", "TERM_PROGRAM", "KITTY_WINDOW_ID", "WEZTERM_EXECUTABLE", "ConEmuANSI"] as const;
 
 /**
- * The look of the error stream, where the narration goes (0008-exit-style-consent FR-002). The style of the marks is an explicit decision, `Io.marks`: `plain` (the ASCII marks), `emoji`,
- * or `auto`, the default, which is plain unless the stream is a terminal that shows emoji and nothing asks for plain: not `NO_COLOR`, not `--no-color`, not the program's `<PREFIX>_PLAIN`.
+ * The look of a stream (0004-headless-cli FR-016, 0008-exit-style-consent FR-002): the capabilities the host decided once with `capabilitiesOf` (`Io.caps` for the error stream, where the narration goes, `Io.outCaps` for the output stream, where a report goes),
+ * else the same function applied to `Io.env` and `Io.terminal`. They are only ever lowered: `NO_COLOR`, `--no-color` and the program's `<PREFIX>_PLAIN` give the plain level, and `FORCE_COLOR` is the one thing that raises a pipe to colour (at the depth it names). The style of the marks is an explicit decision,
+ * `Io.marks`: `plain` (the ASCII tags), `emoji`, or `auto`, the default, which is plain unless the stream is a terminal that shows emoji and nothing asks for plain: not `NO_COLOR`, not `--no-color`, not the program's `<PREFIX>_PLAIN`.
  * The program's `<PREFIX>_EMOJI` turns emoji on where nothing asks for plain. So a run in CI, in a pipe or with colour off is the same plain text everywhere.
  */
-export function lookOfRun(program: Program, io: Io, colour: boolean): Look {
+export function lookOfRun(program: Program, io: Io, colour: boolean, stream: "err" | "out" = "err"): Look {
   const vars: Record<string, string | undefined> = Object.fromEntries(LOOK_VARS.map((n) => [n, io.env(n)]));
-  const base = tty.lookOf({ env: vars, terminal: io.terminal.stderr, os: io.os, ...(io.columns === undefined ? {} : { columns: io.columns }) });
+  const isTerminal = stream === "err" ? io.terminal.stderr : io.terminal.stdout;
+  const decided = (stream === "err" ? io.caps : io.outCaps) ?? capabilitiesOf(vars, { isTTY: isTerminal, ...(io.columns === undefined ? {} : { columns: io.columns }) });
+  const tty = isTerminal && (vars["TERM"] ?? "") !== "dumb";
   const set = (n: string): boolean => (io.env(`${program.envPrefix}_${n}`) ?? "") !== "";
   const asksPlain = set("PLAIN") || !colour || (io.env("NO_COLOR") ?? "") !== "";
+  const forced = !["", "0", "false"].includes(vars["FORCE_COLOR"] ?? "");
+  const columns = decided.columns >= 40 ? decided.columns : 80;
+  let caps: UiCaps = { ...decided, columns };
+  if (asksPlain) caps = atMost(caps, "plain");
+  else if (forced && caps.level === "plain") caps = { ...caps, level: "ansi", colourDepth: colourDepthOf(vars, "ansi"), colour: colourDepthOf(vars, "ansi") !== "none", emoji: false };
   const style = io.marks ?? "auto";
-  const emoji = style === "plain" ? false : style === "emoji" ? true : asksPlain ? false : set("EMOJI") ? true : base.tty && base.emoji;
-  return { tty: base.tty, colour: base.colour && colour, emoji, columns: base.columns };
+  const emoji = style === "plain" ? false : style === "emoji" ? true : asksPlain ? false : set("EMOJI") ? true : tty && caps.emoji;
+  // a line redrawn in place is cursor control, which the plain level never has (the ui's levels): a pipe, CI, NO_COLOR and --no-color draw only the final lines
+  return { ...caps, emoji, tty: tty && caps.level !== "plain" };
 }
 
 /** The standard options out of the parsed values of an options spec that holds them with the command's own. */
@@ -140,6 +150,8 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
     return end(exitCodeOf("usage"));
   };
 
+  // the help is a text for the output stream, dressed by what that stream can show
+  const helpLook = (): Look => lookOfRun(program, io, !argv.includes("--no-color"), "out");
   // the words the surface answers itself
   const first = argv[0];
   if (first === "--version" || first === "-V") {
@@ -149,7 +161,7 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
   if (first === "help") {
     const text = helpFor(program, argv.slice(1));
     if (text === undefined) return usage(`${argv.slice(1).join(" ")} is not a command of ${program.name}. Run ${program.name} help to see them.`);
-    writeOut(`${text}\n`);
+    writeOut(`${styleHelp(text, helpLook())}\n`);
     return end(exitCodeOf("ok"));
   }
   if (first === "explain") {
@@ -182,7 +194,7 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
   const r = resolved.value;
   const below = r.path.slice(1);
   if (r.kind === "help") {
-    writeOut(`${helpFor(program, below) ?? ""}\n`);
+    writeOut(`${styleHelp(helpFor(program, below) ?? "", helpLook())}\n`);
     return end(exitCodeOf("ok"));
   }
   const placed: Placed | undefined = placedCommands(program.children).find((p) => p.path.length === below.length && p.path.every((w, i) => w === below[i]));
@@ -192,7 +204,7 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
   const parsed = parseArgs<Spec>(r.args, spec as never, placed.command.operands);
   if (isErr(parsed)) return usage(formatUsageError(parsed.error, [program.name, ...below].join(" ")));
   if (parsed.value.kind === "help") {
-    writeOut(`${helpFor(program, below) ?? ""}\n`);
+    writeOut(`${styleHelp(helpFor(program, below) ?? "", helpLook())}\n`);
     return end(exitCodeOf("ok"));
   }
   const args = parsed.value;
@@ -207,7 +219,9 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
   if (isErr(mode)) return usage(mode.error);
 
   const interactive = io.terminal.stdin && io.terminal.stderr && !flag("nonInteractive");
-  const look = lookOfRun(program, io, standard["color"] !== false && verbosity.value !== "json");
+  const colourWanted = standard["color"] !== false && verbosity.value !== "json";
+  const look = lookOfRun(program, io, colourWanted);
+  const outLook = lookOfRun(program, io, colourWanted, "out");
   const decision: Decision = decide(placed.facts, { audience: "human", interactive, flagConfirms: true }, { mode: mode.value, confirmed: flag("yes"), given: given(own), ...(typeof standard["consent"] === "string" ? { consent: standard["consent"] } : {}) }, placed.reach);
   if (decision.kind === "refuse") return usage(decision.message);
   const prompt = promptOf({ interactive, readLine: io.readLine, write: writeErr });
@@ -220,7 +234,7 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
   if (typeof onTargets === "string") {
     const forwarded = forwardedArgs(r.args);
     const withYes = placed.facts.effect === "destructive" && !forwarded.includes("--yes") && decision.kind !== "preview" ? ["--yes", ...forwarded] : forwarded;
-    const done = await runOn({ program, io, placed, selector: onTargets, args: withYes, verbosity: verbosity.value, look, sarif: flag("sarif"), below });
+    const done = await runOn({ program, io, placed, selector: onTargets, args: withYes, verbosity: verbosity.value, look, outLook, sarif: flag("sarif"), below });
     writeOut(done.out);
     writeErr(done.err);
     return end(done.code);
@@ -228,7 +242,7 @@ export async function run(whole: Program, argv: readonly string[], io: Io): Prom
 
   const info = { program: program.name, version: program.version, command: placed.id };
   const body = async (events: RunEvents | undefined): Promise<Ended> =>
-    await execute({ program, io, placed, ownArgs, mode: mode.value, verbosity: verbosity.value, interactive, look, sarif: flag("sarif"), prompt, ...(typeof standard["consent"] === "string" && decision.kind === "proceed" && placed.reach?.confirmation === "consent" ? { consent: standard["consent"] } : {}), ...(events === undefined ? {} : { events }) });
+    await execute({ program, io, placed, ownArgs, mode: mode.value, verbosity: verbosity.value, interactive, look, outLook, sarif: flag("sarif"), prompt, ...(typeof standard["consent"] === "string" && decision.kind === "proceed" && placed.reach?.confirmation === "consent" ? { consent: standard["consent"] } : {}), ...(events === undefined ? {} : { events }) });
   const ended = io.observer === undefined ? await body(undefined) : await io.observer.observe(info, (events) => body(events));
   writeOut(ended.out);
   writeErr(ended.err);
@@ -244,6 +258,8 @@ type Execution = {
   readonly verbosity: Verbosity;
   readonly interactive: boolean;
   readonly look: Look;
+  /** What the output stream, where a report is written, can show. */
+  readonly outLook: Look;
   readonly sarif: boolean;
   readonly prompt: Context["prompt"];
   /** The identifier of the consent the run went on by, which the run log records. */
@@ -320,6 +336,7 @@ async function executeWith(x: Execution, credentials: Context["credentials"], co
     mode: x.mode,
     verbosity: x.verbosity,
     interactive: x.interactive,
+    ui: x.outLook,
     progress,
     prompt: x.prompt,
     credentials,

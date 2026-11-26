@@ -100,11 +100,13 @@ proves(["0001-headless-layers FR-004"], "each unit imports only what its row all
   no("src/governance/a.ts", "node:fs");
   ok("src/logical/a.ts", "@intellectual-frontiers/terminal/args");
   ok("src/logical/a.ts", "@intellectual-frontiers/terminal/commands");
+  ok("src/logical/a.ts", "@intellectual-frontiers/terminal/ui");
   no("src/logical/a.ts", "@intellectual-frontiers/terminal/palette");
   no("src/logical/a.ts", "@intellectual-frontiers/system");
   no("src/logical/a.ts", "@intellectual-frontiers/telemetry");
   no("src/logical/a.ts", "fast-check");
-  for (const s of ["@intellectual-frontiers/core", "@intellectual-frontiers/terminal/palette", "@intellectual-frontiers/terminal/width", "@intellectual-frontiers/terminal/args", "@intellectual-frontiers/system"]) ok("src/surfaces/cli/a.ts", s);
+  for (const s of ["@intellectual-frontiers/core", "@intellectual-frontiers/terminal/ui", "@intellectual-frontiers/terminal/width", "@intellectual-frontiers/terminal/args", "@intellectual-frontiers/terminal/commands", "@intellectual-frontiers/system"]) ok("src/surfaces/cli/a.ts", s);
+  no("src/surfaces/cli/a.ts", "@intellectual-frontiers/terminal/palette");
   no("src/surfaces/cli/a.ts", "node:fs");
   no("src/surfaces/cli/a.ts", "@intellectual-frontiers/net");
   ok("src/otel/a.ts", "@intellectual-frontiers/telemetry/signals");

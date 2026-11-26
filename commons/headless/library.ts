@@ -24,7 +24,7 @@ export const library = {
         layer: "logical",
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands"] },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands", "ui"] },
         ],
       },
       {
@@ -33,7 +33,7 @@ export const library = {
         mayImport: ["src/governance/", "src/logical/"],
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/terminal", subpaths: "any" },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands", "ui", "width"] },
           { name: "@intellectual-frontiers/system", subpaths: "any" },
         ],
       },

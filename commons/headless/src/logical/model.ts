@@ -21,6 +21,7 @@
  * @module
  */
 import { flag, value, type Args, type Operand, type Spec, type SpecCheck } from "@intellectual-frontiers/terminal/args";
+import type { UiCaps } from "@intellectual-frontiers/terminal/ui";
 import { group, treeProblems, type CommandNode, type Example, type Group, type TreeProblem, type Verb } from "@intellectual-frontiers/terminal/commands";
 import { actionProblems, defineAction, reachConformance, type ActionDefinition, type ActionFacts, type ActionProblem, type Mode, type Problem, type ProblemFields, type ReachPolicy, type ReachProblem } from "@intellectual-frontiers/headless/governance";
 import { problem } from "@intellectual-frontiers/headless/governance";
@@ -44,6 +45,8 @@ export type Context = {
   readonly verbosity: Verbosity;
   /** Whether the person can be asked a question now. */
   readonly interactive: boolean;
+  /** What the output stream, where a report's text is written, can show (colour depth, emoji, columns), decided once by the host: plain where the output is a pipe and in `json`. A command that draws a table or a block of rows gives it to the surface's drawing functions; none where there is no surface to say. */
+  readonly ui?: UiCaps;
   /** Where the command tells what it is doing, as it does it. */
   readonly progress: Progress;
   /** A question to the person; each answers `undefined` where there is no one to ask. */

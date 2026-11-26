@@ -1,0 +1,26 @@
+### plain at 60
+
+synthetic-host-01
+-----------------
+  state:      ready
+  workspaces: 2 (synthetic-repo-01, synthetic-repo-02)
+  last run:   2026-11-26 10:00
+  log:        /home/synthetic-user-01/.local/state/tool/lo…
+
+### ansi at 60
+
+␛[36;1msynthetic-host-01␛[0m
+␛[2m-----------------␛[0m
+  ␛[2mstate:␛[0m      ready
+  ␛[2mworkspaces:␛[0m 2 (synthetic-repo-01, synthetic-repo-02)
+  ␛[2mlast run:␛[0m   2026-11-26 10:00
+  ␛[2mlog:␛[0m        /home/synthetic-user-01/.local/state/tool/lo…
+
+### full at 60
+
+␛[1;38;2;102;204;238msynthetic-host-01␛[0m
+␛[38;2;136;136;136m─────────────────␛[0m
+  ␛[38;2;136;136;136mstate:␛[0m      ready
+  ␛[38;2;136;136;136mworkspaces:␛[0m 2 (synthetic-repo-01, synthetic-repo-02)
+  ␛[38;2;136;136;136mlast run:␛[0m   2026-11-26 10:00
+  ␛[38;2;136;136;136mlog:␛[0m        /home/synthetic-user-01/.local/state/tool/lo…

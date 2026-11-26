@@ -1,4 +1,4 @@
-// Spec: 0004-headless-cli FR-003, FR-004, FR-005, FR-007
+// Spec: 0004-headless-cli FR-003, FR-004, FR-005, FR-007, FR-021
 /**
  * The calm reporter (commons headless 0004-headless-cli FR-003, FR-005, FR-007): what a command tells while it runs, drawn as a person wants to read
  * it. Quiet on success and loud on a problem: a line for a phase only when it has something to see (a green step line is for `--verbose`), every item only with `--verbose`, the problems kept for the closing
@@ -7,9 +7,11 @@
  *
  * @example
  * ```ts
+ * import { capabilitiesOf } from "@intellectual-frontiers/terminal/ui";
  * import { Reporter } from "./reporter.ts";
+ * import { lookOf } from "./style.ts";
  * const written: string[] = [];
- * const r = new Reporter({ look: { tty: false, colour: false, emoji: false, columns: 80 }, verbosity: "calm", write: (t) => written.push(t), now: () => 0 });
+ * const r = new Reporter({ look: lookOf(capabilitiesOf({}, { isTTY: false }), false), verbosity: "calm", write: (t) => written.push(t), now: () => 0 });
  * r.progress({ kind: "phase", name: "Packages" });
  * r.progress({ kind: "done", result: "86 installed" });
  * r.close();
@@ -22,7 +24,8 @@ import type { Problem, ProblemLevel } from "@intellectual-frontiers/headless/gov
 import { shows, type Hint, type LineKind, type Progress, type ProgressEvent, type Verbosity } from "@intellectual-frontiers/headless/logical";
 import type { RunEvents, TimerPort } from "./io.ts";
 import type { RunLog } from "./state.ts";
-import { dim, fit, fmtDuration, line, mark, paint, progressBar, spinnerFrame, type Look, type Tone } from "./style.ts";
+import { dim, fmtDuration, line, mark, paint, type Look, type Tone } from "./style.ts";
+import { heartbeatLine, stepLive } from "./view.ts";
 
 /** What a reporter is made from. */
 export type ReporterOptions = {
@@ -95,7 +98,7 @@ export class Reporter {
 
   #redraw(): void {
     if (!this.#drawsLive || this.#phase === undefined) return;
-    const text = fit(`${spinnerFrame(this.#step, this.#o.look)} ${this.#phase.name}${this.#live === undefined ? "" : `  ${this.#live}`}`, this.#o.look);
+    const text = heartbeatLine({ name: this.#phase.name, live: this.#live, elapsedMs: this.#o.now() - this.#phase.started, step: this.#step }, this.#o.look);
     this.#o.write(`\r${text}\u001b[K`);
     this.#liveShown = true;
   }
@@ -153,7 +156,7 @@ export class Reporter {
         return;
       }
       case "step": {
-        this.#live = `${progressBar(event.n, event.total, 20, this.#o.look)} ${event.n}/${event.total}${event.label === "" ? "" : `  ${event.label}`}`;
+        this.#live = stepLive(event.n, event.total, event.label, this.#o.look);
         this.#redraw();
         return;
       }

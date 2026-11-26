@@ -1,0 +1,32 @@
+### plain at 80
+tool sync  synthetic-host-01
+   [ok] synthetic-package-01
+   [skip] synthetic-package-02
+[ok] Packages           1 ok, 1 skipped (4s)
+   [ok] synthetic-file-01.txt
+[!] Files              1 changed (1m12s)
+[todo] Token
+[you] Send
+[x] Disk
+
+### ansi at 80
+␛[36;1mtool sync␛[0m␛[2m  synthetic-host-01␛[0m
+   ␛[32m[ok]␛[0m ␛[2msynthetic-package-01␛[0m
+   ␛[2m[skip]␛[0m ␛[2msynthetic-package-02␛[0m
+␛[32m[ok]␛[0m Packages           1 ok, 1 skipped ␛[2m(4s)␛[0m
+   ␛[32m[ok]␛[0m ␛[2msynthetic-file-01.txt␛[0m
+␛[33m[!]␛[0m Files              1 changed ␛[2m(1m12s)␛[0m
+␛[2m[todo]␛[0m Token
+␛[36;1m[you]␛[0m Send
+␛[31;1m[x]␛[0m Disk
+
+### full at 80
+␛[1;38;2;102;204;238mtool sync␛[0m␛[38;2;136;136;136m  synthetic-host-01␛[0m
+   ␛[38;2;102;204;136m✅␛[0m ␛[38;2;136;136;136msynthetic-package-01␛[0m
+   ␛[38;2;136;136;136m⏭️␛[0m ␛[38;2;136;136;136msynthetic-package-02␛[0m
+␛[38;2;102;204;136m✅␛[0m Packages           1 ok, 1 skipped ␛[38;2;136;136;136m(4s)␛[0m
+   ␛[38;2;102;204;136m✅␛[0m ␛[38;2;136;136;136msynthetic-file-01.txt␛[0m
+␛[38;2;238;170;68m⚠️␛[0m Files              1 changed ␛[38;2;136;136;136m(1m12s)␛[0m
+␛[38;2;136;136;136m⏳␛[0m Token
+␛[1;38;2;102;204;238m⚡␛[0m Send
+␛[38;2;238;102;102m❌␛[0m Disk
