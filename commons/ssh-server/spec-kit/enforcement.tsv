@@ -1,0 +1,74 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-ssh-server-layers FR-001	check	.github: cd commons/ssh-server && bun run verify	layers.test.ts: the shared checker finds nothing in the real tree
+0001-ssh-server-layers FR-002	check	.github: cd commons/ssh-server && bun run verify	layers.test.ts: verify runs every check
+0001-ssh-server-layers FR-003	check	.github: cd commons/ssh-server && bun run verify	layers.test.ts: the manifest allows ssh2 in physical only, the version is exact, logical and governance import nothing external
+0001-ssh-server-layers FR-004	check	.github: cd commons/ssh-server && bun run verify	layers.test.ts: the exports are the four entries, and no file of src/ holds the ssh2 Client
+0001-ssh-server-layers FR-005	check	.github: cd commons/ssh-server && bun run verify	server.test.ts and ssh2-spike.test.ts run on Bun in verify and on Node with `node --test`; layers.test.ts: no src file imports child_process
+0001-ssh-server-layers FR-006	none	-	Stated: UNVERIFIED items are listed so that nobody reads their absence as success
+0002-enrollment-protocol FR-001	check	.github: cd commons/ssh-server && bun run verify	registry.test.ts: grammar, metacharacters, oversize, and a seeded fuzz of the parser
+0002-enrollment-protocol FR-002	check	.github: cd commons/ssh-server && bun run verify	registry.test.ts: a command added by a test, duplicates, unknown commands
+0002-enrollment-protocol FR-003	check	.github: cd commons/ssh-server && bun run verify	registry.test.ts: the table of commands
+0002-enrollment-protocol FR-004	check	.github: cd commons/ssh-server && bun run verify	dialogue.test.ts: every move of the table, the refusal of the others, expiry; server.test.ts: another source
+0002-enrollment-protocol FR-005	check	.github: cd commons/ssh-server && bun run verify	dialogue.test.ts: decodeMessage, wrong state, oversize
+0002-enrollment-protocol FR-006	check	.github: cd commons/ssh-server && bun run verify	governance.test.ts: decoder, bounds and a seeded fuzz
+0002-enrollment-protocol FR-007	check	.github: cd commons/ssh-server && bun run verify	governance.test.ts: decoder, refusals, wire
+0002-enrollment-protocol FR-008	check	.github: cd commons/ssh-server && bun run verify	dialogue.test.ts and enroll-flow.test.ts
+0002-enrollment-protocol FR-009	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts: join, reuse, expiry, token reuse
+0002-enrollment-protocol FR-010	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: knock; logical.test.ts: the classes
+0002-enrollment-protocol FR-011	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: checkin with an enrolled key, and with another
+0002-enrollment-protocol FR-012	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: leave
+0002-enrollment-protocol FR-013	check	.github: cd commons/ssh-server && bun run verify	registry.test.ts
+0002-enrollment-protocol FR-014	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: the log holds no token
+0002-enrollment-protocol FR-015	check	.github: cd commons/ssh-server && bun run verify	governance.test.ts
+0002-enrollment-protocol FR-016	check	.github: cd commons/ssh-server && bun run verify	dialogue.test.ts: the conversation steps like the machine; registry.test.ts: the table
+0002-enrollment-protocol FR-017	check	.github: cd commons/ssh-server && bun run verify	registry.test.ts and enroll-flow.test.ts
+0002-enrollment-protocol FR-018	check	.github: cd commons/ssh-server && bun run verify	pairing.test.ts: honest, man in the middle, tampering, replay, nonce reuse
+0002-enrollment-protocol FR-019	check	.github: cd commons/ssh-server && bun run verify	pairing.test.ts and enroll-flow.test.ts: three wrong codes, expiry on an injected clock
+0002-enrollment-protocol FR-020	check	.github: cd commons/ssh-server && bun run verify	pairing.test.ts: both alphabets
+0002-enrollment-protocol FR-021	check	.github: cd commons/ssh-server && bun run verify	pairing.test.ts: tofu; server.test.ts: knock prints the code
+0002-enrollment-protocol FR-022	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: rotation and revoke with the real client
+0002-enrollment-protocol FR-023	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: the full circle
+0003-server-policy FR-001	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts
+0003-server-policy FR-002	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts: authDecision; server.test.ts: a key that is not enrolled
+0003-server-policy FR-003	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts (keyboard-interactive and none)
+0003-server-policy FR-004	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: each request with the OpenSSH client
+0003-server-policy FR-005	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts
+0003-server-policy FR-006	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts
+0003-server-policy FR-007	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts
+0003-server-policy FR-008	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: timeouts and oversize
+0003-server-policy FR-009	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: host key
+0003-server-policy FR-010	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: the file store
+0003-server-policy FR-011	check	.github: cd commons/ssh-server && bun run verify	server.test.ts and dialogue.test.ts: approve and refuse
+0003-server-policy FR-012	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: concurrency
+0003-server-policy FR-013	check	.github: cd commons/ssh-server && bun run verify	server.test.ts
+0003-server-policy FR-014	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and server.test.ts
+0003-server-policy FR-015	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts: checkToken; server.test.ts: no token in the log
+0003-server-policy FR-016	check	.github: cd commons/ssh-server && bun run verify	server.test.ts: the close event and the transcript
+0004-scripts FR-001	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts: the text and shellcheck
+0004-scripts FR-002	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts: the text and PSScriptAnalyzer
+0004-scripts FR-003	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: the whole dialogue with the real script
+0004-scripts FR-004	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts and server.test.ts: the hash in the audit log
+0004-scripts FR-005	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts: drift
+0004-scripts FR-006	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts
+0004-scripts FR-007	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: a plan with a wrong hash stops; a `run` step runs
+0004-scripts FR-008	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts: the catalog; the hashes were computed on 2026-11-26
+0004-scripts FR-009	check	.github: cd commons/ssh-server && bun run verify	docker.test.ts
+0004-scripts FR-010	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: the real client with the embedded line, and another key refused
+0005-enrollment-policy FR-001	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts
+0005-enrollment-policy FR-002	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and enroll-flow.test.ts
+0005-enrollment-policy FR-003	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts
+0005-enrollment-policy FR-004	none	-	Planned: UNBUILT, reserved; verified when attestation is built
+0005-enrollment-policy FR-005	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts
+0006-reserved FR-001	none	-	Planned: UNBUILT
+0006-reserved FR-002	none	-	Planned: UNBUILT
+0006-reserved FR-003	none	-	Planned: UNBUILT
+0006-reserved FR-004	none	-	Planned: UNBUILT
+0006-reserved FR-005	none	-	Planned: UNBUILT
+0006-reserved FR-006	none	-	Planned: UNBUILT
+0006-reserved FR-007	none	-	Planned: UNBUILT; the command `tether` is in the registry as reserved and refuses
+0006-reserved FR-008	none	-	Planned: owner decision first
+0006-reserved FR-009	none	-	Planned: UNBUILT
+0006-reserved FR-010	none	-	Planned: UNBUILT
+0006-reserved FR-011	none	-	Planned: UNBUILT; the guidance is in the Getting started page

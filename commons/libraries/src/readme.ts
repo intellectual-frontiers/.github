@@ -126,6 +126,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["lab", "program"],
   ["evidence-capture", "program"],
   ["linux-observe", "program"],
+  ["ssh-server", "program"],
   ["linux-services", "program"],
   ["lang-sql", "program"],
   ["estate-query", "program"],

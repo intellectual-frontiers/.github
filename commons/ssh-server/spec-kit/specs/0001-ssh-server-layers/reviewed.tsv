@@ -1,0 +1,2 @@
+# Requirements proven by review: the requirement, a tab, how it is verified.
+0001-ssh-server-layers FR-006	The UNVERIFIED items are stated in the requirement itself; the review is that this text lists each one and that no other requirement asserts them (checked at each release by reading this requirement).
