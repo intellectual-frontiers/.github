@@ -77,9 +77,9 @@ export function defineAction(d: ActionDefinition): ActionFacts {
 
 The Logical layer makes the model from Governance. A command in the program's tree carries its facts, and the facts are made by `defineAction`, which is Governance's function. Logical does not restate them.
 
-*Source: `commons/headless/src/logical/model.ts`, lines 181 to 192.*
+*Source: `commons/headless/src/logical/model.ts`, lines 184 to 195.*
 
-```ts source=commons/headless/src/logical/model.ts#L181-L192
+```ts source=commons/headless/src/logical/model.ts#L184-L195
 /** A command together with the path of its words. */
 export type Placed = { readonly path: readonly string[]; readonly id: string; readonly command: Command; readonly facts: ActionFacts; readonly reach: ReachPolicy | undefined };
 
@@ -187,7 +187,7 @@ All of this stays separate because Headless declares its layers as data, and a c
         layer: "logical",
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands"] },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands", "ui"] },
         ],
       },
       {
@@ -196,13 +196,13 @@ All of this stays separate because Headless declares its layers as data, and a c
         mayImport: ["src/governance/", "src/logical/"],
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/terminal", subpaths: "any" },
+          { name: "@intellectual-frontiers/terminal", subpaths: ["args", "commands", "ui", "width"] },
           { name: "@intellectual-frontiers/system", subpaths: "any" },
         ],
       },
 ```
 
-Governance may import only the kernel package. Logical may import Governance and the terminal's command types. The command-line surface may import Governance and Logical, and the table lists the external packages it may use. The other surfaces have rows of their own. A surface that tried to import the tool server from the command line would be a finding.
+Governance may import only the kernel package. Logical may import Governance and the terminal's command and drawing types. The command-line surface may import Governance and Logical, and the table lists the external packages it may use. The other surfaces have rows of their own. A surface that tried to import the tool server from the command line would be a finding.
 
 The check is run by the library's own `verify` script. Run from Headless's folder, it prints:
 

@@ -28,6 +28,8 @@ const available = (): Shell[] => {
   return out;
 };
 const SHELLS = available();
+/** The folders the installed shells are in (a shell may be in /usr/local/bin or /opt), so that the minimal PATH of a run still finds each. */
+const shellDirs = [...new Set(SHELLS.map((s) => dirname(spawnSync("sh", ["-c", `command -v ${BIN[s]}`], { encoding: "utf8" }).stdout.trim())).filter((d) => d !== "." && d !== ""))].join(":");
 
 const work = mkdtempSync(join(tmpdir(), "arcactl-shell-"));
 const bin = join(work, "bin");
@@ -54,7 +56,7 @@ function inShell(shell: Shell, scripts: readonly string[], snippet: (out: string
     return f;
   });
   const out = join(dir, "out");
-  const env = { PATH: `${bin}:${bunDir}:/usr/bin:/bin`, HOME: dir, TERM: "dumb", ...extra };
+  const env = { PATH: `${bin}:${bunDir}:${shellDirs}:/usr/bin:/bin`, HOME: dir, TERM: "dumb", ...extra };
   const src = (f: string): string => (shell === "sh" ? `. ${f}` : shell === "pwsh" ? `. '${f}'` : `source ${f}`);
   const body = `${files.map(src).join(shell === "pwsh" ? "; " : "\n")}\n${snippet(out)}`;
   const args: Record<Shell, string[]> = {

@@ -89,9 +89,14 @@ proves(
         "https://npm.pkg.github.com",
         "the package is sent to the GitHub package registry alone",
       );
-      // The parser is a runtime dependency. Drivers, the Docs tools, and the compiler are optional peers (0036-distribution FR-023).
+      // The parser and the SSH protocol library of the enrollment server are runtime dependencies. Drivers, the Docs tools, and the compiler are optional peers (0036-distribution FR-023).
       const kanonPackage = obj(JSON.parse(await fs.readTextFile(path.join(ROOT, "commons", "kanon", "package.json"))));
-      assertEquals(obj(manifest["dependencies"]), obj(kanonPackage["dependencies"]), "the package installs Kanon's parser dependencies");
+      const sshServerPackage = obj(JSON.parse(await fs.readTextFile(path.join(ROOT, "commons", "ssh-server", "package.json"))));
+      assertEquals(
+        obj(manifest["dependencies"]),
+        { ...obj(kanonPackage["dependencies"]), ...obj(sshServerPackage["dependencies"]) },
+        "the package installs Kanon's parser dependencies and the SSH library of the enrollment server",
+      );
       // the GitHub package registry drops peerDependenciesMeta from the metadata a package manager resolves from, so the optional peers are not peerDependencies entries (a package manager would install them): they are named in ifcOptionalPeers
       const peerDependencies = obj(manifest["peerDependencies"]);
       const optionalPeers = obj(manifest["ifcOptionalPeers"]);

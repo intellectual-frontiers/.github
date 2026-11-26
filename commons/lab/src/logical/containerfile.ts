@@ -59,9 +59,9 @@ export function readMachineSpec(input: unknown): Result<MachineSpec, readonly st
   });
 }
 
-/** The line that installs the packages with dnf: where the builder gives a secret `ca`, the install trusts it too, and the file is removed in the same layer. */
+/** The line that installs the packages with dnf: where the builder gives a secret `ca`, the install trusts it too, and the file is removed in the same layer; the status of the install is the status of the line, so that a failed install fails the build there and not at a later step. */
 const RHEL_INSTALL = (packages: string): string =>
-  "RUN --mount=type=secret,id=ca,required=false sh -c 'O=\"\"; if [ -r /run/secrets/ca ]; then cat /etc/pki/tls/certs/ca-bundle.crt /run/secrets/ca > /tmp/ca.pem; O=\"--setopt=sslcacert=/tmp/ca.pem\"; fi; dnf -y $O install --setopt=install_weak_deps=False " + packages + " && dnf clean all; rm -f /tmp/ca.pem'";
+  "RUN --mount=type=secret,id=ca,required=false sh -c 'O=\"\"; if [ -r /run/secrets/ca ]; then cat /etc/pki/tls/certs/ca-bundle.crt /run/secrets/ca > /tmp/ca.pem; O=\"--setopt=sslcacert=/tmp/ca.pem\"; fi; dnf -y $O install --setopt=install_weak_deps=False " + packages + " && dnf clean all; R=$?; rm -f /tmp/ca.pem; exit $R'";
 
 /** The line that installs the packages with pacman (0003-lab-arch-family FR-003): where the builder gives a secret `ca` it is trusted for the install through the system's own anchors and removed, and trust made again, in the same layer; `--disable-sandbox` only where the builder's kernel lists no Landlock. */
 const ARCH_INSTALL = (packages: string): string =>

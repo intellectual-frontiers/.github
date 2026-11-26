@@ -53,10 +53,8 @@ export const AGENTS_MARKS = { begin: "<!-- workbench:begin -->", end: "<!-- work
 
 Nobody edits inside the marks: `bun run repoctl sync` writes the block, and a check finds a block that is stale. The same rule is written in the file itself, as one of its bullets:
 
-```text source=AGENTS.md#L17-L19
-- **License**: every part of this repository is under `PolyForm-Noncommercial-1.0.0` (0035-licensing); `bun commons/libraries/src/license.ts` writes every `LICENSE`, so never write a license text by hand.
-- **Never put a secret, a token or a person's data in this repository: it is public.**
-- **A fact a program owns is a generated block between marks** (the libraries map of the README, the workbench block below): never edit inside the marks. What a check can enforce is a requirement with an enforcement row, not prose here.
+```text source=AGENTS.md#L21-L21
+- **A fact a program owns is a generated block between marks**: never edit inside the marks. What a check can enforce is a requirement with an enforcement row, not prose here.
 ```
 
 **Nothing that a check can enforce stays only as prose.** A rule that a program can check becomes a requirement of a specification with an enforcement row, one of `check`, `gate`, `review` or `none`, and `none` carries its reason. The rule in `AGENTS.md` then points at the requirement. This is the difference between a rule that is read and a rule that holds. Mizan, the specification method of the repository, keeps the register of these rows; [Mizan in the documentation](concept-mizan.md) describes it.
