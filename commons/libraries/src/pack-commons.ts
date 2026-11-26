@@ -436,7 +436,7 @@ const BUILTIN = /^(?:node|bun|data):/;
 const COMPILED = /\.(?:js|mjs)$/;
 
 /** What is wrong with the package staged in a folder (the files of the tarball, `package/` unpacked), for the libraries it is to hold: see the remarks of this module. */
-export function inspectCommons(stage: string, libraries: readonly string[], budget: { readonly apparentBytes: number; readonly files: number } = SINGLE_BUDGET): Findings {
+export function inspectCommons(stage: string, libraries: readonly string[]): Findings {
   const found: string[] = [];
   const manifestFile = join(stage, "package.json");
   if (!existsSync(manifestFile)) return ["package.json is not in the package"];
@@ -530,9 +530,7 @@ export function inspectCommons(stage: string, libraries: readonly string[], budg
   }
   // the content policy (FR-030, FR-031): dist/ holds declarations and nothing else, nothing internal ships, and no file is shipped twice
   const sizes = new Map<string, string[]>();
-  let apparent = 0;
   for (const f of files) {
-    apparent += readFileBytes(join(stage, f));
     if (/^[^/]+\/dist\//.test(f) && !f.endsWith(".d.ts")) found.push(`${f} is in dist/, which holds declarations only: a file a module reads is shipped once, beside its source`);
     if (INTERNAL_PATHS.some((re) => re.test(f))) found.push(`${f} is internal to commons (a test, a specification, a tool, a map, a lockfile or a baseline) and is not shipped`);
     if (!/\.(?:ts|js|mjs)$/.test(f) && f.includes("/") && !f.startsWith("bin/")) {
@@ -541,8 +539,15 @@ export function inspectCommons(stage: string, libraries: readonly string[], budg
     }
   }
   for (const group of sizes.values()) if (group.length > 1) found.push(`${group.join(" and ")} are the same file shipped twice`);
-  // the budget (FR-032)
-  if (files.size > budget.files) found.push(`the package has ${files.size} files, and the budget is ${budget.files}`);
+  return found;
+}
+
+/** What the size of the package staged in a folder says against its budget (0036-distribution FR-032): an advisory, a growth that is said and that never stops a release, since how big a package is does not make it unbuildable or unsafe. */
+export function budgetAdvisories(stage: string, budget: { readonly apparentBytes: number; readonly files: number } = SINGLE_BUDGET): Findings {
+  const files = filesUnder(stage);
+  const apparent = files.reduce((n, f) => n + readFileBytes(join(stage, f)), 0);
+  const found: string[] = [];
+  if (files.length > budget.files) found.push(`the package has ${files.length} files, and the budget is ${budget.files}`);
   if (apparent > budget.apparentBytes) found.push(`the package is ${apparent} bytes apparent, and the budget is ${budget.apparentBytes}`);
   return found;
 }
@@ -560,11 +565,12 @@ export type PackCommonsOptions = {
   readonly parallel?: number;
 };
 
-/** What packing made: the stage, the tarball where nothing was wrong, the findings, the manifest and the counts. */
+/** What packing made: the stage, the tarball where nothing was wrong, the findings that stop the packing, the advisories that do not (the size budget: 0036-distribution FR-032), the manifest and the counts. */
 export type PackedCommons = {
   readonly stage: string;
   readonly tarball: string | undefined;
   readonly findings: Findings;
+  readonly advisories: Findings;
   readonly manifest: Json;
   readonly counts: { readonly libraries: number; readonly files: number; readonly exports: number; readonly commands: number; readonly sideEffects: number };
 };
@@ -675,7 +681,7 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   const folder = join(root, SINGLE.folder);
   const dist = join(folder, "dist");
   const stage = join(dist, "package");
-  const fail = (findings: Findings, manifest: Json = {}): PackedCommons => ({ stage, tarball: undefined, findings, manifest, counts: EMPTY_COUNTS });
+  const fail = (findings: Findings, manifest: Json = {}): PackedCommons => ({ stage, tarball: undefined, findings, advisories: [], manifest, counts: EMPTY_COUNTS });
   const own = existsSync(join(folder, "package.json")) ? objectOf(JSON.parse(readTextFileSync(join(folder, "package.json"))) as unknown) : undefined;
   const manifestOfFolder = readLibraries(root).find((f) => "library" in f && f.dir === SINGLE.slug);
   if (own === undefined || manifestOfFolder === undefined || !("library" in manifestOfFolder)) return fail([`${SINGLE.folder} has no package.json and no library.ts`]);
@@ -796,16 +802,16 @@ export async function packCommons(repo: string, options: PackCommonsOptions = {}
   else found.push(`${SINGLE.folder} has no LICENSE; run: bun commons/libraries/src/license.ts`);
   found.push(...inspectCommons(stage, facts.map((f) => f.name)));
   const counts = { libraries: facts.length, files: filesUnder(stage).length, exports: Object.keys(exportsOut).length, commands: cmds.commands.length, sideEffects: effects.length };
-  if (found.length > 0) return { stage, tarball: undefined, findings: found, manifest, counts };
+  const advisories: string[] = [...budgetAdvisories(stage)];
+  if (found.length > 0) return { stage, tarball: undefined, findings: found, advisories, manifest, counts };
   const packed = await run([bun, "pm", "pack", "--destination", dist], { cwd: stage });
-  if (packed.code !== 0) return { stage, tarball: undefined, findings: [`bun pm pack stopped: ${packed.stderr || packed.stdout}`.trim()], manifest, counts };
+  if (packed.code !== 0) return { stage, tarball: undefined, findings: [`bun pm pack stopped: ${packed.stderr || packed.stdout}`.trim()], advisories, manifest, counts };
   const tarball = join(dist, tarballName(SELF, version));
   // what was packed, as a report for the page of the site and the budget of the tarball (0036-distribution FR-032)
   const report = reportOfStage(stage, statSync(tarball).size);
   writeTextFileSync(join(dist, "package-report.json"), `${JSON.stringify(report, null, 2)}\n`);
-  if (report.tarballBytes !== undefined && report.tarballBytes > SINGLE_BUDGET.tarballBytes)
-    return { stage, tarball: undefined, findings: [`the tarball is ${report.tarballBytes} bytes, and the budget is ${SINGLE_BUDGET.tarballBytes}`], manifest, counts };
-  return { stage, tarball, findings: [], manifest, counts };
+  if (report.tarballBytes !== undefined && report.tarballBytes > SINGLE_BUDGET.tarballBytes) advisories.push(`the tarball is ${report.tarballBytes} bytes, and the budget is ${SINGLE_BUDGET.tarballBytes}`);
+  return { stage, tarball, findings: [], advisories, manifest, counts };
 }
 
 /** The facts of the package without compiling: the libraries, the keys of the `exports`, the commands and the dependencies, and what is wrong with them. */
@@ -906,6 +912,7 @@ export async function main(repo: string, argv: readonly string[], options: PackC
   }
   const r = await packCommons(repo, options);
   for (const f of r.findings) console.error(f);
+  for (const a of r.advisories) console.error(`finding, does not block the release: ${a}`);
   if (r.tarball === undefined) return 1;
   if (argv.includes("--size")) {
     console.log(sizeTable(reportOfStage(r.stage, statSync(r.tarball).size)));

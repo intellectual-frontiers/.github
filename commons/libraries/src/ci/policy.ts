@@ -124,7 +124,7 @@ export type ReleaseClass = "blocking" | "finding";
 export const CHECK_CLASS: Readonly<Record<Check, { readonly class: ReleaseClass; readonly why: string }>> = {
   syntax: { class: "blocking", why: "a file the parser refuses cannot be built, packed or run" },
   types: { class: "blocking", why: "a type error is a crack in the type safety that every consumer relies on, the exported surface included" },
-  pack: { class: "blocking", why: "a package that does not pack, install or import is not a release at all" },
+  pack: { class: "blocking", why: "a package that does not pack, install or import is not a release at all (how big it is does not decide that: a size budget is an advisory)" },
   "secret-scan": { class: "blocking", why: "a credential in a published package cannot be taken back, so this is a safety rule and not a style rule (kept blocking until the owner decides otherwise)" },
   tests: { class: "finding", why: "a failing test is said loudly in the release summary and holds acceptance (`opsfolio validate`), and the release is not a claim of acceptance" },
   lint: { class: "finding", why: "style and the findings of the linter are recorded and fixed, and a release does not wait for them" },

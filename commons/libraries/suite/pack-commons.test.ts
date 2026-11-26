@@ -17,6 +17,7 @@ import {
   exportKey,
   exportsMap,
   type Facts,
+  budgetAdvisories,
   inspectCommons,
   kindOf,
   launcherOf,
@@ -303,7 +304,8 @@ proves([`${SPEC} FR-029`, `${SPEC} FR-030`], "the packer builds the real files o
     assertStringIncludes(internal, "alpha/suite/a.test.ts is internal to commons");
     assertStringIncludes(internal, "alpha/src/util.js.map is internal to commons");
     for (const f of ["alpha/dist/x.txt", "alpha/data/x2.txt", "alpha/suite", "alpha/src/util.js.map"]) removeSync(join(stage, f), { recursive: true });
-    assertStringIncludes(inspectCommons(stage, ["alpha", "beta"], { apparentBytes: 100, files: 3 }).join("\n"), "the budget is 3");
+    assertStringIncludes(budgetAdvisories(stage, { apparentBytes: 100, files: 3 }).join("\n"), "the budget is 3");
+    assertEquals(inspectCommons(stage, ["alpha", "beta"]).filter((f) => f.includes("budget")), [], "a size is no finding of the inspection: it is an advisory that stops nothing");
     assertEquals(inspectCommons(stage, ["alpha", "beta"]), []);
     // a command that two libraries declare stops the packer
     writeTextFileSync(join(dir, "commons/alpha/package.json"), JSON.stringify({ name: "@intellectual-frontiers/alpha", version: "0.1.0", type: "module", exports: { ".": "./src/mod.ts", "./util": "./src/util.ts" }, bin: { beta: "./bin/beta.mjs" } }));
