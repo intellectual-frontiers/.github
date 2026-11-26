@@ -29,6 +29,7 @@ import { dirname } from "node:path";
 import process from "node:process";
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "@intellectual-frontiers/formats/http";
+import { accept as acceptBatch, type EnvelopeSigner, openEnvelope, type SeenLedger, TELEMETRY_PAYLOAD_TYPE } from "../envelope.ts";
 import {
   type AttributeValue,
   commandShape,
@@ -1010,22 +1011,69 @@ async function bodyText(request: Request): Promise<Result<string, Response>> {
   }
 }
 
+/** Who a request was authenticated as: the asset, and the relay that carried it where it came by one (0003-telemetry-reach FR-012). */
+export type DeviceIdentity = { readonly assetId?: string; readonly relayId?: string };
+
+/** How a receiver identifies a sender and what it requires (0003-telemetry-reach FR-011, FR-012). */
+export type ReceiverPolicy = {
+  /** Who a request is, from a bearer token or a client certificate; it answers a refusal where it knows no one. Required for a body that is not an envelope. */
+  readonly authenticate?: (request: Request) => Result<DeviceIdentity, string> | Promise<Result<DeviceIdentity, string>>;
+  /** The signer that verifies an envelope, and who the key that signed it is (`undefined`: no such enrolled device). */
+  readonly signer?: EnvelopeSigner;
+  readonly identityOfKey?: (keyId: string) => DeviceIdentity | undefined;
+  /** `required`: a body that is not a signed envelope is refused with 401. */
+  readonly signatures: "required" | "optional";
+  /** What was taken, to drop a replay (FR-007); the receiver updates `current`. */
+  readonly ledger?: { current: SeenLedger };
+};
+
+const ASSET = "if.asset.id";
+const RELAY = "if.relay.id";
+
+const stamp = <B extends { readonly resource: Resource }>(batches: readonly B[], who: DeviceIdentity): readonly B[] =>
+  batches.map((b) => {
+    const attributes: Record<string, AttributeValue> = { ...b.resource.attributes };
+    delete attributes[ASSET];
+    delete attributes[RELAY];
+    if (who.assetId !== undefined) attributes[ASSET] = who.assetId;
+    if (who.relayId !== undefined) attributes[RELAY] = who.relayId;
+    return { ...b, resource: { attributes } };
+  });
+
 /**
  * An OTLP/HTTP JSON receiver, as a handler for `serve` (FR-019): `POST /v1/traces`, `/v1/logs` and `/v1/metrics` with a JSON body
  * (gzip-encoded or not) decoded by the kernel (FR-004) and handed to the sink; 415 for any content type but `application/json` (protobuf
  * among them), 400 with the path where the body does not decode, 404 for another path, 405 for another method, and OTLP's success body
  * (`{}`, or `partialSuccess` where the sink rejected some) otherwise. Errors are `google.rpc.Status` JSON. The handler is `untraced`.
+ *
+ * With a `policy` (0003-telemetry-reach FR-011, FR-012) the receiver also takes `application/vnd.ifc.telemetry+json` (a signed envelope and its batch), answers 401 where a sender is not identified or a signature is
+ * required and absent, sets `if.asset.id` on every resource from what it authenticated and overwrites what the sender wrote (for a relay it sets `if.relay.id` and removes any `if.asset.id`), and drops a batch it
+ * already took with a success answer so that the sender removes it from its queue.
  */
-export function otlpReceiver(sinks: ReceiverSinks): (request: Request) => Promise<Response> {
+export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (request: Request) => Promise<Response> {
   return untraced(async (request: Request): Promise<Response> => {
     const path = new URL(request.url).pathname;
     const signal = Object.hasOwn(RECEIVER_PATHS, path) ? RECEIVER_PATHS[path] : undefined;
     if (signal === undefined) return statusResponse(404, 5, `${path} is not an OTLP path (/v1/traces, /v1/logs, /v1/metrics)`);
     if (request.method !== "POST") return statusResponse(405, 12, `${request.method} is not allowed; OTLP/HTTP is POST`);
     const type = (request.headers.get("content-type") ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
-    if (type !== "application/json") {
+    const signed = policy !== undefined && type === TELEMETRY_PAYLOAD_TYPE;
+    if (type !== "application/json" && !signed) {
       await request.body?.cancel().catch(() => undefined);
       return statusResponse(415, 3, `the content type ${type === "" ? "(none)" : type} is not supported; send application/json`);
+    }
+    let who: DeviceIdentity | undefined;
+    if (policy !== undefined && !signed) {
+      if (policy.signatures === "required") {
+        await request.body?.cancel().catch(() => undefined);
+        return statusResponse(401, 16, "a signed envelope is required on this path");
+      }
+      const a = policy.authenticate === undefined ? undefined : await policy.authenticate(request);
+      if (a === undefined || a.kind === "err") {
+        await request.body?.cancel().catch(() => undefined);
+        return statusResponse(401, 16, "the sender is not identified");
+      }
+      who = a.value;
     }
     const text = await bodyText(request);
     if (text.kind === "err") return text.error;
@@ -1035,25 +1083,44 @@ export function otlpReceiver(sinks: ReceiverSinks): (request: Request) => Promis
     } catch (e) {
       return statusResponse(400, 3, `the body is not JSON: ${e instanceof Error ? e.message : String(e)}`);
     }
+    if (policy !== undefined && signed) {
+      if (policy.signer === undefined || policy.identityOfKey === undefined) return statusResponse(401, 16, "this path takes no signed envelope");
+      const opened = await openEnvelope(parsed, policy.signer);
+      if (opened.kind === "err") return statusResponse(401, 16, `the envelope is refused: ${opened.error.kind}`);
+      const known = policy.identityOfKey(opened.value.keyId);
+      if (known === undefined || known.assetId !== opened.value.predicate.device) return statusResponse(401, 16, "the sender is not an enrolled device");
+      if (opened.value.predicate.signal !== signal) return statusResponse(400, 3, "the envelope is of another signal than the path");
+      who = known;
+      if (policy.ledger !== undefined) {
+        const [verdict, next] = acceptBatch(policy.ledger.current, opened.value.predicate);
+        if (verdict.kind === "err") return new Response(JSON.stringify(encodeResponse(signal, { rejected: 0, errorMessage: "" })), { status: 200, headers: { "content-type": "application/json" } });
+        policy.ledger.current = next;
+      }
+      try {
+        parsed = JSON.parse(opened.value.batch);
+      } catch {
+        return statusResponse(400, 3, "the batch is not JSON");
+      }
+    }
     let answer: void | ExportResponse;
     try {
       switch (signal) {
         case "traces": {
           const d = decodeTraces(parsed);
           if (d.kind === "err") return statusResponse(400, 3, formatDecodeError(d.error));
-          answer = await sinks.onTraces?.(d.value);
+          answer = await sinks.onTraces?.(who === undefined ? d.value : stamp(d.value, who));
           break;
         }
         case "logs": {
           const d = decodeLogs(parsed);
           if (d.kind === "err") return statusResponse(400, 3, formatDecodeError(d.error));
-          answer = await sinks.onLogs?.(d.value);
+          answer = await sinks.onLogs?.(who === undefined ? d.value : stamp(d.value, who));
           break;
         }
         case "metrics": {
           const d = decodeMetrics(parsed);
           if (d.kind === "err") return statusResponse(400, 3, formatDecodeError(d.error));
-          answer = await sinks.onMetrics?.(d.value);
+          answer = await sinks.onMetrics?.(who === undefined ? d.value : stamp(d.value, who));
           break;
         }
         default:

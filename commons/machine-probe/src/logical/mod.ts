@@ -10,3 +10,5 @@ export * from "./state.ts";
 export * from "./grc.ts";
 export * from "./judge.ts";
 export * from "./rules.ts";
+export * from "./signals.ts";
+export * from "./signals-otlp.ts";

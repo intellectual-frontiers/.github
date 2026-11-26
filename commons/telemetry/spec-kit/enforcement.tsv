@@ -32,25 +32,25 @@ requirement	mechanism	by	note
 0002-telemetry-query FR-003	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-004	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-005	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
-0003-telemetry-reach FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-014	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-015	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-016	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-017	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-018	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-019	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-020	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-021	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-telemetry-reach FR-022	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-telemetry-reach FR-001	none	-	Deferred: not built yet
+0003-telemetry-reach FR-002	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the port and its use by the exporter and the drain; the store behind it is anyfs 0011
+0003-telemetry-reach FR-003	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: queueExporter enqueues before it answers; drain keeps on 503 and removes only what was taken
+0003-telemetry-reach FR-004	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the drops become the metric if.telemetry.dropped; the cap itself is anyfs 0011 FR-005
+0003-telemetry-reach FR-005	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: a secret in a resource is not at rest in the queue
+0003-telemetry-reach FR-006	none	-	Deferred: not built yet
+0003-telemetry-reach FR-007	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the ledger drops a pair of device and sequence number already taken
+0003-telemetry-reach FR-008	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the statement binds the digest; a changed batch is refused
+0003-telemetry-reach FR-009	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: grows by one, a new epoch starts a new count
+0003-telemetry-reach FR-010	none	-	Deferred: not built yet
+0003-telemetry-reach FR-011	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: a bad signature, a changed batch and a plain body on a required path are refused without naming a key; a relay by its token
+0003-telemetry-reach FR-012	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the asset id from the key that signed, the sender's claim overwritten, 401 where not identified
+0003-telemetry-reach FR-013	none	-	Deferred: not built yet
+0003-telemetry-reach FR-014	none	-	Deferred: not built yet
+0003-telemetry-reach FR-015	none	-	Deferred: not built yet
+0003-telemetry-reach FR-016	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the table has its version and a finding for an unknown name
+0003-telemetry-reach FR-017	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: ours under if. and marked ours
+0003-telemetry-reach FR-018	none	-	Deferred: not built yet
+0003-telemetry-reach FR-019	none	-	Deferred: not built yet
+0003-telemetry-reach FR-020	none	-	Deferred: not built yet
+0003-telemetry-reach FR-021	none	-	Deferred: not built yet
+0003-telemetry-reach FR-022	none	-	Deferred: not built yet

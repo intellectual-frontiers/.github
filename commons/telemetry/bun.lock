@@ -6,6 +6,7 @@
       "name": "@intellectual-frontiers/telemetry",
       "devDependencies": {
         "@intellectual-frontiers/core": "link:../core",
+        "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
         "@intellectual-frontiers/lang-sql": "link:../lang-sql",
         "@intellectual-frontiers/libraries": "link:../libraries",
@@ -21,6 +22,8 @@
   },
   "packages": {
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
+
+    "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
 
     "@intellectual-frontiers/formats": ["@intellectual-frontiers/formats@link:../formats", {}],
 

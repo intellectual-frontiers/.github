@@ -20,7 +20,7 @@ export const library = {
     package: "@intellectual-frontiers/machine-probe",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/lang-sql", subpaths: ["aide/guard", "dialects/sqlite"] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["logical"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] }] },
+      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["logical"] }, { name: "@intellectual-frontiers/grc", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/telemetry", subpaths: ["otel", "otlp", "semconv"] }] },
       { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound", "targets/ssh"] }, { name: "@intellectual-frontiers/machine-probe", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }, { name: "node:fs/promises", subpaths: [] }, { name: "node:os", subpaths: [] }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },

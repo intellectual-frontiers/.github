@@ -77,16 +77,16 @@ requirement	mechanism	by	note
 0008-estate-workstations FR-020	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
 0008-estate-workstations FR-021	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
 0008-estate-workstations FR-022	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
-0009-estate-sightings FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0009-estate-sightings FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-001	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: the decoder reads keys and a provenance and no payload
+0009-estate-sightings FR-002	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: no provenance is refused
+0009-estate-sightings FR-003	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)
+0009-estate-sightings FR-004	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: constructors normalise and refuse; strength
+0009-estate-sightings FR-005	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: new, adopt, candidate, conflict
+0009-estate-sightings FR-006	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: resolution names an asset and merges nothing
+0009-estate-sightings FR-007	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: one asset from two relays and two protocols; stable id
+0009-estate-sightings FR-008	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: foldSightings and unexpectedSightings
+0009-estate-sightings FR-009	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: relayDependentStatus
+0009-estate-sightings FR-010	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)
+0009-estate-sightings FR-011	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)
+0009-estate-sightings FR-012	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: levelOf and missingMinimums
+0009-estate-sightings FR-013	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)

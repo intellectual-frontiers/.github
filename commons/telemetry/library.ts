@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.2.7",
   distribution: ["github", "npm"],
-  exports: [".", "./otel", "./otlp", "./signals", "./render", "./query", "./host/query", "./host", "./host/otel", "./host/console"],
+  exports: [".", "./otel", "./otlp", "./signals", "./semconv", "./queue", "./envelope", "./render", "./query", "./host/query", "./host", "./host/otel", "./host/console"],
   summary:
     "OpenTelemetry-native signals written from the specification itself: the data model, W3C Trace Context, OTLP/HTTP JSON, typed signals, a pure renderer of the console, and a host that exports, journals and shows them.",
 };

@@ -12,3 +12,4 @@ export * from "./services.ts";
 export * from "./states.ts";
 export * from "./capture.ts";
 export * from "./workshop.ts";
+export * from "./sightings.ts";
