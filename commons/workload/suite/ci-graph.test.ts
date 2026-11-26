@@ -1,6 +1,6 @@
 /**
- * Tests of the migration of the repository's CI onto the graph form (commons workload 0016-ci-on-graph FR-001 to FR-005): the direction of the dependency between workload and libraries, the guard (the generator finds no file different, the
- * golden copies hold), the measure of what is thin and what is not, the parity of the emitter with the typed model for a thin graph, and the record of what moved (nothing) and why, kept true against the real definitions.
+ * Tests of the repository's CI on the graph form (commons workload 0016-ci-on-graph FR-001 to FR-005): the direction of the dependency between workload and libraries, the guard (the generator finds no file different, the
+ * golden copies hold), the measure of what is thin and what is not, the parity of the emitter with the typed model for a thin graph, and the record of the workflows (none is thin) and why, kept true against the real definitions.
  *
  * @module
  */
@@ -44,7 +44,7 @@ proves(["0016-ci-on-graph FR-001"], "libraries imports nothing of workload and d
   for await (const file of walk(path.join(libs, "src", "workflows"))) assert(!(await fs.readTextFile(file)).includes("commons/workload"), file);
 });
 
-proves(["0016-ci-on-graph FR-002"], "the generator finds no file of the repository different from what the model makes and the golden copies are the files: the migration has changed no byte", async () => {
+proves(["0016-ci-on-graph FR-002"], "the generator finds no file of the repository different from what the model makes and the golden copies are the files: the files are the golden copies", async () => {
   const r = synchronize(REPO, false);
   assertEquals(r.problems, []);
   assertEquals(r.stale, []);
@@ -125,11 +125,11 @@ const RECORD: Readonly<Record<string, { readonly jobs: number; readonly kinds: r
   tests: { jobs: 8, kinds: ["action", "checkout-options", "condition", "continue-on-error", "expression", "inline-script", "runner", "shell-logic", "step-id", "trigger", "working-directory"] },
 };
 
-proves(["0016-ci-on-graph FR-005"], "no job of the real workflows is thin, so nothing moved, and the record of the specification names each workflow and what blocks it", async () => {
+proves(["0016-ci-on-graph FR-005"], "no job of the real workflows is thin, and the record of the specification names each workflow and what blocks it", async () => {
   const all = workflows();
   assertEquals(all.map((w) => w.file).sort(), Object.keys(RECORD).sort(), "a workflow the record does not name");
   const spec = await fs.readTextFile(path.join(ROOT, "spec-kit", "specs", "0016-ci-on-graph", "spec.md"));
-  assert(spec.includes("Nothing moved."));
+  assert(spec.includes("No job is thin."));
   for (const w of all) {
     const blockers = thinBlockers(w);
     const jobs = Object.keys(w.jobs);

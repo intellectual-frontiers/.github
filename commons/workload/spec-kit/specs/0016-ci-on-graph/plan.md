@@ -10,4 +10,4 @@
 
 ## What is built and what is reused
 
-Reused: the typed model, the writer and the definitions of workflows of commons/libraries, and the golden test of 0030-generated-workflows FR-014. New: the measure of what can move (`thinBlockers`) and the record of the migration.
+Reused: the typed model, the writer and the definitions of workflows of commons/libraries, and the golden test of 0030-generated-workflows FR-014. New: the measure of what is thin (`thinBlockers`) and the record of the workflows.

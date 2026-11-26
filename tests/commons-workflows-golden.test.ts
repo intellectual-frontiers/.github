@@ -1,7 +1,7 @@
 // Spec: 0030-generated-workflows FR-014
 /**
- * The golden copy of every generated workflow (commons 0030-generated-workflows FR-014): the files the model makes today, kept byte for byte in `tests/fixtures/workflows-golden/`, so that a change of how they are made (the
- * migration of a definition onto the graph form of workload, 0016-ci-on-graph) shows as a difference of bytes and never as a surprise in CI. The test renders every workflow and composite action of the model, compares each with its
+ * The golden copy of every generated workflow (commons 0030-generated-workflows FR-014): the files the model makes today, kept byte for byte in `tests/fixtures/workflows-golden/`, so that a change of how they are made (a definition written
+ * as a graph of workload, 0016-ci-on-graph) shows as a difference of bytes and never as a surprise in CI. The test renders every workflow and composite action of the model, compares each with its
  * golden copy and with the file that is checked in, and finds a golden copy that no workflow makes. A deliberate change of CI refreshes the copies with `UPDATE_GOLDEN=1 bun test tests/commons-workflows-golden.test.ts`.
  *
  * @module
