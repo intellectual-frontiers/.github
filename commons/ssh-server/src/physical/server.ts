@@ -278,7 +278,7 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
         case "reject":
           if (d.reason !== "a method is needed") {
             failures += 1;
-            event("auth", "refused", d.reason);
+            event("auth", "refused", d.reason, key === undefined ? {} : { fingerprint: key.fingerprint });
             if (accountOf(attempt.username) === undefined || d.disconnect) strikeIp(ip);
           }
           if (d.disconnect) client.end();

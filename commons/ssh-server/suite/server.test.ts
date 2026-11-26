@@ -263,6 +263,8 @@ proves(["0002-enrollment-protocol FR-011", "0002-enrollment-protocol FR-012", "0
     assertEquals((await f.store.assets())[0]?.facts?.kernel, "Linux 6.13.0");
     const no = await ssh(f.port, ["checkin"], "", "s-device", withKey(other.path));
     assert(no.code !== 0, "a key that is not enrolled is refused");
+    const refusal = (await f.store.audit()).filter((e) => e.kind === "auth" && e.outcome === "refused" && e.fingerprint === other.fingerprint);
+    assert(refusal.length > 0, "the refusal of a key names the key's fingerprint, so that the refusal of a revoked key can be told from any other");
     const anon = await ssh(f.port, ["checkin"], "", "s-device", KI);
     assert(anon.code !== 0, "anonymous is refused on s-device");
     const onEnroll = await ssh(f.port, ["checkin"], "", "s-enroll", KI);
