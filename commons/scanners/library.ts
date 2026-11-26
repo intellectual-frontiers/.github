@@ -20,7 +20,7 @@ export const library = {
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance"] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/scanners", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }, { name: "node:http", subpaths: [] }, { name: "node:https", subpaths: [] }, { name: "node:tls", subpaths: [] }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/findings", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/scanners", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }, { name: "node:http", subpaths: [] }, { name: "node:https", subpaths: [] }, { name: "node:tls", subpaths: [] }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

@@ -5,9 +5,10 @@
     "": {
       "name": "@intellectual-frontiers/package-managers",
       "devDependencies": {
-        "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
+        "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
+        "@intellectual-frontiers/estate": "link:../estate",
         "@intellectual-frontiers/kanon": "link:../kanon",
         "@intellectual-frontiers/libraries": "link:../libraries",
         "@intellectual-frontiers/mizan": "link:../mizan",
@@ -22,11 +23,13 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:../desired-os-state", {}],
-
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],
+
+    "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:../desired-os-state", {}],
+
+    "@intellectual-frontiers/estate": ["@intellectual-frontiers/estate@link:../estate", {}],
 
     "@intellectual-frontiers/kanon": ["@intellectual-frontiers/kanon@link:../kanon", {}],
 

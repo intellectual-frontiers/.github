@@ -11,3 +11,4 @@ export * from "./truth.ts";
 export * from "./discovery.ts";
 export * from "./sightings.ts";
 export * from "./seen.ts";
+export * from "./boundaries.ts";

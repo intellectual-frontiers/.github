@@ -17,19 +17,16 @@ import type { RawFinding } from "@intellectual-frontiers/findings/governance";
 import { importReport } from "@intellectual-frontiers/findings/logical";
 import { argvOf, scannerById, targetProblem, type Pins, type Target } from "@intellectual-frontiers/scanners/governance";
 import { headerFindings, tlsFindings } from "@intellectual-frontiers/scanners/logical";
+import { permitProblem } from "@intellectual-frontiers/estate/logical";
+import type { Permit } from "@intellectual-frontiers/estate/governance";
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { probeEndpoint, type Probed } from "./probe.ts";
 
-/** The engagement's answer to one action. */
-export type Authorize = (asset: string, technique: string) => { readonly allowed: boolean; readonly reason: string };
-
-/** What a run is given. */
-export type RunInput = {
+/** What every run is given. */
+export type RunBase = {
   readonly scanner: string;
   /** The asset of the estate the scan is about: what its findings are about, and what the engagement's scope is asked. */
   readonly asset: string;
-  readonly target: Target;
-  readonly authorize: Authorize;
   readonly pins: Pins;
   readonly now: string;
   readonly rate?: number;
@@ -40,6 +37,12 @@ export type RunInput = {
   /** The name of the program of the product that runs this (default `scanners`): it names the temporary folder (`<program>-scan-`) and the pin command the refusal tells the owner to run (`<program> scan pin`). The product gives it; this library names none. */
   readonly program?: string;
 };
+
+/**
+ * What a run is given: a scan of a path reads local files and needs no permit; a scan of an endpoint or a host reaches a target and needs the permit of the interlock (`permits` of estate) for the action `scan` on the asset, made
+ * only by that function, so that a call with none does not type-check.
+ */
+export type RunInput = RunBase & ({ readonly target: Extract<Target, { readonly kind: "path" }>; readonly permit?: undefined } | { readonly target: Exclude<Target, { readonly kind: "path" }>; readonly permit: Permit<"scan"> });
 
 /** The record of a run, refused or made. */
 export type RunRecord = {
@@ -77,8 +80,10 @@ export async function runScanner(i: RunInput): Promise<Result<RunResult, RunRefu
   if (bad !== undefined) return refuse(bad);
   if (target.kind === "path" && !(await fs.exists(target.value))) return refuse(`${target.value} does not exist`);
 
-  const allowed = i.authorize(i.asset, scanner.technique);
-  if (!allowed.allowed) return refuse(`not allowed: ${allowed.reason}`);
+  if (target.kind !== "path") {
+    const problem = i.permit === undefined ? "a scan that reaches a target needs the permit of the interlock for it" : permitProblem(i.permit, "scan", i.asset, i.now);
+    if (problem !== undefined) return refuse(`not allowed: ${problem}`);
+  }
 
   const timeoutMs = i.timeoutMs ?? 600_000;
   if (scanner.tool === undefined) {

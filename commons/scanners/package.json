@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/estate": "link:../estate",
     "@intellectual-frontiers/findings": "link:../findings",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",

@@ -6,6 +6,7 @@
  *
  * @module
  */
+import { applyPermit } from "./permit.ts";
 import { createServer, type Server } from "node:http";
 import { Retries } from "@intellectual-frontiers/net/net";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
@@ -175,7 +176,7 @@ proves(["0004-pinned-downloads-dialect FR-003"], "the plan file is rendered from
   const step = steps[0];
   assert(step !== undefined && step.apply.some((a) => a.includes(rendered.value.digest)) && step.check?.some((a) => a.includes(rendered.value.digest)) === true);
   assertEquals([step.apply[2], step.check?.[2], step.changedExit], ["apply", "check", 2]);
-  const exec = executionPlanOf(plan, rendered.value, steps);
+  const exec = executionPlanOf(plan, rendered.value, steps, await applyPermit(plan.subject.name, "2026-06-01T00:00:00Z"), "2026-06-01T00:00:00Z");
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const r0 = requirements[0];
   assert(r0 !== undefined);

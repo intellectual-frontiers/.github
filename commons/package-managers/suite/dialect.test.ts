@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { applyPermit } from "./permit.ts";
 import { buildOrder, planOf as planOfOrder } from "@intellectual-frontiers/desired-os-state/logical";
 import { executionPlanOf, isGenerated } from "@intellectual-frontiers/desired-os-state/dialect";
 import { defineRequirement, parseSubjectName, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/desired-os-state/governance";
@@ -96,7 +97,7 @@ proves(["0004-package-managers-dialect FR-003"], "one step runs the program of t
   assertEquals(step.covers.map(String), ["tool.git", "tool.jq"]);
   assertEquals([step.apply[2], step.check?.[2], step.changedExit], ["apply", "check", 2]);
   assert(step.apply[3]?.endsWith(`/${rendered.value.digest}/fakepm/plan.json`) === true && step.check?.[3] === step.apply[3]);
-  const exec = executionPlanOf(plan, rendered.value, steps);
+  const exec = executionPlanOf(plan, rendered.value, steps, await applyPermit(plan.subject.name, "2026-06-01T00:00:00Z"), "2026-06-01T00:00:00Z");
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const adminReqs = toolRequirements(ADMIN, [{ name: "git" }]);
   const adminOrder = orderOf(adminReqs);

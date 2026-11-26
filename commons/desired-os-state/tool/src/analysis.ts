@@ -75,6 +75,9 @@ export async function analyse(config: ToolPluginConfig, names: readonly string[]
   const order = buildOrder({ subject: { name: subject.value, class: "workstation" }, assurance: config.assurance, layers: [{ layer: "baseline", requirements: reqs.value }] });
   if (order.kind === "err") return err(order.error.map((p) => JSON.stringify(p)));
   const plan = planOf(order.value, observed);
+  const now = new Date().toISOString();
+  const permit = config.interlock(subject.value, now);
+  if (permit.kind === "err") return err([`${permit.error.code}: ${permit.error.reason}`]);
   const shares: Share[] = [];
   const problems: string[] = [];
   for (const rt of config.runtimes) {
@@ -84,7 +87,7 @@ export async function analyse(config: ToolPluginConfig, names: readonly string[]
       problems.push(...rendered.error.map((m) => `${rt.tool.id}: ${m}`));
       continue;
     }
-    const exec = executionPlanOf(plan, rendered.value, rt.dialect.steps(plan, rendered.value));
+    const exec = executionPlanOf(plan, rendered.value, rt.dialect.steps(plan, rendered.value), permit.value, now);
     if (exec.kind === "err") problems.push(...exec.error.map((p) => `${rt.tool.id}: ${JSON.stringify(p)}`));
     else shares.push({ runtime: rt, rendered: rendered.value, exec: exec.value });
   }

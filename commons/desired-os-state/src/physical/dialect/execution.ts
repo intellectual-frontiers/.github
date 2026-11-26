@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { executionPlanOf } from "./execution.ts";
- * // executionPlanOf(plan, rendered, dialect.steps(plan, rendered)) is a Result of an ExecutionPlan, or nothing to do
+ * // executionPlanOf(plan, rendered, dialect.steps(plan, rendered), permit, now) is a Result of an ExecutionPlan, or nothing to do
  * ```
  *
  * @module
@@ -15,21 +15,26 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { parseStepId, planOf, type ExecStep, type ExecutionPlan } from "@intellectual-frontiers/headless/logical";
 import type { RequirementId } from "@intellectual-frontiers/desired-os-state/governance";
 import type { Plan, PlanEntry } from "@intellectual-frontiers/desired-os-state/logical";
+import type { Permit } from "@intellectual-frontiers/estate/governance";
+import { permitProblem } from "@intellectual-frontiers/estate/logical";
 import type { DialectStep, Rendered } from "./types.ts";
 
 /** Why a plan of steps could not be made. */
 export type ExecutionProblem =
   | { readonly kind: "unknown-entry"; readonly step: number; readonly id: RequirementId }
   | { readonly kind: "digest-not-named"; readonly step: number }
-  | { readonly kind: "executor"; readonly message: string };
+  | { readonly kind: "executor"; readonly message: string }
+  | { readonly kind: "permit"; readonly message: string };
 
 function isDestructive(e: PlanEntry): boolean {
   return e.change === "destructive" || e.action === "remove";
 }
 
-/** The plan of steps for a plan and the steps of a dialect, or why it cannot be made; nothing where the plan changes nothing. A destructive step with no check is refused by the plan of headless, and the problem says so. */
-export function executionPlanOf(plan: Plan, rendered: Rendered, steps: readonly DialectStep[]): Result<ExecutionPlan | undefined, readonly ExecutionProblem[]> {
+/** The plan of steps for a plan and the steps of a dialect, or why it cannot be made; nothing where the plan changes nothing. A plan that changes something is made only with the permit of the interlock for `apply` on the subject of the plan (a permit made only by `permits` of estate), and a permit for another subject or an expired one is a problem of kind `permit`. A destructive step with no check is refused by the plan of headless, and the problem says so. */
+export function executionPlanOf(plan: Plan, rendered: Rendered, steps: readonly DialectStep[], permit: Permit<"apply">, now: string): Result<ExecutionPlan | undefined, readonly ExecutionProblem[]> {
   if (plan.entries.every((e) => e.action === "none")) return ok(undefined);
+  const refused = permitProblem(permit, "apply", plan.subject.name, now);
+  if (refused !== undefined) return err([{ kind: "permit", message: refused }]);
   const problems: ExecutionProblem[] = [];
   const out: ExecStep[] = [];
   steps.forEach((s, index) => {

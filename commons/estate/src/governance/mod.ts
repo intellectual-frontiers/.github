@@ -13,3 +13,4 @@ export * from "./states.ts";
 export * from "./capture.ts";
 export * from "./workshop.ts";
 export * from "./sightings.ts";
+export * from "./boundaries.ts";

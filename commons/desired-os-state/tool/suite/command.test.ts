@@ -6,7 +6,7 @@
  * @module
  */
 import { main } from "@intellectual-frontiers/desired-os-state/cli";
-import { err } from "@intellectual-frontiers/core";
+import { err, ok } from "@intellectual-frontiers/core";
 import { managerDialect, observeRequirements, runWithin, toolDialectOf, type CommandSource, type ManagerSpec } from "@intellectual-frontiers/package-managers";
 import * as fs from "@intellectual-frontiers/system/fs";
 import * as path from "@intellectual-frontiers/system/path";
@@ -15,6 +15,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { defineCatalog, defineTool, parseManagerId } from "@intellectual-frontiers/toolchain";
 import { verbIds } from "@intellectual-frontiers/headless/logical";
 import { assemble } from "@intellectual-frontiers/desired-os-state/cli";
+import { applyPermit } from "./permit.ts";
 import { toolPlugin, type ToolPluginConfig } from "../src/mod.ts";
 
 const posix = proc.build.os !== "windows";
@@ -33,6 +34,7 @@ type World = { readonly config: ToolPluginConfig; readonly work: string; readonl
 
 /** A made-up manager as three scripts that keep their state in a folder, and the configuration of a fleet that uses it. */
 async function withWorld<T>(f: (w: World) => Promise<T>, more: { readonly integrity?: "rolling" | "release-line" | "exact-hashed"; readonly noJq?: boolean } = {}): Promise<T> {
+  const permit = await applyPermit("build-01.example.test", new Date().toISOString());
   return fs.withTempDir(async (dir) => {
     const state = path.join(dir, "state");
     const work = path.join(dir, "work");
@@ -81,6 +83,7 @@ async function withWorld<T>(f: (w: World) => Promise<T>, more: { readonly integr
       pins: { lookup: () => err("no pins here") },
       policy: { platform: "linux-x64", integrity: more.integrity ?? "release-line", systemCopy: "never" },
       subject: "build-01.example.test",
+      interlock: () => ok(permit),
       assurance: "solo",
       workFolder: work,
     };

@@ -11,8 +11,10 @@
  *
  * @module
  */
+import type { Result } from "@intellectual-frontiers/core";
 import type { Dialect } from "@intellectual-frontiers/desired-os-state/dialect";
 import type { DialectId, JsonValue, ProfileName, Requirement, RequirementId } from "@intellectual-frontiers/desired-os-state/governance";
+import type { Permit, Refusal } from "@intellectual-frontiers/estate/governance";
 import type { Catalog, Platform } from "@intellectual-frontiers/toolchain/governance";
 import type { Context, PinSource, ToolDialect } from "@intellectual-frontiers/toolchain/logical";
 
@@ -43,6 +45,8 @@ export type ToolPluginConfig = {
   readonly policy: Omit<Context, "preference" | "platform"> & { readonly platform: Platform };
   /** The name of this computer, as the fleet names it. */
   readonly subject: string;
+  /** The interlock of the fleet (`permits` of estate over its approved boundaries): the permit for `apply` on this computer at an instant, or why it is refused. No step of a plan is made without it. */
+  readonly interlock: (subject: string, at: string) => Result<Permit<"apply">, Refusal>;
   /** The assurance profile of the fleet. */
   readonly assurance: ProfileName;
   /** The folder the rendered files go in, under `.desired-os-state/<digest>/`, and the working folder of every step. */

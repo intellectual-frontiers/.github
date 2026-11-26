@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { applyPermit } from "./permit.ts";
 import { ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { planHash } from "@intellectual-frontiers/headless/logical";
@@ -121,12 +122,14 @@ proves(["0004-desired-os-state-dialects FR-004"], "the matrix has a row for each
   assertEquals(unexpressedOf(m).map((u) => `${u.requirement} ${u.dialect} ${u.annotation}`), ["m.gone tool-g change"]);
 });
 
+const NOW = "2026-06-01T00:00:00Z";
+
 proves(["0004-desired-os-state-dialects FR-005"], "the plan of steps names the digest, refuses a destructive step with no check, and is nothing where nothing changes", async () => {
   const plan = planOf([req("x.pkg")]);
   const d = dialect("tool-i");
   const files = await renderedOf(new Map([["main.txt", `${renderHeader("text")}\nx\n`]]));
   assert(files.kind === "ok");
-  const exec = executionPlanOf(plan, files.value, d.steps(plan, files.value));
+  const exec = executionPlanOf(plan, files.value, d.steps(plan, files.value), await applyPermit(plan.subject.name, NOW), NOW);
   assert(exec.kind === "ok" && exec.value !== undefined);
   assertEquals(exec.value.steps.length, 1);
   assertEquals(exec.value.steps[0]?.effect, "mutate");
@@ -134,18 +137,23 @@ proves(["0004-desired-os-state-dialects FR-005"], "the plan of steps names the d
 
   const other = await renderedOf(new Map([["main.txt", `${renderHeader("text")}\ny\n`]]));
   assert(other.kind === "ok");
-  const exec2 = executionPlanOf(plan, other.value, d.steps(plan, files.value));
+  const exec2 = executionPlanOf(plan, other.value, d.steps(plan, files.value), await applyPermit(plan.subject.name, NOW), NOW);
   assert(exec2.kind === "err" && exec2.error.some((p) => p.kind === "digest-not-named"));
 
   const goneRequirement = req("x.gone", { ensure: "absent", change: "destructive", rollback: "restore-from-backup", desired: null });
   const gone = planOf([goneRequirement], new Map<RequirementId, JsonValue>([[goneRequirement.id, { name: "present" }]]));
-  const noCheck = executionPlanOf(gone, files.value, [{ covers: [goneRequirement.id], summary: "remove", apply: ["tool", "remove", files.value.digest], check: undefined }]);
+  const noCheck = executionPlanOf(gone, files.value, [{ covers: [goneRequirement.id], summary: "remove", apply: ["tool", "remove", files.value.digest], check: undefined }], await applyPermit(gone.subject.name, NOW), NOW);
   assert(noCheck.kind === "err" && noCheck.error.some((p) => p.kind === "executor" && p.message.includes("check")));
 
   const same = planOf([]);
-  assertEquals(executionPlanOf(same, files.value, []), ok(undefined));
-  const unknown = executionPlanOf(plan, files.value, [{ covers: [req("x.unknown").id], summary: "x", apply: ["tool", files.value.digest], check: undefined }]);
+  assertEquals(executionPlanOf(same, files.value, [], await applyPermit(same.subject.name, NOW), NOW), ok(undefined));
+  const unknown = executionPlanOf(plan, files.value, [{ covers: [req("x.unknown").id], summary: "x", apply: ["tool", files.value.digest], check: undefined }], await applyPermit(plan.subject.name, NOW), NOW);
   assert(unknown.kind === "err" && unknown.error.some((p) => p.kind === "unknown-entry"));
+
+  const elsewhere = executionPlanOf(plan, files.value, d.steps(plan, files.value), await applyPermit("synthetic-other-01", NOW), NOW);
+  assert(elsewhere.kind === "err" && elsewhere.error.some((p) => p.kind === "permit" && p.message.includes("the permit is for synthetic-other-01")), "a permit for another subject serves no plan");
+  const late = executionPlanOf(plan, files.value, d.steps(plan, files.value), await applyPermit(plan.subject.name, NOW), "2027-12-01T00:00:00Z");
+  assert(late.kind === "err" && late.error.some((p) => p.kind === "permit" && p.message.includes("expired")), "an expired permit serves no plan");
 });
 
 proves(["0004-desired-os-state-dialects FR-006"], "rendered files say they are generated, and their digest does not depend on the order they were made in", async () => {

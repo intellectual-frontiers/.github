@@ -43,6 +43,7 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
+          { name: "@intellectual-frontiers/estate", subpaths: ["governance", "logical"] },
           { name: "@intellectual-frontiers/headless", subpaths: ["logical"] },
         ],
       },

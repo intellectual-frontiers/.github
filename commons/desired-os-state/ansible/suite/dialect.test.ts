@@ -5,6 +5,7 @@
  *
  * @module
  */
+import { applyPermit } from "./permit.ts";
 import { executionPlanOf, isGenerated, stepFindings } from "@intellectual-frontiers/desired-os-state/dialect";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/desired-os-state/governance";
 import { buildOrder, planOf, type Observed } from "@intellectual-frontiers/desired-os-state/logical";
@@ -96,7 +97,7 @@ proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and
   assertEquals(s.changedExit, 2);
   assert(s.apply.includes("ansible-playbook") && s.check?.includes("--check") && s.check.includes("--diff") && !s.apply.includes("--check"));
   assert(s.apply.some((w) => w.includes(rendered.value.digest)), "the digest is in the vector");
-  const exec = executionPlanOf(plan, rendered.value, steps);
+  const exec = executionPlanOf(plan, rendered.value, steps, await applyPermit(plan.subject.name, "2026-06-01T00:00:00Z"), "2026-06-01T00:00:00Z");
   assert(exec.kind === "ok" && exec.value !== undefined && exec.value.steps.length === 1);
   const done: Observed = new Map(REQS.map((r) => [r.id, r.desired]));
   const nothing = planOf(order, done);
@@ -108,7 +109,7 @@ proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and
   const p2 = planOf(o2, new Map([[gone.id, { name: "labuser" }]]));
   const r2 = await d.render(o2, p2);
   assert(r2.kind === "ok");
-  const e2 = executionPlanOf(p2, r2.value, d.steps(p2, r2.value));
+  const e2 = executionPlanOf(p2, r2.value, d.steps(p2, r2.value), await applyPermit(p2.subject.name, "2026-06-01T00:00:00Z"), "2026-06-01T00:00:00Z");
   assert(e2.kind === "ok" && e2.value?.steps[0]?.effect === "destructive" && e2.value.steps[0].check !== undefined);
 });
 

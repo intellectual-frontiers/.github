@@ -25,6 +25,7 @@
     "@intellectual-frontiers/anyfs": "link:../anyfs",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
+    "@intellectual-frontiers/estate": "link:../estate",
     "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/grc": "link:../grc",
     "@intellectual-frontiers/headless": "link:../headless",

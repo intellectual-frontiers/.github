@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/desired-os-state": "link:..",
+    "@intellectual-frontiers/estate": "link:../../estate",
     "@intellectual-frontiers/core": "link:../../core",
     "@intellectual-frontiers/crypto": "link:../../crypto",
     "@intellectual-frontiers/headless": "link:../../headless",

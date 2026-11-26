@@ -8,6 +8,7 @@
         "@intellectual-frontiers/core": "link:../../core",
         "@intellectual-frontiers/crypto": "link:../../crypto",
         "@intellectual-frontiers/desired-os-state": "link:..",
+        "@intellectual-frontiers/estate": "link:../../estate",
         "@intellectual-frontiers/headless": "link:../../headless",
         "@intellectual-frontiers/kanon": "link:../../kanon",
         "@intellectual-frontiers/libraries": "link:../../libraries",
@@ -29,6 +30,8 @@
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../../crypto", {}],
 
     "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:..", {}],
+
+    "@intellectual-frontiers/estate": ["@intellectual-frontiers/estate@link:../../estate", {}],
 
     "@intellectual-frontiers/headless": ["@intellectual-frontiers/headless@link:../../headless", {}],
 
