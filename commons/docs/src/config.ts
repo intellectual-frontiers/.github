@@ -226,8 +226,6 @@ export interface DocsConfig {
   readonly lenses?: readonly Lens[];
   /** The folder of the lint rules an `about` may name, as `<rule>.ts`, from the root; a lint rule is not checked without it. */
   readonly lintRules?: string;
-  /** Names that must not appear on any page of the site (a retired library, a product that is gone): a page that names one is a finding. */
-  readonly retired?: readonly string[];
   /** Words that must not appear on the pages that people write (the sections Start here, Concepts and How-to): a page that has one is a finding. */
   readonly forbiddenInGuides?: readonly string[];
   /** Where `build` writes the site, from the root; `_site` by default. */
@@ -292,8 +290,6 @@ export interface Config {
   readonly lenses: readonly Lens[];
   /** The folder of the lint rules, from the root. */
   readonly lintRules: string | undefined;
-  /** Names that must not appear on any page. */
-  readonly retired: readonly string[];
   /** Words that must not appear on the pages people write. */
   readonly forbiddenInGuides: readonly string[];
   /** Where `build` writes the site, absolute. */
@@ -576,7 +572,6 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     }
     return v.map(String);
   };
-  const retired = names("retired");
   const forbiddenInGuides = names("forbiddenInGuides");
   const lint = optStr("lintRules", "lintRules");
   const out = path.resolve(root, optStr("out", "out") ?? "_site");
@@ -615,7 +610,6 @@ export function resolveConfig(value: unknown, file: string): Result<Config, stri
     citations,
     lenses,
     lintRules: lint === undefined ? undefined : normalDir(lint),
-    retired,
     forbiddenInGuides,
     out,
     presentations,

@@ -87,14 +87,13 @@ function homes(b: Build, packages: readonly Package[]): void {
   }
 }
 
-/** The pages that name a retired name, and the pages people write that have a word they do not use. */
-export function wordFindings(pages: readonly Page[], retired: readonly string[], forbidden: readonly string[]): Finding[] {
+/** The pages people write that have a word they do not use. */
+export function wordFindings(pages: readonly Page[], forbidden: readonly string[]): Finding[] {
   const found: Finding[] = [];
   const escape = (w: string): string => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const has = (text: string, w: string): boolean => new RegExp(`(^|[^A-Za-z0-9])${escape(w)}($|[^A-Za-z0-9])`, "i").test(text);
   for (const p of pages) {
     const text = markdownOf(p);
-    for (const name of retired) if (has(text, name)) found.push({ where: p.path, problem: { kind: "retired-name", name } });
     if (p.section === "start" || p.section === "concepts" || p.section === "howto") {
       for (const word of forbidden) if (has(text, word)) found.push({ where: p.path, problem: { kind: "forbidden-word", word } });
     }
@@ -284,7 +283,7 @@ export async function buildSite(config: Config): Promise<Built> {
   citedBy(b);
   b.found.push(...brokenLinks(b.pages));
   for (const p of b.pages) for (const src of diagramSources(p.blocks)) if (!drawable(src)) b.found.push({ where: p.path, problem: { kind: "diagram-undrawable", first: src.split("\n")[0] ?? "" } });
-  b.found.push(...wordFindings(b.pages, config.retired, config.forbiddenInGuides));
+  b.found.push(...wordFindings(b.pages, config.forbiddenInGuides));
   fillFindings(b, b.found);
   const lensFiles = config.lenses.flatMap((l) => {
     try {

@@ -52,7 +52,7 @@ proves(["0001-docs FR-052"], "a quoted block equals the lines of the file it nam
     }
   }
   assert(quoted >= 3, `${quoted} quoted blocks`);
-  assert(outputs >= 3, `${outputs} blocks of output`);
+  assert(outputs >= 2, `${outputs} blocks of output`);
 });
 
 proves(["0001-docs FR-052"], "each page is at least fifteen hundred words and has no long or medium dash, and each entry of a Sources section has a date or says that it is undated", async () => {

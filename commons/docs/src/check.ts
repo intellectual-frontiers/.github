@@ -29,7 +29,6 @@ export type Problem =
   | { readonly kind: "evidence-unreadable"; readonly why: string }
   | { readonly kind: "registry-unreadable"; readonly why: string }
   | { readonly kind: "test-requirement-unknown"; readonly requirement: string; readonly test: string }
-  | { readonly kind: "retired-name"; readonly name: string }
   | { readonly kind: "forbidden-word"; readonly word: string };
 
 /** A problem and where it is. */
@@ -81,8 +80,6 @@ export function message(p: Problem): string {
       return `holds a test, "${p.test}", that proves ${p.requirement}, which is not a requirement of the spec kits`;
     case "book-part-empty":
       return `has a part, ${p.part}, of the volume ${p.volume} that selects no page`;
-    case "retired-name":
-      return `names ${p.name}, which is retired`;
     case "forbidden-word":
       return `has the word "${p.word}", which a page people write does not use`;
     default:

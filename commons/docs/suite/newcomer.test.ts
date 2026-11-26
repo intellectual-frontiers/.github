@@ -1,6 +1,6 @@
 /**
  * The newcomer questions (commons 0011-documentation FR-036): five questions a person or an agent with no context asks of a repository, each answered from the site alone, by its search (the same words-all-present rule the script
- * uses) and by the text of the page it finds; and the site names no retired library and no history in the pages people write.
+ * uses) and by the text of the page it finds; and the site has no history word in the pages people write.
  *
  * @module
  */
@@ -47,11 +47,11 @@ proves(["0011-documentation FR-036"], "five questions a newcomer asks are answer
   assertStringIncludes(text("concepts/release-loop.html"), "dev:check");
 });
 
-proves(["0011-documentation FR-036"], "a page that names a retired library, or a page people write that uses a word of history, is a finding, and commons' site has neither", async () => {
+proves(["0011-documentation FR-036"], "a page people write that uses a word of history is a finding, and commons' site has none", async () => {
   const page = { path: "start/x.html", title: "X", description: "d", section: "start" as const, group: "g", order: 0, blocks: [{ kind: "paragraph" as const, inlines: [{ kind: "text" as const, text: "It was formerly the SQL Aide." }] }] };
-  const found = wordFindings([page, { ...page, path: "specs/y.html", section: "specs" as const }], ["SQL Aide"], ["formerly"]);
-  assertEquals(found.map((f) => `${f.where} ${f.problem.kind}`), ["start/x.html retired-name", "start/x.html forbidden-word", "specs/y.html retired-name"]);
+  const found = wordFindings([page, { ...page, path: "specs/y.html", section: "specs" as const }], ["formerly"]);
+  assertEquals(found.map((f) => `${f.where} ${f.problem.kind}`), ["start/x.html forbidden-word"]);
   const built = await siteOnce();
-  assertEquals(wordFindings(built.pages, CONFIG.retired, CONFIG.forbiddenInGuides), []);
-  assert(CONFIG.retired.length > 0 && CONFIG.forbiddenInGuides.length > 0, "commons' configuration names them");
+  assertEquals(wordFindings(built.pages, CONFIG.forbiddenInGuides), []);
+  assert(CONFIG.forbiddenInGuides.length > 0, "commons' configuration names them");
 });
