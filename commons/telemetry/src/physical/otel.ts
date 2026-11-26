@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { defineSignals } from "../signals.ts";
+ * import { defineSignals } from "@intellectual-frontiers/telemetry/signals";
  * import { ok } from "@intellectual-frontiers/core";
  * import { startTelemetry } from "./otel.ts";
  * const registry = defineSignals({ "build.step": { signal: "span", role: "step", attributes: { target: "string" } } });
@@ -29,7 +29,7 @@ import { dirname } from "node:path";
 import process from "node:process";
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "@intellectual-frontiers/formats/http";
-import { accept as acceptBatch, type EnvelopeSigner, openEnvelope, type SeenLedger, TELEMETRY_PAYLOAD_TYPE } from "../envelope.ts";
+import { accept as acceptBatch, type EnvelopeSigner, openEnvelope, type SeenLedger, TELEMETRY_PAYLOAD_TYPE } from "@intellectual-frontiers/telemetry/envelope";
 import {
   type AttributeValue,
   commandShape,
@@ -49,7 +49,7 @@ import {
   type LogRecord,
   type SpanContext,
   type SpanData,
-} from "../otel.ts";
+} from "@intellectual-frontiers/telemetry/otel";
 import {
   decodeLogs,
   decodeMetrics,
@@ -63,7 +63,7 @@ import {
   type LogBatch,
   type MetricBatch,
   type TraceBatch,
-} from "../otlp.ts";
+} from "@intellectual-frontiers/telemetry/otlp";
 import {
   batchProcessor,
   type BatchOptions,
@@ -81,7 +81,7 @@ import {
   type SignalStats,
   type Source,
   type Telemetry,
-} from "../signals.ts";
+} from "@intellectual-frontiers/telemetry/signals";
 import { setProcessTracer } from "@intellectual-frontiers/system/proc";
 
 /** The longest a probe of the default endpoint waits for an answer (FR-015). */

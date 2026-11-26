@@ -11,8 +11,8 @@
  * @module
  */
 import { readTextOr } from "@intellectual-frontiers/system/fs";
-import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../otlp.ts";
-import { type Answer, querySignals, type Signals } from "../query.ts";
+import { decodeLogs, decodeMetrics, decodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "@intellectual-frontiers/telemetry/otlp";
+import { type Answer, querySignals, type Signals } from "@intellectual-frontiers/telemetry/query";
 
 /** What a journal gave: the signals, and how many lines did not decode. */
 export type Journal = { readonly signals: Signals; readonly skipped: number };

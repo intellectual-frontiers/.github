@@ -1,0 +1,13 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-redfish-layers FR-001	check	.github: cd commons/integrations-redfish && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-integrations-redfish-layers FR-002	check	.github: cd commons/integrations-redfish && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-redfish-connector FR-001	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: the governance as data
+0002-redfish-connector FR-002	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: the allow-list of paths and the bounds
+0002-redfish-connector FR-003	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: the observation and what is dropped
+0002-redfish-connector FR-004	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: health fails the policy and the members are bounded
+0002-redfish-connector FR-005	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: the keys, the sighting and the stored document by the estate's bridge
+0002-redfish-connector FR-006	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: a gap and an error
+0002-redfish-connector FR-007	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: conformConnector finds nothing
+0002-redfish-connector FR-012	check	.github: cd commons/integrations-redfish && bun run verify	suite/redfish.test.ts: the read port authorizes with basic and reads only

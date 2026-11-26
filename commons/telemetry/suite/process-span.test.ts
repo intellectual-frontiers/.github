@@ -4,12 +4,12 @@
  *
  * @module
  */
-import { formatTraceparent } from "../src/otel.ts";
-import { defineSignals, memoryProcessor } from "../src/signals.ts";
+import { formatTraceparent } from "../src/logical/otel.ts";
+import { defineSignals, memoryProcessor } from "../src/logical/signals.ts";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
-import { startTelemetry } from "../src/host/otel.ts";
+import { startTelemetry } from "../src/physical/otel.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SPAWN = "0001-system FR-010";

@@ -43,7 +43,7 @@ export type Observed = {
   readonly at: string;
   readonly probe: string;
   readonly os: { readonly family: string; readonly name: string; readonly version: string; readonly kernel: string; readonly arch: string; readonly hostname: string; readonly model?: string; readonly serial?: string; readonly flavor?: string; readonly wsl?: boolean };
-  readonly hardware: { readonly cpus?: number; readonly memoryMB?: number; readonly diskTotalGB?: number; readonly diskUsedPct?: number };
+  readonly hardware: { readonly cpus?: number; readonly memoryMB?: number; readonly diskTotalGB?: number; readonly diskUsedPct?: number; readonly clockTicksPerSecond?: number };
   /** Security settings: `on`, `off`, `manual` or `unknown`. */
   readonly security: { readonly diskEncryption: string; readonly firewall: string; readonly autoUpdates: string; readonly sshPasswordAuth?: string; readonly antivirus?: string; readonly admins: readonly string[] };
   readonly software: { readonly manager?: string; readonly packages?: number; readonly brewPackages?: number; readonly pendingUpdates?: number; readonly osquery?: string };
@@ -93,7 +93,7 @@ export function toObserved(p: ProbeOutput): Result<Observed, string> {
       ...some("flavor", os["flavor"] || undefined),
       ...some("wsl", os["wsl"] ? true : undefined),
     },
-    hardware: { ...some("cpus", num(hw["cpus"])), ...some("memoryMB", num(hw["memory_mb"])), ...some("diskTotalGB", num(hw["disk_total_gb"])), ...some("diskUsedPct", num(hw["disk_used_pct"])) },
+    hardware: { ...some("cpus", num(hw["cpus"])), ...some("memoryMB", num(hw["memory_mb"])), ...some("diskTotalGB", num(hw["disk_total_gb"])), ...some("diskUsedPct", num(hw["disk_used_pct"])), ...some("clockTicksPerSecond", num(hw["clk_tck"])) },
     security: {
       diskEncryption: sec["disk_encryption"] || "unknown",
       firewall: sec["firewall"] || "unknown",

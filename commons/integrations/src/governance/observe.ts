@@ -140,6 +140,25 @@ export function credentialSpec(ref: CredentialRef, fields: readonly CredentialFi
   return ok({ ref, fields });
 }
 
+/** Why the access to a store of our own is refused. */
+export type LocalAccessError = { readonly kind: "secret-field"; readonly name: string } | { readonly kind: "no-field" } | { readonly kind: "field-without-hint"; readonly name: string } | { readonly kind: "duplicate-field"; readonly name: string };
+
+/**
+ * The credential spec of a connector that reads only a store of our own, with the access of the process that runs it (0002-integrations-governance FR-016): a reference, and fields that name the store, none of them secret, each with a hint. The way
+ * to a secret stays `credentialSpec`, which refuses a spec with no secret field.
+ */
+export function localAccess(ref: CredentialRef, fields: readonly CredentialField[]): Result<CredentialSpec, LocalAccessError> {
+  if (fields.length === 0) return err({ kind: "no-field" });
+  const seen = new Set<string>();
+  for (const f of fields) {
+    if (f.secret) return err({ kind: "secret-field", name: f.name });
+    if (f.hint.trim() === "") return err({ kind: "field-without-hint", name: f.name });
+    if (seen.has(f.name)) return err({ kind: "duplicate-field", name: f.name });
+    seen.add(f.name);
+  }
+  return ok({ ref, fields });
+}
+
 /** How a pinned certificate came to be trusted: the first one seen (trust on first use), or one that was set beforehand. */
 export type PinOrigin = "trust-on-first-use" | "preconfigured";
 
@@ -148,10 +167,11 @@ export type TlsPolicy =
   | { readonly kind: "system-roots" }
   | { readonly kind: "pinned"; readonly origin: PinOrigin; readonly sha256: Sha256 | undefined };
 
-/** How the system is reached: over HTTPS to listed hosts, or over SNMPv3. */
+/** How the system is reached: over HTTPS to listed hosts, over SNMPv3, or not at all because it is a store of our own that the process reads with its own access (`local`). */
 export type TransportPolicy =
   | { readonly kind: "https"; readonly hosts: readonly string[]; readonly tls: TlsPolicy }
-  | { readonly kind: "snmp-v3"; readonly level: "authPriv" };
+  | { readonly kind: "snmp-v3"; readonly level: "authPriv" }
+  | { readonly kind: "local" };
 
 /** The governance of one connector. */
 export type ConnectorGovernance = {

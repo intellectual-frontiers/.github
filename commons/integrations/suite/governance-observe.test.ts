@@ -11,6 +11,7 @@ import {
   MAX_STALE_MS,
   cadence,
   credentialSpec,
+  localAccess,
   decidePin,
   denylistWith,
   durationMs,
@@ -65,11 +66,26 @@ proves(["0002-integrations-governance FR-007"], "a spec without a secret field i
   assertEquals(credentialSpec(ref, [{ name: "t", secret: true, hint: "h" }]).kind, "ok");
 });
 
+proves(["0002-integrations-governance FR-016"], "the access to a store of our own has plain fields only, and the way to a secret keeps its rule", () => {
+  const ref = must(parseCredentialRef("vault://tests/store"));
+  assertEquals(localAccess(ref, [{ name: "store", secret: false, hint: "The folder of the controller's store." }]).kind, "ok");
+  assertEquals(localAccess(ref, [{ name: "t", secret: true, hint: "h" }]).kind, "err");
+  assertEquals(localAccess(ref, []).kind, "err");
+  assertEquals(localAccess(ref, [{ name: "a", secret: false, hint: "" }]).kind, "err");
+  assertEquals(localAccess(ref, [{ name: "a", secret: false, hint: "h" }, { name: "a", secret: false, hint: "h" }]).kind, "err");
+  assertEquals(credentialSpec(ref, [{ name: "store", secret: false, hint: "h" }]).kind, "err");
+});
+
 proves(["0002-integrations-governance FR-008"], "the generic denylist and a weaker one", () => {
   const list = denylistWith([{ kind: "exact", text: "nickname", why: "personal" }]);
   for (const f of ["salary", "Annual_Salary", "ssn", "date_of_birth", "home_address", "api_key", "password_hash", "nickname"]) assert(isDenied(list, f), f);
   for (const f of ["name", "email", "private", "status"]) assert(!isDenied(list, f), f);
   assertEquals(governanceProblems(sampleGovernance({ denylist: { patterns: [] } })).some((p) => p.kind === "denylist-weaker"), true);
+});
+
+proves(["0002-integrations-governance FR-009"], "a store of our own has no host to reach and is no problem, and an https transport with no host still is", () => {
+  assertEquals(governanceProblems(sampleGovernance({ transport: { kind: "local" } })), []);
+  assertEquals(governanceProblems(sampleGovernance({ transport: { kind: "https", hosts: [], tls: { kind: "system-roots" } } })).map((p) => p.kind), ["no-host"]);
 });
 
 proves(["0002-integrations-governance FR-009"], "decidePin over every policy and digest (property)", () => {

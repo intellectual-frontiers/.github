@@ -29,7 +29,7 @@ import {
   type SpanStatus,
   type TraceId,
   type TraceState,
-} from "../src/otel.ts";
+} from "../src/logical/otel.ts";
 import {
   countSignals,
   decodeLogs,
@@ -43,7 +43,7 @@ import {
   type LogBatch,
   type MetricBatch,
   type TraceBatch,
-} from "../src/otlp.ts";
+} from "../src/logical/otlp.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
 import { assertEquals, proves } from "@intellectual-frontiers/test";
 

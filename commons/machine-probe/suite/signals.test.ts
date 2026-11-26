@@ -27,6 +27,7 @@ const PROBE = [
   "memory_mb=8192",
   "disk_total_gb=100",
   "disk_used_pct=42",
+  "clk_tck=100",
   "@software",
   "manager=apt",
   "pending_updates=7",
@@ -57,14 +58,25 @@ proves([S("FR-006")], "with the rows it gives uptime, load, memory, processor ti
   const m = signalsOf(observed(), ROWS, { platform: "debian" });
   const by = (name: string): number[] => m.signals.filter((s) => s.name === name).map((s) => s.value);
   assertEquals(by("system.uptime"), [3600]);
-  assertEquals(by("system.cpu.load_average.1m"), [0.5]);
-  assertEquals(by("system.cpu.load_average.15m"), [0.1]);
+  assertEquals(by("if.host.load.1m"), [0.5]);
+  assertEquals(by("if.host.load.15m"), [0.1]);
   assertEquals(by("system.memory.usage"), [6000, 2000]);
   assertEquals(by("system.memory.utilization"), [0.75]);
   assertEquals(by("system.cpu.time").slice(0, 3), [5, 0, 1]);
   assertEquals(by("system.network.io"), [10, 20]);
   assertEquals(m.gaps, []);
   assertEquals(m.refused, 0);
+});
+
+proves([S("FR-014")], "the processor time is divided by the ticks the machine reports, and without them there is a gap and no number", () => {
+  const fast = toObserved(parseProbe(PROBE.replace("clk_tck=100", "clk_tck=250")));
+  if (fast.kind === "err") throw new Error(fast.error);
+  assertEquals(signalsOf(fast.value, ROWS, { platform: "debian" }).signals.filter((s) => s.name === "system.cpu.time").slice(0, 3).map((s) => s.value), [2, 0, 0.4]);
+  const none = toObserved(parseProbe(PROBE.replace("clk_tck=100\n", "")));
+  if (none.kind === "err") throw new Error(none.error);
+  const m = signalsOf(none.value, ROWS, { platform: "debian" });
+  assertEquals(m.signals.some((s) => s.name === "system.cpu.time"), false);
+  assertEquals(m.gaps.map((g) => `${g.table}:${g.why}`), ["cpu_time:unreadable"]);
 });
 
 proves([S("FR-007")], "a table that is absent or not claimed for the platform gives a gap and no zero; a value that is not a number is refused and counted", () => {

@@ -7,10 +7,10 @@ import { ok } from "@intellectual-frontiers/core";
 import { withTempDir } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { journalExporter } from "../src/host/otel.ts";
-import { main, parseJournal, readJournal } from "../src/host/query.ts";
-import { signalsCatalog, signalsRelations, type Signals, querySignals } from "../src/query.ts";
-import { createTelemetry, defineSignals, memoryProcessor } from "../src/signals.ts";
+import { journalExporter } from "../src/physical/otel.ts";
+import { main, parseJournal, readJournal } from "../src/physical/query.ts";
+import { signalsCatalog, signalsRelations, type Signals, querySignals } from "../src/logical/query.ts";
+import { createTelemetry, defineSignals, memoryProcessor } from "../src/logical/signals.ts";
 
 const registry = defineSignals({
   "app.request": { signal: "span", role: "step", attributes: { route: "string", "retries?": "int" } },

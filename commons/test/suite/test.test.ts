@@ -179,7 +179,7 @@ const url = (rel: string): string => JSON.stringify(new URL(rel, import.meta.url
 const PIPED = `
 import { appendFileSync } from "node:fs";
 import process from "node:process";
-import { createPipeline, install } from ${url("../../telemetry/src/host/otel.ts")};
+import { createPipeline, install } from ${url("../../telemetry/src/physical/otel.ts")};
 import { reviewed, test } from ${url("../src/test.ts")};
 const out = process.env["PIPE_OUT"] ?? "";
 const done = () => Promise.resolve({ kind: "done" });

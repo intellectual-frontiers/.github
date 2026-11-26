@@ -39,7 +39,7 @@ import {
   traceStateDelete,
   traceStateGet,
   traceStateSet,
-} from "../src/otel.ts";
+} from "../src/logical/otel.ts";
 import { toHex } from "@intellectual-frontiers/formats/hex";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -291,13 +291,15 @@ proves([REDACT], "URLs lose their user information and the values of credential 
 
 proves([REDACT], "bearer and basic credentials, private keys and token shapes are replaced in text", () => {
   const basic = btoa("user:secret");
-  const pem = "-----BEGIN RSA PRIVATE KEY-----\nMIIEow\nabc\n-----END RSA PRIVATE KEY-----";
+  const dashes = "-".repeat(5);
+  const armor = (edge: string, kind: string): string => `${dashes}${edge} ${kind}${dashes}`;
+  const pem = `${armor("BEGIN", "RSA PRIVATE KEY")}\nMIIEow\nabc\n${armor("END", "RSA PRIVATE KEY")}`;
   const text = `curl -H "Authorization: Bearer abc.def-ghi_123" -H "Authorization: Basic ${basic}" https://u:p@h/?token=t\n${pem}\nBasic usage is fine.`;
   assertEquals(
     redactText(text),
     `curl -H "Authorization: Bearer REDACTED" -H "Authorization: Basic REDACTED" https://REDACTED:REDACTED@h/?token=REDACTED\nREDACTED\nBasic usage is fine.`,
   );
-  assertEquals(redactText("-----BEGIN PRIVATE KEY-----\ncut short"), "REDACTED");
+  assertEquals(redactText(`${armor("BEGIN", "PRIVATE KEY")}\ncut short`), "REDACTED");
   assertEquals(redactText(`token ghp_${"a".repeat(36)} here`), "token REDACTED here");
   assertEquals(
     redactAttributes({ password: "p", "url.full": "https://h/?code=1", note: ["Bearer abcdefghij", "plain"], n: 1n }, ["password"]),

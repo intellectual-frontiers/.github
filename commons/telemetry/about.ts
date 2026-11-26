@@ -16,16 +16,18 @@ export const about: About = {
     "Published to npm as compiled modules with their declarations; it depends on Core, Formats, Terminal and System.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
+    { path: "src/governance/", what: "Layer 1: the table of semantic conventions as data, with its version.", mayImport: ["nothing"] },
     {
-      path: "src/",
-      what: "The pure modules (`otel`, `otlp`, `signals`, `render`) and `mod.ts`, the entry that names them as namespaces.",
-      mayImport: ["src/", "core, formats and terminal, by package name"],
+      path: "src/logical/",
+      what: "Layer 2: the pure modules (`otel`, `otlp`, `signals`, `render`, `queue`, `envelope`, `exporter`, `query`).",
+      mayImport: ["core, crypto, formats, lang-sql and terminal, by package name"],
     },
     {
-      path: "src/host/",
-      what: "The host: the exporter, the journal, the installed pipeline and the console, with `mod.ts` as its entry.",
-      mayImport: ["node: builtins", "src/", "core, formats, terminal and system, by package name"],
+      path: "src/physical/",
+      what: "Layer 3: the host: the exporter, the journal, the installed pipeline, the receiver and the console, with `mod.ts` as its entry.",
+      mayImport: ["node: builtins", "governance and logical, by package name", "core, formats and system, by package name"],
     },
+    { path: "src/", what: "`mod.ts`, the entry that names the pure modules as namespaces.", mayImport: ["src/"] },
     {
       path: "suite/",
       what: "The tests: the model, the encoding, the signals, the renderer, the exporter against servers the tests start, the console as a child process, and the conformance with the OpenTelemetry Collector.",

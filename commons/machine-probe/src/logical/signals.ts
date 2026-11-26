@@ -79,9 +79,6 @@ export function platformOfFamily(family: string): SignalPlatform | undefined {
   return undefined;
 }
 
-/** The ticks per second that osQuery's `cpu_time` counts in on Linux (USER_HZ). */
-const TICKS_PER_SECOND = 100;
-
 const osType = (family: string): string => (family === "windows" ? "windows" : family === "macos" || family === "darwin" ? "darwin" : "linux");
 
 /** The signals of an observation (level 2) and, given rows, of osQuery (level 3). `hostId` is the machine id where the caller has it. */
@@ -135,7 +132,7 @@ export function signalsOf(observed: Observed, rows: Rows | undefined, options: {
           push("system.uptime", "gauge", "s", num(r[0]?.["total_seconds"]));
           break;
         case "load_average":
-          for (const [period, name] of [["1m", "system.cpu.load_average.1m"], ["5m", "system.cpu.load_average.5m"], ["15m", "system.cpu.load_average.15m"]] as const) {
+          for (const [period, name] of [["1m", "if.host.load.1m"], ["5m", "if.host.load.5m"], ["15m", "if.host.load.15m"]] as const) {
             const row = r.find((x) => x["period"] === period);
             if (row !== undefined) push(name, "gauge", "{thread}", num(row["average"]));
           }
@@ -153,14 +150,20 @@ export function signalsOf(observed: Observed, rows: Rows | undefined, options: {
           push("system.memory.utilization", "gauge", "1", (total - free) / total);
           break;
         }
-        case "cpu_time":
+        case "cpu_time": {
+          const hz = observed.hardware.clockTicksPerSecond;
+          if (hz === undefined || hz <= 0) {
+            gaps.push({ table: t.table, why: "unreadable" });
+            break;
+          }
           for (const row of r) {
-            for (const [column, mode] of [["user", "user"], ["nice", "nice"], ["system", "system"], ["idle", "idle"], ["iowait", "iowait"], ["irq", "irq"], ["softirq", "softirq"], ["steal", "steal"]] as const) {
+            for (const [column, mode] of [["user", "user"], ["nice", "nice"], ["system", "system"], ["idle", "idle"], ["iowait", "iowait"], ["irq", "interrupt"], ["softirq", "softirq"], ["steal", "steal"]] as const) {
               const ticks = num(row[column]);
-              if (ticks !== undefined) push("system.cpu.time", "counter", "s", ticks / TICKS_PER_SECOND, { "cpu.logical_number": row["core"] ?? "", "cpu.mode": mode });
+              if (ticks !== undefined) push("system.cpu.time", "counter", "s", ticks / hz, { "cpu.logical_number": row["core"] ?? "", "cpu.mode": mode });
             }
           }
           break;
+        }
         case "interface_details":
           for (const row of r) {
             const name = row["interface"] ?? "";

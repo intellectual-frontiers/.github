@@ -1,0 +1,35 @@
+{
+  "name": "@intellectual-frontiers/integrations-snmp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A read-only observer of network devices that answer SNMPv3: GET and GETNEXT with authentication and privacy (HMAC-SHA-2 and AES), a bounded walk of an allow-list of subtrees, the posture of each device in the vocabulary of GRC and its identity keys for the estate, written against the read port of Integrations and proved over recorded, made-up messages.",
+  "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/mod.ts",
+    "./governance": "./src/governance/mod.ts",
+    "./logical": "./src/logical/mod.ts",
+    "./physical": "./src/physical/mod.ts"
+  },
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "bun test suite/",
+    "test:node": "node --test \"suite/**/*.test.ts\"",
+    "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
+  },
+  "devDependencies": {
+    "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/estate": "link:../estate",
+    "@intellectual-frontiers/integrations": "link:../integrations",
+    "@intellectual-frontiers/kanon": "link:../kanon",
+    "@intellectual-frontiers/libraries": "link:../libraries",
+    "@intellectual-frontiers/mizan": "link:../mizan",
+    "@intellectual-frontiers/system": "link:../system",
+    "@intellectual-frontiers/test": "link:../test",
+    "@types/node": "26.6.6",
+    "fast-check": "4.10.2",
+    "typescript": "7.0.2"
+  }
+}

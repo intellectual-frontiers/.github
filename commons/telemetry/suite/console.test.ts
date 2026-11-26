@@ -1,5 +1,5 @@
 /**
- * Tests of `src/host/console.ts` (commons 0001-telemetry FR-024): a child process run by this same runtime, with its output piped (so
+ * Tests of `src/physical/console.ts` (commons 0001-telemetry FR-024): a child process run by this same runtime, with its output piped (so
  * `plain`), shows its spans and log records as lines with no escape byte, says once at the end where signals were not sent, writes OTLP
  * JSON lines where `IFC_CONSOLE=json` asks for them, and on an uncaught exception or an unhandled rejection renders the error and exits
  * with status 1. The rule that the console is the one writer for a person, and `system/stdio` the one for a program (0005-typescript-practice
@@ -7,11 +7,11 @@
  *
  * @module
  */
-import { decodeLogs } from "../src/otlp.ts";
-import { chooseMode } from "../src/render.ts";
-import { createTelemetry, defineSignals, type Telemetry } from "../src/signals.ts";
+import { decodeLogs } from "../src/logical/otlp.ts";
+import { chooseMode } from "../src/logical/render.ts";
+import { createTelemetry, defineSignals, type Telemetry } from "../src/logical/signals.ts";
 import { type Equal, expectType } from "@intellectual-frontiers/core";
-import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../src/host/console.ts";
+import { consoleProcessor, exceptionOf, type UncaughtTarget, uncaughtSignals } from "../src/physical/console.ts";
 import { readDir, readTextFile, withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { fromFileUrl, join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
@@ -24,9 +24,9 @@ const url = (relative: string): string => new URL(relative, import.meta.url).hre
 
 const SCRIPT = `
 import process from "node:process";
-import { createTelemetry, defineSignals } from "${url("../src/signals.ts")}";
+import { createTelemetry, defineSignals } from "${url("../src/logical/signals.ts")}";
 import { ok } from "${url("../../core/src/mod.ts")}";
-import { consoleProcessor, installUncaught, uncaughtSignals } from "${url("../src/host/console.ts")}";
+import { consoleProcessor, installUncaught, uncaughtSignals } from "${url("../src/physical/console.ts")}";
 
 const registry = defineSignals({
   ...uncaughtSignals,
@@ -175,7 +175,7 @@ const WRITER =
 
 /** The folders of the host's code, and the files of each that write to standard output or standard error: the console, for a person; stdio, for a program (FR-054). */
 const FOLDERS: readonly { readonly dir: string; readonly label: string; readonly writers: ReadonlySet<string> }[] = [
-  { dir: "../src/host/", label: "telemetry/src/host", writers: new Set(["console.ts"]) },
+  { dir: "../src/physical/", label: "telemetry/src/physical", writers: new Set(["console.ts"]) },
   { dir: "../../system/src/", label: "system/src", writers: new Set(["stdio.ts"]) },
 ];
 

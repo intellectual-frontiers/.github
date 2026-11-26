@@ -6,7 +6,7 @@
  */
 export const library = {
   name: "integrations-github",
-  group: "integrations",
+  family: { host: "integrations", role: "plugin" },
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
@@ -14,4 +14,21 @@ export const library = {
   distribution: ["github", "npm"],
   exports: ["."],
   summary: "The reference connector of Integrations for the posture of one organization of a code host: read-only, with its governance as data, its posture policies in the vocabulary of GRC, its records and entities, proved by the conformance suite over made-up recorded answers.",
+  kanon: {
+    package: "@intellectual-frontiers/integrations-github",
+    extends: "@intellectual-frontiers/integrations",
+    units: [
+      {
+        folder: "src/",
+        layer: "logical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/integrations", subpaths: ["governance", "logical"] },
+        ],
+      },
+      { folder: "suite/", own: true },
+      { folder: "tools/", own: true },
+      { folder: "./", own: true },
+    ],
+  },
 };

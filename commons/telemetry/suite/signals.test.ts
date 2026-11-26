@@ -15,8 +15,8 @@ import {
   type SpanId,
   type TraceId,
   DEFAULT_HISTOGRAM_BOUNDS,
-} from "../src/otel.ts";
-import { countSignals } from "../src/otlp.ts";
+} from "../src/logical/otel.ts";
+import { countSignals } from "../src/logical/otlp.ts";
 import { err, ok, type Result, type Equal, expectType } from "@intellectual-frontiers/core";
 import {
   type AttributesOf,
@@ -35,7 +35,7 @@ import {
   type Source,
   type TelemetryOptions,
   type Timer,
-} from "../src/signals.ts";
+} from "../src/logical/signals.ts";
 import { assert, assertEquals, assertRejects, assertThrows, proves } from "@intellectual-frontiers/test";
 
 const REGISTRY = "0001-telemetry FR-009";

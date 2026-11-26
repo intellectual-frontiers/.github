@@ -7,7 +7,7 @@
  */
 export const library = {
   name: "integrations-identity",
-  group: "integrations",
+  family: { host: "integrations", role: "plugin" },
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
@@ -18,6 +18,7 @@ export const library = {
   summary: "Read-only connectors for the identity and device posture of a managed service provider's customers: a Microsoft Entra tenant (who has multifactor authentication, whether a policy requires it), Microsoft Intune managed devices (compliance, encryption, staleness) and a Google Workspace domain (two-step verification, administrators), each written against the read port of Integrations, with its governance as data and a conformance run over recorded answers.",
   kanon: {
     package: "@intellectual-frontiers/integrations-identity",
+    extends: "@intellectual-frontiers/integrations",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/integrations", subpaths: ["governance", "logical"] }] },
       { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/integrations", subpaths: ["logical"] }, { name: "@intellectual-frontiers/integrations-identity", subpaths: ["governance"] }] },

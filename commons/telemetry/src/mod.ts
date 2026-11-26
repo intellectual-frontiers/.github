@@ -12,7 +12,7 @@
  *
  * @module
  */
-export * as otel from "./otel.ts";
-export * as otlp from "./otlp.ts";
-export * as render from "./render.ts";
-export * as signals from "./signals.ts";
+export * as otel from "./logical/otel.ts";
+export * as otlp from "./logical/otlp.ts";
+export * as render from "./logical/render.ts";
+export * as signals from "./logical/signals.ts";

@@ -33,7 +33,7 @@ facts() {
   if [ "$os" = Darwin ]; then
     kv cpus "$(sysctl -n hw.ncpu 2>/dev/null)"; kv memory_mb "$(( $(sysctl -n hw.memsize 2>/dev/null || echo 0) / 1048576 ))"
   else
-    kv cpus "$(getconf _NPROCESSORS_ONLN 2>/dev/null)"; kv memory_mb "$(awk '/MemTotal/{print int($2/1024)}' /proc/meminfo 2>/dev/null)"
+    kv cpus "$(getconf _NPROCESSORS_ONLN 2>/dev/null)"; kv memory_mb "$(awk '/MemTotal/{print int($2/1024)}' /proc/meminfo 2>/dev/null)"; kv clk_tck "$(getconf CLK_TCK 2>/dev/null)"
   fi
   df -Pk / 2>/dev/null | awk 'NR==2{printf "disk_total_gb=%d\ndisk_used_pct=%s\n", $2/1048576, $5}' | tr -d '%'
   echo "@security"

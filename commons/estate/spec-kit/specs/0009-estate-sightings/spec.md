@@ -32,6 +32,8 @@
 - **FR-012**: `levelOf({ identified, sshOut, osquery })` MUST be the total function of commons 0041-telemetry-and-reach FR-001 and `missingMinimums` that of FR-011 there, in the logical layer, with an exhaustive `switch` over `AssetLevel`. Relies on audit rows: B1, D1.
 - **FR-013**: The origin of an asset adopted from sightings MUST be `scan` as `ORIGINS` already says (an asset seen on the network and adopted from the list of what was found); no new origin MUST be added. Relies on audit rows: B1.
 
+- **FR-014**: From an observation of the shape every connector of Integrations makes, given as a structural type so that estate imports no connector, estate MUST give the pure functions `keysOfProps` (the keys of the properties `machineId`, `serial`, `engineId`, `mac` and `hostKey` of a record, each made by the smart constructor of its kind, the strongest first, none twice, a property that is not a key of its kind left out), `sightingsOf` (one sighting for each record labelled `device` that has at least one key and no property `asset`, with the provenance of the strongest key, the relay and the protocol the record names in its properties `relay` and `protocol` where it names them, and none for a device with no key or one an asset holds) and `storedOf` (the observation of one asset as a stored observation document), so that the connectors of devices (integrations 0010-integrations-network-observers FR-005) share one bridge. Relies on audit rows: B4, B6.
+
 ## Acceptance scenarios
 
 1. **Given** a syslog sighting with a MAC that no asset has, **When** the sightings are folded and compared with the declared assets, **Then** it is an unexpected seen asset with provenance `relay:<id>/syslog#<mac>`, per FR-002 and FR-008.

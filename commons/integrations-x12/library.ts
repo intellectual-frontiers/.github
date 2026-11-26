@@ -6,7 +6,7 @@
  */
 export const library = {
   name: "integrations-x12",
-  group: "integrations",
+  family: { host: "integrations", role: "plugin" },
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
@@ -14,4 +14,21 @@ export const library = {
   distribution: ["github", "npm"],
   exports: ["."],
   summary: "The X12 envelope and acknowledgement skeleton of Integrations: the entries of X12 and of the HIPAA 5010 and purchasing transaction sets with their licence as data, a codec for the fixed-width ISA envelope and its ISA, GS and ST levels, control counts checked as findings, TA1 and 999 made and read, and a loader of a schema from the user's own transcription of a licensed guide. It embeds no standard.",
+  kanon: {
+    package: "@intellectual-frontiers/integrations-x12",
+    extends: "@intellectual-frontiers/integrations",
+    units: [
+      {
+        folder: "src/",
+        layer: "logical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/integrations", subpaths: ["governance", "logical"] },
+        ],
+      },
+      { folder: "suite/", own: true },
+      { folder: "tools/", own: true },
+      { folder: "./", own: true },
+    ],
+  },
 };

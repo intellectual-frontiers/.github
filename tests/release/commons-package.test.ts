@@ -105,7 +105,7 @@ proves(
       assert(bytes <= SINGLE_BUDGET.tarballBytes, `the tarball is ${bytes} bytes, over its budget of ${SINGLE_BUDGET.tarballBytes}`);
       const sideEffects = manifest["sideEffects"];
       assert(
-        Array.isArray(sideEffects) && sideEffects.includes("./telemetry/src/host/otel.js"),
+        Array.isArray(sideEffects) && sideEffects.includes("./telemetry/src/physical/otel.js"),
         "the telemetry host installs a port when loaded: it is not marked free of effects",
       );
       const keys = Object.keys(obj(manifest["exports"]));

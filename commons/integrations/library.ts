@@ -7,7 +7,7 @@
  */
 export const library = {
   name: "integrations",
-  group: "integrations",
+  family: { host: "integrations", role: "host" },
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
@@ -18,6 +18,8 @@ export const library = {
     "Integrations on one skeleton of Kanon layers (governance, logical, physical): connectors that observe the outside world read-only into observations and entities, and exchanges of messages and documents under standards and partner agreements, each standard a plugin package behind a typed codec port and a conformance suite.",
   kanon: {
     package: "@intellectual-frontiers/integrations",
+    family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}", contract: "./logical" },
+    plugins: [{ noun: "github" }, { noun: "identity" }, { noun: "fhir" }, { noun: "x12" }, { noun: "snmp" }, { noun: "redfish" }, { noun: "otel" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {

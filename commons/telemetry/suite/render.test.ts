@@ -10,10 +10,10 @@
  */
 import { absurd, err, ok } from "@intellectual-frontiers/core";
 import fc from "fast-check";
-import { SEVERITY } from "../src/otel.ts";
-import { decodeLogs } from "../src/otlp.ts";
-import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../src/render.ts";
-import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../src/signals.ts";
+import { SEVERITY } from "../src/logical/otel.ts";
+import { decodeLogs } from "../src/logical/otlp.ts";
+import { chooseMode, duration, initial, type Input, type Mode, parseMode, progressText, render, type State } from "../src/logical/render.ts";
+import { createTelemetry, defineSignals, type FlushResult, type Processor } from "../src/logical/signals.ts";
 import { createScreen, describeStyle, type Screen } from "@intellectual-frontiers/terminal/vt";
 import { cutToWidth } from "@intellectual-frontiers/terminal/width";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";

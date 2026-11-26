@@ -1,5 +1,5 @@
 /**
- * Tests of `src/host/otel.ts` (commons 0001-telemetry FR-014 to FR-019), all against servers on 127.0.0.1 that the test starts or a `fetch`
+ * Tests of `src/physical/otel.ts` (commons 0001-telemetry FR-014 to FR-019), all against servers on 127.0.0.1 that the test starts or a `fetch`
  * it gives: the OTLP/HTTP JSON exporter (the request it sends, retries after `Retry-After` and growing waits, partial success, failures
  * that never throw and are said once), the probe of the default endpoint and the capped wait at exit, the rotated journal, the context
  * carried across `await` and the parent from `TRACEPARENT`, the runtime's own spans for `proc`, the HTTP client and `serve` (and nothing
@@ -19,10 +19,10 @@ import {
   signalEndpoint,
   SEVERITY,
   type SpanData,
-} from "../src/otel.ts";
-import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../src/otlp.ts";
+} from "../src/logical/otel.ts";
+import { decodeTraces, encodeTraces, type LogBatch, type MetricBatch, type TraceBatch } from "../src/logical/otlp.ts";
 import { ok } from "@intellectual-frontiers/core";
-import { batchProcessor, defineSignals, memoryProcessor } from "../src/signals.ts";
+import { batchProcessor, defineSignals, memoryProcessor } from "../src/logical/signals.ts";
 import { withTempDir, writeTextFile } from "@intellectual-frontiers/system/fs";
 import { join } from "@intellectual-frontiers/system/path";
 import * as proc from "@intellectual-frontiers/system/proc";
@@ -42,7 +42,7 @@ import {
   startTelemetry,
   systemClock,
   untraced,
-} from "../src/host/otel.ts";
+} from "../src/physical/otel.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
 /** What the tests use of a server: the port it listens on, and its end. */

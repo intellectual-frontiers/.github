@@ -6,11 +6,11 @@
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { accept, newEpoch, nextSeq, openEnvelope, sealBatch, type BatchPredicate, type SeenLedger, webCryptoSigner } from "../src/envelope.ts";
-import { otlpReceiver } from "../src/host/otel.ts";
-import { type LogBatch, type MetricBatch, type TraceBatch, encodeMetrics } from "../src/otlp.ts";
-import { drain, droppedMetric, NO_DROPS, outcomeOfStatus, queueExporter, type Segment, type SegmentQueue, type SendOutcome } from "../src/queue.ts";
-import { SEMCONV, SEMCONV_VERSION, semconvEntry, unknownNames } from "../src/semconv.ts";
+import { accept, newEpoch, nextSeq, openEnvelope, sealBatch, type BatchPredicate, type SeenLedger, webCryptoSigner } from "../src/logical/envelope.ts";
+import { otlpReceiver } from "../src/physical/otel.ts";
+import { type LogBatch, type MetricBatch, type TraceBatch, encodeMetrics } from "../src/logical/otlp.ts";
+import { drain, droppedMetric, NO_DROPS, outcomeOfStatus, queueExporter, type Segment, type SegmentQueue, type SendOutcome } from "../src/logical/queue.ts";
+import { SEMCONV, SEMCONV_VERSION, semconvEntry, unknownNames } from "../src/governance/semconv.ts";
 
 const S = (n: string): string => `0003-telemetry-reach ${n}`;
 
@@ -220,8 +220,8 @@ proves([S("FR-016"), S("FR-017")], "the table has a version, ours are under if. 
 
 // --- the exporter -----------------------------------------------------------------------------------------------------------------
 
-import { exportOnce, httpSender, type SequenceStore } from "../src/exporter.ts";
-import type { Sequence } from "../src/envelope.ts";
+import { exportOnce, httpSender, type SequenceStore } from "../src/logical/exporter.ts";
+import type { Sequence } from "../src/logical/envelope.ts";
 
 proves([S("FR-020"), S("FR-013")], "a round signs, numbers and queues a batch, waits while the forward is down, and sends in order when it is up", async () => {
   const { signer } = await keys();

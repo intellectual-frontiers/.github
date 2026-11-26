@@ -6,7 +6,7 @@
  */
 export const library = {
   name: "integrations-fhir",
-  group: "integrations",
+  family: { host: "integrations", role: "plugin" },
   level: "L1",
   specKit: "spec-kit",
   verify: "bun run verify",
@@ -14,4 +14,21 @@ export const library = {
   distribution: ["github", "npm"],
   exports: ["."],
   summary: "The FHIR plugin of Integrations: R4 and US Core as registry entries with their licence as data, a codec for FHIR JSON and NDJSON to the abstract typed tree, a loader of StructureDefinitions, CodeSystems and ValueSets the user supplies, and the acknowledgement port of OperationOutcome.",
+  kanon: {
+    package: "@intellectual-frontiers/integrations-fhir",
+    extends: "@intellectual-frontiers/integrations",
+    units: [
+      {
+        folder: "src/",
+        layer: "logical",
+        packages: [
+          { name: "@intellectual-frontiers/core", subpaths: [] },
+          { name: "@intellectual-frontiers/integrations", subpaths: ["governance", "logical"] },
+        ],
+      },
+      { folder: "suite/", own: true },
+      { folder: "tools/", own: true },
+      { folder: "./", own: true },
+    ],
+  },
 };

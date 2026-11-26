@@ -46,3 +46,4 @@ requirement	mechanism	by	note
 0009-machine-probe-signals FR-011	check	.github: cd commons/machine-probe && bun test suite/	layers.test.ts: the shared checker holds the unit table
 0009-machine-probe-signals FR-012	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the platform of a family and the tables claimed for it
 0009-machine-probe-signals FR-013	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the drift count as a gauge
+0009-machine-probe-signals FR-014	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the ticks come from the facts and without them there is a gap and no number

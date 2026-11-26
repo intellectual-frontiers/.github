@@ -20,6 +20,7 @@
 - **FR-006**: The public surface MUST be the entries of `exports`: `.`, `./governance`, `./logical`, `./http`, `./transport` and `./headless`, and a vendor adapter or a standard MUST be a separate package of commons that imports them by name.
 - **FR-007**: The library MUST declare its table of layers as the field `kanon` of its manifest `library.ts` (commons 0033-kanon FR-010) and its `verify` MUST run the shared checker of `@intellectual-frontiers/kanon` (`bun ../kanon/src/check.ts`); the library keeps no checker of its own.
 - **FR-008**: The library MUST declare itself with a manifest (`library.ts`, `release.ts`, `about.ts`) and be published as compiled ESM with declarations, with exports conditions `types`, `bun` and `default` (commons 0032-libraries-by-concern).
+- **FR-009**: The library MUST be the host of the family of its plugins (commons 0033-kanon FR-019 to FR-024, and 0041-telemetry-and-reach audit row C6): its manifest declares `family: { host: "integrations", role: "host" }`, its table declares the rule `{host}-{name}` for a plugin, the contract `./logical` that each plugin imports, and one plugin noun for each connector and standard (`github`, `identity`, `fhir`, `x12`, `snmp`, `redfish`, `otel`); each of those libraries MUST declare `family: { host: "integrations", role: "plugin" }` and a table that extends this package; and the shared checker MUST hold the name and the imports of each plugin.
 
 ## Acceptance scenarios
 

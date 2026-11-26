@@ -20,7 +20,8 @@
 - **FR-006**: A cadence MUST have `every` and `staleAfter`, `staleAfter` MUST default to twice `every`, MUST NOT exceed seven days and MUST NOT be less than `every`; whether an observation is stale MUST be a pure function of the cadence and two instants.
 - **FR-007**: A credential spec MUST hold a reference and fields, at least one of them secret, each with a hint and none twice.
 - **FR-008**: Governance MUST carry a generic denylist of fields that are never kept (compensation, government identifiers, birth dates, home address, personal contact, secrets), a connector MAY add to it and MUST NOT remove from it (a weaker one is a problem `denylist-weaker`), and `isDenied` MUST be a pure function of the list and a field name.
-- **FR-009**: The trust a connector places in a system MUST be a typed policy (`https` with its hosts and a TLS policy of system roots or a pinned certificate whose origin is `trust-on-first-use` or `preconfigured`, or `snmp-v3`), and `decidePin` MUST be a total function of the policy, the digest shown and the digest remembered: it accepts a match, remembers the first digest only under trust on first use, and refuses a mismatch.
+- **FR-009**: The trust a connector places in a system MUST be a typed policy (`https` with its hosts and a TLS policy of system roots or a pinned certificate whose origin is `trust-on-first-use` or `preconfigured`, `snmp-v3`, or `local`, a store of our own read with the access of the process, which has no host to reach), and `decidePin` MUST be a total function of the policy, the digest shown and the digest remembered: it accepts a match, remembers the first digest only under trust on first use, and refuses a mismatch.
+
 
 ## Exchange
 
@@ -30,6 +31,7 @@
 - **FR-013**: An exchange agreement MUST name its trading partner, direction, syntax, schemas, profiles, bindings, acknowledgement requirements (X12 TA1 and 999, HL7 ACK, FHIR OperationOutcome, each within a duration), service levels, data protection, obligations, transport and a credential reference; `agreementProblems` MUST find an agreement with no schema, an obligation to acknowledge with no requirement, validation of no level, a send that is never tried and a keep longer than the retention.
 - **FR-014**: Data protection MUST classify what is exchanged (`public`, `internal`, `confidential`, `protected-health-information`), say its handling and its minimum necessary (`whole-record`, `listed-elements`, `treatment-exempt`), and `mayAppearInLogs` MUST be true of `public` only.
 - **FR-015**: Obligations MUST be a closed union (`validate` with its levels, `acknowledge`, `log` metadata only, `keep` for a duration), and the publication gate `embeddingFindings` MUST refuse, as a finding, an embedded file of a standard whose licence does not allow embedding or that is not in the registry.
+- **FR-016**: A connector that reads only a store of our own, with the access of the process that runs it, MAY have the credential spec made by `localAccess`: a reference and at least one field that names the store, none of them secret, each with a hint and none twice; a secret field MUST be refused there, and `credentialSpec` MUST still refuse a spec with no secret field, so that the way to a secret has no exception.
 
 ## Acceptance scenarios
 

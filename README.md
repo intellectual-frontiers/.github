@@ -75,7 +75,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/net`](https://www.npmjs.com/package/@intellectual-frontiers/net) | Foundation | The network as one typed library | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/rdf`](https://www.npmjs.com/package/@intellectual-frontiers/rdf) | Foundation | RDF as algebraically typed values | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/system`](https://www.npmjs.com/package/@intellectual-frontiers/system) | Foundation | The host as one typed library | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/telemetry`](https://www.npmjs.com/package/@intellectual-frontiers/telemetry) | Foundation | The OpenTelemetry data model | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/telemetry`](https://www.npmjs.com/package/@intellectual-frontiers/telemetry) | Foundation | The OpenTelemetry data model | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/terminal`](https://www.npmjs.com/package/@intellectual-frontiers/terminal) | Foundation | A typed command-line parser (`args`) whose options are declared once as data | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/assessment`](commons/assessment) | Pattern | Assessment-objective evidence | layers | L1 | not released (owner-blocked) |
@@ -105,8 +105,11 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/evidence-capture`](commons/evidence-capture) | Program | The unattended capture of evidence | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/findings`](commons/findings) | Program | Test results from other tools (SARIF, OWASP ZAP, Burp Suite and Nessus reports) read into findings that keep where they came from | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/grc`](https://www.npmjs.com/package/@intellectual-frontiers/grc) | Program | Governance, risk and compliance in layers | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers | L1 | GitHub, npm |
-| [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations`](https://www.npmjs.com/package/@intellectual-frontiers/integrations) | Program | Two families on one skeleton of Kanon layers | layers, plugins | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations-github`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-github) | Program | The reference connector of Integrations for the posture of one organization of a code host | layers, extension | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations-otel`](commons/integrations-otel) | Program | A read-only observer of what the controller's receiver kept of the signals of assets and of site relays | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/integrations-redfish`](commons/integrations-redfish) | Program | A read-only observer of baseboard management controllers that answer Redfish over HTTPS | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/integrations-snmp`](commons/integrations-snmp) | Program | A read-only observer of network devices that answer SNMPv3 | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/lab`](commons/lab) | Program | Disposable machines for tests | layers | L1 | not released (tests-only) |
 | [`@intellectual-frontiers/lang-sql`](https://www.npmjs.com/package/@intellectual-frontiers/lang-sql) | Program | A small, fast, portable multi-dialect SQL language library | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/libraries`](https://www.npmjs.com/package/@intellectual-frontiers/libraries) | Program | The tools of a repository of commons | - | L1 | GitHub, npm |
@@ -123,9 +126,9 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/catalog-nist-csf-2`](commons/catalog-nist-csf-2) | Standard | The NIST Cybersecurity Framework 2.0 as a grc catalog package | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/catalog-nist-sp800`](commons/catalog-nist-sp800) | Standard | NIST SP 800-53 Rev 5.2.0 and SP 800-171 Rev 3 as grc catalog packages | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/catalog-soc2`](commons/catalog-soc2) | Standard | SOC 2 Trust Services Criteria as a grc catalog package | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | - | L1 | GitHub, npm |
-| [`@intellectual-frontiers/integrations-identity`](commons/integrations-identity) | Standard | Read-only connectors for the identity and device posture of a managed service provider's customers | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations-fhir`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-fhir) | Standard | The FHIR plugin of Integrations | layers, extension | L1 | GitHub, npm |
+| [`@intellectual-frontiers/integrations-identity`](commons/integrations-identity) | Standard | Read-only connectors for the identity and device posture of a managed service provider's customers | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/integrations-x12`](https://www.npmjs.com/package/@intellectual-frontiers/integrations-x12) | Standard | The X12 envelope and acknowledgement skeleton of Integrations | layers, extension | L1 | GitHub, npm |
 | [`@intellectual-frontiers/mizan`](https://www.npmjs.com/package/@intellectual-frontiers/mizan) | Standard | Mizan, the IF Spec Profile, as code | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/ontology`](https://www.npmjs.com/package/@intellectual-frontiers/ontology) | Standard | The ontologies of Intellectual Frontiers Commons | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/quality`](https://www.npmjs.com/package/@intellectual-frontiers/quality) | Standard | The run of a suite of tests as evidence (one OTLP record of the run, its reports as TAP, JUnit, CTRF, SARIF, OSCAL and the documents of ISO/IEC/IEEE 29119-3, and its signed ledger entry) | - | L1 | GitHub, npm |

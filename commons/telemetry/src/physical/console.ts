@@ -16,7 +16,7 @@
  *
  * @example
  * ```ts
- * import { createTelemetry, defineSignals } from "../signals.ts";
+ * import { createTelemetry, defineSignals } from "@intellectual-frontiers/telemetry/signals";
  * import { consoleProcessor, installUncaught, uncaughtSignals } from "./console.ts";
  * const registry = defineSignals({ ...uncaughtSignals, "build.step": { signal: "span", role: "step", attributes: { target: "string" } } });
  * const telemetry = createTelemetry({ registry, processors: [consoleProcessor({ registry })], ...rest });
@@ -27,10 +27,10 @@
  */
 import process from "node:process";
 import { clearInterval, clearTimeout, setInterval, setTimeout } from "node:timers";
-import type { AnyValue, Attributes } from "../otel.ts";
-import { SEVERITY } from "../otel.ts";
-import { chooseMode, initial, type Input, type Mode, parseMode, render, type State } from "../render.ts";
-import { type Declarations, describeError, type FlushResult, type Processor, type ProcessorStats, type Registry } from "../signals.ts";
+import type { AnyValue, Attributes } from "@intellectual-frontiers/telemetry/otel";
+import { SEVERITY } from "@intellectual-frontiers/telemetry/otel";
+import { chooseMode, initial, type Input, type Mode, parseMode, render, type State } from "@intellectual-frontiers/telemetry/render";
+import { type Declarations, describeError, type FlushResult, type Processor, type ProcessorStats, type Registry } from "@intellectual-frontiers/telemetry/signals";
 import { env, exit } from "@intellectual-frontiers/system/proc";
 import { currentLook, type Look } from "@intellectual-frontiers/system/tty";
 

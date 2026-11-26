@@ -32,7 +32,7 @@ requirement	mechanism	by	note
 0002-telemetry-query FR-003	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-004	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
 0002-telemetry-query FR-005	check	.github: cd commons/telemetry && bun test suite/	query.test.ts
-0003-telemetry-reach FR-001	none	-	Deferred: not built yet
+0003-telemetry-reach FR-001	check	.github: cd commons/telemetry && bun run verify	suite/layers.test.ts: the shared checker holds the unit table of the library and verify runs it
 0003-telemetry-reach FR-002	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the port and its use by the exporter and the drain; the store behind it is anyfs 0011
 0003-telemetry-reach FR-003	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: queueExporter enqueues before it answers; drain keeps on 503 and removes only what was taken
 0003-telemetry-reach FR-004	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the drops become the metric if.telemetry.dropped; the cap itself is anyfs 0011 FR-005

@@ -89,4 +89,5 @@ requirement	mechanism	by	note
 0009-estate-sightings FR-010	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)
 0009-estate-sightings FR-011	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)
 0009-estate-sightings FR-012	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: levelOf and missingMinimums
+0009-estate-sightings FR-014	check	.github: cd commons/estate && bun test suite/	seen.test.ts: keys of a record, a sighting for each device with a key and none without, the stored document
 0009-estate-sightings FR-013	none	-	Deferred: not built yet (fleet documents, the retention fold, the approval by moveState)

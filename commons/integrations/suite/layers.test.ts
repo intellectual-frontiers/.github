@@ -87,3 +87,17 @@ proves(["0001-integrations-layers FR-008"], "the manifest agrees with the packag
   assertEquals(Object.keys(pkg.exports), [...library.exports]);
   assertEquals(table().package, pkg.name);
 });
+
+proves(["0001-integrations-layers FR-009"], "the host declares the family rule and a noun for each plugin, and each plugin declares the family and extends the host", async () => {
+  assertEquals(library.family, { host: "integrations", role: "host" });
+  const t = table();
+  assertEquals(t.family?.plugin, "{host}-{name}");
+  assertEquals(t.family?.contract, "./logical");
+  const nouns = t.plugins.map((p) => p.noun).sort();
+  assertEquals(nouns, ["fhir", "github", "identity", "otel", "redfish", "snmp", "x12"]);
+  for (const noun of nouns) {
+    const text = await fs.readTextFile(path.join(ROOT, "..", `integrations-${noun}`, "library.ts"));
+    assert(text.includes('family: { host: "integrations", role: "plugin" }'), `${noun} declares the family`);
+    assert(text.includes('extends: "@intellectual-frontiers/integrations"'), `${noun} extends the host`);
+  }
+});

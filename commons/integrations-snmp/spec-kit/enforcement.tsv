@@ -1,0 +1,16 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-integrations-snmp-layers FR-001	check	.github: cd commons/integrations-snmp && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-integrations-snmp-layers FR-002	check	.github: cd commons/integrations-snmp && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-snmp-connector FR-001	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: the governance is read-only, of the transport authPriv, with a plain user and two secrets
+0002-snmp-connector FR-002	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: version 1, 2c, MD5, SHA-1 and DES are problems
+0002-snmp-connector FR-003	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: the allow-list and its bounds
+0002-snmp-connector FR-004	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: the bytes of X.690 for known values, a round trip, and each refusal
+0002-snmp-connector FR-005	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: keys, seal and open: the digest, a changed octet, another key
+0002-snmp-connector FR-006	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: discovery, get, getNext, a late request, a refused user, a wrong digest
+0002-snmp-connector FR-007	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: a walk stays in the subtree, the list and the bounds
+0002-snmp-connector FR-008	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: the observation of a made-up switch and its policies
+0002-snmp-connector FR-009	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: the keys, the sighting and the stored document by the estate's bridge
+0002-snmp-connector FR-010	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: a gap where the view gives nothing, an error where the device is silent
+0002-snmp-connector FR-011	check	.github: cd commons/integrations-snmp && bun run verify	suite/snmp.test.ts: conformConnector finds nothing

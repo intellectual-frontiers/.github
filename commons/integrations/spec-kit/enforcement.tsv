@@ -9,6 +9,7 @@ requirement	mechanism	by	note
 0001-integrations-layers FR-006	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table's entries are the package's exports
 0001-integrations-layers FR-007	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the table is read from the manifest and verify runs the shared checker
 0001-integrations-layers FR-008	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the manifest agrees with the package
+0001-integrations-layers FR-009	check	.github: cd commons/integrations && bun run verify	suite/layers.test.ts: the host's rule and nouns, and each plugin declares the family and extends the host
 0002-integrations-governance FR-001	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: each parse accepts its form and refuses others as a value
 0002-integrations-governance FR-002	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: a refused credential reference does not appear in its error
 0002-integrations-governance FR-003	check	.github: cd commons/integrations && bun run verify	suite/governance-ids.test.ts: urn parts round-trip (property)
@@ -24,6 +25,7 @@ requirement	mechanism	by	note
 0002-integrations-governance FR-013	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: agreementProblems finds each
 0002-integrations-governance FR-014	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: only a public payload may appear in logs
 0002-integrations-governance FR-015	check	.github: cd commons/integrations && bun run verify	suite/governance-exchange.test.ts: embeddingFindings refuses embedded content a licence does not allow
+0002-integrations-governance FR-016	check	.github: cd commons/integrations && bun run verify	suite/governance-observe.test.ts: localAccess takes plain fields and refuses a secret one
 0003-integrations-logical FR-001	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a connector observes over an in-memory port and a fixed clock
 0003-integrations-logical FR-002	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: a secret never shows in text or JSON
 0003-integrations-logical FR-003	check	.github: cd commons/integrations && bun run verify	suite/observe.test.ts: findings and failures hold no value of the payload
