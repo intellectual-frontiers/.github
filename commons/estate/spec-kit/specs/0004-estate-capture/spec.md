@@ -17,6 +17,7 @@
 - **FR-006**: Pushing MUST be `never`, `after-commit` or `every`, to a remote that has a name; `every` MUST have an interval above zero, and an interval MUST NOT be given for another mode.
 - **FR-007**: A seal MUST be `never`, `on-export` or `daily` (a person's seal of the journal's head is due every day), and a requirement written out MUST name a signer where it is not `never`.
 - **FR-008**: `cadenceOf` MUST give the cadence of an asset: its own where one is given, else that of its state, and nothing for a discovered asset.
+- **FR-009**: A policy MAY name `ignore`, the records of the state of a machine (`os`, `hardware`, `security`, `software`, `listening`, `agent`) that are not kept as evidence, sorted and each once; a name that is not a record is refused. It is for a fleet whose machines share a network namespace or a kernel with what else runs on their host, where a record such as the listening ports moves with that and not with the machine; nothing is ignored by default, and what is ignored is said in the policy that a person reads. Relies on audit rows: F2.
 
 ## Acceptance scenarios
 

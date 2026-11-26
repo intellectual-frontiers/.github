@@ -34,6 +34,8 @@ export type CapturePolicyInput = {
   readonly journal?: { readonly granularity?: JournalGranularity; readonly heartbeat?: string; readonly disposable?: { readonly granularity: JournalGranularity; readonly heartbeat?: string }; readonly commit?: { readonly every?: string } };
   readonly push?: { readonly mode?: PushMode; readonly remote?: string; readonly every?: string };
   readonly sealing?: { readonly required?: SealRequirement; readonly key?: string };
+  /** The records of the state of a machine that are not kept as evidence (of `RECORDS`), for a fleet whose machines share a network or a kernel with others, where such a record moves with what else runs there. */
+  readonly ignore?: readonly string[];
 };
 
 /** A capture policy: every field is there. */
@@ -44,7 +46,12 @@ export type CapturePolicy = {
   readonly journal: { readonly granularity: JournalGranularity; readonly heartbeat: string | null; readonly disposable: { readonly granularity: JournalGranularity; readonly heartbeat: string | null } | null; readonly commit: { readonly every: string } };
   readonly push: { readonly mode: PushMode; readonly remote: string; readonly every: string | null };
   readonly sealing: { readonly required: SealRequirement; readonly key: string | null };
+  /** The records of the state that are not kept, sorted: none by default. */
+  readonly ignore: readonly string[];
 };
+
+/** The records of the state of a machine, by name (0004-estate-capture FR-009). */
+export const RECORDS = ["os", "hardware", "security", "software", "listening", "agent"] as const;
 
 /** The longest a freshness window may be: seven days, the longest interval of continuous validation of FedRAMP 20x. */
 export const LONGEST_WINDOW_MS = 7 * 86_400_000;
@@ -57,6 +64,7 @@ export const DEFAULT_CAPTURE_POLICY: CapturePolicy = {
   journal: { granularity: "every-capture", heartbeat: null, disposable: null, commit: { every: "PT1H" } },
   push: { mode: "never", remote: "origin", every: null },
   sealing: { required: "on-export", key: null },
+  ignore: [],
 };
 
 /** The capture policy for the workshops of an estate whose role is agent-workspace (0008-estate-workstations FR-016): such a workshop is observed every 15 minutes whether adopted or managed, and a disposable one is journaled as changes and a heartbeat. */
@@ -154,6 +162,9 @@ export function defineCapturePolicy(input: CapturePolicyInput = {}): Result<Capt
   if (required !== "never" && key === null && input.sealing?.required !== undefined) problems.push("a seal is made with a key of the tenant's signers: name it");
   if (key !== null && !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(key)) problems.push(`${JSON.stringify(key)} is not a name of a signer`);
 
+  const ignore = [...new Set(input.ignore ?? [])].sort();
+  for (const r of ignore) if (!(RECORDS as readonly string[]).includes(r)) problems.push(`${JSON.stringify(r)} is not a record of the state (${RECORDS.join(", ")})`);
+
   if (problems.length > 0) return err(problems);
   return ok({
     branch,
@@ -162,6 +173,7 @@ export function defineCapturePolicy(input: CapturePolicyInput = {}): Result<Capt
     journal: { granularity, heartbeat, disposable, commit: { every: commitEvery } },
     push: { mode, remote, every: pushEvery },
     sealing: { required, key },
+    ignore,
   });
 }
 

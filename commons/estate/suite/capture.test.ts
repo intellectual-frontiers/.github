@@ -83,3 +83,11 @@ proves(["0004-estate-capture FR-008"], "the cadence of an asset is its own, else
   assertEquals(cadenceOf(policy.value, { id: "synthetic-server-03", state: "adopted" }), "P1D");
   assertEquals(cadenceOf(policy.value, { id: "printer", state: "discovered" }), undefined);
 });
+
+proves(["0004-estate-capture FR-009"], "a policy may name the records of the state that are not kept: sorted, each once, nothing by default, and a name that is not a record is refused", () => {
+  assertEquals(defineCapturePolicy().kind === "ok" ? (defineCapturePolicy() as { value: { ignore: readonly string[] } }).value.ignore : ["?"], []);
+  const some = defineCapturePolicy({ ignore: ["listening", "agent", "listening"] });
+  assert(some.kind === "ok" && some.value.ignore.join() === "agent,listening", JSON.stringify(some));
+  const bad = defineCapturePolicy({ ignore: ["listening", "weather"] });
+  assert(bad.kind === "err" && bad.error.some((m) => m.includes("weather")), JSON.stringify(bad));
+});
