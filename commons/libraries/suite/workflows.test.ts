@@ -293,7 +293,9 @@ proves([`${SPEC} FR-015`], "a push to a branch other than main is proved once: t
     const script = seen.steps.map((st) => (st.kind === "run" ? st.run : "")).join("\n");
     assertStringIncludes(script, 'GITHUB_EVENT_NAME" = push');
     assertStringIncludes(script, 'GITHUB_REF" != refs/heads/main');
-    assertStringIncludes(script, "status=success");
+    assertStringIncludes(script, "head_sha=$GITHUB_SHA");
+    assertStringIncludes(script, '.conclusion == \\"success\\" or .status != \\"completed\\"');
+    assertStringIncludes(script, "select(.id < $GITHUB_RUN_ID)");
     assertStringIncludes(script, "|| n=0");
     for (const [id, j] of Object.entries(w.jobs)) {
       if (id === "seen" || id === "keep-findings") continue;

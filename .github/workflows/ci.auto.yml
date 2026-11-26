@@ -50,7 +50,8 @@ jobs:
         run: |
           proved=false
           if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" != refs/heads/main ]; then
-            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&status=success&per_page=1" --jq .total_count 2>/dev/null) || n=0
+            # an earlier run of this workflow on the same commit that succeeded or is still going (the run of main that the push of the branch follows); the earliest run is never skipped, so two pushes at once do not skip each other
+            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&per_page=50" --jq "[.workflow_runs[] | select(.id < $GITHUB_RUN_ID) | select(.conclusion == \"success\" or .status != \"completed\")] | length" 2>/dev/null) || n=0
             case "$n" in ""|*[!0-9]*) n=0 ;; esac
             if [ "$n" -gt 0 ]; then proved=true; fi
           fi

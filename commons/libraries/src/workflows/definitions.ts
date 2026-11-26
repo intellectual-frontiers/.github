@@ -238,7 +238,7 @@ const ci: Workflow = {
 export const NOT_PROVED = "needs.seen.outputs.proved != 'true'";
 
 /**
- * The job that says whether a commit was proved already (FR-015): for a push to a branch other than main, whether this workflow has a run on the same commit that ended in success; for anything else, never. It reads the runs of the
+ * The job that says whether a commit was proved already (FR-015): for a push to a branch other than main, whether this workflow has an earlier run on the same commit that ended in success or is still going (the run of main that the push of the branch follows); for anything else, never. It reads the runs of the
  * workflow through the API with the token of the run, installs nothing and checks nothing out, and where it cannot ask it says not proved, so that a failure of the guard runs the workflow and never leaves a commit unproved.
  */
 function seenJob(file: string): Job {
@@ -254,7 +254,8 @@ function seenJob(file: string): Job {
         lines(
           "proved=false",
           'if [ "$GITHUB_EVENT_NAME" = push ] && [ "$GITHUB_REF" != refs/heads/main ]; then',
-          '  n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&status=success&per_page=1" --jq .total_count 2>/dev/null) || n=0',
+          "  # an earlier run of this workflow on the same commit that succeeded or is still going (the run of main that the push of the branch follows); the earliest run is never skipped, so two pushes at once do not skip each other",
+          '  n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$WORKFLOW_FILE/runs?head_sha=$GITHUB_SHA&per_page=50" --jq "[.workflow_runs[] | select(.id < $GITHUB_RUN_ID) | select(.conclusion == \\"success\\" or .status != \\"completed\\")] | length" 2>/dev/null) || n=0',
           '  case "$n" in ""|*[!0-9]*) n=0 ;; esac',
           '  if [ "$n" -gt 0 ]; then proved=true; fi',
           "fi",
