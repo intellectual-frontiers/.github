@@ -1,0 +1,14 @@
+### plain at 60
+| Packages
+\ Packages  [######--------------] 3/10  synthetic-package…
+\ Build  linking synthetic-work-01  3m10s
+
+### ansi at 60
+␛[36;1m|␛[0m Packages
+␛[36;1m\␛[0m Packages  [######--------------] 3/10  synthetic-package…
+␛[36;1m\␛[0m Build  linking synthetic-work-01  ␛[2m3m10s␛[0m
+
+### full at 60
+␛[1;38;2;102;204;238m⠋␛[0m Packages
+␛[1;38;2;102;204;238m⠸␛[0m Packages  [██████░░░░░░░░░░░░░░] 3/10  synthetic-package…
+␛[1;38;2;102;204;238m⠧␛[0m Build  linking synthetic-work-01  ␛[38;2;136;136;136m3m10s␛[0m

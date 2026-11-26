@@ -1,0 +1,44 @@
+### plain at 60
+tool: A tool for the tests.
+
+Usage: tool COMMAND [OPTIONS] [ARGUMENTS]
+
+Commands:
+  status  Show the status.
+  sync    Sync the files.
+  wipe    Delete the cache.
+  work    Works.
+
+Run tool COMMAND --help for a command's help.
+
+Built in: help, explain, completions, man, run, --version
+
+### ansi at 60
+␛[36;1mtool␛[0m: A tool for the tests.
+
+␛[36;1mUsage:␛[0m tool COMMAND [OPTIONS] [ARGUMENTS]
+
+␛[36;1mCommands:␛[0m
+  ␛[36;1mstatus␛[0m  Show the status.
+  ␛[36;1msync␛[0m    Sync the files.
+  ␛[36;1mwipe␛[0m    Delete the cache.
+  ␛[36;1mwork␛[0m    Works.
+
+Run tool COMMAND --help for a command's help.
+
+Built in: help, explain, completions, man, run, --version
+
+### full at 60
+␛[1;38;2;102;204;238mtool␛[0m: A tool for the tests.
+
+␛[1;38;2;102;204;238mUsage:␛[0m tool COMMAND [OPTIONS] [ARGUMENTS]
+
+␛[1;38;2;102;204;238mCommands:␛[0m
+  ␛[1;38;2;102;204;238mstatus␛[0m  Show the status.
+  ␛[1;38;2;102;204;238msync␛[0m    Sync the files.
+  ␛[1;38;2;102;204;238mwipe␛[0m    Delete the cache.
+  ␛[1;38;2;102;204;238mwork␛[0m    Works.
+
+Run tool COMMAND --help for a command's help.
+
+Built in: help, explain, completions, man, run, --version

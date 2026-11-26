@@ -8,7 +8,7 @@
 import fc from "fast-check";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { fs, path } from "@intellectual-frontiers/system";
-import * as palette from "@intellectual-frontiers/terminal/palette";
+import { ICONS, lineMarkOf, tint } from "@intellectual-frontiers/terminal/ui";
 import { createScreen } from "@intellectual-frontiers/terminal/vt";
 import { displayWidth } from "@intellectual-frontiers/terminal/width";
 import { problem } from "../src/governance/mod.ts";
@@ -16,31 +16,35 @@ import { closingOf, outcomeOf } from "../src/logical/mod.ts";
 import { renderClosing } from "../src/surfaces/cli/render.ts";
 import { Reporter } from "../src/surfaces/cli/reporter.ts";
 import { lookOfRun } from "../src/surfaces/cli/run.ts";
-import { fit, fmtDuration, line, markKindOf, mark, progressBar, SPINNER, spinnerFrame, type Look, type Tone } from "../src/surfaces/cli/style.ts";
+import { fit, fmtDuration, iconOfTone, line, mark, progressBar, SPINNER, spinnerFrame, themeOfTone, type Look, type Tone } from "../src/surfaces/cli/style.ts";
+import { lookAt } from "./looks.ts";
 import { fakeTimer, sample, world } from "./world.ts";
 
 const TONES: readonly Tone[] = ["fail", "warn", "pending", "action", "ok", "skip", "hint", "cancelled"];
-const PLAIN: Look = { tty: false, colour: false, emoji: false, columns: 80 };
-const FANCY: Look = { tty: true, colour: true, emoji: true, columns: 80 };
+const PLAIN: Look = lookAt("plain");
+const FANCY: Look = lookAt("full");
 const SRC = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..", "src");
 
-proves(["0004-headless-cli FR-001"], "every tone is one mark of the palette, with its ASCII fallback where there are no emoji", () => {
+proves(["0004-headless-cli FR-001", "0004-headless-cli FR-017"], "every tone is one icon of the ui's table, with its ASCII tag where there are no emoji, and one name of its theme", () => {
   assertEquals(
-    TONES.map(markKindOf),
-    ["failed", "warning", "pending", "action", "done", "skipped", "hint", "cancelled"],
+    TONES.map(iconOfTone),
+    ["failed", "warn", "working", "action", "done", "skipped", "hint", "stop"],
   );
-  for (const t of TONES) {
-    const kind = markKindOf(t);
-    assertEquals(mark(t, PLAIN), palette.MARKS[kind].ascii);
-    assertEquals(mark(t, { ...PLAIN, emoji: true }), palette.MARKS[kind].emoji);
-    assertEquals(line(t, "text", PLAIN), `${palette.MARKS[kind].ascii} text`);
+  const tags = ["[x]", "[!]", "[todo]", "[you]", "[ok]", "[skip]", "->", "[stop]"];
+  for (const [i, t] of TONES.entries()) {
+    assertEquals(mark(t, PLAIN), tags[i]);
+    assertEquals(mark(t, { ...PLAIN, emoji: true }), ICONS[iconOfTone(t)].emoji);
+    assertEquals(line(t, "text", PLAIN), `${tags[i]} text`);
+    assertEquals(lineMarkOf(iconOfTone(t), PLAIN), tags[i]);
   }
-  assertEquals(new Set(TONES.map(markKindOf)).size, TONES.length, "no two tones share a mark");
-  assertEquals(mark("ok", FANCY), "\u001b[32m✅\u001b[0m");
-  assertEquals(mark("fail", FANCY), "\u001b[31m❌\u001b[0m");
+  assertEquals(new Set(TONES.map(iconOfTone)).size, TONES.length, "no two tones share an icon");
+  assertEquals(TONES.map(themeOfTone), ["error", "warn", "dim", "accent", "success", "dim", "accent", "dim"]);
+  assertEquals(mark("ok", FANCY), tint("success", "✅", FANCY));
+  assertEquals(mark("fail", FANCY), "\u001b[38;2;238;102;102m❌\u001b[0m");
+  assertEquals(mark("ok", lookAt("ansi")), "\u001b[32m[ok]\u001b[0m");
 });
 
-proves(["0004-headless-cli FR-001"], "no file of the layers writes an emoji of its own: the only marks are the palette's", async () => {
+proves(["0004-headless-cli FR-001"], "no file of the layers writes an emoji of its own: the only marks are the ui's table", async () => {
   const offenders: string[] = [];
   for (const rel of await fs.walkFiles(SRC)) {
     if (!rel.endsWith(".ts")) continue;
@@ -56,8 +60,9 @@ proves(["0004-headless-cli FR-002"], "colour is written only where the look allo
   const p = sample();
   const look = (env: Record<string, string>, terminal: boolean, colour = true, columns?: number) =>
     lookOfRun(p, world({ env, terminal: { stdin: terminal, stdout: terminal, stderr: terminal }, ...(columns === undefined ? {} : { columns }) }), colour);
-  assertEquals(look({}, false), { tty: false, colour: false, emoji: false, columns: 80 });
-  assertEquals(look({ LANG: "en_US.UTF-8" }, true, true, 120), { tty: true, colour: true, emoji: true, columns: 120 });
+  const shape = (l: Look) => ({ tty: l.tty, colour: l.colour, emoji: l.emoji, columns: l.columns });
+  assertEquals(shape(look({}, false)), { tty: false, colour: false, emoji: false, columns: 80 });
+  assertEquals(shape(look({ LANG: "en_US.UTF-8" }, true, true, 120)), { tty: true, colour: true, emoji: true, columns: 120 });
   assertEquals(look({ NO_COLOR: "1" }, true).colour, false);
   assertEquals(look({ FORCE_COLOR: "1" }, false).colour, true);
   assertEquals(look({ FORCE_COLOR: "1" }, false).tty, false);
@@ -77,7 +82,7 @@ proves(["0004-headless-cli FR-002"], "a line is cut to the terminal's width, nev
   assertEquals(fit("short", look), "short");
   assertEquals(fit("a long line of text", look), "a long …");
   assertEquals(displayWidth(fit("✅ 测试测试测试测试", look)), 8);
-  const painted = palette.paint("failure", "abcdefghijklmnopqrstuvwxyz", { colour: true });
+  const painted = tint("error", "abcdefghijklmnopqrstuvwxyz", { colour: true });
   const cut = fit(painted, look);
   assert(displayWidth(cut) <= 9 && cut.endsWith("…") || cut.endsWith("\u001b[0m…") || displayWidth(cut) <= 9, cut);
   fc.assert(
@@ -101,7 +106,7 @@ proves(["0004-headless-cli FR-005"], "the spinner and the bar are pure functions
   assertEquals([640, 12_000, 72_000, 7_380_000].map(fmtDuration), ["640ms", "12s", "1m12s", "2h03m"]);
 });
 
-proves(["0004-headless-cli FR-001", "0004-headless-cli FR-003"], "the closing block is drawn with the palette's marks in the order it was chosen, the verdict last, and in quiet only the verdict", () => {
+proves(["0004-headless-cli FR-001", "0004-headless-cli FR-003"], "the closing block is drawn with the ui's icons in the order it was chosen, the verdict last, and in quiet only the verdict", () => {
   const o = outcomeOf(null, {
     problems: [problem("fail", "root", { fix: "tool fix", code: "E1-ROOT", raw: "EPERM", logLine: 4 }), problem("warn", "slow", { code: "E1-SLOW" }), problem("action", "send it", { fix: "tool send" }), problem("pending", "no token", { fix: "tool token" })],
     next: ["then: power on alpha"],
@@ -120,6 +125,7 @@ proves(["0004-headless-cli FR-001", "0004-headless-cli FR-003"], "the closing bl
       "-> remote is off",
       "   run: tool remote",
       "   power on alpha",
+      "   1 failed, 1 warning, 1 pending, 1 for you",
       "[x] root [E1-ROOT]",
       "next: tool fix",
       "",
@@ -127,9 +133,9 @@ proves(["0004-headless-cli FR-001", "0004-headless-cli FR-003"], "the closing bl
   );
   assertEquals(renderClosing(c, { look: PLAIN, verbosity: "quiet" }), "[x] root [E1-ROOT]\n");
   const verbose = renderClosing(c, { look: PLAIN, verbosity: "verbose", logPath: "/s/log/1.log" });
-  assertStringIncludes(verbose, "   log: /s/log/1.log\n[x] root");
+  assertStringIncludes(verbose, "   log: /s/log/1.log\n   1 failed, 1 warning, 1 pending, 1 for you\n[x] root");
   const fancy = renderClosing(closingOf(outcomeOf(null), { fix: { commands: [], own: [] }, shownHints: [] }), { look: FANCY, verbosity: "calm" });
-  assertEquals(fancy, "\n\u001b[32m✅\u001b[0m \u001b[32mUp to date\u001b[0m\n");
+  assertEquals(fancy, `\n${tint("success", "✅", FANCY)} ${tint("success", "Up to date", FANCY)}\n`);
   // verbose shows the raw text and the line of the log with the failure that has them
   const withRaw = renderClosing(closingOf(outcomeOf(null, { problems: [problem("fail", "a", { raw: "EPERM" }), problem("fail", "b", { raw: "EACCES", logLine: 9 })] }), { fix: { commands: [], own: [] }, shownHints: [] }), { look: PLAIN, verbosity: "verbose", logPath: "/l.log" });
   assertStringIncludes(withRaw, "   raw: EACCES");

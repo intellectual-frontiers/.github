@@ -23,6 +23,7 @@ import {
   reportOfRemote,
   sarifText,
   selectTargets,
+  statusWord,
   treeOf,
   type Placed,
   type Program,
@@ -31,6 +32,7 @@ import {
 import type { Io, RunResult } from "./io.ts";
 import { renderClosing } from "./render.ts";
 import type { Look } from "./style.ts";
+import { tableLines, toneCell } from "./view.ts";
 
 /** The arguments to forward to a target: those given, without `--on` and its value, and without `--json` and `--sarif`, which the remote run does not take as this run's. */
 export function forwardedArgs(args: readonly string[]): readonly string[] {
@@ -57,6 +59,8 @@ export type OnRun = {
   readonly args: readonly string[];
   readonly verbosity: Verbosity;
   readonly look: Look;
+  /** What the output stream, where the table of hosts is written, can show. */
+  readonly outLook: Look;
   readonly sarif: boolean;
   readonly below: readonly string[];
 };
@@ -85,7 +89,8 @@ export async function runOn(x: OnRun): Promise<RunResult> {
   );
   const rows = fanned.map(remoteOfFanned);
   const code = exitOfRemote(rows);
-  const outcome = redactOutcome(reportOfRemote(rows), redactor(program.secrets(), { keys: program.secretKeys }));
+  const redact = redactor(program.secrets(), { keys: program.secretKeys });
+  const outcome = redactOutcome(reportOfRemote(rows), redact);
   if (x.verbosity === "json") {
     const text = x.sarif
       ? sarifText({ program: program.name, version: program.version, outcome })
@@ -93,7 +98,17 @@ export async function runOn(x: OnRun): Promise<RunResult> {
     return { code, out: text, err: "" };
   }
   const closing = closingOf(outcome, { fix: program.fix, shownHints: [] });
-  return { code, out: outcome.text === undefined ? "" : `${outcome.text}\n`, err: renderClosing(closing, { look: x.look, verbosity: x.verbosity }) };
+  const table = tableLines(
+    [
+      { key: "target", title: "TARGET" },
+      { key: "status", title: "STATUS" },
+      { key: "exit", title: "EXIT", align: "right" },
+      { key: "problem", title: "FIRST PROBLEM" },
+    ],
+    rows.map((r) => ({ target: r.target, status: toneCell(r.kind === "ran" && r.code === 0 ? "ok" : r.kind === "ran" ? "fail" : "warn", statusWord(r), x.outLook), exit: String(r.code), problem: r.outcome.problems[0]?.message ?? "" })),
+    x.outLook,
+  ).join("\n");
+  return { code, out: outcome.text === undefined ? "" : `${redact(table)}\n`, err: renderClosing(closing, { look: x.look, verbosity: x.verbosity }) };
 }
 
 /**

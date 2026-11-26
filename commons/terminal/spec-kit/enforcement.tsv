@@ -32,3 +32,4 @@ requirement	mechanism	by	note
 0002-ui FR-023	check	.github: cd commons/terminal && bun test suite/	ui-app.test.ts: a screen on vt redrawn on key and on resize, the value returned, abort and throw restore the terminal, not-interactive writes nothing
 0002-ui FR-024	check	.github: cd commons/terminal && bun test suite/	ui-theme.test.ts: every import of every src/ui*.ts is core, palette, width or its own file, and no source names a domain
 0002-ui FR-025	check	.github: cd commons/terminal && bun test suite/	ui-theme.test.ts: colour depth and emoji from the environment, the icon table widths (2 and 3), the theme by depth, and the left column of the flow aligned on vt with emoji and without
+0002-ui FR-026	check	.github: cd commons/terminal && bun test suite/	ui-theme.test.ts: the line mark is the emoji, else the icon's ASCII tag, else its three-column ASCII

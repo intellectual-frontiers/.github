@@ -1,0 +1,38 @@
+### plain at 60
+
+[!] synthetic-file-01.txt is large [E001-LARGE]
+   It removes the old copies
+   fix: tool trim
+[!] synthetic-file-02.txt has no owner [E003-OWNER]
+[you] approve the change
+   run: tool approve
+[todo] no token yet [P001-TOKEN]
+   run: tool token
+[ok] Up to date · 2 warnings · 1 for you · 1 waiting
+next: tool approve
+
+### ansi at 60
+
+␛[33m[!]␛[0m ␛[33msynthetic-file-01.txt is large␛[0m␛[2m [E001-LARGE]␛[0m
+   It removes the old copies
+   ␛[2mfix: tool trim␛[0m
+␛[33m[!]␛[0m ␛[33msynthetic-file-02.txt has no owner␛[0m␛[2m [E003-OWNER]␛[0m
+␛[36;1m[you]␛[0m approve the change
+   ␛[2mrun: tool approve␛[0m
+␛[2m[todo]␛[0m no token yet␛[2m [P001-TOKEN]␛[0m
+   ␛[2mrun: tool token␛[0m
+␛[32m[ok]␛[0m ␛[32mUp to date · 2 warnings · 1 for you · 1 waiting␛[0m
+␛[36;1mnext:␛[0m tool approve
+
+### full at 60
+
+␛[38;2;238;170;68m⚠️␛[0m ␛[38;2;238;170;68msynthetic-file-01.txt is large␛[0m␛[38;2;136;136;136m [E001-LARGE]␛[0m
+   It removes the old copies
+   ␛[38;2;136;136;136mfix: tool trim␛[0m
+␛[38;2;238;170;68m⚠️␛[0m ␛[38;2;238;170;68msynthetic-file-02.txt has no owner␛[0m␛[38;2;136;136;136m [E003-OWNER]␛[0m
+␛[1;38;2;102;204;238m⚡␛[0m approve the change
+   ␛[38;2;136;136;136mrun: tool approve␛[0m
+␛[38;2;136;136;136m⏳␛[0m no token yet␛[38;2;136;136;136m [P001-TOKEN]␛[0m
+   ␛[38;2;136;136;136mrun: tool token␛[0m
+␛[38;2;102;204;136m✅␛[0m ␛[38;2;102;204;136mUp to date · 2 warnings · 1 for you · 1 waiting␛[0m
+👉 ␛[1;38;2;102;204;238mnext:␛[0m tool approve

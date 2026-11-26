@@ -1,0 +1,68 @@
+### plain at 60
+tool sync: Sync the files.
+
+Usage: tool sync [OPTIONS]
+
+Options:
+      --warn             Warn about something.
+      --fail             Fail.
+      --wait             Leave something pending.
+      --throws           Throw.
+      --json             Write one JSON document and nothing else for a person.
+  -q, --quiet            Show only how it ended.
+  -v, --verbose          Show every step as it happens.
+      --[no-]color       Use colour where the terminal shows it (--no-color turns it off). (default: --color)
+      --non-interactive  Never ask a question: where one is needed, fail and say so.
+      --dry-run          Show what would change and change nothing.
+      --check            Change nothing; end with findings where something would change.
+  -h, --help             Show this help and do nothing else.
+
+Effect: changes something (--dry-run shows what it would do; --check changes nothing and ends with findings where it would)
+Repeating it: not promised to be safe
+For: anyone
+
+### ansi at 60
+␛[36;1mtool sync␛[0m: Sync the files.
+
+␛[36;1mUsage:␛[0m tool sync [OPTIONS]
+
+␛[36;1mOptions:␛[0m
+      ␛[36;1m--warn␛[0m             Warn about something.
+      ␛[36;1m--fail␛[0m             Fail.
+      ␛[36;1m--wait␛[0m             Leave something pending.
+      ␛[36;1m--throws␛[0m           Throw.
+      ␛[36;1m--json␛[0m             Write one JSON document and nothing else for a person.
+  ␛[36;1m-q, --quiet␛[0m            Show only how it ended.
+  ␛[36;1m-v, --verbose␛[0m          Show every step as it happens.
+      ␛[36;1m--[no-]color␛[0m       Use colour where the terminal shows it (--no-color turns it off). (default: --color)
+      ␛[36;1m--non-interactive␛[0m  Never ask a question: where one is needed, fail and say so.
+      ␛[36;1m--dry-run␛[0m          Show what would change and change nothing.
+      ␛[36;1m--check␛[0m            Change nothing; end with findings where something would change.
+  ␛[36;1m-h, --help␛[0m             Show this help and do nothing else.
+
+␛[36;1mEffect:␛[0m changes something (--dry-run shows what it would do; --check changes nothing and ends with findings where it would)
+␛[36;1mRepeating it:␛[0m not promised to be safe
+␛[36;1mFor:␛[0m anyone
+
+### full at 60
+␛[1;38;2;102;204;238mtool sync␛[0m: Sync the files.
+
+␛[1;38;2;102;204;238mUsage:␛[0m tool sync [OPTIONS]
+
+␛[1;38;2;102;204;238mOptions:␛[0m
+      ␛[1;38;2;102;204;238m--warn␛[0m             Warn about something.
+      ␛[1;38;2;102;204;238m--fail␛[0m             Fail.
+      ␛[1;38;2;102;204;238m--wait␛[0m             Leave something pending.
+      ␛[1;38;2;102;204;238m--throws␛[0m           Throw.
+      ␛[1;38;2;102;204;238m--json␛[0m             Write one JSON document and nothing else for a person.
+  ␛[1;38;2;102;204;238m-q, --quiet␛[0m            Show only how it ended.
+  ␛[1;38;2;102;204;238m-v, --verbose␛[0m          Show every step as it happens.
+      ␛[1;38;2;102;204;238m--[no-]color␛[0m       Use colour where the terminal shows it (--no-color turns it off). (default: --color)
+      ␛[1;38;2;102;204;238m--non-interactive␛[0m  Never ask a question: where one is needed, fail and say so.
+      ␛[1;38;2;102;204;238m--dry-run␛[0m          Show what would change and change nothing.
+      ␛[1;38;2;102;204;238m--check␛[0m            Change nothing; end with findings where something would change.
+  ␛[1;38;2;102;204;238m-h, --help␛[0m             Show this help and do nothing else.
+
+⚙️ ␛[1;38;2;102;204;238mEffect:␛[0m changes something (--dry-run shows what it would do; --check changes nothing and ends with findings where it would)
+␛[1;38;2;102;204;238mRepeating it:␛[0m not promised to be safe
+␛[1;38;2;102;204;238mFor:␛[0m anyone
