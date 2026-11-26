@@ -11,6 +11,7 @@ export * as oto from "./oto/mod.ts";
 export * as planning from "./planning/mod.ts";
 export * as workload from "./workload/mod.ts";
 export * as boundary from "./boundary/mod.ts";
+export * as zerotrust from "./zerotrust/mod.ts";
 export * as kanon from "./kanon/mod.ts";
 export * as ifr from "./ifr/mod.ts";
 export * as audit from "./audit/mod.ts";

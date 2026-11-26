@@ -27,3 +27,7 @@ requirement	mechanism	by	note
 0005-boundary-terms FR-002	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
 0005-boundary-terms FR-003	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
 0005-boundary-terms FR-004	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
+0006-zero-trust-terms FR-001	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
+0006-zero-trust-terms FR-002	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
+0006-zero-trust-terms FR-003	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts
+0006-zero-trust-terms FR-004	check	.github: cd commons/ontology && bun test suite/	zerotrust-ontology.test.ts

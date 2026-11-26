@@ -28,6 +28,8 @@ export const library = {
     "./workload/workload",
     "./boundary",
     "./boundary/boundary",
+    "./zerotrust",
+    "./zerotrust/zerotrust",
     "./ifr",
     "./ifr/audit",
     "./ifr/ifr",

@@ -41,6 +41,7 @@ import * as otoOntology from "@intellectual-frontiers/ontology/oto";
 import * as planningOntology from "@intellectual-frontiers/ontology/planning";
 import * as workloadOntology from "@intellectual-frontiers/ontology/workload";
 import * as boundaryOntology from "@intellectual-frontiers/ontology/boundary";
+import * as zerotrustOntology from "@intellectual-frontiers/ontology/zerotrust";
 import * as kanonOntology from "@intellectual-frontiers/ontology/kanon";
 import { formatRdfFinding, type OntologyFile, validate } from "@intellectual-frontiers/rdf";
 import { stdio } from "@intellectual-frontiers/system";
@@ -448,8 +449,43 @@ export const KANON: OntologyPublication = {
   license: CC0,
 };
 
+/** The ontology of Zero trust (commons 0047-zero-trust), as it is published. */
+export const ZEROTRUST: OntologyPublication = {
+  name: "zerotrust",
+  ns: { prefix: "zt", iri: zerotrustOntology.ZEROTRUST.iri },
+  idNs: { prefix: "mzid", iri: MZID.iri },
+  curies: [
+    ["zt", zerotrustOntology.ZEROTRUST.iri],
+    ["mz", MZ.iri],
+    ["xsd", "http://www.w3.org/2001/XMLSchema#"],
+    ["rdfs", "http://www.w3.org/2000/01/rdf-schema#"],
+    ["skos", "http://www.w3.org/2004/02/skos/core#"],
+    ["dcterms", "http://purl.org/dc/terms/"],
+    ["prov", "http://www.w3.org/ns/prov#"],
+  ],
+  files: zerotrustOntology.files,
+  ontology: zerotrustOntology.zeroTrustOntology,
+  classes: zerotrustOntology.classes,
+  properties: zerotrustOntology.properties,
+  terms: zerotrustOntology.terms,
+  schemas: [zerotrustOntology.TenetSchema, zerotrustOntology.PillarSchema, zerotrustOntology.DataSourceSchema],
+  lists: listsOf("zt", [
+    ["Tenet", zerotrustOntology.tenets],
+    ["Pillar", zerotrustOntology.pillars],
+    ["DataSource", zerotrustOntology.dataSources],
+  ]),
+  source: "commons/ontology/src/zerotrust/*.ts",
+  run: RUN,
+  shapes: { prefix: "ztsh", iri: "https://www.intellectualfrontiers.com/ontology/zerotrust-shapes#" },
+  schemasIri: "https://www.intellectualfrontiers.com/ontology/zerotrust-schemas",
+  sssomSetId: "https://www.intellectualfrontiers.com/ontology/zerotrust-mappings",
+  sssomCuries: { dcterms: "http://purl.org/dc/terms/", prov: "http://www.w3.org/ns/prov#" },
+  viewTitle: "Zero Trust Ontology",
+  license: CC0,
+};
+
 /** The ontologies of commons that are published, each from its own typed modules: Mizan's, then the ones its specifications define. */
-export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, WORKLOAD, BOUNDARY, IFR, KANON];
+export const publications: readonly OntologyPublication[] = [MIZAN, IFCCM, IFQS, OTO, PLANNING, WORKLOAD, BOUNDARY, ZEROTRUST, IFR, KANON];
 
 /** Where the generated files are downloaded from: this repository's `commons/` folder on its default branch. */
 const DOWNLOAD_BASE = "https://raw.githubusercontent.com/intellectual-frontiers/.github/main/commons/";
