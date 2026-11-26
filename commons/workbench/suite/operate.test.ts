@@ -8,7 +8,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { type OperateSpec, defineOperate, operateSteps } from "@intellectual-frontiers/workbench/governance";
-import { bootstrapPs1, bootstrapSh, operatePs1, operateSh } from "@intellectual-frontiers/workbench/logical";
+import { bootstrapPs1, bootstrapSh, operatePs1, operateSh, typedInferables } from "@intellectual-frontiers/workbench/logical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
 const SHA_X64 = "a".repeat(64);
@@ -161,4 +161,34 @@ proves(["0007-workbench-operate FR-002", "0007-workbench-operate FR-011"], "the 
   const root = fileURLToPath(new URL("../../../", import.meta.url));
   assertEquals(readFileSync(`${root}bin/bootstrap.sh`, "utf8"), bootstrapSh());
   assertEquals(readFileSync(`${root}bin/bootstrap.ps1`, "utf8"), bootstrapPs1());
+});
+
+proves(["0007-workbench-operate FR-012"], "a plan with next.offer makes the script offer to run it at a terminal and only say it otherwise", () => {
+  const spec = ok({ ...SPEC, next: { say: "start the controller", argv: ["bun", "run", "demo", "serve"], offer: true } });
+  const sh = operateSh(spec, DIGEST);
+  const ps = operatePs1(spec, DIGEST);
+  assert(sh.includes("if [[ -t 0 && -t 1 ]]; then") && sh.includes("Press Enter to start it, or Ctrl+C to stop.") && sh.includes("exec 'bun' 'run' 'demo' 'serve'"), "the Bash script offers at a terminal and runs the argument vector");
+  assert(ps.includes("[Console]::IsInputRedirected") && ps.includes("Press Enter to start it, or Ctrl+C to stop.") && ps.includes("& 'bun' @rest"), "the PowerShell script offers at a terminal and runs the argument vector");
+  assert(sh.includes("Next: start the controller") && ps.includes("Next: start the controller"), "without a terminal both only say what comes next");
+  const plain = operateSh(ok(SPEC), DIGEST);
+  assert(!plain.includes("Press Enter"), "no offer, no prompt");
+});
+
+proves(["0007-workbench-operate FR-013"], "ports to open are checked first and offered once with one permission prompt, on Windows only", () => {
+  const spec = ok({ ...SPEC, openPorts: [{ name: "demo enroll", port: 2222, profile: "Private" }] });
+  const ps = operatePs1(spec, DIGEST);
+  assert(ps.includes("Get-NetFirewallRule -DisplayName $Name") && ps.includes("Start-Process -FilePath pwsh -Verb RunAs") && ps.includes("Initialize-Port -Name 'demo enroll' -Port 2222 -Profile 'Private'"), "the rule is looked for, then offered with one permission prompt");
+  assert(ps.indexOf("Get-NetFirewallRule") < ps.indexOf("Read-Host"), "it checks before it asks");
+  assert(!operateSh(spec, DIGEST).includes("Firewall"), "the Bash script leaves the firewall alone");
+  assert(operatePs1(ok(SPEC), DIGEST).includes("Initialize-Port") === false, "a plan with no ports has no firewall code");
+  const bad = defineOperate({ ...SPEC, openPorts: [{ name: "x'; evil", port: 70000, profile: "Everything" as "Private" }] });
+  assert(bad.kind === "err" && bad.error.join("; ").includes("openPorts[0].name") && bad.error.join("; ").includes("port") && bad.error.join("; ").includes("profile"), "a bad port is refused with every reason");
+});
+
+proves(["0007-workbench-operate FR-014"], "a command that asks for an inferable thing is found in a fenced block and in an inline span, and a clean text has none", () => {
+  const rules = [{ name: "address", option: "advertise", why: "the controller picks its address" }, { name: "case id", pattern: /\benroll approve [A-Z]{2,}\b/u, why: "the one pending session is the one" }];
+  const dirty = "Run `demo enroll approve ID --code 1`.\n\n```bash\ndemo serve --advertise 10.0.0.1\n# demo serve --advertise 10.0.0.2\n```\n";
+  const found = typedInferables(dirty, rules);
+  assertEquals(found.map((f) => `${String(f.line)}:${f.name}`), ["1:case id", "4:address"]);
+  assertEquals(typedInferables("```bash\ndemo serve\n```\nThen `demo enroll approve`.\n", rules).length, 0);
 });

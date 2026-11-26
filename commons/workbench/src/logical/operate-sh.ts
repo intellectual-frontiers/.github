@@ -128,6 +128,20 @@ ${fnOf(s.id)}() {
     .join("");
   const calls = spec.converge.map((s) => `  # step ${s.id}\n  ${fnOf(s.id)}\n`).join("");
   const token = spec.registry.tokenEnv;
+  const said = text`  say ${shq(`Next: ${spec.next.say}`)}
+  printf '  cd %q\n' "$ROOT"
+  say ${shq(`  ${spec.next.argv.join(" ")}`)}
+`;
+  const nextText =
+    spec.next.offer === true
+      ? text`  if [[ -t 0 && -t 1 ]]; then
+    say ${shq(`Next: ${spec.next.say}. Press Enter to start it, or Ctrl+C to stop.`)}
+    read -r _
+    cd "$ROOT"
+    exec ${shWords(spec.next.argv)}
+  fi
+${said}`
+      : said;
   return (
     HEAD(`${spec.name} operate: sets this repository up so that it can be operated, and brings it up to date`, `${spec.slug} fleet write (plan ${digest})`) +
     COMMON +
@@ -228,10 +242,7 @@ main() {
   install_deps
 ${calls}  if (( CHANGED == 0 )); then say "Nothing to do. ${spec.name} is ready."; else say "Done: $CHANGED change(s) made."; fi
   say ""
-  say ${shq(`Next: ${spec.next.say}`)}
-  printf '  cd %q\n' "$ROOT"
-  say ${shq(`  ${spec.next.argv.join(" ")}`)}
-}
+${nextText}}
 main "$@"; exit
 `
   );

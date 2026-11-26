@@ -43,3 +43,6 @@ requirement	mechanism	by	note
 0007-workbench-operate FR-009	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
 0007-workbench-operate FR-010	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
 0007-workbench-operate FR-011	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-012	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-013	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-014	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts

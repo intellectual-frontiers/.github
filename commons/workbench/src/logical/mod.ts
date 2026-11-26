@@ -11,3 +11,4 @@ export * from "./matrix.ts";
 export * from "./project.ts";
 export * from "./operate-sh.ts";
 export * from "./operate-ps1.ts";
+export * from "./instructions.ts";

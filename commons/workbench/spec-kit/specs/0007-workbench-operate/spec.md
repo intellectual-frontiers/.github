@@ -20,6 +20,9 @@
 - **FR-009**: A converge step MUST be `{ id, say, check, run }` with two argument vectors run without a shell in the repository: `run` only where `check` fails, and the step MUST hold afterwards or the run fails.
 - **FR-010**: `bootstrapSh` and `bootstrapPs1` MUST be the public, generic first command: given the name of a repository (`owner/name`) and optionally a folder, they MUST install Git and GitHub CLI as FR-005 says, sign in as FR-006 says, clone the repository to the folder (`~/name` where none is given), leave a clone that is there to its own script to bring up to date (FR-008), and run that repository's own `bin/operate.sh` or `bin/operate.ps1`. They MUST name no product.
 - **FR-011**: The files `bin/bootstrap.sh` and `bin/bootstrap.ps1` of the commons MUST be the output of `bootstrapSh` and `bootstrapPs1`, and a test MUST fail where they differ.
+- **FR-012**: A plan MAY say `next.offer`: a script run at a terminal MUST then say what comes next and run it when the person presses Enter (Ctrl+C stops), in the folder of the repository and as the person, with the argument vector of the plan and no shell. Run with no terminal (a pipe, a build) the script MUST only say it, as without `offer`.
+- **FR-013**: A plan MAY give `openPorts`, each `{ name, port, profile }` (a plain name, a TCP port, `Private`, `Domain` or `Public`). The script for PowerShell on Windows MUST, for each, check the firewall for a rule of that name first and change nothing where it is there; where it is missing and a person is at the terminal it MUST offer to add it (Enter allows, `n` skips), add it with one permission prompt (`Start-Process -Verb RunAs`), and say plainly where the permission was not given; with no terminal it MUST only say that the port is closed. The script for Bash MUST leave the firewall alone.
+- **FR-014**: `typedInferables(markdown, rules)` MUST return every command of a fenced shell block and every inline code span of a text that holds an option or a pattern of a rule a product gave as inferable (an address, a folder, a name, an operating system, an identifier): the commands a person is told to type MUST NOT carry what the program can find out, and a product's tests MUST fail where its README or a generated page does.
 
 ## Acceptance scenarios
 
@@ -34,6 +37,9 @@
 9. **Given** the case of FR-009, **When** it is checked, **Then** it holds, per FR-009.
 10. **Given** the case of FR-010, **When** it is checked, **Then** it holds, per FR-010.
 11. **Given** the case of FR-011, **When** it is checked, **Then** it holds, per FR-011.
+12. **Given** the case of FR-012, **When** it is checked, **Then** it holds, per FR-012.
+13. **Given** the case of FR-013, **When** it is checked, **Then** it holds, per FR-013.
+14. **Given** the case of FR-014, **When** it is checked, **Then** it holds, per FR-014.
 
 ## Out of scope
 

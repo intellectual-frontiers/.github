@@ -107,6 +107,38 @@ export function operatePs1(spec: OperateSpec, digest: string): string {
 `,
     )
     .join("");
+  const ports = spec.openPorts ?? [];
+  const portFn =
+    ports.length === 0
+      ? ""
+      : text`function Initialize-Port([string]$Name, [int]$Port, [string]$Profile) {
+  if (-not $IsWindows) { return }
+  if (Get-NetFirewallRule -DisplayName $Name -ErrorAction SilentlyContinue) { Write-Ok "port $Port is open for $Name"; return }
+  if ([Console]::IsInputRedirected) { Write-Say "Port $Port is not open for other machines yet: run this script at a terminal to allow it."; return }
+  $answer = Read-Host "Other machines must reach port $Port of this computer. Press Enter to allow it (Windows asks you once), or type n to skip"
+  if ($answer -match '^[nN]') { Write-Say "Skipped: other machines cannot reach port $Port until it is allowed."; return }
+  $rule = "New-NetFirewallRule -DisplayName '$Name' -Direction Inbound -Protocol TCP -LocalPort $Port -Profile $Profile -Action Allow | Out-Null"
+  try { Start-Process -FilePath pwsh -Verb RunAs -Wait -ArgumentList '-NoProfile', '-Command', $rule } catch { Write-Say "The permission was not given: port $Port stays closed."; return }
+  if (Get-NetFirewallRule -DisplayName $Name -ErrorAction SilentlyContinue) { Write-Did "port $Port is open for $Name" } else { Write-Say "Port $Port stays closed." }
+}
+`;
+  const portCalls = ports.map((o) => `  Initialize-Port -Name ${shq(o.name)} -Port ${String(o.port)} -Profile ${shq(o.profile)}\n`).join("");
+  const said = text`  Write-Say ${shq(`Next: ${spec.next.say}`)}
+  Write-Say ("  cd '" + $script:Root + "'")
+  Write-Say ${shq(`  ${spec.next.argv.join(" ")}`)}
+`;
+  const nextText =
+    spec.next.offer === true
+      ? text`  if (-not [Console]::IsInputRedirected -and -not [Console]::IsOutputRedirected) {
+    Write-Say ${shq(`Next: ${spec.next.say}. Press Enter to start it, or Ctrl+C to stop.`)}
+    [void](Read-Host)
+    Set-Location $script:Root
+    $rest = ${words(spec.next.argv.slice(1))}
+    & ${shq(spec.next.argv[0] ?? "")} @rest
+    exit $LASTEXITCODE
+  }
+${said}`
+      : said;
   const token = spec.registry.tokenEnv;
   const pinned = `bun ${spec.bun.minimum} or newer`;
   return (
@@ -165,7 +197,7 @@ function Install-DependencyTree {
   New-Item -ItemType Directory -Force -Path (Split-Path $script:Stamp) | Out-Null
   Set-Content -Path $script:Stamp -Value (Get-Stamp)
 }
-function Invoke-Converge([string]$Id, [string]$Say, [string[]]$Check, [string[]]$Run) {
+${portFn}function Invoke-Converge([string]$Id, [string]$Say, [string[]]$Check, [string[]]$Run) {
   if (Test-Native $Check $script:Root) { Write-Ok $Say; return }
   Write-Did $Say
   if (-not (Invoke-Native $Run $script:Root)) { Exit-Step "the step $Id failed" ('run it by hand in the repository: ' + ($Run -join ' ')) }
@@ -187,12 +219,9 @@ function Invoke-Main {
   Sync-Repository
   # step install
   Install-DependencyTree
-${converge}  if ($script:Changed -eq 0) { Write-Say 'Nothing to do. ${spec.name} is ready.' } else { Write-Say "Done: $($script:Changed) change(s) made." }
+${converge}${portCalls}  if ($script:Changed -eq 0) { Write-Say 'Nothing to do. ${spec.name} is ready.' } else { Write-Say "Done: $($script:Changed) change(s) made." }
   Write-Say ''
-  Write-Say ${shq(`Next: ${spec.next.say}`)}
-  Write-Say ("  cd '" + $script:Root + "'")
-  Write-Say ${shq(`  ${spec.next.argv.join(" ")}`)}
-}
+${nextText}}
 try { Invoke-Main } catch { $Host.UI.WriteErrorLine("$($script:IBad) $($_.Exception.Message)"); exit 1 }
 `
   );

@@ -38,9 +38,16 @@ export type OperateSpec = {
   readonly registry: { readonly scope: string; readonly tokenEnv: string };
   /** The steps after the install, in order. */
   readonly converge: readonly ConvergeStep[];
-  /** The one thing the person does next: what to say and the command. */
-  readonly next: { readonly say: string; readonly argv: readonly string[] };
+  /** The one thing the person does next: what to say and the command. With `offer`, a script run at a terminal offers to run it: one press of Enter does, and anything else (a pipe, a build) only says it. */
+  readonly next: { readonly say: string; readonly argv: readonly string[]; readonly offer?: boolean };
+  /** The ports of this computer that other machines must reach. On Windows the script checks the firewall and, where a rule is missing and a person is at the terminal, offers to add it with one permission prompt; the Bash script leaves the firewall alone. */
+  readonly openPorts?: readonly OpenPort[];
 };
+
+/** A port to open: the name of the firewall rule (also what says it is there), the TCP port and the network profile the rule is for. */
+export type OpenPort = { readonly name: string; readonly port: number; readonly profile: "Private" | "Domain" | "Public" };
+
+const PORT_NAME = /^[A-Za-z][A-Za-z0-9 ._-]{0,39}$/u;
 
 /** The ids of the steps every operate script has before the converge steps of the plan, in order. */
 export const FIXED_STEPS = ["git", "gh", "bun", "sign-in", "update", "install"] as const;
@@ -94,6 +101,11 @@ export function defineOperate(spec: OperateSpec): Result<OperateSpec, readonly s
   }
   if (!SAY.test(spec.next.say)) problems.push("next.say: printable ASCII, up to 120 characters");
   problems.push(...argvProblems("next.argv", spec.next.argv));
+  for (const [i, o] of (spec.openPorts ?? []).entries()) {
+    if (!PORT_NAME.test(o.name)) problems.push(`openPorts[${String(i)}].name: a plain name of up to 40 characters`);
+    if (!Number.isInteger(o.port) || o.port < 1 || o.port > 65535) problems.push(`openPorts[${String(i)}].port: a whole number from 1 to 65535`);
+    if (!["Private", "Domain", "Public"].includes(o.profile)) problems.push(`openPorts[${String(i)}].profile: Private, Domain or Public`);
+  }
   if (SECRET.test(JSON.stringify(spec))) problems.push("the plan holds text that looks like a secret: a credential is only the name of a variable");
   return problems.length === 0 ? ok(spec) : err(problems);
 }
