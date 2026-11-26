@@ -118,10 +118,10 @@ export type SendOutcome =
 /** What sends one segment: the HTTP client, the SSH forward or a test. It never throws. */
 export type SendSegment = (segment: Segment) => Promise<SendOutcome>;
 
-/** The outcome of an HTTP status (FR-003): 2xx taken; 429, 502, 503 and 504 retry; any other is a permanent refusal. */
+/** The outcome of an HTTP status (FR-003): 2xx taken; 429, 502, 503 and 504 retry, and so do 401 and 403 (a device that is not enrolled yet, or that a person enrolls again, must not lose what it measured: the cap of the queue ends the wait); any other is a permanent refusal. */
 export function outcomeOfStatus(status: number, retryAfterMs?: number): SendOutcome {
   if (status >= 200 && status < 300) return { kind: "taken" };
-  if (status === 429 || status === 502 || status === 503 || status === 504) {
+  if (status === 429 || status === 502 || status === 503 || status === 504 || status === 401 || status === 403) {
     return { kind: "retry", message: `HTTP ${status}`, ...(retryAfterMs === undefined ? {} : { afterMs: retryAfterMs }) };
   }
   return { kind: "refused", message: `HTTP ${status}` };

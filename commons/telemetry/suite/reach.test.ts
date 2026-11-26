@@ -260,3 +260,10 @@ proves([S("FR-013")], "the sender over the forward refuses an address that is no
   assertEquals(httpSender("http://192.0.2.10:4318", { loopbackOnly: true }).kind, "err");
   assertEquals(httpSender("http://127.0.0.1:4318", { loopbackOnly: true }).kind, "ok");
 });
+
+proves([S("FR-003")], "a status maps to taken, retry or refused: 401 and 403 wait in the queue, any other 4xx is a permanent refusal", () => {
+  assertEquals(outcomeOfStatus(200).kind, "taken");
+  for (const s of [401, 403, 429, 502, 503, 504]) assertEquals(outcomeOfStatus(s).kind, "retry");
+  for (const s of [400, 404, 413, 415]) assertEquals(outcomeOfStatus(s).kind, "refused");
+  assertEquals(outcomeOfStatus(503, 2000), { kind: "retry", message: "HTTP 503", afterMs: 2000 });
+});
