@@ -1,6 +1,6 @@
-// Spec: 0002-guide FR-001
+// Spec: 0002-ui FR-001
 /**
- * The step of a guided flow, as a type and as a decoder (commons terminal 0002-guide FR-001). A guided flow is a deterministic machine that
+ * The step of a guided flow, as a type and as a decoder (commons terminal 0002-ui FR-001). A guided flow is a deterministic machine that
  * emits ONE typed step at a time; this is the shape of that step, the same for a person at a terminal, for a pipe, for a tool and for a
  * test. It is generic: what a verb is and what it does is the caller's.
  *
@@ -9,7 +9,7 @@
  *
  * @example
  * ```ts
- * import { decodeStep } from "./guide-model.ts";
+ * import { decodeStep } from "./ui-model.ts";
  * decodeStep({ id: "s1", kind: "done", summary: "All set", say: "Nothing more to do." }); // { kind: "ok", value: { ... } }
  * decodeStep({ id: "s1", kind: "done", summary: "All set", say: "", colour: "red" }); // { kind: "err", error: { path: "$.colour", ... } }
  * ```
@@ -19,25 +19,25 @@
 import { type DecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 
 /** The kinds of step. */
-export type GuideKind = "question" | "run" | "human" | "wait" | "done";
+export type FlowKind = "question" | "run" | "human" | "wait" | "done";
 
 /** Every kind, in a fixed order. */
-export const GUIDE_KINDS: readonly GuideKind[] = ["question", "run", "human", "wait", "done"];
+export const FLOW_KINDS: readonly FlowKind[] = ["question", "run", "human", "wait", "done"];
 
 /** One thing the person is asked: the name of the answer, what to say to ask it and a hint of what a good answer looks like. */
 export type AskField = {
   readonly field: string;
   readonly prompt: string;
   readonly hint: string;
-  /** True for a token or a password: the guide refuses such a field (`E-GUIDE-SECRET-FIELD`); it is never read. */
+  /** True for a token or a password: the guide refuses such a field (`E-UI-SECRET-FIELD`); it is never read. */
   readonly secret?: boolean;
 };
 
 /** The call of a verb the caller knows by its id, with its inputs. */
-export type GuideVerb = { readonly id: string; readonly inputs: Readonly<Record<string, unknown>> };
+export type FlowVerb = { readonly id: string; readonly inputs: Readonly<Record<string, unknown>> };
 
 /** Who must act at a human step: always the person. */
-export type GuideGate = { readonly who: "person" };
+export type FlowGate = { readonly who: "person" };
 
 type Common = {
   readonly id: string;
@@ -55,16 +55,16 @@ type Common = {
 /** A step that asks the person for values. */
 export type QuestionStep = Common & { readonly kind: "question"; readonly ask: readonly [AskField, ...AskField[]] };
 /** A step that runs a verb of the caller. */
-export type RunStep = Common & { readonly kind: "run"; readonly verb: GuideVerb };
+export type RunStep = Common & { readonly kind: "run"; readonly verb: FlowVerb };
 /** A step that only the person can do; the guide waits for the person and never confirms for them. */
-export type HumanStep = Common & { readonly kind: "human"; readonly gate: GuideGate; readonly ask?: readonly AskField[] };
+export type HumanStep = Common & { readonly kind: "human"; readonly gate: FlowGate; readonly ask?: readonly AskField[] };
 /** A step that waits for something outside, and is asked for again. */
 export type WaitStep = Common & { readonly kind: "wait" };
 /** The end. */
 export type DoneStep = Common & { readonly kind: "done" };
 
 /** One step of a guided flow. */
-export type GuideStep = QuestionStep | RunStep | HumanStep | WaitStep | DoneStep;
+export type FlowStep = QuestionStep | RunStep | HumanStep | WaitStep | DoneStep;
 
 type Fail = Result<never, DecodeError>;
 
@@ -128,7 +128,7 @@ function decodeAsk(input: unknown, path: string, nonEmpty: boolean): Result<read
   return ok(out);
 }
 
-function decodeVerb(input: unknown, path: string): Result<GuideVerb, DecodeError> {
+function decodeVerb(input: unknown, path: string): Result<FlowVerb, DecodeError> {
   if (!isRecord(input)) return fail(path, "an object", describe(input));
   const extra = unknownField(input, ["id", "inputs"], path);
   if (extra) return extra;
@@ -146,11 +146,11 @@ const COMMON = ["id", "kind", "summary", "say", "evidence", "command"] as const;
  * may have `ask`, a `wait` and a `done` have none of them), and a field that is not declared for the kind, a missing field and a field of the
  * wrong type are refused with the path of the field.
  */
-export function decodeStep(input: unknown, path = "$"): Result<GuideStep, DecodeError> {
+export function decodeStep(input: unknown, path = "$"): Result<FlowStep, DecodeError> {
   if (!isRecord(input)) return fail(path, "an object", describe(input));
   const kind = input["kind"];
-  if (typeof kind !== "string" || !GUIDE_KINDS.includes(kind as GuideKind)) return fail(`${path}.kind`, `one of ${GUIDE_KINDS.join(", ")}`, describe(kind));
-  const k = kind as GuideKind;
+  if (typeof kind !== "string" || !FLOW_KINDS.includes(kind as FlowKind)) return fail(`${path}.kind`, `one of ${FLOW_KINDS.join(", ")}`, describe(kind));
+  const k = kind as FlowKind;
   const allowed: readonly string[] =
     k === "question" ? [...COMMON, "ask"] : k === "run" ? [...COMMON, "verb"] : k === "human" ? [...COMMON, "gate", "ask"] : COMMON;
   const extra = unknownField(input, allowed, path);

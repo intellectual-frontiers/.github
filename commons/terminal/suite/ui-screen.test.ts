@@ -1,17 +1,17 @@
 /**
- * Tests of `src/guide-screen.ts` and of the driver in `full`: the layout drawn on the emulator of `vt` at 80 by 24, every row exactly the
- * width, no scroll, a resize redrawn, the fallback to ansi under 60 columns and the return (commons 0002-guide FR-008).
+ * Tests of `src/ui-screen.ts` and of the driver in `full`: the layout drawn on the emulator of `vt` at 80 by 24, every row exactly the
+ * width, no scroll, a resize redrawn, the fallback to ansi under 60 columns and the return (commons 0002-ui FR-008).
  *
  * @module
  */
 import { ok } from "@intellectual-frontiers/core";
-import { drawScreen, ENTER, frameOf, LEAVE, layoutOf, runGuide, type ScreenState } from "../src/guide.ts";
+import { drawScreen, ENTER, frameOf, LEAVE, layoutOf, runFlow, type ScreenState } from "../src/ui.ts";
 import { createScreen } from "../src/vt.ts";
 import { displayWidth } from "../src/width.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
-import { bare, capsOf, fakeClock, machine, recorder, scriptedIn } from "./guide-helpers.ts";
+import { bare, capsOf, fakeClock, machine, recorder, scriptedIn } from "./ui-helpers.ts";
 
-const FR = "0002-guide FR-008";
+const FR = "0002-ui FR-008";
 
 const plan = [
   { id: "p1", title: "Check the host" },
@@ -96,7 +96,7 @@ proves([FR], "the driver in full enters the alternate screen, draws the plan, re
   const screen = createScreen({ width: 80, height: 24 });
   let resized = false;
   const all: string[] = [];
-  const result = await runGuide({
+  const result = await runFlow({
     next: m.next,
     run: (c) => {
       // A frame is on the screen while the verb runs.
@@ -150,7 +150,7 @@ proves([FR], "under 60 columns the driver falls back to ansi, and returns to the
     { id: "d", kind: "done", summary: "All set", say: "" },
   ]);
   let polls = 0;
-  const result = await runGuide({
+  const result = await runFlow({
     next: () => {
       polls++;
       const w = out.writes.join("");
@@ -175,7 +175,7 @@ proves([FR], "under 60 columns the driver falls back to ansi, and returns to the
 
 proves([FR], "a full screen is not used where the input is not a TTY: the guide goes on in ansi", async () => {
   const out = recorder(80, 24);
-  const result = await runGuide({
+  const result = await runFlow({
     next: machine([{ id: "d", kind: "done", summary: "All set", say: "" }]).next,
     run: () => Promise.resolve(ok({ summary: "" })),
     out,

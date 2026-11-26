@@ -1,18 +1,18 @@
 /**
- * Helpers of the tests of the guide (commons terminal 0002-guide): input scripted in chunks, an output that records what was written, a clock
+ * Helpers of the tests of the guide (commons terminal 0002-ui): input scripted in chunks, an output that records what was written, a clock
  * that does not wait, and a machine that gives steps one at a time. Synthetic names only.
  *
  * @module
  */
-import { atMost, type GuideCaps, type GuideClock, type GuideIn, type GuideLevel, type GuideOut, lineReader } from "../src/guide.ts";
+import { atMost, type UiCaps, type UiClock, type UiIn, type UiLevel, type UiOut, lineReader } from "../src/ui.ts";
 
 /** The capabilities of a level at a size, with emoji off. */
-export function capsOf(level: GuideLevel, columns = 60, rows = 24): GuideCaps {
-  return atMost({ level: "full", colour: true, emoji: false, columns, rows }, level);
+export function capsOf(level: UiLevel, columns = 60, rows = 24): UiCaps {
+  return atMost({ level: "full", colourDepth: "16", colour: true, emoji: false, columns, rows }, level);
 }
 
 /** An input that gives `chunks` as they are (a line end may be split between two) and then ends. */
-export function scriptedIn(chunks: readonly string[], isTTY = true): GuideIn {
+export function scriptedIn(chunks: readonly string[], isTTY = true): UiIn {
   async function* gen(): AsyncGenerator<string> {
     for (const c of chunks) yield c;
   }
@@ -20,7 +20,7 @@ export function scriptedIn(chunks: readonly string[], isTTY = true): GuideIn {
 }
 
 /** An input that gives nothing and never ends, until its signal aborts: a person who has not typed yet. */
-export function silentIn(isTTY = true): GuideIn {
+export function silentIn(isTTY = true): UiIn {
   return lineReader(
     {
       [Symbol.asyncIterator]: () => ({ next: () => new Promise<IteratorResult<string>>(() => undefined) }),
@@ -29,7 +29,7 @@ export function silentIn(isTTY = true): GuideIn {
   );
 }
 
-export type Recorder = GuideOut & {
+export type Recorder = UiOut & {
   columns: number;
   rows: number;
   readonly writes: string[];
@@ -62,7 +62,7 @@ export function recorder(columns = 60, rows = 24): Recorder {
 }
 
 /** A clock that does not wait: a sleep moves the time forward at once, and is recorded. */
-export function fakeClock(): GuideClock & { readonly sleeps: number[]; time(): number } {
+export function fakeClock(): UiClock & { readonly sleeps: number[]; time(): number } {
   let t = 1_000_000;
   const sleeps: number[] = [];
   return {

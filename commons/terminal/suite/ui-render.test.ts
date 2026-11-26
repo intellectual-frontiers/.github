@@ -1,19 +1,19 @@
 /**
- * Tests of `src/guide-render.ts`: the lines of every kind of step at the three levels, as snapshots, every line within the columns, no escape
- * sequence at `plain`, wide characters wrapped whole, and text from the caller made safe (commons 0002-guide FR-003).
+ * Tests of `src/ui-render.ts`: the lines of every kind of step at the three levels, as snapshots, every line within the columns, no escape
+ * sequence at `plain`, wide characters wrapped whole, and text from the caller made safe (commons 0002-ui FR-003).
  *
  * @module
  */
 import fc from "fast-check";
-import { type GuideStep, decodeStep, renderPrompt, renderResult, renderStep, wrap } from "../src/guide.ts";
+import { type FlowStep, decodeStep, renderPrompt, renderResult, renderStep, wrap } from "../src/ui.ts";
 import { displayWidth } from "../src/width.ts";
 import { createScreen } from "../src/vt.ts";
 import { assert, assertEquals, assertNotMatch, proves } from "@intellectual-frontiers/test";
-import { bare, capsOf } from "./guide-helpers.ts";
+import { bare, capsOf } from "./ui-helpers.ts";
 
-const FR = "0002-guide FR-003";
+const FR = "0002-ui FR-003";
 
-const steps: Readonly<Record<string, GuideStep>> = {
+const steps: Readonly<Record<string, FlowStep>> = {
   question: {
     id: "synthetic-step-01",
     kind: "question",
@@ -78,7 +78,7 @@ proves([FR], "full shows the palette's emoji where the terminal does, and the li
   const c = { ...capsOf("full", 40), emoji: true };
   const done = renderStep(steps["done"]!, c);
   assertEquals(bare(done[0] ?? ""), "✅ All set");
-  assertEquals(bare(renderStep(steps["human"]!, c)[0] ?? ""), "⚡ Approve the key");
+  assertEquals(bare(renderStep(steps["human"]!, c)[0] ?? ""), "👤 Approve the key");
   for (const s of Object.values(steps)) for (const l of renderStep(s, c)) assert(displayWidth(l) <= 40, l);
 });
 
@@ -108,14 +108,14 @@ proves([FR], "a wide character at the edge goes whole to the next line; a long w
 proves([FR], "every line fits the columns, at any width and for any text (property)", () => {
   fc.assert(
     fc.property(fc.integer({ min: 20, max: 120 }), fc.string({ maxLength: 200 }), fc.constantFrom("plain", "ansi", "full"), (columns, text, level) => {
-      const step: GuideStep = { id: "x", kind: "run", summary: text || "s", say: text, verb: { id: text || "v", inputs: { a: text } } };
+      const step: FlowStep = { id: "x", kind: "run", summary: text || "s", say: text, verb: { id: text || "v", inputs: { a: text } } };
       for (const l of renderStep(step, capsOf(level, columns))) assert(displayWidth(l) <= columns, `${columns}: ${JSON.stringify(l)}`);
     }),
   );
 });
 
 proves([FR], "the escape sequences and control characters of the caller's text are removed before it is shown", () => {
-  const step: GuideStep = {
+  const step: FlowStep = {
     id: "x",
     kind: "done",
     summary: "ok\u001b[31m red \u001b]0;title\u0007fine",
@@ -154,7 +154,7 @@ proves([FR], "a decoded step renders as it was written (the steps are the ones t
 
 const UUID = "00000000-0000-4000-8000-000000000001";
 
-proves(["0002-guide FR-010"], "a token that fits the width is never broken: an order id stays whole at 41 and 60 columns, indented less where it must", () => {
+proves(["0002-ui FR-010"], "a token that fits the width is never broken: an order id stays whole at 41 and 60 columns, indented less where it must", () => {
   for (const columns of [41, 60]) {
     const c = capsOf("plain", columns);
     const lines = renderStep(
@@ -169,7 +169,7 @@ proves(["0002-guide FR-010"], "a token that fits the width is never broken: an o
   for (const l of narrow) assert(displayWidth(l) <= 41);
 });
 
-proves(["0002-guide FR-010"], "a token wider than the width itself is cut, and a wide character wider than the line does not loop", () => {
+proves(["0002-ui FR-010"], "a token wider than the width itself is cut, and a wide character wider than the line does not loop", () => {
   const long = "x".repeat(50);
   const lines = wrap(long, 40, 4);
   assertEquals(lines.join("").replaceAll(" ", ""), long);
@@ -178,7 +178,7 @@ proves(["0002-guide FR-010"], "a token wider than the width itself is cut, and a
   assertEquals(wrap("\u4e2d\u6587", 1).filter((l) => l !== "").length >= 2, true);
 });
 
-proves(["0002-guide FR-010"], "Windows: CRLF text and a long path are wrapped as LF text, the path kept whole where it fits, at narrow widths", () => {
+proves(["0002-ui FR-010"], "Windows: CRLF text and a long path are wrapped as LF text, the path kept whole where it fits, at narrow widths", () => {
   const path = "C:\\Users\\synthetic-user-01\\Documents\\works";
   const crlf = wrap(`first line\r\nthen ${path} here\r\nlast`, 48, 2);
   assert(crlf.every((l) => !l.includes("\r")));
@@ -193,7 +193,7 @@ proves(["0002-guide FR-010"], "Windows: CRLF text and a long path are wrapped as
   }
 });
 
-proves(["0002-guide FR-015"], "a failure is printed once: a detail that only repeats the summary is not shown", () => {
+proves(["0002-ui FR-015"], "a failure is printed once: a detail that only repeats the summary is not shown", () => {
   const lines = renderResult(false, "the run failed", ["the run failed", "cause: synthetic-cause-01"], capsOf("plain", 60));
   assertEquals(lines, ["[failed] the run failed", "  cause: synthetic-cause-01"]);
 });

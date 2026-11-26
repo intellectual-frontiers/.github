@@ -1,13 +1,13 @@
 /**
- * Tests of `src/guide-model.ts`: each kind of step decoded, and every refusal of the decoder with the path of the field
- * (commons 0002-guide FR-001).
+ * Tests of `src/ui-model.ts`: each kind of step decoded, and every refusal of the decoder with the path of the field
+ * (commons 0002-ui FR-001).
  *
  * @module
  */
-import { decodeStep } from "../src/guide.ts";
+import { decodeStep } from "../src/ui.ts";
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 
-const FR = "0002-guide FR-001";
+const FR = "0002-ui FR-001";
 
 const base = { id: "synthetic-step-01", summary: "Choose a folder", say: "Pick where the work goes." };
 const field = { field: "folder", prompt: "Which folder?", hint: "a path" };

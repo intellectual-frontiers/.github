@@ -11,7 +11,7 @@
     ".": "./src/mod.ts",
     "./args": "./src/args.ts",
     "./commands": "./src/commands.ts",
-    "./guide": "./src/guide.ts",
+    "./ui": "./src/ui.ts",
     "./palette": "./src/palette.ts",
     "./vt": "./src/vt.ts",
     "./width": "./src/width.ts"

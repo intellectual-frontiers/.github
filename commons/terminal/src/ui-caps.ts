@@ -1,6 +1,6 @@
-// Spec: 0002-guide FR-002
+// Spec: 0002-ui FR-002
 /**
- * What the terminal written to can do, decided in one place (commons terminal 0002-guide FR-002): `capabilitiesOf(env, stream)` gives one of
+ * What the terminal written to can do, decided in one place (commons terminal 0002-ui FR-002): `capabilitiesOf(env, stream)` gives one of
  * three levels, and the rest of the guide only obeys it.
  *
  * - `plain`: no colour, no cursor movement, no emoji. A stream that is not a TTY, `NO_COLOR` set and not empty, `TERM=dumb`, `CI` set.
@@ -13,7 +13,7 @@
  *
  * @example
  * ```ts
- * import { capabilitiesOf } from "./guide-caps.ts";
+ * import { capabilitiesOf } from "./ui-caps.ts";
  * capabilitiesOf({ TERM: "xterm-256color" }, { isTTY: true, columns: 100, rows: 30 }).level; // "full"
  * capabilitiesOf({ NO_COLOR: "1" }, { isTTY: true, columns: 100, rows: 30 }).level; // "plain"
  * capabilitiesOf({}, { isTTY: false }).level; // "plain"
@@ -23,10 +23,10 @@
  */
 
 /** The three levels, from the least to the most. */
-export type GuideLevel = "plain" | "ansi" | "full";
+export type UiLevel = "plain" | "ansi" | "full";
 
 /** Every level, from the least to the most. */
-export const GUIDE_LEVELS: readonly GuideLevel[] = ["plain", "ansi", "full"];
+export const UI_LEVELS: readonly UiLevel[] = ["plain", "ansi", "full"];
 
 /** The least size, in columns, of a terminal that gets the full screen. */
 export const FULL_MIN_COLUMNS = 60;
@@ -38,8 +38,13 @@ export const FULL_MIN_ROWS = 12;
 export const DEFAULT_COLUMNS = 80;
 
 /** What the guide may do on a stream; `colour`, `emoji` and `columns` are the fields of the palette's `Capabilities`, so it is one. */
-export type GuideCaps = {
-  readonly level: GuideLevel;
+/** How many colours the terminal shows: none, the 16 of ANSI, 256, or 24-bit. */
+export type ColourDepth = "none" | "16" | "256" | "truecolor";
+
+export type UiCaps = {
+  /** How many colours (`none` exactly where `colour` is false). */
+  readonly colourDepth: ColourDepth;
+  readonly level: UiLevel;
   readonly colour: boolean;
   readonly emoji: boolean;
   readonly columns: number;
@@ -47,30 +52,31 @@ export type GuideCaps = {
 };
 
 /** The environment as a record: `process.env` is one. */
-export type GuideEnv = Readonly<Record<string, string | undefined>>;
+export type UiEnv = Readonly<Record<string, string | undefined>>;
 
 /** The stream written to: `process.stdout` is one. */
-export type GuideStream = { readonly isTTY?: boolean | undefined; readonly columns?: number | undefined; readonly rows?: number | undefined };
+export type UiStream = { readonly isTTY?: boolean | undefined; readonly columns?: number | undefined; readonly rows?: number | undefined };
 
 const set = (v: string | undefined): boolean => v !== undefined && v !== "";
 
 /** Whether `CI` says this is a CI run: set, and not empty, `0` or `false`. */
-function inCi(env: GuideEnv): boolean {
+function inCi(env: UiEnv): boolean {
   const v = env["CI"];
   return set(v) && v !== "0" && v?.toLowerCase() !== "false";
 }
 
 /** Whether the terminal is known to show emoji: Windows Terminal, a named terminal program, or a UTF-8 locale on a terminal that is not the bare Linux console. */
-function showsEmoji(env: GuideEnv): boolean {
+function showsEmoji(env: UiEnv): boolean {
   if (env["TERM"] === "linux") return false;
-  if (set(env["WT_SESSION"]) || set(env["TERM_PROGRAM"])) return true;
+  if (set(env["WT_SESSION"]) || set(env["TERM_PROGRAM"]) || set(env["KITTY_WINDOW_ID"]) || set(env["WEZTERM_EXECUTABLE"])) return true;
+  if (/kitty|alacritty|wezterm|foot|ghostty/i.test(env["TERM"] ?? "")) return true;
   return /utf-?8/i.test(`${env["LC_ALL"] ?? ""}${env["LC_CTYPE"] ?? ""}${env["LANG"] ?? ""}`);
 }
 
 const dimension = (v: number | undefined, fallback: number): number => (v !== undefined && Number.isFinite(v) && v >= 1 ? Math.floor(v) : fallback);
 
 /** The level of a terminal: why `plain`, or `ansi`, or `full`, from the environment and the stream only. */
-export function levelOf(env: GuideEnv, stream: GuideStream): GuideLevel {
+export function levelOf(env: UiEnv, stream: UiStream): UiLevel {
   if (stream.isTTY !== true) return "plain";
   if (set(env["NO_COLOR"]) || env["TERM"] === "dumb" || inCi(env)) return "plain";
   const columns = dimension(stream.columns, DEFAULT_COLUMNS);
@@ -79,15 +85,33 @@ export function levelOf(env: GuideEnv, stream: GuideStream): GuideLevel {
 }
 
 /**
+ * The colours a level shows, from the environment alone: `none` at `plain`; `FORCE_COLOR` 1, 2 or 3 says 16, 256 or truecolor (0 says none);
+ * else `COLORTERM` `truecolor` or `24bit`, `WT_SESSION` or a known emulator say truecolor, a `TERM` with `256color` says 256, and otherwise 16.
+ */
+export function colourDepthOf(env: UiEnv, level: UiLevel): ColourDepth {
+  if (level === "plain") return "none";
+  const forced = env["FORCE_COLOR"];
+  if (forced === "0" || forced === "false") return "none";
+  if (forced === "1" || forced === "true") return "16";
+  if (forced === "2") return "256";
+  if (forced === "3") return "truecolor";
+  if (/^(truecolor|24bit)$/i.test(env["COLORTERM"] ?? "") || set(env["WT_SESSION"]) || set(env["KITTY_WINDOW_ID"]) || set(env["WEZTERM_EXECUTABLE"])) return "truecolor";
+  if (/256color|kitty|alacritty|wezterm|ghostty/i.test(env["TERM"] ?? "") || set(env["TERM_PROGRAM"])) return "256";
+  return "16";
+}
+
+/**
  * The capabilities of a stream in an environment (FR-002). `force` lowers the level and never raises it: asking for `full` of a pipe gives
  * `plain`. Colour is on at `ansi` and `full`; emoji at `full` where the terminal is known to show them.
  */
-export function capabilitiesOf(env: GuideEnv, stream: GuideStream, force?: GuideLevel): GuideCaps {
+export function capabilitiesOf(env: UiEnv, stream: UiStream, force?: UiLevel): UiCaps {
   const decided = levelOf(env, stream);
-  const level = force !== undefined && GUIDE_LEVELS.indexOf(force) < GUIDE_LEVELS.indexOf(decided) ? force : decided;
+  const level = force !== undefined && UI_LEVELS.indexOf(force) < UI_LEVELS.indexOf(decided) ? force : decided;
+  const colourDepth = colourDepthOf(env, level);
   return {
     level,
-    colour: level !== "plain",
+    colourDepth,
+    colour: colourDepth !== "none",
     emoji: level === "full" && showsEmoji(env),
     columns: dimension(stream.columns, DEFAULT_COLUMNS),
     rows: dimension(stream.rows, 24),
@@ -95,7 +119,7 @@ export function capabilitiesOf(env: GuideEnv, stream: GuideStream, force?: Guide
 }
 
 /** The same capabilities at a lower level; a level that is not lower leaves them as they are. */
-export function atMost(caps: GuideCaps, level: GuideLevel): GuideCaps {
-  if (GUIDE_LEVELS.indexOf(level) >= GUIDE_LEVELS.indexOf(caps.level)) return caps;
-  return { ...caps, level, colour: level !== "plain", emoji: level === "full" && caps.emoji };
+export function atMost(caps: UiCaps, level: UiLevel): UiCaps {
+  if (UI_LEVELS.indexOf(level) >= UI_LEVELS.indexOf(caps.level)) return caps;
+  return { ...caps, level, colourDepth: level === "plain" ? "none" : caps.colourDepth, colour: level !== "plain", emoji: level === "full" && caps.emoji };
 }

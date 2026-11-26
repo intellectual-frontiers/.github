@@ -1,6 +1,6 @@
-// Spec: 0002-guide FR-008
+// Spec: 0002-ui FR-008
 /**
- * The full screen of the guide (commons terminal 0002-guide FR-008): a stable layout, drawn whole each time, from a state and a size, with no
+ * The full screen of the guide (commons terminal 0002-ui FR-008): a stable layout, drawn whole each time, from a state and a size, with no
  * line feed so that the screen never scrolls.
  *
  * ```text
@@ -19,8 +19,8 @@
  *
  * @module
  */
-import type { GuideCaps } from "./guide-caps.ts";
 import { paint, type Role } from "./palette.ts";
+import { type Dress, iconCell, type IconName, tint } from "./ui-theme.ts";
 import { cutToWidth, displayWidth, RESET } from "./width.ts";
 
 const ESC = String.fromCharCode(0x1b);
@@ -172,7 +172,7 @@ export type Drawn = { readonly lines: readonly string[]; readonly cursor: { read
  * The screen as `rows` lines of exactly `columns` columns. Colour only where `caps.colour`; the content is the same without it. The pane shows
  * the last lines that fit.
  */
-export function drawScreen(state: ScreenState, size: { readonly columns: number; readonly rows: number }, caps: Pick<GuideCaps, "colour">): Drawn {
+export function drawScreen(state: ScreenState, size: { readonly columns: number; readonly rows: number }, caps: Dress): Drawn {
   const { columns, rows } = size;
   const progress = state.progress === undefined || state.progress === "" ? undefined : state.progress;
   const lay = layoutOf(columns, rows, state.plan, progress === undefined ? 0 : 1);
@@ -182,7 +182,7 @@ export function drawScreen(state: ScreenState, size: { readonly columns: number;
   const fallback = doneCount + (state.current !== undefined && !state.done.has(state.current) ? 1 : 0);
   const count = state.plan.length === 0 ? "" : `step ${Math.max(1, Math.min(state.plan.length, state.position ?? fallback))} of ${state.plan.length}`;
   const gap = Math.max(1, columns - displayWidth(state.title) - displayWidth(count) - 2);
-  lines.push(role("accent", pad(` ${state.title}${" ".repeat(gap)}${count}`, columns)));
+  lines.push(tint("accent", pad(` ${state.title}${" ".repeat(gap)}${count}`, columns), caps));
   const shown = fitPane(state.pane, lay.body, state.pinned ?? 0, state.keep ?? 0, state.protect ?? []);
   let cursor: Drawn["cursor"];
   // A plan longer than the body scrolls so that the current step stays in view.
@@ -198,17 +198,9 @@ export function drawScreen(state: ScreenState, size: { readonly columns: number;
         const isDone = state.done.has(item.id) && !isFailed;
         const isCurrent = item.id === state.current && !isDone;
         const isSkipped = !isDone && !isCurrent && state.skipped?.has(item.id) === true;
-        const mark = isFailed
-          ? PLAN_MARKS.failed
-          : isDone
-            ? PLAN_MARKS.done
-            : isCurrent
-              ? PLAN_MARKS.current
-              : isSkipped
-                ? PLAN_MARKS.skipped
-                : PLAN_MARKS.pending;
-        const text = pad(`${mark} ${labelOf(item, Math.max(1, lay.left - 4))}`, lay.left);
-        l = role(isFailed ? "failure" : isDone ? "success" : isCurrent ? "accent" : "dim", text) + " | ";
+        const icon: IconName = isFailed ? "failed" : isDone ? "done" : isCurrent ? "current" : isSkipped ? "skipped" : "pending";
+        const text = pad(`${iconCell(icon, caps)} ${labelOf(item, Math.max(1, lay.left - 4))}`, lay.left);
+        l = tint(isFailed ? "error" : isDone ? "success" : isCurrent ? "accent" : "dim", text, caps) + " | ";
       }
     }
     const paneLine = shown[i] ?? "";

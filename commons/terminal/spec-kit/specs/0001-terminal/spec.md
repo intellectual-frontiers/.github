@@ -20,7 +20,7 @@
 
 ## The package
 
-- **FR-006**: Terminal MUST depend on Core alone, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/terminal` (commons 0032-libraries-by-concern FR-005), with an entry for the package and an entry for each of `args`, `commands`, `guide` (0002-guide), `palette`, `vt` and `width`, so that it runs on Bun, on Node 26 and in a browser.
+- **FR-006**: Terminal MUST depend on Core alone, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/terminal` (commons 0032-libraries-by-concern FR-005), with an entry for the package and an entry for each of `args`, `commands`, `guide` (0002-ui), `palette`, `vt` and `width`, so that it runs on Bun, on Node 26 and in a browser.
 
 ## Acceptance scenarios
 

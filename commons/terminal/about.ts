@@ -12,7 +12,7 @@ export const about: About = {
   title: "Terminal",
   summary:
     "A typed command-line parser (`args`) whose options are declared once as data, command trees (`commands`) resolved and helped from their declaration, the console's one palette (`palette`), display width " +
-    "and the cutting of a text by columns (`width`), a terminal emulator for snapshot tests (`vt`), and a guided-flow renderer and driver (`guide`: a typed step, the capabilities of the terminal, plain, ANSI and full-screen rendering, and a loop that never answers for the person). It names no host global and runs wherever ECMAScript does. Published to npm as compiled modules with " +
+    "and the cutting of a text by columns (`width`), a terminal emulator for snapshot tests (`vt`), and a general terminal interface library (`ui`: the guided `flow` (a typed step, the capabilities of the terminal, plain, ANSI and full-screen rendering, and a loop that never answers for the person), keys, select, table, status bar, log, home layout and a screen loop, with colour and emoji from the capabilities). It names no host global and runs wherever ECMAScript does. Published to npm as compiled modules with " +
     "their declarations; it depends on Core alone.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
@@ -23,7 +23,7 @@ export const about: About = {
     },
     {
       path: "suite/",
-      what: "The tests: every grammar rule and error kind of the parser, the commands, the palette, the width, the emulator and the guide, with properties and type-level tests.",
+      what: "The tests: every grammar rule and error kind of the parser, the commands, the palette, the width, the emulator and the ui, with properties and type-level tests.",
       mayImport: ["src/", "fast-check", "the test module of commons' runtime, by package name"],
     },
     {

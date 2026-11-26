@@ -1,6 +1,6 @@
-// Spec: 0002-guide FR-003
+// Spec: 0002-ui FR-003
 /**
- * A step as the lines a person reads (commons terminal 0002-guide FR-003): `renderStep(step, caps)` is pure, takes the capabilities decided by
+ * A step as the lines a person reads (commons terminal 0002-ui FR-003): `renderStep(step, caps)` is pure, takes the capabilities decided by
  * `capabilitiesOf` and returns text lines that fit the columns, wrapped by display width (a wide character goes whole to the next line).
  *
  * - `plain`: ASCII furniture, no escape sequence, nothing that moves the cursor.
@@ -12,16 +12,17 @@
  *
  * @example
  * ```ts
- * import { renderStep } from "./guide-render.ts";
+ * import { renderStep } from "./ui-render.ts";
  * renderStep({ id: "a", kind: "done", summary: "All set", say: "Nothing more." }, { level: "plain", colour: false, emoji: false, columns: 40, rows: 24 });
  * // ["[done] All set", "  Nothing more."]
  * ```
  *
  * @module
  */
-import { type GuideCaps } from "./guide-caps.ts";
-import type { AskField, GuideKind, GuideStep } from "./guide-model.ts";
+import { type UiCaps } from "./ui-caps.ts";
+import type { AskField, FlowKind, FlowStep } from "./ui-model.ts";
 import { mark, paint, type Role } from "./palette.ts";
+import { type IconName, iconOf } from "./ui-theme.ts";
 import { cutToWidth, displayWidth, graphemes, splitAtWidth } from "./width.ts";
 
 const ESC = String.fromCharCode(0x1b);
@@ -97,20 +98,20 @@ export function wrap(text: string, width: number, indent = 0, first = indent): r
   return out.length === 0 ? [""] : out;
 }
 
-type Tag = { readonly ascii: string; readonly role: Role; readonly emoji?: "hint" | "action" | "pending" | "done" };
+type Tag = { readonly ascii: string; readonly role: Role; readonly icon: IconName };
 
-const TAGS: Readonly<Record<GuideKind, Tag>> = {
-  question: { ascii: "[ask]", role: "hint", emoji: "hint" },
-  run: { ascii: "[run]", role: "accent" },
-  human: { ascii: "[you]", role: "accent", emoji: "action" },
-  wait: { ascii: "[wait]", role: "dim", emoji: "pending" },
-  done: { ascii: "[done]", role: "success", emoji: "done" },
+const TAGS: Readonly<Record<FlowKind, Tag>> = {
+  question: { ascii: "[ask]", role: "hint", icon: "question" },
+  run: { ascii: "[run]", role: "accent", icon: "run" },
+  human: { ascii: "[you]", role: "accent", icon: "person" },
+  wait: { ascii: "[wait]", role: "dim", icon: "working" },
+  done: { ascii: "[done]", role: "success", icon: "done" },
 };
 
 /** The tag at the start of a step's first line: ASCII, or the palette's emoji where the level is `full` and the terminal shows them. */
-export function tagOf(kind: GuideKind, caps: GuideCaps): string {
+export function tagOf(kind: FlowKind, caps: UiCaps): string {
   const t = TAGS[kind];
-  return caps.emoji && t.emoji !== undefined ? mark(t.emoji, caps) : t.ascii;
+  return caps.emoji ? iconOf(t.icon, caps) : t.ascii;
 }
 
 const field = (f: AskField): string => `${f.field}: ${f.prompt}${f.hint === "" ? "" : ` (${f.hint})`}`;
@@ -126,7 +127,7 @@ function inputsOf(inputs: Readonly<Record<string, unknown>>): string {
  * verb and its inputs of a `run`, the fields of a `question`, exactly what the person is to do at a `human` step), then the evidence. Every
  * line fits `caps.columns`; at `plain` there is no escape sequence and the guide's own furniture is ASCII.
  */
-export function renderStep(step: GuideStep, caps: GuideCaps): readonly string[] {
+export function renderStep(step: FlowStep, caps: UiCaps): readonly string[] {
   const parts = renderStepParts(step, caps);
   return [...parts.head, ...parts.body];
 }
@@ -138,7 +139,7 @@ export function renderStep(step: GuideStep, caps: GuideCaps): readonly string[] 
 export type StepParts = { readonly head: readonly string[]; readonly body: readonly string[]; readonly command: readonly number[] };
 
 /** A step as two runs of lines: `head`, the mark and the summary (what the full screen keeps pinned), and `body`, everything after it (FR-013). */
-export function renderStepParts(step: GuideStep, caps: GuideCaps): StepParts {
+export function renderStepParts(step: FlowStep, caps: UiCaps): StepParts {
   const cols = Math.max(20, caps.columns);
   const tag = tagOf(step.kind, caps);
   const lead = displayWidth(tag) + 1;
@@ -197,14 +198,14 @@ export function renderStepParts(step: GuideStep, caps: GuideCaps): StepParts {
 }
 
 /** The lines of a prompt for one field: its prompt and hint wrapped, and as the last line the mark of where to type, which is written without a line end. */
-export function renderPrompt(f: AskField, caps: Pick<GuideCaps, "columns">): readonly string[] {
+export function renderPrompt(f: AskField, caps: Pick<UiCaps, "columns">): readonly string[] {
   const cols = Math.max(20, caps.columns);
   const body = wrap(`${f.prompt}${f.hint === "" ? "" : ` (${f.hint})`}`, cols, 2);
   return [...body, "  > "];
 }
 
 /** The lines that tell what came of a verb or of a refusal: a mark, the text wrapped, and the lines of the result indented. */
-export function renderResult(ok: boolean, summary: string, details: readonly string[], caps: GuideCaps): readonly string[] {
+export function renderResult(ok: boolean, summary: string, details: readonly string[], caps: UiCaps): readonly string[] {
   const cols = Math.max(20, caps.columns);
   const tag = ok ? (caps.emoji ? mark("done", caps) : "[ok]") : caps.emoji ? mark("failed", caps) : "[failed]";
   const lead = displayWidth(tag) + 1;

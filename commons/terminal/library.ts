@@ -12,7 +12,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.2.1",
   distribution: ["github", "npm"],
-  exports: [".", "./args", "./commands", "./guide", "./palette", "./vt", "./width"],
+  exports: [".", "./args", "./commands", "./ui", "./palette", "./vt", "./width"],
   summary:
-    "The terminal as pure code: a typed command-line parser and command trees, the one palette of colour roles and marks, display width and cutting by columns, a terminal emulator for snapshot tests, and a guided-flow renderer and driver, with no host.",
+    "The terminal as pure code: a typed command-line parser and command trees, the one palette of colour roles and marks, display width and cutting by columns, a terminal emulator for snapshot tests, and a general-purpose terminal interface library (`ui`: the guided `flow`, keys, select, table, status bar, log, home layout and screen loop, with colour and emoji from the capabilities), with no host.",
 };

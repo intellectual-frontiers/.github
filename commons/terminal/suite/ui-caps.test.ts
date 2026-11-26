@@ -1,13 +1,13 @@
 /**
- * Tests of `src/guide-caps.ts`: the level of a terminal from its environment and its stream, for a TTY, a pipe, `NO_COLOR`, `TERM=dumb`, `CI`,
- * a small terminal, a forced level and a Windows terminal (commons 0002-guide FR-002).
+ * Tests of `src/ui-caps.ts`: the level of a terminal from its environment and its stream, for a TTY, a pipe, `NO_COLOR`, `TERM=dumb`, `CI`,
+ * a small terminal, a forced level and a Windows terminal (commons 0002-ui FR-002).
  *
  * @module
  */
-import { atMost, capabilitiesOf, type GuideLevel } from "../src/guide.ts";
+import { atMost, capabilitiesOf, type UiLevel } from "../src/ui.ts";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 
-const FR = "0002-guide FR-002";
+const FR = "0002-ui FR-002";
 const tty = { isTTY: true, columns: 100, rows: 30 };
 
 proves([FR], "a TTY with nothing against it is full; colour from ansi up; emoji only where the terminal shows them", () => {
@@ -67,6 +67,6 @@ proves([FR], "a Windows terminal is decided by isTTY and the environment, never 
   // The same machine with its output redirected: plain.
   assertEquals(capabilitiesOf({ WT_SESSION: "x", OS: "Windows_NT" }, { isTTY: false }).level, "plain");
   // An environment with the Windows variable names in any case is no different from any other.
-  const levels: GuideLevel[] = [{ OS: "Windows_NT" }, { os: "Windows_NT" }, { COMSPEC: "C:\\Windows\\System32\\cmd.exe" }].map((env) => capabilitiesOf(env, tty).level);
+  const levels: UiLevel[] = [{ OS: "Windows_NT" }, { os: "Windows_NT" }, { COMSPEC: "C:\\Windows\\System32\\cmd.exe" }].map((env) => capabilitiesOf(env, tty).level);
   assert(levels.every((l) => l === "full"));
 });
