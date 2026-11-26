@@ -11,6 +11,9 @@ import type { DisclosureClass } from "./disclosure.ts";
 /** What JSON holds. */
 export type Json = null | boolean | number | string | readonly Json[] | { readonly [key: string]: Json };
 
+/** The kind of the one source that holds what a collection looked for and did not find. */
+export const GAP_KIND = "collection-gap";
+
 /** A piece of evidence that already exists (0046-dossiers FR-001). */
 export interface Source {
   /** The id: lower case words joined by hyphens, dots and slashes, stable for the thing observed. */
@@ -190,6 +193,10 @@ export interface BuildError {
     | "E-DOSSIER-LENS-CEILING"
     | "E-DOSSIER-ANCHOR"
     | "E-DOSSIER-AS-OF"
+    | "E-DOSSIER-EMPTY"
+    | "E-DOSSIER-COLLECTOR"
+    | "E-DOSSIER-COLLECTOR-DUPLICATE"
+    | "E-DOSSIER-COLLECTOR-KIND"
     | "E-DOSSIER-NO-RENDERER";
   readonly message: string;
 }

@@ -35,7 +35,7 @@ proves(["0002-assurance-lenses FR-001", "0002-assurance-lenses FR-006"], "a body
   assert(r.kind === "err" && r.error.code === "E-DOSSIER-LENS-REFUSED" && r.error.message.includes("acceptance/bad"));
   const p = await run(decl("negative-space", { title: "Gaps" }), []);
   assert(p.kind === "err" && p.error.code === "E-DOSSIER-LENS-PARAMS");
-  assertEquals(ASSURANCE_LENSES.length, 4);
+  assertEquals(ASSURANCE_LENSES.length, 5);
 });
 
 proves(["0002-assurance-lenses FR-002"], "the acceptance lens counts the steps and says that no person approved and that a person's step is not done", async () => {
@@ -83,4 +83,24 @@ proves(["0002-assurance-lenses FR-005"], "the negative space lists what has no r
   assert(adoc.includes("no reading at all") && adoc.includes("only partly met") && adoc.includes("stale: 86 days old"));
   const clean = await run(decl("negative-space", { title: "Gaps", requirements: [], maxAgeDays: 30 }), await sources());
   assert(clean.kind === "ok" && clean.value.adoc.includes("No requirement of the list has a gap."));
+});
+
+proves(["0002-assurance-lenses FR-007", "0002-assurance-lenses FR-008"], "the ledger gives a section for each kind newest first, ends with what was not found, and refuses a record of another shape", async () => {
+  const ss = [
+    await made("tiers/asset-a", "asset-observation", "2026-11-25T09:00:00Z", { subject: "synthetic-host-01", summary: "tier 2, observed by the controller", facts: { tier: 2, online: true } }),
+    await made("tiers/asset-b", "asset-observation", "2026-11-26T09:00:00Z", { subject: "synthetic-host-02", summary: "tier 3", facts: { tier: 3 } }),
+    await made("audit/head", "audit-head", "2026-11-26T10:00:00Z", { subject: "audit chain", summary: "69 events verified", facts: { events: 69 } }),
+    await made("collection-gaps", "collection-gap", "2026-11-26T10:00:00Z", { gaps: [{ collector: "assessment", kind: "assessment-status", reason: "no assessment is kept" }] }),
+  ];
+  const r = await run(decl("ledger", { title: "Ledger" }), ss);
+  assert(r.kind === "ok");
+  const adoc = r.value.adoc;
+  assert(adoc.indexOf("Assets as last observed") < adoc.indexOf("The audit chain") && adoc.indexOf("The audit chain") < adoc.indexOf("Looked for and not found"));
+  assert(adoc.indexOf("synthetic-host-02") < adoc.indexOf("synthetic-host-01"), "newest first");
+  assert(adoc.includes("online: true; tier: 2") && adoc.includes("no assessment is kept") && adoc.includes("says nothing about it"));
+  const bad = await made("tiers/bad", "asset-observation", "2026-11-26T09:00:00Z", { summary: "no subject" });
+  const refused = await run(decl("ledger", { title: "Ledger" }), [bad]);
+  assert(refused.kind === "err" && refused.error.code === "E-DOSSIER-LENS-REFUSED" && refused.error.message.includes("tiers/bad"));
+  const none = await run(decl("ledger", { title: "Ledger" }), []);
+  assert(none.kind === "ok" && none.value.adoc.includes("no evidence"));
 });

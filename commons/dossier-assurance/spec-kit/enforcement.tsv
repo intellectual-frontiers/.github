@@ -9,3 +9,5 @@ requirement	mechanism	by	note
 0002-assurance-lenses FR-004	check	.github: cd commons/dossier-assurance && bun run verify	suite/lenses.test.ts
 0002-assurance-lenses FR-005	check	.github: cd commons/dossier-assurance && bun run verify	suite/lenses.test.ts
 0002-assurance-lenses FR-006	check	.github: cd commons/dossier-assurance && bun run verify	suite/lenses.test.ts
+0002-assurance-lenses FR-007	check	.github: cd commons/dossier-assurance && bun run verify	suite/lenses.test.ts: the ledger
+0002-assurance-lenses FR-008	check	.github: cd commons/dossier-assurance && bun run verify	suite/lenses.test.ts: the ledger

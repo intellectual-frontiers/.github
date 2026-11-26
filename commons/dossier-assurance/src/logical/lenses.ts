@@ -8,7 +8,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import type { Block, Inline, Json, Lens, Source } from "@intellectual-frontiers/dossier/governance";
 import { ageDays, cite, code, defineLens, emptyPlate, erase, freshness, plateOf, slugOf, text } from "@intellectual-frontiers/dossier/logical";
-import { decodeFindings, decodeReading, decodeRun, type Finding, KINDS, type Reading } from "@intellectual-frontiers/dossier-assurance/governance";
+import { decodeFindings, decodeGaps, decodeReading, decodeRecord, decodeRun, type Finding, GAP_KIND, KINDS, LEDGER_KINDS, type Reading } from "@intellectual-frontiers/dossier-assurance/governance";
 
 /** The parameters of a lens: a title. */
 export interface TitleParams {
@@ -185,5 +185,59 @@ export const negativeSpaceLens: Lens<GapParams> = defineLens<GapParams>({
   },
 });
 
+const KIND_TITLES: Readonly<Record<string, string>> = {
+  "boundary-coverage": "Boundaries and what they hold",
+  "asset-observation": "Assets as last observed",
+  enrollment: "Enrollments",
+  "apply-run": "Changes applied",
+  "access-decision": "Access decisions",
+  "audit-head": "The audit chain",
+  "assessment-status": "Assessment status",
+};
+
+/** The ledger: every record of a thing observed, a section for each kind, each row with what it says, how old it is and the source it cites, and at the end what the collection looked for and did not find. */
+export const ledgerLens: Lens<TitleParams> = defineLens<TitleParams>({
+  id: "ledger",
+  version: "1.0.0",
+  title: "Evidence ledger",
+  inputs: [...LEDGER_KINDS, GAP_KIND],
+  ceiling: "internal",
+  decode: title,
+  plate: ({ sources, params, asOf }) => {
+    const records = sources.filter((s) => s.kind !== GAP_KIND);
+    const gapSources = sources.filter((s) => s.kind === GAP_KIND);
+    if (records.length === 0 && gapSources.length === 0) return ok(emptyPlate({ id: "ledger", ceiling: "internal" }, params.title, "a record of something observed"));
+    const blocks: Block[] = [];
+    for (const kind of LEDGER_KINDS) {
+      const of = records.filter((s) => s.kind === kind).sort((a, b) => (a.observedAt < b.observedAt ? 1 : a.observedAt > b.observedAt ? -1 : a.id < b.id ? -1 : 1));
+      if (of.length === 0) continue;
+      const rows: (readonly Inline[])[][] = [];
+      for (const s of of) {
+        const r = decodeRecord(s.body);
+        if (r.kind === "err") return refuse("record-body", `source ${s.id}: ${r.error}`);
+        const facts = Object.entries(r.value.facts).map(([k, v]) => `${k}: ${String(v)}`).join("; ");
+        rows.push([t(r.value.subject), t(r.value.summary + (facts === "" ? "" : ` (${facts})`)), t(freshness(s.observedAt, asOf)), [cite(s.id)]]);
+      }
+      blocks.push({ t: "section", level: 2, id: `${slugOf(params.title)}-${slugOf(kind)}`, title: KIND_TITLES[kind] ?? kind, blocks: [{ t: "table", head: ["Subject", "What it says", "Age", "Evidence"], rows }] });
+    }
+    const missing: { collector: string; kind: string; reason: string }[] = [];
+    for (const s of gapSources) {
+      const g = decodeGaps(s.body);
+      if (g.kind === "err") return refuse("gap-body", `source ${s.id}: ${g.error}`);
+      missing.push(...g.value);
+    }
+    if (missing.length > 0) {
+      blocks.push({
+        t: "section",
+        level: 2,
+        id: `${slugOf(params.title)}-not-found`,
+        title: "Looked for and not found",
+        blocks: [{ t: "table", head: ["Kind", "Looked for by", "Why nothing"], rows: missing.map((g) => [[code(g.kind)], t(g.collector), t(g.reason)]) }, { t: "note", tone: "warning", inlines: t(`${missing.length} kind${missing.length === 1 ? "" : "s"} of evidence ${missing.length === 1 ? "was" : "were"} looked for and not found. This dossier says nothing about ${missing.length === 1 ? "it" : "them"}.`) }],
+      });
+    }
+    return ok(plateOf({ lens: { id: "ledger", ceiling: "internal" }, title: params.title, blocks, cites: [...records, ...gapSources].map((s) => s.id) }));
+  },
+});
+
 /** The lenses of this plugin, erased for a registry. */
-export const ASSURANCE_LENSES: readonly Lens<unknown>[] = [erase(acceptanceLens), erase(findingsLens), erase(postureLens), erase(negativeSpaceLens)];
+export const ASSURANCE_LENSES: readonly Lens<unknown>[] = [erase(acceptanceLens), erase(findingsLens), erase(postureLens), erase(negativeSpaceLens), erase(ledgerLens)];

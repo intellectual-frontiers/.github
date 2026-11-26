@@ -40,6 +40,7 @@ interface Resolved {
 /** The instant and the sources of a declaration: those that meet its selection at or before the instant. */
 function resolve(decl: Declaration, checked: readonly Source[]): Result<Resolved, BuildError> {
   const pre = checked.filter((x) => meets(decl.selection, x));
+  if (decl.asOf === "latest" && pre.length === 0) return err({ code: "E-DOSSIER-EMPTY", message: "a dossier as of `latest` takes its instant from the newest source it selects, and it selects none: collect evidence, or give the instant" });
   const asOf = instantOf(decl.asOf, pre);
   if (!INSTANT.test(asOf)) return err({ code: "E-DOSSIER-AS-OF", message: `${JSON.stringify(asOf)} is not an instant like 2026-11-26T12:00:00Z` });
   return ok({ asOf, sources: select(decl.selection, checked, asOf) });

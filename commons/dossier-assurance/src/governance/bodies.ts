@@ -5,10 +5,22 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Json } from "@intellectual-frontiers/dossier/governance";
+import { GAP_KIND, type Json } from "@intellectual-frontiers/dossier/governance";
+
+export { GAP_KIND };
 
 /** The kinds of source. */
 export const KINDS = { acceptance: "acceptance-run", findings: "finding-set", reading: "reading" } as const;
+
+/** The kinds of source the ledger lens reads: each is a record of one thing observed, `{ subject, summary, facts? }`, in the order the ledger shows them. */
+export const LEDGER_KINDS = ["boundary-coverage", "asset-observation", "enrollment", "apply-run", "access-decision", "audit-head", "assessment-status"] as const;
+
+/** A record of one thing observed: what it is about, what it says in one sentence, and the facts a reader may want beside it. */
+export interface Record_ {
+  readonly subject: string;
+  readonly summary: string;
+  readonly facts: Readonly<Record<string, string | number | boolean>>;
+}
 
 /** One step of a case. */
 export interface Step {
@@ -88,4 +100,31 @@ export function decodeFindings(j: Json): Result<FindingSet, string> {
 export function decodeReading(j: Json): Result<Reading, string> {
   if (!rec(j) || !str(j["requirement"]) || !one(j["standing"], STANDINGS)) return err("a reading is { requirement, standing, title?, answers? }");
   return ok({ requirement: j["requirement"], standing: j["standing"], ...(str(j["title"]) ? { title: j["title"] } : {}), ...(str(j["answers"]) ? { answers: j["answers"] } : {}) });
+}
+
+/** A record of one thing observed from a body. */
+export function decodeRecord(j: Json): Result<Record_, string> {
+  if (!rec(j) || !str(j["subject"]) || !str(j["summary"])) return err("a record is { subject, summary, facts? }");
+  const facts: Record<string, string | number | boolean> = {};
+  const f = j["facts"];
+  if (f !== undefined) {
+    if (!rec(f)) return err("the facts of a record are an object of strings, numbers and booleans");
+    for (const k of Object.keys(f).sort()) {
+      const v = f[k];
+      if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") return err(`the fact ${k} is not a string, a number or a boolean`);
+      facts[k] = v;
+    }
+  }
+  return ok({ subject: j["subject"], summary: j["summary"], facts });
+}
+
+/** What a collection did not find, from a body. */
+export function decodeGaps(j: Json): Result<readonly { readonly collector: string; readonly kind: string; readonly reason: string }[], string> {
+  if (!rec(j) || !Array.isArray(j["gaps"])) return err("the gaps of a collection are { gaps }");
+  const out: { collector: string; kind: string; reason: string }[] = [];
+  for (const g of j["gaps"]) {
+    if (!rec(g) || !str(g["collector"]) || !str(g["kind"]) || !str(g["reason"])) return err("a gap is { collector, kind, reason }");
+    out.push({ collector: g["collector"], kind: g["kind"], reason: g["reason"] });
+  }
+  return ok(out);
 }
