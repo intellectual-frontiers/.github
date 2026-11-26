@@ -1,0 +1,29 @@
+### plain at 60
+
+[!] synthetic-file-01.txt is large [E001-LARGE]
+-> a smaller cache keeps the disk free
+   run: tool config cache 2g
+   It removes the old copies
+   1 failed, 1 warning
+[x] the disk of synthetic-host-01 is full [E002-DISK]
+next: tool clean synthetic-host-01
+
+### ansi at 60
+
+␛[33m[!]␛[0m ␛[33msynthetic-file-01.txt is large␛[0m␛[2m [E001-LARGE]␛[0m
+␛[36;1m->␛[0m a smaller cache keeps the disk free
+   ␛[2mrun: tool config cache 2g␛[0m
+   It removes the old copies
+   ␛[31;1m1 failed␛[0m, ␛[33m1 warning␛[0m
+␛[31;1m[x]␛[0m ␛[31;1mthe disk of synthetic-host-01 is full␛[0m␛[2m [E002-DISK]␛[0m
+␛[36;1mnext:␛[0m tool clean synthetic-host-01
+
+### full at 60
+
+␛[38;2;238;170;68m⚠️␛[0m ␛[38;2;238;170;68msynthetic-file-01.txt is large␛[0m␛[38;2;136;136;136m [E001-LARGE]␛[0m
+␛[1;38;2;102;204;238m👉␛[0m a smaller cache keeps the disk free
+   ␛[38;2;136;136;136mrun: tool config cache 2g␛[0m
+   It removes the old copies
+   ␛[38;2;238;102;102m1 failed␛[0m, ␛[38;2;238;170;68m1 warning␛[0m
+␛[38;2;238;102;102m❌␛[0m ␛[38;2;238;102;102mthe disk of synthetic-host-01 is full␛[0m␛[38;2;136;136;136m [E002-DISK]␛[0m
+👉 ␛[1;38;2;102;204;238mnext:␛[0m tool clean synthetic-host-01

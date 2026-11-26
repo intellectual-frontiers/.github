@@ -1,7 +1,7 @@
 // Spec: 0001-headless-layers FR-001
 /**
- * Layer 3 of Headless, the command-line surface (commons headless 0004-headless-cli): the calm renderer (marks from the terminal's palette only, colour
- * and width by the terminal's look, a spinner and a progress bar on a terminal and plain lines elsewhere), the prompts, the run log and the memory of hints in the
+ * Layer 3 of Headless, the command-line surface (commons headless 0004-headless-cli): the calm renderer (marks from the ui's one table of icons, colours from its one theme,
+ * emoji and colour by the terminal's capabilities, a spinner and a progress bar on a terminal and plain lines elsewhere), the prompts, the run log and the memory of hints in the
  * program's folder of state, the signals, the help, completions and man page generated from the tree, the run boundary `run(program, argv, io)`, and
  * the launcher. It imports the terminal, the system and Core, and the layers below; it does not import the telemetry (an adapter, `./otel`, reports a
  * run through the observer port of `Io`).
@@ -26,3 +26,4 @@ export * from "./run.ts";
 export * from "./signals.ts";
 export * from "./state.ts";
 export * from "./style.ts";
+export * from "./view.ts";

@@ -1,0 +1,38 @@
+### plain at 80
+
+[you] send the change to synthetic-repo-01
+   The change is checked first
+   run: tool send --to synthetic-repo-01
+[todo] no token for synthetic-host-02 yet [P001-TOKEN]
+   run: tool token synthetic-host-02
+-> the remote is off
+   run: tool remote on
+   power on synthetic-host-01
+[ok] Up to date · 1 for you · 1 waiting · 1 optional
+next: tool send --to synthetic-repo-01
+
+### ansi at 80
+
+␛[36;1m[you]␛[0m send the change to synthetic-repo-01
+   The change is checked first
+   ␛[2mrun: tool send --to synthetic-repo-01␛[0m
+␛[2m[todo]␛[0m no token for synthetic-host-02 yet␛[2m [P001-TOKEN]␛[0m
+   ␛[2mrun: tool token synthetic-host-02␛[0m
+␛[36;1m->␛[0m the remote is off
+   ␛[2mrun: tool remote on␛[0m
+   ␛[2mpower on synthetic-host-01␛[0m
+␛[32m[ok]␛[0m ␛[32mUp to date · 1 for you · 1 waiting · 1 optional␛[0m
+␛[36;1mnext:␛[0m tool send --to synthetic-repo-01
+
+### full at 80
+
+␛[1;38;2;102;204;238m⚡␛[0m send the change to synthetic-repo-01
+   The change is checked first
+   ␛[38;2;136;136;136mrun: tool send --to synthetic-repo-01␛[0m
+␛[38;2;136;136;136m⏳␛[0m no token for synthetic-host-02 yet␛[38;2;136;136;136m [P001-TOKEN]␛[0m
+   ␛[38;2;136;136;136mrun: tool token synthetic-host-02␛[0m
+␛[1;38;2;102;204;238m👉␛[0m the remote is off
+   ␛[38;2;136;136;136mrun: tool remote on␛[0m
+   ␛[38;2;136;136;136mpower on synthetic-host-01␛[0m
+␛[38;2;102;204;136m✅␛[0m ␛[38;2;102;204;136mUp to date · 1 for you · 1 waiting · 1 optional␛[0m
+👉 ␛[1;38;2;102;204;238mnext:␛[0m tool send --to synthetic-repo-01

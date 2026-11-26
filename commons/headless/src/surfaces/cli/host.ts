@@ -1,4 +1,4 @@
-// Spec: 0004-headless-cli FR-011, FR-013
+// Spec: 0004-headless-cli FR-011, FR-013, FR-016
 /**
  * The one place the command line touches a process (commons headless 0004-headless-cli FR-011, FR-013): it binds `Io` to this process's environment,
  * streams, clock, signals and files, and `launch` runs a program with it, making the check of its start first where it has one. Everything else in
@@ -13,6 +13,7 @@
  * @module
  */
 import { fs, path, proc, stdio, tty } from "@intellectual-frontiers/system";
+import { capabilitiesOf, type UiCaps } from "@intellectual-frontiers/terminal/ui";
 import type { Program } from "@intellectual-frontiers/headless/logical";
 import type { Io, RunObserver, SignalPort, TimerPort } from "./io.ts";
 import { formatStartupFailure, startupExit, type StartupFailure } from "./launcher.ts";
@@ -101,10 +102,28 @@ export async function readStdinLine(): Promise<string | undefined> {
   }
 }
 
+/** The environment of this process as a record, as the capabilities of a terminal are decided from it. */
+function processEnv(): Readonly<Record<string, string | undefined>> {
+  return proc.env.toObject();
+}
+
+/**
+ * The capabilities of this process's two streams, decided once (0004-headless-cli FR-016): `capabilitiesOf` of the environment and of each stream's `isTTY` and size. A host (a program's `main`) that wants the same look elsewhere,
+ * for a table it writes itself, takes them from `hostCaps` and gives them to the drawing functions (`tableLines`, `keyValues`, `sectionHeader`) or to `launch` as `io: { caps, outCaps }`.
+ */
+export function hostCaps(env: Readonly<Record<string, string | undefined>> = processEnv()): { readonly caps: UiCaps; readonly outCaps: UiCaps } {
+  const size = tty.consoleSize();
+  const stream = (name: "stdout" | "stderr") => ({ isTTY: tty.isTerminal(name), ...(size === undefined ? {} : { columns: size.columns, rows: size.rows }) });
+  return { caps: capabilitiesOf(env, stream("stderr")), outCaps: capabilitiesOf(env, stream("stdout")) };
+}
+
 /** The `Io` of this process; its output is written as it comes. */
 export function hostIo(options: { readonly observer?: RunObserver } = {}): Io {
   const size = tty.consoleSize();
+  const { caps, outCaps } = hostCaps();
   return {
+    caps,
+    outCaps,
     env: (name) => {
       const v = proc.env.get(name);
       return v === "" ? undefined : v;
