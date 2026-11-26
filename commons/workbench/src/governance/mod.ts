@@ -8,3 +8,4 @@ export * from "./terms.ts";
 export * from "./roles.ts";
 export * from "./contract.ts";
 export * from "./catalog.ts";
+export * from "./operate.ts";

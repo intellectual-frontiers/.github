@@ -32,3 +32,14 @@ requirement	mechanism	by	note
 0003-workbench-contract FR-006	check	.github: cd commons/workbench && bun run verify	suite/contract.test.ts
 0003-workbench-contract FR-007	check	.github: cd commons/workbench && bun run verify	suite/collect.test.ts
 0005-workbench-resolution FR-007	check	.github: cd commons/workbench && bun run verify	suite/cli.test.ts
+0007-workbench-operate FR-001	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-002	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-003	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-004	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-005	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-006	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-007	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-008	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-009	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-010	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
+0007-workbench-operate FR-011	check	.github: cd commons/workbench && bun run verify	suite/operate.test.ts
