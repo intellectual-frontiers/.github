@@ -18,7 +18,7 @@ const unwrap = <T, E>(r: { readonly kind: "ok"; readonly value: T } | { readonly
   return r.value;
 };
 const ADA = unwrap(person("ada", "Ada"));
-const IMPORTER = unwrap(tool("opsfolio-findings", "opsfolio findings", ADA));
+const IMPORTER = unwrap(tool("synth-findings", "synth findings", ADA));
 const F = (id: string, over: Partial<Finding> = {}): Finding => ({ id, rule: "40012", title: `Title ${id}`, severity: "high", asset: "portal", location: "https://app.example.test/search", description: "XSS is possible.", solution: "Encode output.", cwe: ["CWE-79"], cve: [], evidence: "Cookie: [redacted]", source: { tool: "zap", version: "2.15.0", file: "zap.json" }, ...over });
 
 /** A finding opened and then acted on, as Planning's events, folded. */
@@ -65,7 +65,7 @@ proves(["0004-findings-lifecycle FR-001"], "a finding is opened as an item of th
   assert(item.body.includes("XSS is possible.") && item.body.includes("Solution: Encode output."));
   const v = life.status();
   assertEquals([v.status, v.severity, v.asset, v.tool, v.cwe, v.fingerprint], ["open", "high", "portal", "zap", ["CWE-79"], "3fa9c1d2e4b5a697"]);
-  assertEquals(FINGERPRINT_SOURCE, "opsfolio-findings");
+  assertEquals(FINGERPRINT_SOURCE, "ifc-findings");
   for (const [sev, planning] of [["critical", "error"], ["high", "error"], ["medium", "warning"], ["low", "note"], ["info", "note"]] as const) assertEquals(new Life(F("a", { severity: sev })).item.severity, planning, sev);
   assertEquals(new Life(F("a", { severity: "critical" })).status().severity, "critical", "the five levels survive the three of Planning");
   const agentActor = unwrap(agent("scanner", "a scanner", ADA, "session"));

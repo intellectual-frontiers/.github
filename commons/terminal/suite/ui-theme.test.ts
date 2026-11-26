@@ -103,7 +103,7 @@ proves(["0002-ui FR-024"], "the sources of the ui import only core, the palette,
     const text = readFileSync(`${dir}${f}`, "utf8");
     const specs = [...text.matchAll(/(?:^|\n)\s*(?:import|export)\b[^;]*?\bfrom\s+"([^"]+)"/g)].map((m) => m[1] ?? "");
     for (const s of specs) assert(allowed(s), `${f} imports ${s}`);
-    assert(!/opsfolio|erga/i.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), `${f} names a domain`);
+    assert(!/erga/i.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), `${f} names a domain`);
   }
 });
 

@@ -67,7 +67,7 @@ const tasks = ["Enroll a bootable server", "Enroll a server", "Converge a host",
 const FOOTER = "up/down choose   Enter open   / search   Ctrl+C quit";
 const home = (columns: number, rows: number, colour = false) =>
   renderHome(
-    { title: "Opsfolio", chips: [{ text: "fleet 1 tenant, 2 hosts, 1 plan waiting", role: "accent" }], body: (size) => renderSelect(selectStart(tasks, 1), size, { colour }), footer: FOOTER },
+    { title: "Synth", chips: [{ text: "fleet 1 tenant, 2 hosts, 1 plan waiting", role: "accent" }], body: (size) => renderSelect(selectStart(tasks, 1), size, { colour }), footer: FOOTER },
     { columns, rows },
     { colour },
   );
@@ -80,7 +80,7 @@ proves(["0002-ui FR-022"], "home at 100x30 and 60x24 on vt: header, body, footer
     const s = createScreen({ width: columns, height: rows });
     s.write(frameOf(d));
     const out = s.lines();
-    assert(out[0]?.startsWith(" Opsfolio") === true && out[0]?.includes("fleet 1 tenant, 2 hosts, 1 plan waiting") === true);
+    assert(out[0]?.startsWith(" Synth") === true && out[0]?.includes("fleet 1 tenant, 2 hosts, 1 plan waiting") === true);
     assertEquals(out[3], "> Enroll a server");
     assertEquals(out[rows - 1], ` ${FOOTER}`);
   }
@@ -97,7 +97,7 @@ proves(["0002-ui FR-022"], "on a short screen the footer and the selected row ar
 });
 
 proves(["0002-ui FR-022"], "a narrow screen cuts the chips with ~ and keeps the title; colour only where allowed", () => {
-  const d = renderHome({ title: "Opsfolio", chips: [{ text: "fleet 1 tenant, 2 hosts, 1 plan waiting" }], body: () => drawnOf([]), footer: "x" }, { columns: 30, rows: 8 }, { colour: false });
-  assert(d.lines[0]?.startsWith(" Opsfolio") === true && d.lines[0]?.includes("~") === true && displayWidth(d.lines[0] ?? "") === 30);
+  const d = renderHome({ title: "Synth", chips: [{ text: "fleet 1 tenant, 2 hosts, 1 plan waiting" }], body: () => drawnOf([]), footer: "x" }, { columns: 30, rows: 8 }, { colour: false });
+  assert(d.lines[0]?.startsWith(" Synth") === true && d.lines[0]?.includes("~") === true && displayWidth(d.lines[0] ?? "") === 30);
   assertEquals(home(60, 24, true).lines.map(bare), home(60, 24, false).lines);
 });

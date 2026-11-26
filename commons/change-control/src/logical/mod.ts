@@ -6,5 +6,5 @@
  */
 export { allowedSigners, judgeRange, matches, parsePolicy } from "./judge.ts";
 export type { Commit, Judgement, Verdict } from "./judge.ts";
-export { RECOVERY_DAYS, checkKeys, opensshSigns, opensshVersion, recoveryOverdue, renderSigners, replaceKey, sameKey, signingWorks, withSigner } from "./keys.ts";
-export type { Facts, Finding } from "./keys.ts";
+export { NEUTRAL_KEY_HINTS, RECOVERY_DAYS, checkKeys, opensshSigns, opensshVersion, recoveryOverdue, renderSigners, replaceKey, sameKey, signingWorks, withSigner } from "./keys.ts";
+export type { Facts, Finding, KeyHints } from "./keys.ts";

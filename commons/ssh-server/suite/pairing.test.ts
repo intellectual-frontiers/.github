@@ -44,7 +44,7 @@ proves(["0002-enrollment-protocol FR-018"], "an honest handshake gives the devic
   const r = ok(pairReveal(c.session, d.reveal, fpOf(DEVICE), true, p, DIGITS, 2000));
   assert(r.kind === "ok");
   assertEquals(commit(p, r.out["nc"] as string, r.out["controllerHostKey"] as string), cc, "the device can verify the controller's commitment");
-  const deviceCode = codeOf(sha(`opsfolio-sas-v1\n${CONTROLLER}\n${DEVICE}\n${r.out["nc"]}\n${nd}`), DIGITS);
+  const deviceCode = codeOf(sha(`ifc-enroll-sas-v1\n${CONTROLLER}\n${DEVICE}\n${r.out["nc"]}\n${nd}`), DIGITS);
   assertEquals(r.session.pairing?.sas, deviceCode);
   assert(/^[0-9]{6}$/.test(deviceCode));
   const wrong = confirmPairing(r.session, "000000" === deviceCode ? "111111" : "000000", "synthetic-person-01", { steps: [] }, DIGITS, 3, 3000);

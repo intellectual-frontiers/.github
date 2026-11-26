@@ -36,7 +36,7 @@ proves(["0004-scripts FR-009"], engine ? "the sh script on a real Debian 13 cont
     }
     const boot = await ssh(f.port, ["bootstrap"], "", "s-enroll", [...SSH_BASE, "-o", "BatchMode=no"]);
     assertEquals(boot.code, 0, boot.stderr);
-    const args = ["run", "--rm", "-i", "--network", "host", "-e", `OPSFOLIO_HOST=127.0.0.1`, "-e", `OPSFOLIO_PORT=${f.port}`, "-e", "OPSFOLIO_CONSENT=yes", "-e", "OPSFOLIO_POLL=1", "-e", "OPSFOLIO_SSH_OPTS=-F none -o LogLevel=ERROR", "-e", `HTTPS_PROXY=${process.env["HTTPS_PROXY"] ?? ""}`, "-e", "CURL_CA_BUNDLE=/usr/local/share/ca.crt", IMAGE, "sh"];
+    const args = ["run", "--rm", "-i", "--network", "host", "-e", `SYNTH_HOST=127.0.0.1`, "-e", `SYNTH_PORT=${f.port}`, "-e", "SYNTH_CONSENT=yes", "-e", "SYNTH_POLL=1", "-e", "SYNTH_SSH_OPTS=-F none -o LogLevel=ERROR", "-e", `HTTPS_PROXY=${process.env["HTTPS_PROXY"] ?? ""}`, "-e", "CURL_CA_BUNDLE=/usr/local/share/ca.crt", IMAGE, "sh"];
     const child = spawn("docker", args, { stdio: ["pipe", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";

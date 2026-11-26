@@ -26,12 +26,12 @@ async function sha256(file: string): Promise<string> {
 async function tool(dir: string, name: string, prints: string): Promise<{ readonly file: string; readonly mark: string; readonly pins: (version?: string) => Promise<Pins> }> {
   const file = path.join(dir, name);
   const mark = path.join(dir, `${name}.mark`);
-  await fs.writeTextFile(file, `#!/bin/sh\n{ echo "args: $*"; echo "cwd: $(pwd)"; echo "home: $HOME"; echo "secret: \${OPSFOLIO_TEST_SECRET:-none}"; echo "path: $PATH"; } > '${mark}'\ncat <<'EOF'\n${prints}\nEOF\n`);
+  await fs.writeTextFile(file, `#!/bin/sh\n{ echo "args: $*"; echo "cwd: $(pwd)"; echo "home: $HOME"; echo "secret: \${SYNTH_TEST_SECRET:-none}"; echo "path: $PATH"; } > '${mark}'\ncat <<'EOF'\n${prints}\nEOF\n`);
   await fs.chmod(file, 0o755);
   return { file, mark, pins: async (version = "1.0.0") => ({ [name]: { version, path: file, sha256: await sha256(file) } }) };
 }
 
-const input = (over: Partial<RunInput>): RunInput => ({ scanner: "nuclei", asset: "portal", target: { kind: "endpoint", value: "https://app.example.test" }, authorize: yes, pins: {}, now: NOW, ...over });
+const input = (over: Partial<RunInput>): RunInput => ({ scanner: "nuclei", asset: "portal", target: { kind: "endpoint", value: "https://app.example.test" }, authorize: yes, pins: {}, now: NOW, program: "synth", ...over });
 
 proves(["0004-scanners-run FR-001"], "a run is refused with the reason and a record, before anything else, for an unknown scanner, a target of the wrong kind or an unfit one, and a path that does not exist", async () => {
   const bad = [
@@ -73,7 +73,7 @@ proves(["0004-scanners-run FR-003"], "a tool runs only when it has a pin and the
   await fs.withTempDir(async (dir) => {
     const t = await tool(dir, "nuclei", NUCLEI_LINE);
     const none = await runScanner(input({ pins: {} }));
-    assert(none.kind === "err" && none.error.reason.includes("has no pin") && none.error.reason.includes("opsfolio scan pin"));
+    assert(none.kind === "err" && none.error.reason.includes("has no pin") && none.error.reason.includes("synth scan pin"));
     const pins = await t.pins("3.3.0");
     const missing = await runScanner(input({ pins: { nuclei: { ...(pins["nuclei"] as { version: string; path: string; sha256: string }), path: path.join(dir, "gone") } } }));
     assert(missing.kind === "err" && missing.error.reason.includes("does not exist") && missing.error.reason.includes("3.3.0"));
@@ -90,7 +90,7 @@ proves(["0004-scanners-run FR-003"], "a tool runs only when it has a pin and the
 
 proves(["0004-scanners-run FR-004"], "a tool is started with a list of arguments, in an empty folder that is removed afterwards, with a bare environment that holds no secret of the caller, and is stopped at its time limit", async () => {
   await fs.withTempDir(async (dir) => {
-    process.env["OPSFOLIO_TEST_SECRET"] = "hunter2-made-up";
+    process.env["SYNTH_TEST_SECRET"] = "hunter2-made-up";
     try {
       const t = await tool(dir, "nmap", `<?xml version="1.0"?><nmaprun version="7.95"><host><address addr="192.0.2.10"/><ports><port protocol="tcp" portid="22"><state state="open"/><service name="ssh"/></port></ports></host></nmaprun>`);
       const r = await runScanner(input({ scanner: "nmap", target: { kind: "host", value: "synthetic-server-02.example.test" }, pins: await t.pins() }));
@@ -100,11 +100,11 @@ proves(["0004-scanners-run FR-004"], "a tool is started with a list of arguments
       assert(mark.includes("secret: none") && !mark.includes("hunter2"), "the caller's environment does not reach the tool");
       assert(mark.includes("path: /usr/local/bin:/usr/bin:/bin"), mark);
       const cwd = /cwd: (.*)/.exec(mark)?.[1] ?? "";
-      assert(cwd.includes("opsfolio-scan-") && cwd !== dir, cwd);
+      assert(cwd.includes("synth-scan-") && cwd !== dir, cwd);
       assertEquals(/home: (.*)/.exec(mark)?.[1], cwd);
       assert(!(await fs.exists(cwd)), "the working folder is removed afterwards");
     } finally {
-      delete process.env["OPSFOLIO_TEST_SECRET"];
+      delete process.env["SYNTH_TEST_SECRET"];
     }
     const slow = path.join(dir, "nuclei");
     await fs.writeTextFile(slow, "#!/bin/sh\nexec sleep 30\n");

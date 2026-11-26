@@ -21,8 +21,8 @@ export type CryptoPort = {
 };
 
 /** The domain tags: a commitment and a string are never made of the same text. */
-export const COMMIT_TAG = "opsfolio-commit-v1";
-export const SAS_TAG = "opsfolio-sas-v1";
+export const COMMIT_TAG = "ifc-enroll-commit-v1";
+export const SAS_TAG = "ifc-enroll-sas-v1";
 /** The code of an error where a pairing is burned. */
 export const BURNED = "E-SSH-PAIRING-BURNED";
 

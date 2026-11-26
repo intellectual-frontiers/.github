@@ -1,6 +1,6 @@
 # `.github`: agent entry point
 
-This file is an index: each rule is one or two sentences and names where it is stated in full ([how it is prepared and used](commons/docs/guides/agents-md.md), [0011-documentation FR-043](commons/spec-kit/specs/0011-documentation/spec.md)). The repository is small on purpose: the public profile (`profile/`), the one-command installers of agora (`bin/`), `commons/` (what any company or harness of Intellectual Frontiers may use, with its own ontology, specifications and generated tables; the site is <https://intellectual-frontiers.github.io/.github/>) and `tests/`. Erga, its specifications, ontology and content are in the private `erga` repository: add none of it here.
+This file is an index: each rule is one or two sentences and names where it is stated in full ([agents-md](commons/docs/guides/agents-md.md), 0011-documentation FR-043). The repository is small on purpose: the public profile (`profile/`), the one-command installers of agora (`bin/`), `commons/` (what any company or harness of Intellectual Frontiers may use, with its own ontology and specifications; the site is <https://intellectual-frontiers.github.io/.github/>) and `tests/`. Erga, its specifications, ontology and content are in the private `erga` repository: add none of it here.
 
 - **Between edits run `bun run dev:check`** (once `bun install`); `bun run repoctl prove [--why|--plan]` proves a change by its blast radius; CI runs the rest, once, in `ci.auto.yml`. The development loop is not the release loop: [the loop](commons/docs/guides/ops-dev-loop.md), [proof by blast radius](commons/docs/guides/proof-by-blast-radius.md), [CI](commons/docs/guides/ops-ci-cd.md), commons 0001-libraries FR-011, FR-012.
 - **Push small steps to `main`**: `bun run repoctl merge origin/main`, then `bun run repoctl commit -m "Subject" --refs N`, then `git push origin HEAD:main`; never force-push. Set `git config user.name` and `user.email` before you pull. Every commit is made by `repoctl commit`, authored as Shahid Shah with the GitHub no-reply address (an agent is the author only where a person expressly authorizes it in the message), names its ticket and credits the agent in `Co-Authored-By`: [push small steps](commons/docs/guides/ops-dev-loop.md), [0007-repoctl-hygiene FR-007](commons/repoctl/spec-kit/specs/0007-repoctl-hygiene/spec.md), [the attribution Decision](commons/spec-kit/specs/../audits/2026-11-agent-attribution.md).
@@ -17,15 +17,12 @@ This file is an index: each rule is one or two sentences and names where it is s
 - **License**: every part of this repository is under `PolyForm-Noncommercial-1.0.0` (0035-licensing); `bun commons/libraries/src/license.ts` writes every `LICENSE`, so never write a license text by hand.
 - **Never put a secret, a token or a person's data in this repository: it is public.**
 - **Renderers render, the SDK decides** (headless 0001-headless-layers FR-009): all functionality and capability is in the algebraically and strongly typed TypeScript SDK (commons); the REST API, command line, MCP server, terminal UI and GUI only collect typed inputs, call the SDK, render typed results and relay a person's explicit act, are generated from one command definition and decide nothing; every domain decision is an SDK function.
-- **A fact a program owns is a generated block between marks** (the libraries map of the README, the workbench block below): never edit inside the marks. What a check can enforce is a requirement with an enforcement row, not prose here.
+- **IF Commons holds no product code: products pass a Brand** (0027-commons-libraries FR-028); `tests/commons-no-product.test.ts` enforces it.
+- **A fact a program owns is a generated block between marks**: never edit inside the marks. What a check can enforce is a requirement with an enforcement row, not prose here.
 
 ## Building something a person will use
 
-- Write the person's instruction set first, in three steps or fewer, before any code.
-- Show the owner a plan, then screenshots of the surface early; real terminal or browser captures, never mock-ups.
-- Rehearse as a junior with only the README, against a real container, before you ask the owner to test.
-- No acceptance-specific logic and no real names in platform code.
-- Surfaces carry no logic: they call the SDK.
+Write the person's steps first, show real captures early, rehearse as a junior; surfaces carry no logic.
 
 <!-- workbench:begin -->
 ## The workbench

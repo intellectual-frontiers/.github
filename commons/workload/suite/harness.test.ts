@@ -115,8 +115,8 @@ proves(["0007-workload-harness FR-007"], "a registered dialect receives the opti
   const seen: (string | undefined)[] = [];
   const mine: DialectImpl = { info: MINIMAL, render: (views, options) => { seen.push(options?.verbCommand); return views.map((v) => ({ path: `minimal/${v.id}.txt`, text: `${v.id}\n` })); } };
   const impls = must(registerDialect(DIALECT_IMPLS, mine, WITH_MINIMAL));
-  projectAll([viewOf(RESTORE_DRILL)], impls, { verbCommand: "opsfolio verb" });
-  assertEquals(seen, ["opsfolio verb"]);
+  projectAll([viewOf(RESTORE_DRILL)], impls, { verbCommand: "synth verb" });
+  assertEquals(seen, ["synth verb"]);
   let thrown: unknown;
   try { projectAll([viewOf(RESTORE_DRILL)], impls, { verbCommand: "a; b" }); } catch (e) { thrown = e; }
   assert(thrown instanceof Error && thrown.message.startsWith("E-WL-HARNESS-COMMAND-INVALID"));

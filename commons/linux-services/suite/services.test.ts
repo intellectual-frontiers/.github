@@ -155,7 +155,7 @@ proves(["0002-linux-services-profiles FR-008"], "the Cloudflare provider pages t
 });
 
 const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-const ACCESS = { machine: "synthetic-server-01", user: "ops", program: "opsfolio", keys: [{ name: "reader", publicKey: `${KEY} reader@example`, role: "read-only" }, { name: "admin", publicKey: KEY, role: "full", from: ["192.0.2.0/24"] }] };
+const ACCESS = { machine: "synthetic-server-01", user: "ops", program: "synth", keys: [{ name: "reader", publicKey: `${KEY} reader@example`, role: "read-only" }, { name: "admin", publicKey: KEY, role: "full", from: ["192.0.2.0/24"] }] };
 
 proves(["0002-linux-services-profiles FR-009"], "each key of a tool-server access forces the program's mcp under restrict, a read-only key says so, and a key that is not one public key line is refused", () => {
   const p = parseMcpAccess(ACCESS);
@@ -163,8 +163,8 @@ proves(["0002-linux-services-profiles FR-009"], "each key of a tool-server acces
   const keys = mcpAuthorizedKeys(p.value);
   assert(keys.kind === "ok");
   const lines = keys.value.split("\n").filter((l) => !l.startsWith("#") && l !== "");
-  assertEquals(lines[0], `restrict,command="opsfolio mcp --read-only" ${KEY} reader@example`);
-  assertEquals(lines[1], `restrict,from="192.0.2.0/24",command="opsfolio mcp" ${KEY}`);
+  assertEquals(lines[0], `restrict,command="synth mcp --read-only" ${KEY} reader@example`);
+  assertEquals(lines[1], `restrict,from="192.0.2.0/24",command="synth mcp" ${KEY}`);
   const r = mcpAccessRequirements(p.value);
   assertEquals(ids(r).ids, ["services.mcp-ops.ssh-dir", "services.mcp-ops.keys"]);
   for (const bad of [{ ...ACCESS, keys: [{ name: "k", publicKey: canaryText("openssh-private-key"), role: "full" }] }, { ...ACCESS, keys: [{ name: "k", publicKey: `command="x" ${KEY}`, role: "full" }] }, { ...ACCESS, program: 'x" --evil' }, { ...ACCESS, keys: [] }]) assertEquals(parseMcpAccess(bad).kind, "err");

@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { sealPayload } from "./bundle.ts";
- * sealPayload({ fleet: "synthetic-network-01", branch: "evidence", seq: 3, head: "ab".repeat(32), at: "2026-12-01T10:00:00Z" }).includes("opsfolio-seal/1"); // true
+ * sealPayload({ fleet: "synthetic-network-01", branch: "evidence", seq: 3, head: "ab".repeat(32), at: "2026-12-01T10:00:00Z" }).includes("ifc-seal/1"); // true
  * ```
  *
  * @module
@@ -28,11 +28,11 @@ const text = (b: Uint8Array | undefined): string | undefined => (b === undefined
 
 /** The payload a seal signs: the fleet, the branch and the position and digest of the head of the journal, and when. */
 export function sealPayload(s: { readonly fleet: string; readonly branch: string; readonly seq: number; readonly head: string; readonly at: string }): string {
-  return canonicalize({ format: "opsfolio-seal/1", fleet: s.fleet, branch: s.branch, seq: s.seq, head: s.head, sealedAt: s.at });
+  return canonicalize({ format: "ifc-seal/1", fleet: s.fleet, branch: s.branch, seq: s.seq, head: s.head, sealedAt: s.at });
 }
 
 /** The payload type of a seal. */
-export const SEAL_PAYLOAD_TYPE = "application/vnd.opsfolio.seal+json";
+export const SEAL_PAYLOAD_TYPE = "application/vnd.ifc.seal+json";
 
 /** A signer a seal or a bundle is verified with: its name, its role and its public key line. */
 export type TrustedSigner = { readonly name: string; readonly role: string; readonly key: string };
@@ -154,7 +154,7 @@ export async function exportBundle(store: GitRefStore, o: ExportOptions): Promis
 
 /** The policy a bundle is verified with: signers of the roles given may attest, with a key in a file, and evidence is kept as long as the verifier says. */
 export function bundlePolicy(roles: readonly string[], retention = "P10Y"): EvidencePolicy {
-  const decoded = evidencePolicy.decode({ kind: "grc.evidence-policy", schema: "1", id: "policy:opsfolio-bundle", createdAt: "2026-01-01T00:00:00Z", provenance: provenanceOf([]), counts: [], retention, attesters: [...roles], custody: "file" });
+  const decoded = evidencePolicy.decode({ kind: "grc.evidence-policy", schema: "1", id: "policy:evidence-bundle", createdAt: "2026-01-01T00:00:00Z", provenance: provenanceOf([]), counts: [], retention, attesters: [...roles], custody: "file" });
   if (decoded.kind === "err") throw new Error(`the policy of a bundle does not decode: ${decoded.error.path}`);
   return decoded.value;
 }

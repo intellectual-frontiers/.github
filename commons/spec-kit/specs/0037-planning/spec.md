@@ -138,7 +138,7 @@ The monorepo's issue record (entries 1 to 6 of `inventory.md`) has: ten event ty
 
 - A user interface, a calendar, a time tracker and estimates: Planning holds what is planned, not who does it when.
 - The typed issues of the weaknesses of a library of `commons/data` and their copy in a database: FR-024 makes them a source of Planning, and this specification does not change them; the database copy stays as the specifications of `commons/data` have it (data 0044-issues and data 0045-issues-model).
-- The findings of the Quality System, pen test findings of Opsfolio and the like: a later phase, after experience with the library; `inventory.md` says where each would attach and nothing is modeled for them now.
+- The findings of the Quality System, pen test findings of a host product and the like: a later phase, after experience with the library; `inventory.md` says where each would attach and nothing is modeled for them now.
 - The monorepo's issue schema: Planning reads and writes it as it is; a change to it (OQ-10) is the monorepo's.
 - The release, the version and the publication of the package: the release of commons.
 

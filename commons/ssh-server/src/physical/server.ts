@@ -10,8 +10,8 @@ import { reverse } from "node:dns/promises";
 import { readFile } from "node:fs/promises";
 import ssh2 from "ssh2";
 import type { AuthContext, Connection, ServerChannel, Session } from "ssh2";
-import { DEFAULT_SERVER_POLICY, PERSON_DECIDES, accountOf } from "@intellectual-frontiers/ssh-server/governance";
-import type { AuditEvent, ChainedEvent, EnrollPolicy, EnrollmentSession, Facts, Fingerprint, HostKey, InstallPlan, OfferedKey, ServerPolicy, SessionId, ServiceAccount } from "@intellectual-frontiers/ssh-server/governance";
+import { SERVER_POLICY_DEFAULTS, brandProblems, PERSON_DECIDES, accountOf } from "@intellectual-frontiers/ssh-server/governance";
+import type { AuditEvent, ChainedEvent, EnrollPolicy, EnrollmentSession, Facts, Fingerprint, HostKey, InstallPlan, OfferedKey, ServerIdentity, ServerPolicy, SessionId, ServiceAccount } from "@intellectual-frontiers/ssh-server/governance";
 import {
   CLEAN,
   OSQUERY_PINS,
@@ -44,7 +44,8 @@ export type EnrollServerOptions = {
   readonly port?: number;
   readonly host?: string;
   readonly hostKeyPath: string;
-  readonly policy?: Partial<ServerPolicy>;
+  /** The policy: the identity (endpoint and brand) is REQUIRED, this library has no default product name; the rest changes the defaults. */
+  readonly policy: Partial<Omit<ServerPolicy, "endpoint" | "brand">> & ServerIdentity;
   readonly enroll?: EnrollPolicy;
   readonly store: EnrollStore;
   readonly clock?: () => number;
@@ -114,7 +115,9 @@ function normaliseIp(ip: string | undefined): string {
 
 /** Start the enrollment server. Resolves once it listens. */
 export async function createEnrollServer(options: EnrollServerOptions): Promise<EnrollServer> {
-  const policy: ServerPolicy = { ...DEFAULT_SERVER_POLICY, ...options.policy };
+  const policy: ServerPolicy = { ...SERVER_POLICY_DEFAULTS, ...options.policy };
+  const bad = brandProblems(policy.brand);
+  if (bad.length > 0) throw new Error(`the brand is not usable: ${bad.join("; ")}`);
   const cidrs = checkCidrs(policy.allowCidrs);
   if (cidrs.kind === "err") throw new Error(cidrs.error);
   const clock = options.clock ?? Date.now;
@@ -151,7 +154,7 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
     penalties.set(ip, strike(penalties.get(ip) ?? CLEAN, policy.penalty, clock()));
   };
 
-  const server = new Server({ hostKeys: [loaded.privateKey], ident: "opsfolio-enroll_0.1" }, (client: Connection, info) => {
+  const server = new Server({ hostKeys: [loaded.privateKey], ident: policy.brand.serverIdent }, (client: Connection, info) => {
     const ip = options.peerAddress === undefined ? normaliseIp(info.ip) : options.peerAddress(normaliseIp(info.ip));
     const ident = String(info.header.identRaw ?? "").slice(0, 128);
     const event = (kind: AuditEvent["kind"], outcome: AuditEvent["outcome"], detail: string, more: Partial<AuditEvent> = {}): void => {

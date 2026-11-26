@@ -27,8 +27,8 @@ export type Status = (typeof STATUSES)[number];
 /** The states in which a finding still counts against the system. */
 export const OPEN_STATUSES: readonly Status[] = ["open", "confirmed", "reopened", "fixed"];
 
-/** The source name of the external id a finding carries: its fingerprint. */
-export const FINGERPRINT_SOURCE = "opsfolio-findings";
+/** The default source name of the external id a finding carries: its fingerprint. A product that files findings in a tracker of its own gives its own name where it writes the external id (IF Commons names no product). */
+export const FINGERPRINT_SOURCE = "ifc-findings";
 
 /** The labels the lifecycle uses. */
 export const LABEL = { confirmed: "triage:confirmed", falsePositive: "triage:false-positive", accepted: "risk-accepted", fixClaimed: "fix-claimed", reopened: "reopened" } as const;

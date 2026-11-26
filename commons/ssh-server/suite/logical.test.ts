@@ -5,7 +5,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { createHash } from "node:crypto";
-import { DEFAULT_SERVER_POLICY, GENESIS } from "../src/governance/mod.ts";
+import { GENESIS, SERVER_POLICY_DEFAULTS } from "../src/governance/mod.ts";
 import type { AuditEvent, Fingerprint, KnownAsset } from "../src/governance/mod.ts";
 import {
   CLEAN, TOKEN, authDecision, blocked, chainNext, checkPairing, checkToken, classify, classifyClient, constantTimeEqual, decideEnrollment, factsDrift, forgive, fullBucket, inAnyCidr, pairingCode,
@@ -16,7 +16,7 @@ import { syntheticFacts } from "./helpers.ts";
 
 const sha = (t: string): string => createHash("sha256").update(t).digest("hex");
 const fp = `SHA256:${"B".repeat(43)}` as Fingerprint;
-const POLICY = { accounts: DEFAULT_SERVER_POLICY.accounts, anonymous: DEFAULT_SERVER_POLICY.anonymous, maxAuthTries: 3 } as const;
+const POLICY = { accounts: SERVER_POLICY_DEFAULTS.accounts, anonymous: SERVER_POLICY_DEFAULTS.anonymous, maxAuthTries: 3 } as const;
 
 proves(["0003-server-policy FR-001", "0003-server-policy FR-002", "0003-server-policy FR-003"], "authDecision: accounts, an unsigned key is a query and never proof, a bad signature is refused, anonymous by policy", () => {
   const d = (over: Parameters<typeof authDecision>[1], failures = 0, policy: Parameters<typeof authDecision>[0] = POLICY) => authDecision(policy, over, { failures });

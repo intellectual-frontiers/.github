@@ -13,7 +13,7 @@ import { openEstateQuery, type EstateData } from "../src/logical/mod.ts";
 import { gatherLive } from "../src/physical/mod.ts";
 
 const asset = (id: string) => {
-  const r = defineAsset({ id, kind: "server", state: "managed", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "opsfolio"])) });
+  const r = defineAsset({ id, kind: "server", state: "managed", owners: Object.fromEntries(CAPABILITIES.map((c) => [c, "synth"])) });
   if (r.kind === "err") throw new Error(r.error.join("; "));
   return r.value;
 };

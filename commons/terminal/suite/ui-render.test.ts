@@ -164,7 +164,7 @@ proves(["0002-ui FR-010"], "a token that fits the width is never broken: an orde
     assert(lines.some((l) => l.includes(UUID)), `${columns} columns: the id is on one line, whole\n${lines.join("\n")}`);
     for (const l of lines) assert(displayWidth(l) <= columns);
   }
-  const narrow = wrap(`Command: opsfolio work run ${UUID} --apply`, 41, 2);
+  const narrow = wrap(`Command: synth work run ${UUID} --apply`, 41, 2);
   assertEquals(narrow.filter((l) => l.includes(UUID)).length, 1);
   for (const l of narrow) assert(displayWidth(l) <= 41);
 });

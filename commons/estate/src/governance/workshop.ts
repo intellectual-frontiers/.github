@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { workshopOwners } from "./workshop.ts";
- * workshopOwners({ system: "opsfolio", state: "adopted" }); // { observe: "opsfolio", verify: "opsfolio" }
+ * workshopOwners({ system: "synth", state: "adopted" }); // { observe: "synth", verify: "synth" }
  * ```
  *
  * @module

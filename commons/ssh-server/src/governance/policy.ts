@@ -29,6 +29,38 @@ export function accountOf(username: string): AccountSpec | undefined {
   return ACCOUNTS.find((a) => a.name === username);
 }
 
+/**
+ * What a product that hosts the server calls itself, given by the product and never by this library (IF Commons holds no product code). It names the things the scripts and the server say or create on a machine.
+ */
+export type Brand = {
+  /** The name of the product as a person reads it (the first line of a script and the answer of `hello`). */
+  readonly name: string;
+  /** The prefix of the environment variables a script reads (`PREFIX_HOST`, `PREFIX_PORT`, `PREFIX_CONSENT`, ...): capital letters, digits and `_`, starting with a letter. */
+  readonly envPrefix: string;
+  /** The folder a script keeps its state in on a POSIX machine (an absolute path) and, on Windows, the folder name under `ProgramData`. */
+  readonly stateDir: { readonly posix: string; readonly windows: string };
+  /** The comment of the key a device makes (`ssh-keygen -C`). */
+  readonly keyComment: string;
+  /** The identification of the server in the SSH banner (`name-enroll_0.1`). */
+  readonly serverIdent: string;
+  /** What a person types on the controller to approve a session, given its id and the code the device shows (a string for a person to read, never run by a script). */
+  readonly approveHint: (sessionId: string, code: string) => string;
+};
+
+/** Whether a brand is well formed: its prefix is a legal variable prefix and its texts are single printable lines without quotes or shell syntax. Returns the reasons it is not. */
+export function brandProblems(b: Brand): readonly string[] {
+  const out: string[] = [];
+  if (!/^[A-Z][A-Z0-9_]*$/.test(b.envPrefix)) out.push("envPrefix is capital letters, digits and _");
+  if (!/^[A-Za-z0-9 ._-]{1,64}$/.test(b.name)) out.push("name is 1 to 64 letters, digits, spaces, dots, underscores and hyphens");
+  if (!/^\/[A-Za-z0-9._/-]{1,100}$/.test(b.stateDir.posix)) out.push("stateDir.posix is an absolute path of safe characters");
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(b.stateDir.windows)) out.push("stateDir.windows is a folder name of safe characters");
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(b.keyComment)) out.push("keyComment is safe characters");
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(b.serverIdent)) out.push("serverIdent is safe characters");
+  const hint = b.approveHint("en-x", "000000");
+  if (!/^[A-Za-z0-9 ._:/@=+,%<>-]{1,300}$/.test(hint)) out.push("approveHint gives one line of safe characters (no quote, backslash, dollar or semicolon)");
+  return out;
+}
+
 /** The server policy. */
 export type ServerPolicy = {
   /** The service accounts the server accepts (only built ones can be listed). */
@@ -38,8 +70,10 @@ export type ServerPolicy = {
   readonly anonymous: AnonymousMode;
   /** The CIDR blocks a source may be in, as well as the private ranges (RFC 1918, loopback, link-local, ULA) that are always allowed. Public ranges are refused unless listed here. */
   readonly allowCidrs: readonly string[];
-  /** A name and a port the scripts say to a person and call. */
+  /** A name and a port the scripts say to a person and call. The product MUST give it: this library has no default name. */
   readonly endpoint: { readonly host: string; readonly port: number };
+  /** What the product calls itself in the scripts and the banner. The product MUST give it. */
+  readonly brand: Brand;
   readonly maxAuthTries: number;
   readonly maxConnections: number;
   readonly maxConnectionsPerIp: number;
@@ -63,13 +97,15 @@ export type PairingConfig = { readonly kind: "digits" | "letters"; readonly leng
 /** The alphabet of letter codes: no I, L, O (and no 0, 1) so that a person reading aloud or typing cannot mistake one for another. */
 export const LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ";
 
-/** The default server policy. */
-export const DEFAULT_SERVER_POLICY: ServerPolicy = {
+/** What a product must give the server: where devices reach it and what it is called. */
+export type ServerIdentity = Pick<ServerPolicy, "endpoint" | "brand">;
+
+/** The defaults of the server policy, with no endpoint and no brand: see {@link serverPolicy}. */
+export const SERVER_POLICY_DEFAULTS: Omit<ServerPolicy, "endpoint" | "brand"> = {
   accounts: ["s-enroll", "s-device"],
   transcriptBytes: 0,
   anonymous: "keyboard-interactive",
   allowCidrs: [],
-  endpoint: { host: "opsfolio", port: 2222 },
   maxAuthTries: 6,
   maxConnections: 64,
   maxConnectionsPerIp: 8,
@@ -84,6 +120,11 @@ export const DEFAULT_SERVER_POLICY: ServerPolicy = {
   pairingTtlMs: 5 * 60_000,
   maxPairingAttempts: 3,
 };
+
+/** The policy of a product: the defaults, its identity and the changes it wants. */
+export function serverPolicy(identity: ServerIdentity, changes: Partial<Omit<ServerPolicy, "endpoint" | "brand">> = {}): ServerPolicy {
+  return { ...SERVER_POLICY_DEFAULTS, ...changes, endpoint: identity.endpoint, brand: identity.brand };
+}
 
 /** An inventory entry by which a device is approved: a serial, a MAC, a machine id or a host key fingerprint. */
 export type InventoryEntry = { readonly serial?: string; readonly mac?: string; readonly machineId?: string; readonly hostKey?: string; readonly tenant?: string; readonly fleet?: string; readonly labels?: readonly string[] };

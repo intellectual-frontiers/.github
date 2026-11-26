@@ -10,7 +10,7 @@ import { openEstateQuery, type EstateData } from "../src/logical/mod.ts";
 import { checkOf, estateConnection, runEstateChecks } from "../src/physical/mod.ts";
 
 function asset(id: string, state: "adopted" | "managed", without: readonly string[] = []): Asset {
-  const owners = state === "managed" ? Object.fromEntries(CAPABILITIES.filter((c) => !without.includes(c)).map((c) => [c, "opsfolio"])) : { observe: "opsfolio", verify: "opsfolio" };
+  const owners = state === "managed" ? Object.fromEntries(CAPABILITIES.filter((c) => !without.includes(c)).map((c) => [c, "synth"])) : { observe: "synth", verify: "synth" };
   const r = defineAsset({ id, kind: "server", state, ...(without.includes("provision") ? { origin: "paired" as const } : {}), owners });
   if (r.kind === "err") throw new Error(r.error.join("; "));
   return r.value;

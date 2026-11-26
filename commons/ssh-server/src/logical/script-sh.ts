@@ -9,7 +9,7 @@
 import type { Pin } from "./pins.ts";
 import { offered } from "./pins.ts";
 import { LETTERS } from "@intellectual-frontiers/ssh-server/governance";
-import type { PairingConfig } from "@intellectual-frontiers/ssh-server/governance";
+import type { Brand, PairingConfig } from "@intellectual-frontiers/ssh-server/governance";
 import { COMMIT_TAG, SAS_TAG } from "./pairing.ts";
 import { quoted, script } from "./script-text.ts";
 
@@ -19,28 +19,30 @@ export type ScriptSession = { readonly id: string };
 export type Endpoint = { readonly host: string; readonly port: number };
 
 /** What else the scripts are rendered with: the host key of the controller as `algo base64` (embedded, so that there is no trust on first use; without it the script says that it trusts on first use), and the kind of code the person types. */
-export type ScriptOptions = { readonly hostKey?: string; readonly pairing?: PairingConfig };
+export type ScriptOptions = { readonly brand: Brand; readonly hostKey?: string; readonly pairing?: PairingConfig };
 
 /** The default options: a code of 6 digits and no embedded host key. */
 export const DEFAULT_SCRIPT_OPTIONS: Required<Pick<ScriptOptions, "pairing">> = { pairing: { kind: "digits", length: 6 } };
 
-/** Render the bootstrap script for POSIX sh (the one a Linux, BSD or macOS device runs: `ssh -p 2222 s-enroll@opsfolio bootstrap | sh`). */
-export function renderBootstrapSh(session: ScriptSession, pins: readonly Pin[], endpoint: Endpoint, options: ScriptOptions = {}): string {
+/** Render the bootstrap script for POSIX sh (the one a Linux, BSD or macOS device runs: `ssh -p 2222 s-enroll@HOST bootstrap | sh`). */
+export function renderBootstrapSh(session: ScriptSession, pins: readonly Pin[], endpoint: Endpoint, options: ScriptOptions): string {
+  const brand = options.brand;
+  const P = brand.envPrefix;
   const pairing = options.pairing ?? DEFAULT_SCRIPT_OPTIONS.pairing;
   const [hkAlgo = "", hkB64 = ""] = (options.hostKey ?? "").split(" ");
   const lines = (family: "linux" | "windows" | "macos"): string => offered(pins, family).map((p) => `    echo "  ${p}"`).join("\n") || '    echo "  nothing is offered for this system"';
   return script`#!/bin/sh
-# opsfolio enrollment bootstrap, for POSIX sh. Read it before you run it: ssh -p ${String(endpoint.port)} s-enroll@${endpoint.host} bootstrap > enroll.sh
+# ${brand.name} enrollment bootstrap, for POSIX sh. Read it before you run it: ssh -p ${String(endpoint.port)} s-enroll@${endpoint.host} bootstrap > enroll.sh
 # It reports facts about this machine, waits for a person to approve, asks you before it installs anything, and runs only the typed steps of the plan.
 # It holds no secret. It never evaluates what the server sends: it reads fields of a small alphabet and runs argument vectors without a shell.
 set -eu
 
 SESSION=${quoted(session.id)}
-HOST=\${OPSFOLIO_HOST:-${quoted(endpoint.host)}}
-PORT=\${OPSFOLIO_PORT:-${quoted(String(endpoint.port))}}
-WAIT_MAX=\${OPSFOLIO_WAIT_MAX:-1800}
-POLL=\${OPSFOLIO_POLL:-10}
-DIR=\${OPSFOLIO_DIR:-/etc/opsfolio}
+HOST=\${${P}_HOST:-${quoted(endpoint.host)}}
+PORT=\${${P}_PORT:-${quoted(String(endpoint.port))}}
+WAIT_MAX=\${${P}_WAIT_MAX:-1800}
+POLL=\${${P}_POLL:-10}
+DIR=\${${P}_DIR:-${quoted(brand.stateDir.posix)}}
 HKALGO=${quoted(hkAlgo)}
 HKB64=${quoted(hkB64)}
 PAIR_KIND=${quoted(pairing.kind)}
@@ -56,7 +58,7 @@ die() { printf 'enroll: %s\n' "$*" >&2; exit 1; }
 ssh_s() {
   # shellcheck disable=SC2086
   ssh -p "$PORT" -i "$KEY" -o IdentitiesOnly=yes -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no -o ConnectTimeout=15 \
-    -o UserKnownHostsFile="$KH" -o StrictHostKeyChecking="$STRICT" -o HashKnownHosts=no \${OPSFOLIO_SSH_OPTS:-} "s-enroll@$HOST" "$@"
+    -o UserKnownHostsFile="$KH" -o StrictHostKeyChecking="$STRICT" -o HashKnownHosts=no \${${P}_SSH_OPTS:-} "s-enroll@$HOST" "$@"
 }
 
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -186,8 +188,8 @@ facts_json() {
 }
 
 ask_consent() {
-  if [ "\${OPSFOLIO_CONSENT:-}" = yes ]; then say "consent given by OPSFOLIO_CONSENT=yes"; return 0; fi
-  if [ ! -r /dev/tty ]; then say "no terminal to ask you on: set OPSFOLIO_CONSENT=yes to consent without one"; return 1; fi
+  if [ "\${${P}_CONSENT:-}" = yes ]; then say "consent given by ${P}_CONSENT=yes"; return 0; fi
+  if [ ! -r /dev/tty ]; then say "no terminal to ask you on: set ${P}_CONSENT=yes to consent without one"; return 1; fi
   printf 'Run the steps above on this machine? Type yes to agree: ' > /dev/tty
   read -r answer < /dev/tty || answer=no
   [ "$answer" = yes ]
@@ -319,7 +321,7 @@ main() {
     STRICT=accept-new
     say "warning: this script holds no host key of the controller, so the first connection trusts what answers (trust on first use). On a network you do not trust, use the one-liner the controller prints."
   fi
-  ssh-keygen -q -t ed25519 -N '' -C opsfolio-device -f "$KEY"
+  ssh-keygen -q -t ed25519 -N '' -C ${quoted(brand.keyComment)} -f "$KEY"
   devpub=$(awk '{print $1 " " $2}' "$KEY.pub")
   ssh_s status "$SESSION" < /dev/null > /dev/null
   observed=$(awk 'NR == 1 {print $2 " " $3}' "$KH")
@@ -343,7 +345,7 @@ main() {
   printf '%s\n' "$facts" | ssh_s report "$SESSION" > /dev/null
   say ""
   say "Your pairing code is: $code"
-  say "A person types it into the controller to approve this machine: opsfolio enroll approve $SESSION --code $code"
+  say "A person types it into the controller to approve this machine: ${brand.approveHint("$SESSION", "$code")}"
   say "If the code the controller expects is another, stop: someone is between this machine and the controller."
   say ""
   say "waiting for a person to approve this machine (session $SESSION)"

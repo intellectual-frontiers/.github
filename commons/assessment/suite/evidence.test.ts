@@ -77,7 +77,7 @@ proves(["0002-objective-evidence FR-005"], "policy results give a test record by
   const out = evidenceFromPolicies(
     [{ id: "firewall", status: "pass" }, { id: "disk-encryption", status: "fail" }, { id: "antivirus", status: "waiting" }, { id: "few-admins", status: "warn" }, { id: "osquery", status: "accepted" }, { id: "unbound", status: "pass" }],
     { firewall: ["3.13.1[a]", "3.13.1[b]"], "disk-encryption": ["3.13.16"], antivirus: ["3.14.2"], "few-admins": ["3.1.5"], osquery: ["3.3.1"] },
-    { framework: F, at: NOW, tool: "opsfolio-probe", asset: "synthetic-server-02" },
+    { framework: F, at: NOW, tool: "synth-probe", asset: "synthetic-server-02" },
   );
   assertEquals(out.map((e) => [e.objective, e.result]), [["3.13.16", "fail"], ["3.13.1[a]", "pass"], ["3.13.1[b]", "pass"]]);
   assert(out.every((e) => e.method === "test" && e.by.kind === "tool" && !e.determines && e.source.startsWith("policy:synthetic-server-02:") && problemsOf(e).length === 0));

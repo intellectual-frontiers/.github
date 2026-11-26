@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { collect } from "./collect.ts";
- * // const done = await collect({ store, policy, assets, observe, now: new Date().toISOString(), runtime: ".git/opsfolio-evidence" });
+ * // const done = await collect({ store, policy, assets, observe, now: new Date().toISOString(), runtime: ".git/evidence-capture" });
  * ```
  *
  * @module
@@ -31,7 +31,7 @@ export type CollectInput = {
   readonly observe: Observer;
   /** The instant of the run (ISO 8601). */
   readonly now: string;
-  /** The folder of the run's own memory (outside the tracked files: the repository's `.git/opsfolio-evidence`). */
+  /** The folder of the run's own memory (outside the tracked files: the repository's `.git/evidence-capture`). */
   readonly runtime: string;
   /** How many assets are looked at at once and how long each may take (8 and 15 seconds by default). */
   readonly limits?: FanOutLimits;
@@ -94,7 +94,7 @@ export async function readJournal(store: GitRefStore, at?: string): Promise<Resu
 export async function collect(input: CollectInput): Promise<Result<Collected, string>> {
   const { store, policy, now } = input;
   await fs.mkdir(input.runtime, { recursive: true });
-  const held = await acquireLock(path.join(input.runtime, "lock"), { wait: false, command: "opsfolio evidence collect" });
+  const held = await acquireLock(path.join(input.runtime, "lock"), { wait: false, command: "evidence collect" });
   if (held === undefined) return err("another collection is running");
   try {
     const memoryFile = path.join(input.runtime, "memory.json");

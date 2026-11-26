@@ -197,7 +197,7 @@ function bootstrap(shell: "sh" | "ps"): (ctx: CommandContext) => Result<CommandO
   return (ctx) => {
     const s = openSession(ctx, ctx.grant);
     const render = shell === "sh" ? renderBootstrapSh : renderBootstrapPs;
-    const text = render({ id: s.id }, ctx.pins, ctx.policy.endpoint, { hostKey: ctx.controllerHostKey, pairing: ctx.policy.pairing });
+    const text = render({ id: s.id }, ctx.pins, ctx.policy.endpoint, { brand: ctx.policy.brand, hostKey: ctx.controllerHostKey, pairing: ctx.policy.pairing });
     return ok({ reply: { stdout: text, stderr: "", exit: 0 }, effects: [{ kind: "put-session", session: s }, aud(ctx, "script", `bootstrap script for ${shell}`, s.id)], script: shell });
   };
 }
@@ -226,7 +226,7 @@ export const BUILTIN: readonly AnyCommand[] = [
     decode: none,
     run: (ctx) => {
       const names = [...ctx.registry.values()].filter((d) => d.account === ctx.account && d.reserved !== true).map((d) => `${d.name}\t${d.summary}`).join("\n");
-      return ok({ reply: { stdout: `opsfolio enrollment\nyou are ${ctx.sourceIp}\n${names}\n`, stderr: "", exit: 0 }, effects: [aud(ctx, "command", "hello")] });
+      return ok({ reply: { stdout: `${ctx.policy.brand.name} enrollment\nyou are ${ctx.sourceIp}\n${names}\n`, stderr: "", exit: 0 }, effects: [aud(ctx, "command", "hello")] });
     },
   }),
   defineCommand<{ readonly session?: string }>({

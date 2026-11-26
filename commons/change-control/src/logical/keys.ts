@@ -52,21 +52,32 @@ export const opensshSigns = (version: string | undefined): boolean => {
   return major > 8 || (major === 8 && minor >= 2);
 };
 
+/** The one fix each check names that a product's own command does: a product passes its commands, and the defaults say what to do in words (IF Commons holds no product code). */
+export type KeyHints = { readonly setup: string; readonly rotate: string; readonly setupWithRecovery: string; readonly checkRecovery: string };
+
+/** The default hints: what to do, with no command of a product. */
+export const NEUTRAL_KEY_HINTS: KeyHints = {
+  setup: "set up the daily signing key and Git signing with it",
+  rotate: "make a new daily key with a passphrase and replace the old one",
+  setupWithRecovery: "set up a recovery key and keep it in a folder off this machine",
+  checkRecovery: "prove the recovery key works by signing with it",
+};
+
 /** Every check, in order, each with its code and its one fix. Signing works where the first six hold (OpenSSH, the daily key and its passphrase, Git signing with it, the identity, the daily key listed). */
-export function checkKeys(f: Facts, now: string): readonly Finding[] {
+export function checkKeys(f: Facts, now: string, hints: KeyHints = NEUTRAL_KEY_HINTS): readonly Finding[] {
   const c = (code: string, ok: boolean, says: string, fix: string): Finding => ({ code, ok, says, fix });
   return [
     c("E-KEY-SSH", opensshSigns(f.openssh), f.openssh === undefined ? "OpenSSH is not here" : `OpenSSH ${f.openssh} cannot sign for Git (8.2 or later can)`, "install OpenSSH 8.2 or later"),
-    c("E-KEY-DAILY", f.daily.exists, "the daily signing key does not exist", "opsfolio keys setup"),
-    c("E-KEY-PASSPHRASE", !f.daily.exists || f.daily.hasPassphrase, "the daily key has no passphrase", "opsfolio keys rotate (a new key with a passphrase)"),
+    c("E-KEY-DAILY", f.daily.exists, "the daily signing key does not exist", hints.setup),
+    c("E-KEY-PASSPHRASE", !f.daily.exists || f.daily.hasPassphrase, "the daily key has no passphrase", hints.rotate),
     c("E-KEY-AGENT", !f.daily.inAgent, "the daily key is loaded in an ssh-agent, where anything running as you can sign with it", "ssh-add -d <the key>, and keep it out of the agent"),
-    c("E-KEY-GIT", f.git.signs && f.git.formatSsh && f.git.signingKeyIsDaily, "Git does not sign every commit of this repository with the daily key", "opsfolio keys setup"),
+    c("E-KEY-GIT", f.git.signs && f.git.formatSsh && f.git.signingKeyIsDaily, "Git does not sign every commit of this repository with the daily key", hints.setup),
     c("E-KEY-IDENTITY", f.git.identity, "Git has no name and email for this repository, so it cannot make a commit", "git config user.name and user.email for this repository"),
-    c("E-KEY-LISTED", f.signers.dailyListed, "the daily key is not in signers.ts, so the fleet will not accept what it signs", "opsfolio keys setup"),
-    c("E-KEY-RECOVERY-LISTED", f.signers.recoveryListed, "no recovery key is in signers.ts: a lost daily key could not be replaced", "opsfolio keys setup --recovery-dir <a folder you will keep off this machine>"),
+    c("E-KEY-LISTED", f.signers.dailyListed, "the daily key is not in signers.ts, so the fleet will not accept what it signs", hints.setup),
+    c("E-KEY-RECOVERY-LISTED", f.signers.recoveryListed, "no recovery key is in signers.ts: a lost daily key could not be replaced", hints.setupWithRecovery),
     c("E-KEY-RECOVERY-HERE", !f.recovery.privateHere, "the private file of the recovery key is on this machine, so it protects nothing a stolen laptop does not", "move it to a place that is not this machine"),
-    c("E-KEY-RECOVERY-OLD", !recoveryOverdue(f.recovery.checkedAt, now), f.recovery.checkedAt === undefined ? "the recovery key was never proved to work" : `the recovery key was last proved on ${f.recovery.checkedAt}, more than ${RECOVERY_DAYS} days ago`, "opsfolio keys check-recovery --key <the recovery key file>"),
-    c("E-KEY-HOOK", f.hookInstalled, "the pre-push check is not installed, so an unsigned commit can be pushed", "opsfolio keys setup"),
+    c("E-KEY-RECOVERY-OLD", !recoveryOverdue(f.recovery.checkedAt, now), f.recovery.checkedAt === undefined ? "the recovery key was never proved to work" : `the recovery key was last proved on ${f.recovery.checkedAt}, more than ${RECOVERY_DAYS} days ago`, hints.checkRecovery),
+    c("E-KEY-HOOK", f.hookInstalled, "the pre-push check is not installed, so an unsigned commit can be pushed", hints.setup),
   ];
 }
 
@@ -76,7 +87,7 @@ export function signingWorks(findings: readonly Finding[]): boolean {
 }
 
 /** The text of the file that lists a fleet's signers, as a tenant keeps it (`signers.ts`): a header, and the signers by name, role and public key. */
-export function renderSigners(signers: readonly Signer[], header = "Who may approve this fleet's changes, by public key. Written by `opsfolio keys`; every change to it is a controlled change."): string {
+export function renderSigners(signers: readonly Signer[], header = "Who may approve this fleet's changes, by public key. Written by the keys program of the product; every change to it is a controlled change."): string {
   const body = signers.map((s) => `  {\n    "name": ${JSON.stringify(s.name)},\n    "role": ${JSON.stringify(s.role)},\n    "key": ${JSON.stringify(s.key)},\n    "added": ${JSON.stringify(s.added ?? "")}${s.retired === undefined ? "" : `,\n    "retired": ${JSON.stringify(s.retired)}`}\n  }`).join(",\n");
   return `// ${header}\nexport const signers = [\n${body}\n] as const;\n`;
 }
