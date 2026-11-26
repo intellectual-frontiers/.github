@@ -1,0 +1,33 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45903673699",
+    "workflow": "ci",
+    "commit": "4a13dfb206b281c72214f5099dbdaf8977d40aef",
+    "at": "2026-11-26T22:17:41Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45903673699"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17319,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 193,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
