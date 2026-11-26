@@ -1,0 +1,1269 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45762587311",
+    "workflow": "ci",
+    "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+    "at": "2026-11-26T05:38:39Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45762587311"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8748,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 275,
+      "exitStatus": 0
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 175,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 440,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 61366,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30501,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 1/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 30501,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 168,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 359,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45234,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18319,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 2/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 18319,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 82,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 269,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 55922,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45658,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 3/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 45658,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "after-verify-5",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 273,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 261,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-tests-on-node-26-6",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 38132,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19102,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "data 4/4",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19102,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 149,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 128615,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 128615,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 29,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 1/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 5,
+      "durationMs": 1740,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 2/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 8,
+      "durationMs": 50733,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 19,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 3/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 991,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 37,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "docs 4/4",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 11,
+      "durationMs": 1821,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "lab",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 310,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "lab",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 67616,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "lab",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 67616,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 198,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54247,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "linux-observe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 54247,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 363,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33088,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 33088,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 129,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 70315,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 70315,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7512,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 12,
+      "durationMs": 41287,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 41287,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-077b87ad568848c3",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5da997de2159b38b0c75867dc81d8a3b7f192f12ac0ef988b79cb9acc31ba766"
+      },
+      "at": "2026-11-26T05:36:12Z",
+      "code": "unhandled-error",
+      "file": "suite/kanon-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/kanon-guides.test.ts"
+    },
+    {
+      "id": "f-0855e2ab7460cdb8",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/config.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/config.test.ts"
+    },
+    {
+      "id": "f-086ebaed8c288542",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/grouping.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/grouping.test.ts"
+    },
+    {
+      "id": "f-10d850d3b5eefbe4",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-165788fd29155cbc",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/packaging-page.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/packaging-page.test.ts"
+    },
+    {
+      "id": "f-21444d98e91ea3f2",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/docker.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-295fa8bf9a7a5de7",
+      "tool": "verify",
+      "module": "lab",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f8f82a6d5513fc1397967278d4737cce072b307dc38988ccb8e2cdecdafdd376"
+      },
+      "at": "2026-11-26T05:37:18Z",
+      "code": "test-failed",
+      "file": "suite/arch.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not",
+      "key": "0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not"
+    },
+    {
+      "id": "f-2a8c156f44fc74db",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/look.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/look.test.ts"
+    },
+    {
+      "id": "f-2ebf51ec694ab7fb",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/release.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/release.test.ts"
+    },
+    {
+      "id": "f-4a09281032a76418",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/repo-ops.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/repo-ops.test.ts"
+    },
+    {
+      "id": "f-4ad83c6cf7328ae5",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5da997de2159b38b0c75867dc81d8a3b7f192f12ac0ef988b79cb9acc31ba766"
+      },
+      "at": "2026-11-26T05:36:12Z",
+      "code": "unhandled-error",
+      "file": "suite/fixture-repo.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/fixture-repo.test.ts"
+    },
+    {
+      "id": "f-4c8dc9b1a5d9fc15",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-5a3159aacb892b39",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/book.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/book.test.ts"
+    },
+    {
+      "id": "f-6f60b3c3aa1a778d",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/findings.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/findings.test.ts"
+    },
+    {
+      "id": "f-7721374a787cf282",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-7786036edda36b23",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/mizan-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/mizan-guides.test.ts"
+    },
+    {
+      "id": "f-7bd832ef168341e6",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/plain-kit.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/plain-kit.test.ts"
+    },
+    {
+      "id": "f-7fbbab4b6614990d",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/program-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/program-lens.test.ts"
+    },
+    {
+      "id": "f-818247904fb81323",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/layered-lens.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/layered-lens.test.ts"
+    },
+    {
+      "id": "f-884660cff84f77a6",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/conventions.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/conventions.test.ts"
+    },
+    {
+      "id": "f-8e1e725b0112336d",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/library-site.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/library-site.test.ts"
+    },
+    {
+      "id": "f-9f9fd80acc081de9",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-a65c9bde05657266",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5da997de2159b38b0c75867dc81d8a3b7f192f12ac0ef988b79cb9acc31ba766"
+      },
+      "at": "2026-11-26T05:36:12Z",
+      "code": "unhandled-error",
+      "file": "suite/html.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/html.test.ts"
+    },
+    {
+      "id": "f-aac69f73771835b4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/ai-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/ai-guides.test.ts"
+    },
+    {
+      "id": "f-ac692524bb695fd3",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/check.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/check.test.ts"
+    },
+    {
+      "id": "f-acd9741f861e05b0",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/explorers.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/explorers.test.ts"
+    },
+    {
+      "id": "f-acf5cf74c26a36b3",
+      "tool": "verify",
+      "module": "lab",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f8f82a6d5513fc1397967278d4737cce072b307dc38988ccb8e2cdecdafdd376"
+      },
+      "at": "2026-11-26T05:37:18Z",
+      "code": "test-failed",
+      "file": "suite/vm.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not",
+      "key": "0003-lab-arch-family FR-004, 0003-lab-arch-family FR-005: a real Arch machine with systemd runs it as the first process where the kernel has cgroup v2, and is skipped with the reason where it has not"
+    },
+    {
+      "id": "f-b0e1756925852b27",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-b1e7c5548bdb36f2",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/twins.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/twins.test.ts"
+    },
+    {
+      "id": "f-b434535bf3b65c07",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-b5179e92cc27dad4",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence-shards.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence-shards.test.ts"
+    },
+    {
+      "id": "f-bc44995470f32712",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/api.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/api.test.ts"
+    },
+    {
+      "id": "f-c951ce1aa954aaaa",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-ca9ec679a907346c",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-d27419413326f5a4",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/agents-guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/agents-guides.test.ts"
+    },
+    {
+      "id": "f-d5b7ee2bb3456845",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5da997de2159b38b0c75867dc81d8a3b7f192f12ac0ef988b79cb9acc31ba766"
+      },
+      "at": "2026-11-26T05:36:12Z",
+      "code": "unhandled-error",
+      "file": "suite/evidence.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/evidence.test.ts"
+    },
+    {
+      "id": "f-d882e5600b1ec85c",
+      "tool": "verify",
+      "module": "docs 1/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5da997de2159b38b0c75867dc81d8a3b7f192f12ac0ef988b79cb9acc31ba766"
+      },
+      "at": "2026-11-26T05:36:12Z",
+      "code": "unhandled-error",
+      "file": "suite/newcomer.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/newcomer.test.ts"
+    },
+    {
+      "id": "f-ddbe08700bbec987",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-ded2d76a0a3dbcfa",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-e0012dc91ded48b1",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/specs.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/specs.test.ts"
+    },
+    {
+      "id": "f-eccafe524c24f302",
+      "tool": "verify",
+      "module": "docs 2/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "d6d002e50b307f46c2e7c956af6bdd82218002a395f2e924e2709d7350d13acb"
+      },
+      "at": "2026-11-26T05:37:10Z",
+      "code": "unhandled-error",
+      "file": "suite/workflow.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/workflow.test.ts"
+    },
+    {
+      "id": "f-fb3d12ee27330ec0",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/guides.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/guides.test.ts"
+    },
+    {
+      "id": "f-fb73d4b87e115cb7",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "353accfea64636ac64a524c4b8ff0190245a5fc31f8cf3f3aab30f01eee6082d"
+      },
+      "at": "2026-11-26T05:37:02Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-fce7619278417a66",
+      "tool": "verify",
+      "module": "docs 4/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "ba01b087b3a7cf25d78609da7ee4056f8bf5763620324445bb0d5ae564fb052c"
+      },
+      "at": "2026-11-26T05:36:16Z",
+      "code": "unhandled-error",
+      "file": "suite/package.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/package.test.ts"
+    },
+    {
+      "id": "f-fe5f1e825ae5d559",
+      "tool": "verify",
+      "module": "docs 3/4",
+      "evidence": {
+        "run": "45762587311",
+        "commit": "15ceffd487eb3871d96ecf360fd77231db6dd274",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "08a2039691726e7f301c792284ed48cb07c2fa3cab684d4aa9bebd0150e1a311"
+      },
+      "at": "2026-11-26T05:36:21Z",
+      "code": "unhandled-error",
+      "file": "suite/lenses.test.ts",
+      "severity": "error",
+      "message": "an unhandled error between tests",
+      "key": "unhandled suite/lenses.test.ts"
+    }
+  ]
+}
