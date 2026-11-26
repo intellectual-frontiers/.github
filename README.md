@@ -85,6 +85,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/headless`](https://www.npmjs.com/package/@intellectual-frontiers/headless) | Pattern | The contract of a program that has no window | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/kanon`](https://www.npmjs.com/package/@intellectual-frontiers/kanon) | Pattern | The pattern of a library built in three layers | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/planning`](https://www.npmjs.com/package/@intellectual-frontiers/planning) | Pattern | Planning content from many places as one item each with one stable id | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/posture-report`](commons/posture-report) | Pattern | A read-only static report site for a compliance posture | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/tenancy`](commons/tenancy) | Pattern | Tenancy for service providers | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/workbench`](https://www.npmjs.com/package/@intellectual-frontiers/workbench) | Pattern | The workbench: what a human or an agent needs to do their job with a repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/workload`](https://www.npmjs.com/package/@intellectual-frontiers/workload) | Pattern | Workload: units of operated work (not running software) as typed data of a form | layers | L1 | GitHub, npm |
