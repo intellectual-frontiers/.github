@@ -94,7 +94,7 @@ export function outcomeOfConfig(p: NonNullable<Host["configProblem"]>): Outcome 
 }
 
 /** A run whose command line does not fit what the verb takes. */
-export function outcomeOfUsage(message: string, code: "E-USAGE" | "E-COMMIT-SUBJECT" | "E-COMMIT-REFS" | "E-COMMIT-IMPACT" | "E-COMMIT-SESSION" | "E-LIBRARY-NAME" = "E-USAGE", fix = "repoctl help"): Outcome {
+export function outcomeOfUsage(message: string, code: "E-USAGE" | "E-COMMIT-SUBJECT" | "E-COMMIT-REFS" | "E-COMMIT-IMPACT" | "E-COMMIT-SESSION" | "E-COMMIT-ACTORS" | "E-LIBRARY-NAME" = "E-USAGE", fix = "repoctl help"): Outcome {
   return withExit(outcomeOf(null, { problems: [problem("fail", message, { code, fix })] }), "usage");
 }
 

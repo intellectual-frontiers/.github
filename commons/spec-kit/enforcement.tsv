@@ -1054,6 +1054,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-208	check	.github: cd commons/catalog-iso27001 && bun run verify	commons/catalog-iso27001: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-209	check	.github: cd commons/catalog-hipaa && bun run verify	commons/catalog-hipaa: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-210	check	.github: cd commons/catalog-crosswalks && bun run verify	commons/catalog-crosswalks: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-211	check	.github: cd commons/actor && bun run verify	commons/actor: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0043-asset-properties FR-033	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0046-dossiers FR-001	check	.github: cd commons/dossier && bun run verify	dossier 0002-dossier-core FR-001
 0046-dossiers FR-002	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
@@ -1136,15 +1137,15 @@ requirement	mechanism	by	note
 0047-zero-trust FR-060	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-070	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-071	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-001	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-010	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-011	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0048-actors FR-001	check	.github: cd commons/actor && bun run verify	actor 0002-actor-roles FR-001
+0048-actors FR-010	check	.github: cd commons/actor && bun run verify	actor 0002-actor-roles FR-002, FR-003
+0048-actors FR-011	check	.github: cd commons/actor && bun run verify	actor 0002-actor-roles FR-002, FR-003
 0048-actors FR-012	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-013	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-014	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0048-actors FR-014	check	.github: cd commons/actor && bun run verify	actor 0004-actor-trailers FR-005
 0048-actors FR-020	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-021	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-022	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0048-actors FR-022	none	-	Partly built: an undirected act is a finding (actor 0002-actor-roles FR-004); the refusal of a regulated verb is deferred until after the first acceptance run
 0048-actors FR-023	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-025	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-026	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
@@ -1161,12 +1162,12 @@ requirement	mechanism	by	note
 0048-actors FR-055	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-060	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-061	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-062	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-063	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-064	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-065	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0048-actors FR-062	none	-	Partly built: the retention policy and the record of an expiry are proved by actor 0003-actor-retention; the digest of a session in the record of an act is deferred
+0048-actors FR-063	check	.github: cd commons/actor && bun run verify	actor 0004-actor-trailers FR-001 to FR-004 (the codec and the lint of a commit; the check of a repository's history is `agora check actors` of erga)
+0048-actors FR-064	check	.github: cd commons/actor && bun run verify	actor 0004-actor-trailers FR-002 to FR-006
+0048-actors FR-065	check	.github: cd commons/actor && bun run verify	actor 0004-actor-trailers FR-006
 0048-actors FR-066	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-070	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0048-actors FR-071	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0048-actors FR-080	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0048-actors FR-080	check	.github: cd commons/actor && bun run verify	actor 0001-actor-layers FR-001
 0048-actors FR-081	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line

@@ -7,6 +7,7 @@
  */
 export * from "./access-decision.ts";
 export * from "./approval.ts";
+export * from "./approval-levels.ts";
 export * from "./as-of.ts";
 export * from "./assemble.ts";
 export * from "./canonical.ts";

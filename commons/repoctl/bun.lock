@@ -5,6 +5,7 @@
     "": {
       "name": "@intellectual-frontiers/repoctl",
       "devDependencies": {
+        "@intellectual-frontiers/actor": "link:../actor",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/headless": "link:../headless",
@@ -23,6 +24,8 @@
     },
   },
   "packages": {
+    "@intellectual-frontiers/actor": ["@intellectual-frontiers/actor@link:../actor", {}],
+
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 
     "@intellectual-frontiers/crypto": ["@intellectual-frontiers/crypto@link:../crypto", {}],

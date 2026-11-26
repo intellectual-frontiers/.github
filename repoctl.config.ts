@@ -142,7 +142,7 @@ export default defineConfig({
     identity: { name: "Shahid Shah", email: "47497+shah@users.noreply.github.com" },
     heldMerges: HELD_MERGES,
     issue: { prefix: "Refs #", required: false },
-    trailers: ["issue", "impact", "co-author"],
+    trailers: ["issue", "impact", "co-author", "session", "prepared-by", "directive", "reviewed-by"],
     coAuthor: "Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
     forbidden: {
       paths: DEFAULT_FORBIDDEN_PATHS,

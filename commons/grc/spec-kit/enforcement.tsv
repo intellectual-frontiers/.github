@@ -181,3 +181,8 @@ requirement	mechanism	by	note
 0020-grc-approval FR-022	check	.github: cd commons/grc && bun test suite/	approval.test.ts: no private key material in the logical files
 0020-grc-approval FR-023	check	.github: cd commons/grc && bun test suite/	approval.test.ts: order and window laws
 0020-grc-approval FR-024	check	.github: cd commons/grc && bun test suite/	approval.test.ts: deterministic verification
+0020-grc-approval FR-025	check	.github: cd commons/grc && bun test suite/	approval-levels.test.ts: the policy of each level and the level reached by a regulated act
+0020-grc-approval FR-026	check	.github: cd commons/grc && bun test suite/	approval-levels.test.ts: the level of custody and of approvers
+0020-grc-approval FR-027	check	.github: cd commons/grc && bun test suite/	approval-levels.test.ts: the first registry and its chain from the first key
+0020-grc-approval FR-028	check	.github: cd commons/grc && bun test suite/	approval-levels.test.ts: a key replaced in the next version
+0020-grc-approval FR-029	check	.github: cd commons/grc && bun test suite/	approval-levels.test.ts: a version signed by the first key

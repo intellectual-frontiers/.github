@@ -24,6 +24,7 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
+    "@intellectual-frontiers/actor": "link:../actor",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/headless": "link:../headless",

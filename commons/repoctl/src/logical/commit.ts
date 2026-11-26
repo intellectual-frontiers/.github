@@ -17,7 +17,8 @@
 import { type CommitImpact, type CommitPolicy, type CommitSubject, type Generator, identityArgs, type IssueNumber, type SessionUrl } from "@intellectual-frontiers/repoctl/governance";
 import { sha256Hex } from "@intellectual-frontiers/headless/logical";
 import { matches } from "./glob.ts";
-import { absurd } from "@intellectual-frontiers/core";
+import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
+import { actorFromTrailer, type CommitActors, decodeMessage, encodeTrailers } from "@intellectual-frontiers/actor/logical";
 import { finding, type Finding } from "./findings.ts";
 import type { World } from "./ports.ts";
 import { findingsOfSync, runSync } from "./sync.ts";
@@ -32,16 +33,53 @@ export type CommitInput = {
   readonly session: SessionUrl | undefined;
   /** The line that credits the agent, where the policy has the trailer. */
   readonly coAuthor: string | undefined;
+  /** The actors the commit names (who prepared it, the directive, who reviewed it), for the trailers the policy has. */
+  readonly actors: CommitActors | undefined;
+  /** What the verb found out about the commit before this runs (for example that an agent prepared it under no directive): shown with the findings, never a refusal. */
+  readonly advice: readonly Finding[];
   /** Paths to stage first (the files already staged are committed in any case). */
   readonly paths: readonly string[];
   readonly dryRun: boolean;
 };
 
+/** What the command line and the environment say of the actors of a commit (commons 0048-actors FR-063). */
+export type ActorOptions = { readonly preparedBy?: string | undefined; readonly model?: string | undefined; readonly directive?: string | undefined; readonly reviewedBy?: string | undefined };
+
+/**
+ * The actors a commit names, for the trailers the policy lists and no others: the preparer from `--prepared-by`, else, where a harness says an agent runs the command, the agent from its variable and the model from `--model`
+ * or its variable (`unspecified` where none says), so nobody types it; the directive from `--directive`; the reviewer from `--reviewed-by`, who must be a person. A value that is not in the form of its trailer is an error.
+ */
+export function actorsOf(trailers: readonly string[], options: ActorOptions, env: (name: string) => string | undefined, names: { readonly agent: string; readonly model: string }): Result<CommitActors, string> {
+  let actors: CommitActors = {};
+  if (trailers.includes("prepared-by")) {
+    if (options.preparedBy !== undefined) {
+      const a = actorFromTrailer(options.preparedBy);
+      if (a.kind === "err") return err(a.error);
+      actors = { ...actors, preparedBy: a.value };
+    } else {
+      const harness = env(names.agent);
+      if (harness !== undefined && harness !== "") actors = { ...actors, preparedBy: { kind: "agent", id: harness.replace(/\s+/g, "-"), model: { name: (options.model ?? env(names.model) ?? "unspecified").replace(/\s+/g, "-"), assurance: "reported" } } };
+    }
+  }
+  if (trailers.includes("directive") && options.directive !== undefined) {
+    const d = decodeMessage(`s\n\nDirective: ${options.directive}\n`);
+    if (d.actors.directive === undefined) return err(`${JSON.stringify(options.directive)} is not a directive: ID@VERSION sha256:DIGEST`);
+    actors = { ...actors, directive: d.actors.directive };
+  }
+  if (trailers.includes("reviewed-by") && options.reviewedBy !== undefined) {
+    const r = decodeMessage(`s\n\nReviewed-by: ${options.reviewedBy} (person)\n`);
+    if (r.actors.reviewedBy === undefined) return err(`${JSON.stringify(options.reviewedBy)} is not a person's id`);
+    actors = { ...actors, reviewedBy: r.actors.reviewedBy };
+  }
+  return ok(actors);
+}
+
 /** The message of a commit: the subject, and the trailers, each a line. */
 export type Message = { readonly subject: string; readonly trailers: readonly string[] };
 
 /** The message: the subject, then the trailers the policy lists, in its order, each a line: the reference to an issue (the policy's prefix and the number), `Impact:` and the impact, the line that credits the agent, and `Claude-Session`. A trailer whose value is not given is left out. */
-export function messageOf(policy: Pick<CommitPolicy, "issue" | "trailers">, input: { readonly subject: string; readonly refs: string | undefined; readonly impact?: string | undefined; readonly coAuthor: string | undefined; readonly session: string | undefined }): Message {
+export function messageOf(policy: Pick<CommitPolicy, "issue" | "trailers">, input: { readonly subject: string; readonly refs: string | undefined; readonly impact?: string | undefined; readonly coAuthor: string | undefined; readonly session: string | undefined; readonly actors?: CommitActors | undefined }): Message {
+  const actorLines = input.actors === undefined ? [] : encodeTrailers(input.actors);
   const lines = policy.trailers.flatMap((t): readonly string[] => {
     switch (t) {
       case "issue":
@@ -52,6 +90,12 @@ export function messageOf(policy: Pick<CommitPolicy, "issue" | "trailers">, inpu
         return input.coAuthor === undefined ? [] : [input.coAuthor];
       case "session":
         return input.session === undefined ? [] : [`Claude-Session: ${input.session}`];
+      case "prepared-by":
+        return actorLines.filter((l) => l.startsWith("Prepared-by: "));
+      case "directive":
+        return actorLines.filter((l) => l.startsWith("Directive: "));
+      case "reviewed-by":
+        return actorLines.filter((l) => l.startsWith("Reviewed-by: "));
       default:
         return absurd(t);
     }
@@ -155,8 +199,9 @@ export async function runCommit(w: Pick<World, "process" | "repo" | "files">, in
     }
   }
   if (found.length > 0) return refuse(found);
-  const message = messageOf(policy, { subject: input.subject, refs: input.refs, impact: input.impact, coAuthor: input.coAuthor, session: input.session });
+  const message = messageOf(policy, { subject: input.subject, refs: input.refs, impact: input.impact, coAuthor: input.coAuthor, session: input.session, actors: input.actors });
   const text = messageText(message);
+  notes.push(...input.advice);
   if (input.dryRun) return { kind: "preview", message: text, files, findings: notes };
   const made = await w.process.run(["git", ...identityArgs(policy.identity), "commit", "-m", message.subject, ...(message.trailers.length === 0 ? [] : ["-m", message.trailers.join("\n")])], here);
   if (made.code !== 0) return refuse([finding("fail", "E-COMMIT-FAILED", `git did not make the commit: ${lines(`${made.stdout}\n${made.stderr}`).slice(-2).join("; ")}`, "git status")]);

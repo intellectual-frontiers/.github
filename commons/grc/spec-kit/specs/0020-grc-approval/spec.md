@@ -33,6 +33,11 @@
 - **FR-022**: Nothing in the logical layer of approvals MUST read a private key, a key file or an agent: the library holds no private key material, and a function that signs MUST be the physical layer's and MUST take a key by name or file for a program to use.
 - **FR-023**: For any set of approvals and any order of them, the persons that count MUST be the same where no two approvals share a nonce or a person, and a refused approval MUST NOT change whether the others make a result; before the end of its window and after its start an approval MUST give the same verdict for any instant, and at and after the end MUST be `E-APPROVAL-EXPIRED`.
 - **FR-024**: Verification MUST be deterministic: the same input MUST give the same result and the same order of rejections on Bun and Node.
+- **FR-025**: The levels of approval MUST be `presence`, `key` and `hardware`, in that order, and `policyOfLevel(level, lifetime?)` MUST give no policy for `presence` (nothing is signed there), for `key` a policy in which every custody is enough for every risk and a regulated act need not have the person verified by a token, and for `hardware` a policy in which a routine act is approved by any custody and a regulated act by a hardware key that verified the person; the lifetime MUST be the given one or the default's. The default policy of FR-010 stays the policy of a fleet that names none of the levels.
+- **FR-026**: `levelOfCustody(custody)` MUST be `hardware` for a hardware custody and `key` for any other, and `levelOfApprovers(approvers)` MUST be the lowest level among the approvers of a verified approval and `presence` where there are none, so that a caller can say, of an act, the level it was in fact approved at.
+- **FR-027**: `firstRegistry(key, issuedAt)` MUST give version 1 of a registry holding that one key with the roles `approver` and `registry-admin`, valid from `issuedAt`, so that the first key a platform makes for a person can be the root of the chain that FR-016 verifies, without a person typing a fingerprint; a caller that pins a root this way MUST say, wherever it shows the assurance of the fleet, that the first trust was that of first use and not a comparison.
+- **FR-028**: `nextRegistry(previous, change, issuedAt)` MUST give the next version of a registry (the version after it, naming its digest) with the keys of `change.add` added with the roles and the `replaces` given and the keys of `change.revoke` marked revoked from `issuedAt`; it MUST refuse to revoke a key that is not in the registry and to add one that is, and the version it gives MUST satisfy FR-018, so that a key is replaced by adding its successor and revoking it in one version, and nothing else of the registry changes.
+- **FR-029**: `signRegistry(registry, key)` of `grc/signers/sshsig` MUST sign a version of the registry as the envelope of DSSE of its canonical JSON, with the payload type of the registry and in the namespace `ifc-approval`, with `ssh-keygen -Y sign`, so that `registryOfChain` verifies it where a registry administrator of the version before signed; it reads no private key itself.
 
 ## Acceptance scenarios
 
@@ -44,6 +49,9 @@
 6. **Given** a regulated act and a token that did not verify the person, **When** it approves, **Then** it is refused for verification, per FR-010.
 7. **Given** one person with two keys, **When** both approve a request that needs two persons, **Then** one counts and the other is a duplicate, per FR-011.
 8. **Given** a chain whose second version removes a key, **When** it is read, **Then** it is refused, per FR-016 and FR-018.
+9. **Given** a first key, **When** a registry is started from it and signed by it, **Then** a chain with that key as the root is good, per FR-027 and FR-029.
+10. **Given** a registry of one key, **When** a successor is added and the first key is revoked in the next version signed by the first key, **Then** the successor approves and the first key is refused as revoked, per FR-028.
+11. **Given** a regulated act signed by a file key, **When** it is verified at the level `key` and at the level `hardware`, **Then** the first approves and the second is refused for its custody, per FR-025.
 
 ## Out of scope
 

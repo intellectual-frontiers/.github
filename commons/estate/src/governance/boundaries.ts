@@ -330,6 +330,24 @@ export type BoundaryApproval = { readonly planHash: string; readonly by: Princip
 /** The window an engagement-scope boundary is valid for. */
 export type Window = { readonly from: string; readonly until: string };
 
+/** Where a network is: the physical site of a boundary of the kind `network-zone` (estate 0010-estate-boundaries FR-035), a name and, where it helps, an address as plain text. No coordinates are asked for. */
+export type Site = { readonly name: string; readonly address?: string };
+
+/** The sites and legal names a boundary is refused for: the problems of the fields, none where they are right. A legal name belongs to a company (the kind `organizational`) and a site to a network (the kind `network-zone`), each non-empty text of at most 200 characters. */
+export function identityProblems(kind: BoundaryKind, legalName: string | undefined, site: Site | undefined): readonly string[] {
+  const problems: string[] = [];
+  if (legalName !== undefined) {
+    if (kind !== "organizational") problems.push(`a legal name belongs to a boundary of the kind organizational, not ${kind}`);
+    if (legalName.trim() === "" || legalName.length > 200) problems.push("the legal name is empty or longer than 200 characters");
+  }
+  if (site !== undefined) {
+    if (kind !== "network-zone") problems.push(`a site belongs to a boundary of the kind network-zone, not ${kind}`);
+    if (site.name.trim() === "" || site.name.length > 200) problems.push("the name of the site is empty or longer than 200 characters");
+    if (site.address !== undefined && (site.address.trim() === "" || site.address.length > 400)) problems.push("the address of the site is empty or longer than 400 characters");
+  }
+  return problems;
+}
+
 /** A boundary of the kind `K`: the declaration of who answers for which assets and under which rule (0045-boundaries FR-001). */
 export type Boundary<K extends BoundaryKind> = {
   readonly id: BoundaryId;
@@ -341,6 +359,10 @@ export type Boundary<K extends BoundaryKind> = {
   readonly roles: Readonly<Partial<Record<PersonRoleOf<K>, readonly PrincipalId[]>>>;
   /** The regime of a privacy boundary. */
   readonly regime?: PrivacyRegime;
+  /** The legal name of the company that a boundary of the kind `organizational` is ("Synthetic Company LLC"): the name is what people call it and this is what it is called in law (estate 0010-estate-boundaries FR-034). */
+  readonly legalName?: string;
+  /** The physical site of the network that a boundary of the kind `network-zone` is (estate 0010-estate-boundaries FR-035). */
+  readonly site?: Site;
   readonly categorization: Categorization;
   readonly include: Selector;
   readonly exclude: Selector;
