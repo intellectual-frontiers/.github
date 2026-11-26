@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** estate-query
 
-**Input:** The questions over the live fleet may name only the osQuery tables of an allow-list, each with its columns as data (0005-estate-query-live). The list has ten tables and none that says how loaded a machine is, how long it has been up, how much memory it uses or what its interfaces carry, so the host metrics that an asset of level 3 sends (machine-probe 0009-machine-probe-signals) cannot be asked. This specification adds those tables. It is governed by commons 0041-telemetry-and-reach (audit row B9). **Every requirement that asks for code is Deferred until after the owner's acceptance run of the command line.**
+**Input:** The questions over the live fleet may name only the osQuery tables of an allow-list, each with its columns as data (0005-estate-query-live). The list has ten tables and none that says how loaded a machine is, how long it has been up, how much memory it uses or what its interfaces carry, so the host metrics that an asset of tier 3 or tier 4 gives (machine-probe 0009-machine-probe-signals) cannot be asked. This specification adds those tables. It is governed by commons 0041-telemetry-and-reach (audit row B9). **Every requirement that asks for code is Deferred until after the owner's acceptance run of the command line.**
 
 ## Requirements
 

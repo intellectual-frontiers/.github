@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** linux-services
 
-**Input:** Two services make telemetry reach the controller from a site: a **site relay**, a pinned OpenTelemetry Collector built with the builder (`ocb`) from only the components the site needs, which receives what devices that cannot run a program send (syslog, SNMP, NetFlow, Redfish, Prometheus, OTLP) and forwards it as OTLP over its own outbound SSH forward; and our own small **exporter** (telemetry 0003-telemetry-reach) on an asset of level 3. Each is said as a typed profile that is checked and from which the requirements of Desired OS State are made, in the way of the profiles that exist (0002-linux-services-profiles). It is governed by commons 0041-telemetry-and-reach (audit rows F1 to F4, G1, G2, A16). **The site relay (FR-001 to FR-006) is built; FR-007 to FR-011 stay Deferred.**
+**Input:** Two services make telemetry reach the controller from a site: a **site relay**, a pinned OpenTelemetry Collector built with the builder (`ocb`) from only the components the site needs, which receives what devices that cannot run a program send (syslog, SNMP, NetFlow, Redfish, Prometheus, OTLP) and forwards it as OTLP over its own outbound SSH forward; and our own small **exporter** (telemetry 0003-telemetry-reach) on an asset of tier 4, where one is installed. Each is said as a typed profile that is checked and from which the requirements of Desired OS State are made, in the way of the profiles that exist (0002-linux-services-profiles). It is governed by commons 0041-telemetry-and-reach (audit rows F1 to F4, G1, G2, A16). **The site relay (FR-001 to FR-006) is built; FR-007 to FR-011 stay Deferred.**
 
 ## The site relay
 
@@ -21,7 +21,7 @@
 ## The exporter and the agent
 
 - **FR-009**: `OtelExporterProfile` MUST be a typed profile of: the controller (as for the relay), the forward ports, the paths of the key and of the pinned host key, the queue's folder and cap, the cadence of the probe, and the pin of the exporter; `otelExporterRequirements(profile)` MUST give the requirements of a service that runs the exporter of telemetry 0003-telemetry-reach (the program, its configuration, the queue's folder, the unit of the exporter and the unit of the forward), with the ids `services.otel-exporter.<part>`, for systemd in this version; a unit for launchd and one for a Windows service MUST be listed as requirements that this version does not make (UNVERIFIED). Relies on audit rows: F1, G1.
-- **FR-010**: A profile `otel-agent` (a Collector on each device) MUST NOT be made: the audit finds that the exporter alone is enough for a device of level 3 and that a Collector on a device is what the owner decided against; a later specification MAY add it only by a decision of the owner. Relies on audit rows: F3.
+- **FR-010**: A profile `otel-agent` (a Collector on each device) MUST NOT be made: the audit finds that the exporter alone is enough for a device of tier 4 and that a Collector on a device is what the owner decided against; a later specification MAY add it only by a decision of the owner. Relies on audit rows: F3.
 - **FR-011**: The mail relay profile (`MailRelayProfile`) MUST be left as it is; where SMTP store and forward is built (commons 0041-telemetry-and-reach FR-009) it MAY be the leg that sends the signed envelope, and MUST NOT be changed before. Relies on audit rows: F2.
 
 ## Acceptance scenarios

@@ -812,17 +812,17 @@ requirement	mechanism	by	note
 0040-workload-pattern FR-005	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the registry of forms (commons-workload-pattern.test.ts)
 0040-workload-pattern FR-006	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the exports of the core (commons-workload-pattern.test.ts)
 0040-workload-pattern FR-007	check	.github: bun test ./tests/	tests/commons-workload-pattern.test.ts: the members of the patterns metapackage (commons-workload-pattern.test.ts)
-0041-telemetry-and-reach FR-001	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: levelOf is total over the four levels
-0041-telemetry-and-reach FR-002	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: levelFinding names what was lost
+0041-telemetry-and-reach FR-001	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-002	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-003	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-004	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0041-telemetry-and-reach FR-005	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: REACH is a closed table of eight rows
+0041-telemetry-and-reach FR-005	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-006	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: no row is opened by an inbound port on a device
 0041-telemetry-and-reach FR-007	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-008	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-009	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-010	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0041-telemetry-and-reach FR-011	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: missingMinimums names what is lacking
+0041-telemetry-and-reach FR-011	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0041-telemetry-and-reach FR-012	check	.github: cd commons/estate && bun test suite/	sightings.test.ts: the five kinds of key and their constructors
 0041-telemetry-and-reach FR-013	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the receiver sets if.asset.id from what it authenticated and for a relay sets if.relay.id
 0041-telemetry-and-reach FR-014	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
@@ -887,3 +887,89 @@ requirement	mechanism	by	note
 0042-tests-as-workloads FR-054	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0042-tests-as-workloads FR-055	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0042-tests-as-workloads FR-056	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-020	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-021	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-022	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0041-telemetry-and-reach FR-023	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-001	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-002	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-003	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-004	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-005	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-006	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-007	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-008	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-009	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-010	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-011	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-012	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-013	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-014	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-015	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-016	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-017	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-018	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-019	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-020	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-021	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-022	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-023	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-024	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-025	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-026	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-027	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-028	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-029	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-030	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-031	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0043-asset-properties FR-032	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-001	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-002	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-003	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-004	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-005	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-006	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-007	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-008	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-030	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-031	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-032	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-033	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-034	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-035	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-036	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-037	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-038	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-039	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-040	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-041	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-042	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-043	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-044	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-045	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-046	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-050	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-051	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-052	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-053	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-054	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-055	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-056	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-057	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-058	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-059	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-060	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-061	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-062	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-063	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-064	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-065	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-066	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-070	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-071	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-072	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-073	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-080	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-081	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-082	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0044-asset-connections FR-083	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line

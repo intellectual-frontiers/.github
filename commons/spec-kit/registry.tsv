@@ -41,3 +41,5 @@ number	slug	state
 0040	workload-pattern	in force
 0041	telemetry-and-reach	in force
 0042	tests-as-workloads	in force
+0043	asset-properties	in force
+0044	asset-connections	in force

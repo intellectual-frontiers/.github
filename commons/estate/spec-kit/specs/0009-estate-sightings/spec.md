@@ -26,10 +26,10 @@
 - **FR-009**: An asset that depends on a relay MUST be `stale` (by `freshness` of `grc`) when it was not seen within the `staleAfter` of its cadence, and MUST NOT be failed, and a relay that is itself stale MUST make the assets behind it `unknown` and not stale (the assets' silence is then not evidence). Relies on audit rows: B7.
 - **FR-010**: Sightings older than the window of the capture policy (`CapturePolicy` gains `sightings: { keep }`, an ISO duration, default `P30D`) MUST be folded into their `SeenAsset` and removed, and the folded record MUST be kept by the journal. Relies on audit rows: B7.
 
-## Promotion and level
+## Promotion and tier
 
-- **FR-011**: A `discovered` asset made from sightings MUST become `adopted` only by `moveState` with an approval of a person that names, by hash, the sightings the person looked at (the hash of the sorted sighting ids and keys); `managed` MUST NOT be offered for an asset of level `1`, which has no owner for `converge` and `provision` (a move to managed needs an owner for every capability it offers, 0003-estate-logical FR-001). Relies on audit rows: B1.
-- **FR-012**: `levelOf({ identified, sshOut, osquery })` MUST be the total function of commons 0041-telemetry-and-reach FR-001 and `missingMinimums` that of FR-011 there, in the logical layer, with an exhaustive `switch` over `AssetLevel`. Relies on audit rows: B1, D1.
+- **FR-011**: A `discovered` asset made from sightings MUST become `adopted` only by `moveState` with an approval of a person that names, by hash, the sightings the person looked at (the hash of the sorted sighting ids and keys); `managed` MUST NOT be offered for an asset of tier `1`, which has no owner for `converge` and `provision` (a move to managed needs an owner for every capability it offers, 0003-estate-logical FR-001). Relies on audit rows: B1.
+- **FR-012**: `tierOf({ identified, protocol, login, osquery, agent })` MUST be the total function of commons 0041-telemetry-and-reach FR-001 and `missingMinimums` that of FR-011 there, in the logical layer, with an exhaustive `switch` over `AssetTier`. Relies on audit rows: B1, D1.
 - **FR-013**: The origin of an asset adopted from sightings MUST be `scan` as `ORIGINS` already says (an asset seen on the network and adopted from the list of what was found); no new origin MUST be added. Relies on audit rows: B1.
 
 - **FR-014**: From an observation of the shape every connector of Integrations makes, given as a structural type so that estate imports no connector, estate MUST give the pure functions `keysOfProps` (the keys of the properties `machineId`, `serial`, `engineId`, `mac` and `hostKey` of a record, each made by the smart constructor of its kind, the strongest first, none twice, a property that is not a key of its kind left out), `sightingsOf` (one sighting for each record labelled `device` that has at least one key and no property `asset`, with the provenance of the strongest key, the relay and the protocol the record names in its properties `relay` and `protocol` where it names them, and none for a device with no key or one an asset holds) and `storedOf` (the observation of one asset as a stored observation document), so that the connectors of devices (integrations 0010-integrations-network-observers FR-005) share one bridge. Relies on audit rows: B4, B6.
@@ -41,7 +41,7 @@
 3. **Given** two assets that both hold a host key, **When** a sighting shows it, **Then** the resolution is `conflict`, per FR-005 and FR-006.
 4. **Given** a sighting with a MAC alone that matches one asset, **When** it resolves with `weakAdopts` false, **Then** it is a `candidate`, per FR-005.
 5. **Given** a relay not heard for longer than its window, **When** the assets behind it are judged, **Then** they are `unknown`, not stale, per FR-009.
-6. **Given** a discovered asset of level 1, **When** a move to `managed` is asked, **Then** it is refused for want of owners, per FR-011.
+6. **Given** a discovered asset of tier 1, **When** a move to `managed` is asked, **Then** it is refused for want of owners, per FR-011.
 7. **Given** a syslog line with a user name and a URL, **When** it becomes a sighting, **Then** neither is in the record, per FR-001.
 
 ## Out of scope
