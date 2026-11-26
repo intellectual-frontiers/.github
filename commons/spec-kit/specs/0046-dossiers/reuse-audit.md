@@ -23,7 +23,7 @@ Paths are under `commons/`. "Spec" names a specification of the library, as `000
 | --- | --- | --- | --- | --- | --- |
 | B1 | A writer of AsciiDoc with the rules of escaping, anchors and fences | `docs` `src/emit/asciidoc.ts` (`textAdoc`, `lead`, the code and fence rules, `pageAnchor`, `partAnchor`) | The rules are not an export of the package | share: `docs` exports the escaping primitives at `./adoc`; the dossier imports them and writes its own small block model on top | One copy of the rules that keep text from being read as markup (FR-053) |
 | B2 | The block model | `docs` `Block`, `Inline`, `Page` | It holds web blocks (tabs, cards, trends, tree) and a page's links to other pages | add a print-shaped model in the dossier; do not reuse the page model | A dossier's inlines need a cite; the web blocks have no meaning in a book |
-| B3 | A site of HTML for a posture | `posture-report` (`logical/site.ts`, 104 lines, plain HTML and a stylesheet, escaping, a page for each requirement) | It writes HTML directly; it is held and has never been released | remove the library; its HTML becomes the dossier's HTML rendition and its requirement pages the posture lens; its tests' cases are kept as the lens's tests | One path from evidence to text to HTML, not two (FR-081) |
+| B3 | A site of HTML for a posture | the `posture` lens of `dossier-assurance` and the HTML rendition of a dossier | None | the posture lens gives the requirement rows, the HTML rendition gives the page | One path from evidence to text to HTML (FR-081) |
 | B4 | A book from AsciiDoc: PDF, ePub and the web edition | `docs` `book.ts`; the works pipeline (`agora work build`, `agora rendition publish`, `agora rendition catalog`); erga `kinds/book` (`ebook.ts`, `print.ts`) | The pipeline is for a work with an author and a version | reuse the pinned tools and the renditions' publishing; a dossier's renditions are workloads that return files and hashes | The tools are pinned once and the catalog lists the renditions |
 | B5 | Pinned downloads with a SHA-256 and a licence | `desired-os-state-pinned-downloads`; the licence rule of 0044 FR-058 | None | reuse | FR-080 and FR-084 |
 
@@ -43,5 +43,5 @@ The model of sources, selections, lenses, plates, the dossier, the manifest and 
 
 ## E. Removed and shared
 
-- `posture-report` is removed (B3); the README table and the generated registers lose its row, and the two specifications that name it (0043, 0045) name the posture lens instead.
+- The `posture` lens is the one report of a posture; no library writes HTML for it directly.
 - `docs` gains one subpath export (B1).

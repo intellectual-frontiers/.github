@@ -109,7 +109,7 @@ const latestReadings = (ss: readonly Source[]): Result<ReadonlyMap<string, { rea
 /** How each requirement stands: one row each from its latest reading, and the count of each standing (never a percentage). */
 export const postureLens: Lens<TitleParams> = defineLens<TitleParams>({
   id: "posture",
-  version: "1.0.0",
+  version: "1.1.0",
   title: "Posture",
   inputs: [KINDS.reading],
   ceiling: "internal",
@@ -120,13 +120,19 @@ export const postureLens: Lens<TitleParams> = defineLens<TitleParams>({
     if (m.value.size === 0) return ok(emptyPlate({ id: "posture", ceiling: "internal" }, params.title, "how a requirement stands"));
     const rows = [...m.value.values()].sort((a, b) => (a.reading.requirement < b.reading.requirement ? -1 : 1));
     const n = (s: Reading["standing"]) => rows.filter((r) => r.reading.standing === s).length;
+    const titled = rows.some((r) => r.reading.title !== undefined);
+    const answered = rows.some((r) => r.reading.answers !== undefined);
     return ok(
       plateOf({
         lens: { id: "posture", ceiling: "internal" },
         title: params.title,
         blocks: [
           { t: "para", inlines: t(`Of ${rows.length} requirements: ${n("met")} met, ${n("partial")} partly met, ${n("not-met")} not met, ${n("no-evidence")} with no evidence.`) },
-          { t: "table", head: ["Requirement", "Standing", "Evidence"], rows: rows.map((r) => [[code(r.reading.requirement)], t(r.reading.standing), [cite(r.source.id), text(`, ${freshness(r.source.observedAt, asOf)}`)]]) },
+          {
+            t: "table",
+            head: ["Requirement", ...(titled ? ["Title"] : []), "Standing", ...(answered ? ["Answers"] : []), "Evidence"],
+            rows: rows.map((r) => [[code(r.reading.requirement)], ...(titled ? [t(r.reading.title ?? "")] : []), t(r.reading.standing), ...(answered ? [t(r.reading.answers ?? "")] : []), [cite(r.source.id), text(`, ${freshness(r.source.observedAt, asOf)}`)]]),
+          },
         ],
         cites: rows.map((r) => r.source.id),
       }),

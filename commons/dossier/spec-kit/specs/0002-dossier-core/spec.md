@@ -22,6 +22,7 @@
 - **FR-010**: `writeDossier` MUST write the AsciiDoc, the manifest with the hash of each rendition, the declaration, and where asked the sources, each file whole or not at all, and MUST refuse a file outside the folder. (commons 0046-dossiers FR-062, FR-121)
 - **FR-011**: `verifyFolder` MUST work from the folder alone: it MUST check each rendition against the manifest, name the one that differs or is missing, rebuild from the carried sources where the lenses are given and say whether the bytes are the same, and say that the rebuild is not possible where the sources are not carried; it MUST reach no network. (commons 0046-dossiers FR-061)
 - **FR-012**: `sealManifest` MUST sign the digest of a manifest with a key in the namespace `ifc-dossier`, naming the person, the role and the date; `verifySeal` MUST refuse a seal whose manifest has changed, a signature that does not verify, and a signature of other words than the seal states. (commons 0046-dossiers FR-063)
+- **FR-013**: `renditionsFor` MUST make each rendition a built dossier declares other than its AsciiDoc, by the renderer the product gives for it (a pure function of the AsciiDoc, the title and the instant the dossier is as of), name each file as `RENDITION_FILES` does, and MUST refuse with `E-DOSSIER-NO-RENDERER` a declared rendition for which no renderer was given; the library holds no renderer, so the tool and its version are the product's to pin.
 
 ## Acceptance scenarios
 

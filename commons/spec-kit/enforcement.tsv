@@ -1049,7 +1049,6 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-203	check	.github: cd commons/integrations-snmp && bun run verify	commons/integrations-snmp: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-204	check	.github: cd commons/dossier && bun run verify	commons/dossier: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-205	check	.github: cd commons/dossier-assurance && bun run verify	commons/dossier-assurance: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0027-commons-libraries FR-206	check	.github: cd commons/posture-report && bun run verify	commons/posture-report: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-207	check	.github: cd commons/catalog-zero-trust && bun run verify	commons/catalog-zero-trust: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0043-asset-properties FR-033	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0046-dossiers FR-001	check	.github: cd commons/dossier && bun run verify	dossier 0002-dossier-core FR-001
@@ -1088,6 +1087,8 @@ requirement	mechanism	by	note
 0046-dossiers FR-082	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
 0046-dossiers FR-083	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
 0046-dossiers FR-084	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
+0046-dossiers FR-085	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
+0046-dossiers FR-086	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
 0046-dossiers FR-090	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
 0046-dossiers FR-091	check	.github: cd commons/dossier-assurance && bun run verify	dossier-assurance 0002-assurance-lenses FR-002, FR-003, FR-004, FR-005
 0046-dossiers FR-092	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land

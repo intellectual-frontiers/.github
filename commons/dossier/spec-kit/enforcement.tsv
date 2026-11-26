@@ -15,3 +15,4 @@ requirement	mechanism	by	note
 0002-dossier-core FR-010	check	.github: cd commons/dossier && bun run verify	suite/files.test.ts
 0002-dossier-core FR-011	check	.github: cd commons/dossier && bun run verify	suite/files.test.ts: verify
 0002-dossier-core FR-012	check	.github: cd commons/dossier && bun run verify	suite/seal.test.ts
+0002-dossier-core FR-013	check	.github: cd commons/dossier && bun run verify	suite/renditions.test.ts

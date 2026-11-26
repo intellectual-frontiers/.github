@@ -64,6 +64,17 @@ proves(["0002-assurance-lenses FR-004"], "the posture lens gives a row for each 
   assert(!/\d\s*%/.test(r.value.adoc), "no percentage");
 });
 
+proves(["0002-assurance-lenses FR-004"], "the posture lens shows the title and who answers where the readings give them, and no column where none does", async () => {
+  const fuller = [
+    await made("readings/ac-2", "reading", "2026-11-25T09:00:00Z", { requirement: "AC-2", standing: "met", title: "Account management", answers: "shared" }),
+    await made("readings/ac-4", "reading", "2026-11-25T09:00:00Z", { requirement: "AC-4", standing: "partial" }),
+  ];
+  const r = await run(decl("posture", { title: "Posture" }), fuller);
+  assert(r.kind === "ok" && r.value.adoc.includes("Title") && r.value.adoc.includes("Account management") && r.value.adoc.includes("Answers") && r.value.adoc.includes("shared"));
+  const plain = await run(decl("posture", { title: "Posture" }), await sources());
+  assert(plain.kind === "ok" && !plain.value.adoc.includes("Answers") && !plain.value.adoc.includes("| Title"));
+});
+
 proves(["0002-assurance-lenses FR-005"], "the negative space lists what has no reading, is stale or is not fully met, and hides no gap", async () => {
   const r = await run(decl("negative-space", { title: "Gaps", requirements: ["AC-2", "AC-3", "AC-4", "AC-5", "AC-5"], maxAgeDays: 30 }), await sources());
   assert(r.kind === "ok");

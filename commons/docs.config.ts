@@ -436,7 +436,6 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/assessment/spec-kit" },
     { layout: "commons", dir: "commons/tenancy/spec-kit" },
     { layout: "commons", dir: "commons/gate/spec-kit" },
-    { layout: "commons", dir: "commons/posture-report/spec-kit" },
     { layout: "commons", dir: "commons/dossier/spec-kit" },
     { layout: "commons", dir: "commons/dossier-assurance/spec-kit" },
     { layout: "commons", dir: "commons/integrations-identity/spec-kit" },

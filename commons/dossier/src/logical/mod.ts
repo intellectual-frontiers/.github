@@ -8,5 +8,6 @@ export * from "./adoc.ts";
 export * from "./build.ts";
 export * from "./diff.ts";
 export * from "./lens.ts";
+export * from "./renditions.ts";
 export * from "./selection.ts";
 export * from "./sources.ts";

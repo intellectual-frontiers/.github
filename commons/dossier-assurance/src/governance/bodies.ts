@@ -52,6 +52,10 @@ export const STANDINGS = ["met", "partial", "not-met", "no-evidence"] as const;
 export interface Reading {
   readonly requirement: string;
   readonly standing: (typeof STANDINGS)[number];
+  /** The requirement in words, where the source knows it. */
+  readonly title?: string;
+  /** Who answers for it (shared, provider, customer, or the product's own word), where a statement of responsibility says. */
+  readonly answers?: string;
 }
 
 const rec = (j: Json): j is { readonly [k: string]: Json } => typeof j === "object" && j !== null && !Array.isArray(j);
@@ -82,6 +86,6 @@ export function decodeFindings(j: Json): Result<FindingSet, string> {
 
 /** The reading of a requirement from a body. */
 export function decodeReading(j: Json): Result<Reading, string> {
-  if (!rec(j) || !str(j["requirement"]) || !one(j["standing"], STANDINGS)) return err("a reading is { requirement, standing }");
-  return ok({ requirement: j["requirement"], standing: j["standing"] });
+  if (!rec(j) || !str(j["requirement"]) || !one(j["standing"], STANDINGS)) return err("a reading is { requirement, standing, title?, answers? }");
+  return ok({ requirement: j["requirement"], standing: j["standing"], ...(str(j["title"]) ? { title: j["title"] } : {}), ...(str(j["answers"]) ? { answers: j["answers"] } : {}) });
 }

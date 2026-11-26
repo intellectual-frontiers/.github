@@ -73,7 +73,6 @@ ok    The specification kit of package-managers
 ok    The specification kit of pentest
 ok    The specification kit of planning
 ok    The specification kit of planning-query
-ok    The specification kit of posture-report
 ok    The specification kit of quality
 ok    The specification kit of rdf
 ok    The specification kit of repoctl

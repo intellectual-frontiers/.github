@@ -171,6 +171,12 @@ export interface Built {
   readonly manifest: Manifest;
 }
 
+/** A rendition tool as the library sees it (0002-dossier-core FR-013): a pure function of the AsciiDoc, the title and the instant the dossier is as of. */
+export type Renderer = (adoc: string, meta: { readonly title: string; readonly asOf: string }) => Promise<Uint8Array>;
+
+/** The name of each rendition other than the AsciiDoc, and the file it is written to. */
+export const RENDITION_FILES = { html: "dossier.html" } as const;
+
 /** Why a build failed; the code is stable. */
 export interface BuildError {
   readonly code:
@@ -183,6 +189,7 @@ export interface BuildError {
     | "E-DOSSIER-LENS-CITE"
     | "E-DOSSIER-LENS-CEILING"
     | "E-DOSSIER-ANCHOR"
-    | "E-DOSSIER-AS-OF";
+    | "E-DOSSIER-AS-OF"
+    | "E-DOSSIER-NO-RENDERER";
   readonly message: string;
 }
