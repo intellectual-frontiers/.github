@@ -1,0 +1,1206 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45891338660",
+    "workflow": "ci",
+    "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+    "at": "2026-11-26T20:33:21Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45891338660"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8825,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 266,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 170,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 187368,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 187368,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 187,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1496,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1496,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 143,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2268,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2268,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 159,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1465,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1465,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 149,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1326,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1326,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 132,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1106,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-endpoints",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1106,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 124,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 669,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-iac",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 669,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 105,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 894,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate-query",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 894,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "estate",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 169,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "estate",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1197,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "estate",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1197,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 2,
+      "durationMs": 3233,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "evidence-capture",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3233,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-otel",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 169,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-otel",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 559,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-redfish",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 259,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-redfish",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 445,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "integrations-snmp",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 130,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "integrations-snmp",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 7,
+      "durationMs": 430,
+      "exitStatus": 1
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 150,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 53685,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "machine-probe",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 53685,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 215,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3523,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3523,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 151,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 812,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "pentest",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 812,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "planning",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 184,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "planning",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5775,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "planning",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5775,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 156,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1906,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "scanners",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1906,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7396,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 12,
+      "durationMs": 47285,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 47285,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-03723ba73210ba2f",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS7006",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 242,
+      "severity": "error",
+      "message": "Parameter 'event' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 'event' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-10d850d3b5eefbe4",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-18735d24c73f8531",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/dev.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-21444d98e91ea3f2",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/docker.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-356c164d856581bc",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS7006",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 242,
+      "severity": "error",
+      "message": "Parameter 'event' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 'event' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-367e813aaf0e3799",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf10ff40bd032cc0ad7264ef5ca9e43b5021addbdd6878a32ea94c87014083cf"
+      },
+      "at": "2026-11-26T20:29:52Z",
+      "code": "test-failed",
+      "file": "suite/collect.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    },
+    {
+      "id": "f-3958c26f9a8db9fa",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/problem.ts",
+      "line": 16,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-3de72c10894a83fc",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 19,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-4c8dc9b1a5d9fc15",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-4db8058640e79a35",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-526ec008770bf7ce",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-706765f3e98b2c09",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-70bbfda17f51abb4",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/problem.ts",
+      "line": 16,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-70e0a84180bda73c",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS7006",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 242,
+      "severity": "error",
+      "message": "Parameter 'event' implicitly has an 'any' type.",
+      "key": "TS7006:Parameter 'event' implicitly has an 'any' type."
+    },
+    {
+      "id": "f-7721374a787cf282",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-78694220721abc4d",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/problem.ts",
+      "line": 16,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-7a5a3a05a1ffd5bb",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/dev.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-7ecd2aab20c80ec6",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-7f084cafcc62108b",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 30,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-87840106608c4633",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 31,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-973002fe1a38e6ca",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 19,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-9ef305ea62ad2f45",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-9f9fd80acc081de9",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-9fd6d028a3c4e7da",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 30,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-a9d1645f974f070d",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 31,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-b434535bf3b65c07",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-c1d185fbef6cbd90",
+      "tool": "verify",
+      "module": "integrations-snmp",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:56Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 30,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/governance' or its corresponding type declarations."
+    },
+    {
+      "id": "f-c951ce1aa954aaaa",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-ca9ec679a907346c",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-cc2d401768d5a701",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/fleet.ts",
+      "line": 31,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-ce41fc7a97f92d61",
+      "tool": "verify",
+      "module": "integrations-redfish",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/example.ts",
+      "line": 19,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-ddbe08700bbec987",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-fb6496e48008b8e5",
+      "tool": "verify",
+      "module": "integrations-otel",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cc8d516e218a087d6b371c95a4501b3e67bd140f0024d74feed52e900271249e"
+      },
+      "at": "2026-11-26T20:29:49Z",
+      "code": "TS2307",
+      "file": "../estate/src/physical/dev.ts",
+      "line": 18,
+      "severity": "error",
+      "message": "Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations.",
+      "key": "TS2307:Cannot find module '@intellectual-frontiers/anyfs-bridge/mirror' or its corresponding type declarations."
+    },
+    {
+      "id": "f-fb73d4b87e115cb7",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "5c39cb831ff8c11651937024e5618f6d4707cfefae608992180e8c131dca6c0f"
+      },
+      "at": "2026-11-26T20:31:01Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-ffc5c01fe2f2a103",
+      "tool": "verify",
+      "module": "evidence-capture",
+      "evidence": {
+        "run": "45891338660",
+        "commit": "43497bdea1667657d7430cae4777ad81a85aab14",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "cf10ff40bd032cc0ad7264ef5ca9e43b5021addbdd6878a32ea94c87014083cf"
+      },
+      "at": "2026-11-26T20:29:52Z",
+      "code": "test-failed",
+      "file": "suite/journal.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed",
+      "key": "0003-evidence-capture-collect FR-001, 0003-evidence-capture-collect FR-002: a state is kept only where it changed, every look is journaled, commits come when a state changed or the batch interval has run, and the commit is made at the instant and names what changed"
+    }
+  ]
+}
