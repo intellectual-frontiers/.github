@@ -8,6 +8,7 @@
  * @module
  */
 import { absurd } from "@intellectual-frontiers/core";
+import { codeAdoc, fence, lead, textAdoc } from "@intellectual-frontiers/formats/asciidoc";
 import type { Block, Card, Href, Inline, Page, TreeNode } from "../model.ts";
 import { plain, slugOf } from "../model.ts";
 
@@ -33,32 +34,6 @@ function claim(seen: Map<string, number>, page: string, anchor: string): string 
   const n = (seen.get(own) ?? 0) + 1;
   seen.set(own, n);
   return n === 1 ? own : `${own}-${n}`;
-}
-
-/** Text that AsciiDoc would read as markup, or replace, is passed through with only its special characters made safe; any other text is as it is. */
-const MARKUP = /[*_`#^~{}|+\\<>&]|--|\.\.\.|\(C\)|\(R\)|\(TM\)|\bhttps?:\/\//;
-
-/** A square bracket as the attribute that holds its place: a bracket in text can close a macro, or (doubled) make an anchor, wherever it is written. */
-const BRACKET: Readonly<Record<string, string>> = { "[": "{startsb}", "]": "{endsb}" };
-
-/** A run of text with no bracket in it, safe for a paragraph, a list item or a cell. */
-const safe = (t: string): string => (MARKUP.test(t) ? `pass:c[${t}]` : t);
-
-/** A run of text for a paragraph, a list item or a cell. */
-export function textAdoc(t: string): string {
-  return /[[\]]/.test(t) ? t.split(/([[\]])/).map((x) => BRACKET[x] ?? (x === "" ? "" : safe(x))).join("") : safe(t);
-}
-
-/** What a line must not begin with, or AsciiDoc reads it as a list, a heading, a block title, a comment, an attribute or an admonition. */
-const LEADS = /^\s*([-*>]\s|=+\s|\.[^\s.]|\.+\s|:[\w-]+:|\[|\d+\.\s|\/\/|(NOTE|TIP|IMPORTANT|WARNING|CAUTION):\s|<<<|'''|\+$)/;
-
-/** A line of text that begins safely: `{empty}` holds the place of what AsciiDoc would read as markup. */
-export const lead = (line: string): string => (LEADS.test(line) ? `{empty}${line}` : line);
-
-/** Code in a line: its text is passed through as it is, brackets apart. */
-function codeAdoc(t: string): string {
-  const one = (x: string): string => (/[+`\\]/.test(x) ? `pass:c[${x}]` : `+${x}+`);
-  return `\`${/[[\]]/.test(t) ? t.split(/([[\]])/).map((x) => BRACKET[x] ?? (x === "" ? "" : one(x))).join("") : one(t)}\``;
 }
 
 const hrefAdoc = (h: Href, scope: AdocScope, text: string): string => {
@@ -110,12 +85,6 @@ function cardsAdoc(cs: readonly Card[], scope: AdocScope, depth: number): string
 
 const treeAdoc = (ns: readonly TreeNode[], scope: AdocScope, depth: number): string[] =>
   ns.flatMap((n) => [`${marks(depth + 1, "*")} ${codeAdoc(n.label)}${n.note === undefined ? "" : `: ${inlinesAdoc(n.note, scope)}`}`, ...treeAdoc(n.children, scope, depth + 1)]);
-
-/** The fence of a source block: longer than any line of dashes the text holds. */
-function fence(t: string): string {
-  const longest = Math.max(3, ...[...t.matchAll(/^-{4,}\s*$/gm)].map((m) => m[0].trim().length));
-  return "-".repeat(longest + 1);
-}
 
 /** What a page's blocks are written as: where it is (its anchor, for the parts it names) and the marker of its chapter. */
 export interface AdocPage {

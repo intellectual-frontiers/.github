@@ -15,6 +15,7 @@ export const library = {
   exports: [
     ".",
     "./archive",
+    "./asciidoc",
     "./base64",
     "./cbor",
     "./csv",

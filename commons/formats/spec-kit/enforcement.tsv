@@ -28,3 +28,7 @@ requirement	mechanism	by	note
 0002-formats-mime-and-protobuf FR-002	none	-	Deferred and optional: later, only if the owner decides it
 0002-formats-mime-and-protobuf FR-003	none	-	Deferred and optional: later, only if the owner decides it
 0002-formats-mime-and-protobuf FR-004	none	-	Deferred and optional: later, only if the owner decides it
+0003-formats-asciidoc FR-001	check	.github: cd commons/formats && bun run verify	suite/asciidoc.test.ts
+0003-formats-asciidoc FR-002	check	.github: cd commons/formats && bun run verify	suite/asciidoc.test.ts
+0003-formats-asciidoc FR-003	check	.github: cd commons/formats && bun run verify	suite/asciidoc.test.ts
+0003-formats-asciidoc FR-004	check	.github: cd commons/formats && bun run verify	suite/asciidoc.test.ts

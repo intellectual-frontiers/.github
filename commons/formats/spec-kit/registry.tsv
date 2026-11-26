@@ -1,3 +1,4 @@
 number	slug	state
 0001	formats	in force
 0002	formats-mime-and-protobuf	in force
+0003	formats-asciidoc	in force

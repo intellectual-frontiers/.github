@@ -8,7 +8,8 @@
  */
 import type { Finding } from "./check.ts";
 import type { BookPart, BookVolume, BooksConfig, PageSelector } from "./config.ts";
-import { type AdocScope, anchorsOf, lead, pageAdoc, pageAnchor, textAdoc } from "./emit/asciidoc.ts";
+import { lead, textAdoc } from "@intellectual-frontiers/formats/asciidoc";
+import { type AdocScope, anchorsOf, pageAdoc, pageAnchor } from "./emit/asciidoc.ts";
 import { navigation } from "./emit/html.ts";
 import type { Page } from "./model.ts";
 
