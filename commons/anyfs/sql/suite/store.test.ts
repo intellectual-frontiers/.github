@@ -258,7 +258,7 @@ proves(["0005-sql-store FR-002"], "the modified instant of a file is the time of
   assertEquals(b.value.modified, "2026-11-21T12:01:00.000Z");
 });
 
-proves(["0005-sql-store FR-008"], "the store names no table, no column and builds no statement: every statement is in the layout module, which the migration, the merge and the dump share by name", async () => {
+proves(["0005-sql-store FR-008"], "the store names no table, no column and builds no statement: every statement is in the layout module, which the layout, the merge and the dump share by name", async () => {
   const { fs, path } = await import("@intellectual-frontiers/system");
   const here = path.dirname(path.fromFileUrl(import.meta.url));
   const body = async (file: string): Promise<string> =>

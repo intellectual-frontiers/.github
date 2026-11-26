@@ -16,7 +16,7 @@
 - **FR-005**: A rename MUST move an object, its history and its search to a path where there is none as one transaction, MUST refuse a move onto an object, and MUST refuse a move to the same path.
 - **FR-006**: `search` MUST be a capability only where the engine has the index, MUST find the objects whose bytes are text that holds the words, below a prefix, and MUST treat the words as words: no operator of the engine's query syntax can be written by the caller.
 - **FR-007**: An object larger than the store's limit MUST be refused as too large and never cut, bytes that are not the ones their revision names MUST be reported as tampered, and a busy or locked database MUST be reported as unavailable and retryable.
-- **FR-008**: Every statement that names a table or a column MUST be in one module, the layout (`layout.ts`), called by name by the store, so that the store holds the rules of an operation and no name of a table, a column or a key, and a different layout of the rows is a replacement of that module and of the migrations and nothing else.
+- **FR-008**: Every statement that names a table or a column MUST be in one module, the layout (`layout.ts`), called by name by the store, so that the store holds the rules of an operation and no name of a table, a column or a key, and a different layout of the rows is a replacement of that module and of the making of the layout and nothing else.
 
 ## Acceptance scenarios
 

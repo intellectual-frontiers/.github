@@ -1,5 +1,5 @@
 /**
- * Tests of the typed documents of AnyFS (commons anyfs 0006-anyfs-documents FR-001 to FR-012): the codecs and their canonical bytes, the schema with its migrations and the refusal of a newer version, the
+ * Tests of the typed documents of AnyFS (commons anyfs 0006-anyfs-documents FR-001 to FR-012): the codecs and their canonical bytes, the schema with its version and the refusal of any other version, the
  * layouts and the law that a path gives its key back, collections over a store in memory and a store in a folder (a document with its revision, a put that states what it expects, a listing that finds the
  * bad objects beside the good ones, an update that retries where another writer got there first), what a collection may do in its type, and the codecs of the file formats.
  *
@@ -21,7 +21,6 @@ import {
   type DocId,
   jsonTree,
   layoutFindings,
-  type Migration,
   parseDocId,
   parseExtension,
   parseIsoDate,
@@ -79,7 +78,7 @@ proves(["0006-anyfs-documents FR-001"], "JSON is written canonically (keys in or
 proves(["0006-anyfs-documents FR-002"], "the bytes codec keeps the bytes, the text codec refuses what is not UTF-8, and a codec that cannot read ends with a malformed result and not an exception", () => {
   const raw = new Uint8Array([1, 2, 3]);
   const kept = bytesCodec.decode(raw);
-  assert(kept.kind === "ok" && kept.value.value === raw && !kept.value.stale);
+  assert(kept.kind === "ok" && kept.value.value === raw);
   const t = textCodec.decode(new Uint8Array([0xff, 0xfe]));
   assert(t.kind === "err" && t.error.reason === "malformed");
   const text = textCodec.decode(bytes("héllo"));
@@ -89,40 +88,30 @@ proves(["0006-anyfs-documents FR-002"], "the bytes codec keeps the bytes, the te
   assertEquals(textCodec.encode("\ud800").kind, "err");
 });
 
-proves(["0006-anyfs-documents FR-003"], "a schema is refused whose migrations do not step from 1 to the version before the current one, in order, with none missing", () => {
-  const up = (value: Record<string, unknown>) => ({ kind: "ok" as const, value: value as never });
+proves(["0006-anyfs-documents FR-003"], "a schema is refused whose version is not a positive whole number", () => {
   assertEquals(defineSchema({ current: 0, decoder: assetDecoder }).kind, "err");
   assertEquals(defineSchema({ current: 1.5, decoder: assetDecoder }).kind, "err");
-  assertEquals(defineSchema({ current: 2, decoder: assetDecoder }).kind, "err");
-  assertEquals(defineSchema({ current: 3, decoder: assetDecoder, migrations: [{ from: 2, up }, { from: 1, up }] }).kind, "err");
-  assertEquals(defineSchema({ current: 3, decoder: assetDecoder, migrations: [{ from: 1, up }, { from: 2, up }] }).kind, "ok");
+  assertEquals(defineSchema({ current: 2, decoder: assetDecoder }).kind, "ok");
 });
 
-const v2Migrations: readonly Migration[] = [
-  { from: 1, up: (v) => ({ kind: "ok", value: typeof v["label"] === "string" ? { name: v["label"], cores: 1 } : v }) },
-];
-const schemaV2 = ok(defineSchema({ current: 2, decoder: assetDecoder, migrations: v2Migrations }));
+const schemaV2 = ok(defineSchema({ current: 2, decoder: assetDecoder }));
 const codecV2 = versioned(jsonTree, schemaV2);
 
-proves(["0006-anyfs-documents FR-004"], "a document is written at the current version and read at any older one through the migrations (and said to be stale), and one of a newer version or a bad shape is refused with its reason", () => {
+proves(["0006-anyfs-documents FR-004"], "a document is written at the current version and read at that version only, and one of another version or a bad shape is refused with its reason", () => {
   const written = ok(codecV2.encode({ name: "synthetic-server-01", cores: 8 }));
   assertEquals(new TextDecoder().decode(written), `{\n  "$version": 2,\n  "cores": 8,\n  "name": "synthetic-server-01"\n}\n`);
   const current = ok(codecV2.decode(written));
   assertEquals(current.value, { name: "synthetic-server-01", cores: 8 });
-  assertEquals(current.stale, false);
-  const old = ok(codecV2.decode(bytes('{ "label": "lab" }')));
-  assertEquals(old.value, { name: "lab", cores: 1 });
-  assertEquals(old.stale, true);
-  const v1 = ok(codecV2.decode(bytes(`{ "${VERSION_FIELD}": 1, "label": "lab" }`)));
-  assertEquals(v1.stale, true);
+  const older = codecV2.decode(bytes(`{ "${VERSION_FIELD}": 1, "name": "x", "cores": 1 }`));
+  assert(older.kind === "err" && older.error.reason === "version");
+  const unversioned = codecV2.decode(bytes('{ "name": "x", "cores": 1 }'));
+  assert(unversioned.kind === "err" && unversioned.error.reason === "version");
   const newer = codecV2.decode(bytes(`{ "${VERSION_FIELD}": 3, "name": "x", "cores": 1 }`));
-  assert(newer.kind === "err" && newer.error.reason === "newer-version");
+  assert(newer.kind === "err" && newer.error.reason === "version");
   const bad = codecV2.decode(bytes(`{ "${VERSION_FIELD}": 2, "name": "x" }`));
   assert(bad.kind === "err" && bad.error.reason === "invalid");
   assertEquals(codecV2.decode(bytes(`{ "${VERSION_FIELD}": "two" }`)).kind, "err");
   assertEquals(codecV2.decode(bytes("[1]")).kind, "err");
-  const refusing = ok(defineSchema({ current: 2, decoder: assetDecoder, migrations: [{ from: 1, up: () => ({ kind: "err", error: "cannot" }) }] }));
-  assertStringIncludes(JSON.stringify(versioned(jsonTree, refusing).decode(bytes('{ "x": 1 }'))), "cannot");
   assertEquals(codecV2.encode({ name: "x", cores: Number.NaN }).kind, "err");
 });
 
@@ -186,7 +175,6 @@ proves(["0006-anyfs-documents FR-007"], "a document is put with what the put exp
   const got = ok(await docs.get(key));
   assertEquals(got.value, { name: "synthetic-server-01", cores: 8 });
   assertEquals(got.rev, created.rev);
-  assertEquals(got.stale, false);
   const again = await docs.put(key, { name: "synthetic-server-01", cores: 16 }, expectAbsent);
   assert(again.kind === "err" && again.error.kind === "store" && again.error.problem.kind === "conflict");
   const moved = ok(await docs.put(key, { name: "synthetic-server-01", cores: 16 }, expectRev(created.rev)));
@@ -312,38 +300,19 @@ proves(["0006-anyfs-documents FR-010"], "what a collection may do is in its type
   assertEquals(nope.error?.problem?.kind, "refused");
 });
 
-proves(["0006-anyfs-documents FR-011"], "migrate writes each stale document again at the current version and leaves the others, and a collection over a store in a folder keeps the same laws as over memory", async () => {
+proves(["0006-anyfs-documents FR-011"], "a collection over a store in a folder keeps the same laws as over memory", async () => {
   await fs.withTempDir(async (dir) => {
-    const made = await localStore(dir, { create: true });
-    const store = ok(made);
-    const old = collection(store, { prefix: prefix("assets"), layout: ok(sharded(ext, 2)), codec: codecV1 });
-    ok(await old.put(id("alpha"), { name: "alpha", cores: 2 }, expectAbsent));
-    const docs = collection(store, { prefix: prefix("assets"), layout: ok(sharded(ext, 2)), codec: codecV2 });
+    const store = ok(await localStore(dir, { create: true }));
+    const docs = collection(store, { prefix: prefix("assets"), layout: ok(sharded(ext, 2)), codec: codecV1 });
     ok(await docs.put(id("bravo"), { name: "bravo", cores: 4 }, expectAbsent));
-    ok(await store.write(p("assets/ch/charlie.json"), bytes('{ "label": "charlie" }'), expectAbsent));
-    const before = ok(await docs.get(id("charlie")));
-    assertEquals(before.stale, true);
-    assertEquals(before.value, { name: "charlie", cores: 1 });
-    const alphaBefore = ok(await docs.get(id("alpha")));
-    assertEquals(alphaBefore.stale, true);
-    const report = ok(await docs.migrate());
-    assertEquals(report.scanned, 3);
-    assertEquals(report.rewritten, 2);
-    assertEquals(report.failures, []);
-    const after = ok(await docs.get(id("charlie")));
-    assertEquals(after.stale, false);
-    assertEquals(after.value, { name: "charlie", cores: 1 });
-    assertEquals(ok(await docs.migrate()).rewritten, 0);
-    const text = await fs.readTextFile(osPath.join(dir, "assets", "ch", "charlie.json"));
-    assertStringIncludes(text, `"${VERSION_FIELD}": 2`);
     const results = await Promise.all(Array.from({ length: 4 }, (_, i) => docs.update(id("bravo"), (d) => ({ kind: "put", value: { name: "bravo", cores: (d?.value.cores ?? 0) + i } }))));
     assertEquals(results.every((r) => r.kind === "ok"), true);
     assertEquals(ok(await docs.get(id("bravo"))).value.cores, 4 + 0 + 1 + 2 + 3);
-    const refused = collection(only(store, ["read", "write", "list", "cas"]), { prefix: prefix("assets"), layout: ok(sharded(ext, 2)), codec: codecV2 });
-    assertEquals((await refused.migrate()).kind, "ok");
+    const text = await fs.readTextFile(osPath.join(dir, "assets", "br", "bravo.json"));
+    assertStringIncludes(text, `"${VERSION_FIELD}": 1`);
   });
-  const noCas = collection(only(memoryStore({ name: "m" }), ["read", "write", "list"]), { prefix: ROOT, layout: byId(ext), codec: codecV2 }) as unknown as { migrate(): Promise<{ kind: string; error?: { kind: string } }> };
-  const r = await noCas.migrate();
+  const noCas = collection(only(memoryStore({ name: "m" }), ["read", "write", "list"]), { prefix: ROOT, layout: byId(ext), codec: codecV1 }) as unknown as { update(key: unknown, f: unknown): Promise<{ kind: string; error?: { kind: string } }> };
+  const r = await noCas.update(id("x"), () => ({ kind: "keep" }));
   assertEquals(r.kind, "err");
   assertEquals(r.error?.kind, "refused");
 });
@@ -360,9 +329,8 @@ proves(["0006-anyfs-documents FR-012"], "the codecs of the file formats read a t
   assertEquals(json5Tree.decode(bytes("{ name: ")).kind, "err");
   assertEquals(yamlTree.decode(bytes("a: [1, 2")).kind, "err");
   const asYaml = versioned(yamlTree, schemaV2);
-  const doc = ok(asYaml.decode(bytes("label: lab\n")));
+  const doc = ok(asYaml.decode(bytes("$version: 2\nname: lab\ncores: 1\n")));
   assertEquals(doc.value, { name: "lab", cores: 1 });
-  assertEquals(doc.stale, true);
   assertStringIncludes(new TextDecoder().decode(ok(asYaml.encode({ name: "x", cores: 2 }))), "$version");
   assertEquals(yamlTree.mediaType, "application/yaml");
   assertEquals(json5Tree.mediaType, "application/json5");

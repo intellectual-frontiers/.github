@@ -1,8 +1,8 @@
 // Spec: 0005-sql-store FR-008
 /**
  * The one module that knows the tables: every statement the store runs, by name, with the names of the tables and of the columns. The store (`store.ts`), the merge (`merge.ts`) and the dump (`dump.ts`) hold the rules of
- * an operation and call these by name, and the migration (`schema.ts`) makes the tables and views these statements read: a different layout of the rows is a different module with the same names, and nothing else in
- * the library changes with it. The rows are the version rows and the blobs; what a path holds is read from the views the migration makes, or from the rows of the path, and nothing is ever written to a view.
+ * an operation and call these by name, and the layout (`schema.ts`) makes the tables and views these statements read: a different layout of the rows is a different module with the same names, and nothing else in
+ * the library changes with it. The rows are the version rows and the blobs; what a path holds is read from the views the layout makes, or from the rows of the path, and nothing is ever written to a view.
  *
  * @example
  * ```ts

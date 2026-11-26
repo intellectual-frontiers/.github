@@ -21,15 +21,15 @@ export type JsonValue = null | boolean | number | string | readonly JsonValue[] 
 export type JsonObject = { readonly [key: string]: JsonValue };
 
 /** Why a codec could not make or read a document: a closed list. */
-export const CODEC_REASONS = ["malformed", "invalid", "newer-version", "unencodable"] as const;
+export const CODEC_REASONS = ["malformed", "invalid", "version", "unencodable"] as const;
 /** One reason a codec could not make or read a document. */
 export type CodecReason = (typeof CODEC_REASONS)[number];
 
 /** What a codec says when it does not: the reason and one sentence. */
 export type CodecProblem = { readonly reason: CodecReason; readonly detail: string };
 
-/** What a codec read: the value and whether the bytes were written at an older version than the current one. */
-export type Decoded<T> = { readonly value: T; readonly stale: boolean };
+/** What a codec read: the value. */
+export type Decoded<T> = { readonly value: T };
 
 /** Bytes to a value and back, with the media type of the bytes. */
 export type Codec<T> = {
@@ -96,7 +96,7 @@ export function canonicalJson(value: JsonValue): string {
 export const bytesCodec: Codec<Uint8Array> = {
   mediaType: "application/octet-stream",
   encode: (value) => ok(value),
-  decode: (bytes) => ok({ value: bytes, stale: false }),
+  decode: (bytes) => ok({ value: bytes }),
 };
 
 /** The bytes as UTF-8 text: bytes that are not UTF-8 are malformed. */
@@ -105,7 +105,7 @@ export const textCodec: Codec<string> = {
   encode: (value) => (value.isWellFormed() ? ok(new TextEncoder().encode(value)) : err(problem("unencodable", "the text holds a lone surrogate"))),
   decode: (bytes) => {
     try {
-      return ok({ value: new TextDecoder("utf-8", { fatal: true }).decode(bytes), stale: false });
+      return ok({ value: new TextDecoder("utf-8", { fatal: true }).decode(bytes) });
     } catch {
       return err(problem("malformed", "the bytes are not UTF-8"));
     }
@@ -122,6 +122,6 @@ export const jsonTree: Codec<JsonValue> = {
     const parsed = json(text.value.value, unknownValue);
     if (parsed.kind === "err") return err(problem("malformed", "the text is not JSON"));
     const tree = toJsonValue(parsed.value);
-    return tree.kind === "ok" ? ok({ value: tree.value, stale: false }) : err(problem("malformed", tree.error));
+    return tree.kind === "ok" ? ok({ value: tree.value }) : err(problem("malformed", tree.error));
   },
 };

@@ -61,7 +61,7 @@ proves(["0005-estate-fleet-documents FR-003"], "each type of document is written
     assert(new TextDecoder().decode(encoded.value).includes('"$version": 1'), `${name} says its version`);
     const text = new TextDecoder().decode(encoded.value).replace('"$version": 1', '"$version": 9');
     const read = (codec as { decode(b: Uint8Array): { kind: string; error?: { reason: string } } }).decode(bytes(text));
-    assert(read.kind === "err" && read.error?.reason === "newer-version", `${name} written at version 9 is refused as newer`);
+    assert(read.kind === "err" && read.error?.reason === "version", `${name} written at version 9 is refused as newer`);
   }
 });
 

@@ -6,13 +6,13 @@
  *
  * @remarks
  * The one cast of the module is in `collection`: it builds the object with every method and gives it the type its capabilities say, as `makeStore` does for a store. The methods that need a capability the
- * store does not have refuse at run time through the store, and `update` and `migrate` refuse before they read.
+ * store does not have refuse at run time through the store, and `update` refuses before it reads.
  *
  * @example
  * ```ts
  * import { collection, jsonTree, byId, parseExtension, defineSchema } from "@intellectual-frontiers/anyfs/docs";
  * // const docs = collection(store, { prefix, layout: byId(ext), codec: versioned(jsonTree, schema) });
- * // const doc = await docs.get(key);          // ok { value, rev, stale }
+ * // const doc = await docs.get(key);          // ok { value, rev }
  * // await docs.update(key, (d) => ({ kind: "put", value: next(d?.value) }));
  * ```
  *
@@ -39,7 +39,7 @@ import type { Layout } from "./layout.ts";
 import { type DocProblem, type Finding, storeProblem } from "./problem.ts";
 
 /** A document with the key it is kept under, the path, the revision it was read at and whether it was written at an older version than the current. */
-export type Doc<T, K> = { readonly key: K; readonly path: Path; readonly value: T; readonly rev: Revision; readonly stale: boolean; readonly modified?: string };
+export type Doc<T, K> = { readonly key: K; readonly path: Path; readonly value: T; readonly rev: Revision; readonly modified?: string };
 /** What a put made. */
 export type Saved<K> = { readonly key: K; readonly path: Path; readonly rev: Revision; readonly created: boolean };
 /** One page of a listing: the good documents and the findings in the order of the paths, and where the next page begins where there is one. */
@@ -54,9 +54,6 @@ export type Updated<T, K> =
   | { readonly kind: "put"; readonly doc: Doc<T, K>; readonly created: boolean; readonly attempts: number }
   | { readonly kind: "deleted"; readonly attempts: number }
   | { readonly kind: "kept"; readonly doc?: Doc<T, K>; readonly attempts: number };
-/** What `migrate` did. */
-export type Migrated = { readonly scanned: number; readonly rewritten: number; readonly findings: readonly Finding[]; readonly failures: readonly DocProblem[] };
-
 /** What a collection is made from. */
 export type CollectionConfig<T, K> = {
   /** Where the documents are in the store. */
@@ -94,8 +91,7 @@ export type Collection<T, K, C extends Capability> = CollectionBase<K> &
       scan(): AsyncGenerator<Item<T, K>, void, undefined>;
     }
   > &
-  Gate<C, "read" | "write" | "cas", { update(key: K, f: (current: Doc<T, K> | undefined) => Update<T, C> | Promise<Update<T, C>>): Promise<Result<Updated<T, K>, DocProblem>> }> &
-  Gate<C, "list" | "read" | "write" | "cas", { migrate(): Promise<Result<Migrated, DocProblem>> }>;
+  Gate<C, "read" | "write" | "cas", { update(key: K, f: (current: Doc<T, K> | undefined) => Update<T, C> | Promise<Update<T, C>>): Promise<Result<Updated<T, K>, DocProblem>> }>;
 
 const mapLimit = async <A, B>(items: readonly A[], limit: number, f: (a: A) => Promise<B>): Promise<B[]> => {
   const out: B[] = new Array<B>(items.length);
@@ -139,7 +135,7 @@ export function collection<T, K, C extends Capability>(store: Store<C>, config: 
   const decode = (key: K, path: Path, bytes: Uint8Array, rev: Revision, modified: string | undefined): Result<Doc<T, K>, DocProblem> => {
     const decoded = config.codec.decode(bytes);
     if (decoded.kind === "err") return err({ kind: "undecodable", path, reason: decoded.error.reason, detail: decoded.error.detail });
-    return ok({ key, path, value: decoded.value.value, rev, stale: decoded.value.stale, ...(modified === undefined ? {} : { modified }) });
+    return ok({ key, path, value: decoded.value.value, rev, ...(modified === undefined ? {} : { modified }) });
   };
 
   const get = async (key: K): Promise<Result<Doc<T, K>, DocProblem>> => {
@@ -226,7 +222,7 @@ export function collection<T, K, C extends Capability>(store: Store<C>, config: 
         if (!(gone.error.kind === "store" && gone.error.problem.kind === "conflict")) return gone;
       } else {
         const saved = await write(key, step.value, expect);
-        if (saved.kind === "ok") return ok({ kind: "put", doc: { key, path: path.value, value: step.value, rev: saved.value.rev, stale: false }, created: saved.value.created, attempts: attempt });
+        if (saved.kind === "ok") return ok({ kind: "put", doc: { key, path: path.value, value: step.value, rev: saved.value.rev }, created: saved.value.created, attempts: attempt });
         if (!(saved.error.kind === "store" && saved.error.problem.kind === "conflict")) return saved;
       }
       if (config.pause !== undefined) await config.pause(attempt);
@@ -234,26 +230,6 @@ export function collection<T, K, C extends Capability>(store: Store<C>, config: 
     return err({ kind: "exhausted", path: path.value, attempts });
   };
 
-  const migrate = async (): Promise<Result<Migrated, DocProblem>> => {
-    if (!store.capabilities.has("cas")) return err({ kind: "refused", detail: "a migration needs a store with cas, and this store has none" });
-    let scanned = 0;
-    let rewritten = 0;
-    const findings: Finding[] = [];
-    const failures: DocProblem[] = [];
-    for await (const item of scan()) {
-      if (item.kind === "finding") {
-        findings.push(item.finding);
-        continue;
-      }
-      scanned++;
-      if (!item.doc.stale) continue;
-      const done = await update(item.doc.key, (current) => (current === undefined ? { kind: "keep" } : { kind: "put", value: current.value }));
-      if (done.kind === "err") failures.push(done.error);
-      else if (done.value.kind === "put") rewritten++;
-    }
-    return ok({ scanned, rewritten, findings, failures });
-  };
-
   // The one cast: the object has every method, and its type says which of them its capabilities allow.
-  return { pathOf, get, put: write, delete: remove, list, scan, update, migrate } as unknown as Collection<T, K, C>;
+  return { pathOf, get, put: write, delete: remove, list, scan, update } as unknown as Collection<T, K, C>;
 }
