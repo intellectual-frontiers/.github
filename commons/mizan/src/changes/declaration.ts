@@ -301,15 +301,3 @@ export type SigningWaiver = {
   readonly key: string;
 };
 
-/**
- * The waivers of the signed-commit rule that the Decisions of a harness record make: each entry of a Decision's `covers` written `signing-waiver <account> <key>`.
- * An entry that names no account or no key waives nothing, and a Decision that says only `signing-waiver` or names the account alone waives no one.
- */
-export function signingWaivers(decisions: readonly DecisionRecord[]): readonly SigningWaiver[] {
-  return decisions.flatMap((d) =>
-    d.covers.flatMap((c): SigningWaiver[] => {
-      const m = new RegExp(`^${SIGNING_WAIVER} (\\S+) (\\S+)$`).exec(c);
-      return m?.[1] === undefined || m[2] === undefined ? [] : [{ decision: d.id, approvedBy: d.approvedBy, account: m[1], key: m[2] }];
-    }),
-  );
-}

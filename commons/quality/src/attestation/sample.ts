@@ -91,9 +91,6 @@ export async function drawSample(input: DrawInput): Promise<Result<Drawn, string
 /** The event of a sample drawn. */
 export type SampleDrawn = Extract<LedgerEvent, { readonly kind: "sample-drawn" }>;
 
-/** The event of a person's attestation. */
-export type SampleAttested = Extract<LedgerEvent, { readonly kind: "sample-attested" }>;
-
 /**
  * Whether a recorded sample is the one its seed and population give (FR-041): the population is the one the record names (its count and
  * digest), and drawing again gives the items the record lists. The first difference is named.

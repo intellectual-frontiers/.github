@@ -135,8 +135,6 @@ export const mz = vocabulary(MZ, {
 
 // ---- the words a field may hold, each list the union of its field's type
 
-/** The statuses of a specification (commons 0003-mizan FR-010). */
-export const SPEC_STATUSES = ["Draft", "Active", "Deferred", "Superseded"] as const;
 /** How a term relates to its standard's term, in the words SSSOM publishes mappings with (commons 0019-mizan-integrations FR-010). */
 export const MAPPING_RELATIONS = ["exactMatch", "closeMatch", "narrowMatch", "broadMatch", "subClassOf", "subPropertyOf"] as const;
 /** The platforms an exception's tool may support (commons 0017-two-languages FR-004). */

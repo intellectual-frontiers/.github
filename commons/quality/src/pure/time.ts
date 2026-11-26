@@ -27,11 +27,6 @@ export function dayOfText(text: string): Result<Day, string> {
   return isDay(text) ? ok(text as Day) : err(`${JSON.stringify(text)} is not a day (YYYY-MM-DD)`); // checked just now: the brand's constructor
 }
 
-/** The UTC day of nanoseconds since the Unix epoch. */
-export function dayOfNanos(nanos: bigint): Day {
-  return new Date(Number(nanos / 1_000_000n)).toISOString().slice(0, 10) as Day; // an ISO date is a day
-}
-
 /** The instant of noon UTC on a day: the time a day-grained piece of evidence is held to its cadence from. */
 export function noonOf(day: string): Instant | undefined {
   return instantOf(`${day}T12:00:00.000Z`);

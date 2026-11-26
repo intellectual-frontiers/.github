@@ -22,7 +22,7 @@
  * @module
  */
 import { absurd, err, ok, type Result } from "@intellectual-frontiers/core";
-import { type BundleName, BUNDLES, type Library, publishedPackage } from "./libraries.ts";
+import { type BundleName, type Library, publishedPackage } from "./libraries.ts";
 import { DEFAULT_LICENSE } from "./license/standard.ts";
 import { ROLE_OF, type Role } from "./readme.ts";
 
@@ -194,5 +194,3 @@ export const ENTRY_JS = "export {};\n";
 /** The declaration of {@link ENTRY_JS}. */
 export const ENTRY_DTS = "export {};\n";
 
-/** Every set, in the order the README lists them. */
-export const ALL_BUNDLES: readonly BundleName[] = BUNDLES;

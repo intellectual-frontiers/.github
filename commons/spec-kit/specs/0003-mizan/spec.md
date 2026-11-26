@@ -10,7 +10,7 @@
 ## The format
 
 - **FR-001**: A spec-kit folder MUST hold `registry.tsv` (header `number`, `slug`, `state`; one row for every number ever assigned, `in force` or `retired`, with no number twice and no gap), `enforcement.tsv` and `specs/NNN-slug/spec.md` or `specs/NNNN-slug/spec.md` for each specification, where NNN or NNNN is a number of three or four digits (amended 2026-11-18, FR-041) and a slug is lower-case words joined by hyphens. A specification in force MUST have a folder; a retired one MUST NOT.
-- **FR-002**: A specification MUST begin `# Feature Specification: <title>`, carry `**Spec ID:**` naming its folder, `**Status:**` (Draft, Active, Deferred or Superseded, and Adopted until a harness has moved to Active, FR-010), `**Owner:**` and `**Domain:**`, and hold `**Input:**`, `## Edge cases`, `## Assumptions`, `## Open questions`, `## Key entities`, `## Success criteria` and `## Review & acceptance checklist` in that order, with `## Mizan and GitHub Spec Kit## Out of scope` (optional) before `## Edge cases`.
+- **FR-002**: A specification MUST begin `# Feature Specification: <title>`, carry `**Spec ID:**` naming its folder, `**Status:**` (Draft, Active, Deferred or Superseded, FR-010), `**Owner:**` and `**Domain:**`, and hold `**Input:**`, `## Edge cases`, `## Assumptions`, `## Open questions`, `## Key entities`, `## Success criteria` and `## Review & acceptance checklist` in that order, with `## Mizan and GitHub Spec Kit## Out of scope` (optional) before `## Edge cases`.
 - **FR-003**: A requirement is `- **FR-nnn**:`, numbered in increasing order and never reused in its specification; every edge case MUST cite the requirements it exercises, and every one it cites MUST exist in its specification.
 - **FR-004**: A specification of another repository MUST be cited with the repository's name before its number (`desired-os-state 0002-specs`); a bare number names a specification of the same folder and MUST exist there.
 - **FR-005**: `enforcement.tsv` MUST have exactly one row, with four tab-separated columns (requirement, mechanism, who, note), for every requirement of every specification, and none for a requirement that does not exist. The mechanism is `check`, `gate`, `review` or `none`; `check` and `gate` name who as `<repository>: <command>`; `review` names the requirement that defines the review; `none` has `-` for who and says why in the note.
@@ -27,7 +27,7 @@
 ## Mizan and GitHub Spec Kit
 
 - **FR-009**: Mizan MUST be a profile of GitHub Spec Kit, never a replacement: a harness keeps Spec Kit's method (its commands, its constitution and the `spec.md`, `plan.md` and `tasks.md` of a feature) and Mizan adds only the registers, the tracing of requirements to proofs, the ladder (0016-ladder), the requirement syntax, the standards-first rules (0018-standards-first) and their checks. A specification MUST say which version of Spec Kit's templates it follows where it departs from them. The old name `spec-kit-check.ts` MUST remain, for one repin cycle, as a file that runs `mizan-check.ts` and adds nothing.
-- **FR-010**: A specification's status MUST be Draft (written, not yet built), Active (in force: every requirement is proven by a test or declared as reviewed), Deferred (out of scope until its owner decides) or Superseded. Adopted, the word this format used before Mizan, MUST be accepted until every specification of a harness has moved to Active.
+- **FR-010**: A specification's status MUST be Draft (written, not yet built), Active (in force: every requirement is proven by a test or declared as reviewed), Deferred (out of scope until its owner decides) or Superseded.
 - **FR-011**: The register of what proves each requirement MUST map a requirement to OSCAL (a control, a component definition and its assessment results) where OSCAL can state it, and MUST stay as `enforcement.tsv` for what OSCAL cannot, so that no proof is written twice. The mapping is built by `commons/libraries/src/oscal-register.ts` (FR-021 to FR-023, amended 2026-11-17).
 - **FR-012**: A specification MAY be written in GitHub Spec Kit's form, told by its `## User Scenarios & Testing` section: its head then has `**Status**:` (or `**Status:**`) and no `**Spec ID:**`, `**Owner:**` or `**Domain:**` line is required, and it MUST hold `## User Scenarios & Testing`, `## Requirements` and `## Success Criteria` in that order (a heading may carry a suffix such as `*(mandatory)*`). The commons sections and the citing of edge cases do not apply to it; the register, the status words, the numbering of requirements, the citations of specifications and the rows of `enforcement.tsv` apply to both forms.
 
@@ -91,7 +91,6 @@
 - A file of `commons/mizan/` that imports a package that is not a library it declares, the ontology, the Git host contract's types or `node:`: refused, per FR-017.
 - `commons/generated/mizan.auto.ttl` edited by hand: `--check` names it as not what the ontology makes, per FR-018.
 - A class of the Mizan ontology with no `mz:OntologyTerm` saying its basis: the test names it, per 0018-standards-first FR-003.
-- A harness that still runs `spec-kit-check.ts`: it keeps working and gets the same findings, per FR-009.
 - A `**Part of:**` line that names a specification the folder does not have, or the specification itself: the tool names it, per FR-008.
 - A specification folder named `12-short`, or `00001-long`: the tool names the folder's name and the register's row, per FR-041.
 - A gap in a register of three-digit numbers: the tool says `gap at 002`, per FR-041.
@@ -116,7 +115,6 @@
 
 - **SC-001**: `bun commons/tools/mizan-check.ts` exits 0 on commons' own folder.
 - **SC-002**: Each rule has a test that breaks it and sees it named.
-- **SC-003**: The old name still runs and its findings and exit status are the new name's.
 
 ## Review & acceptance checklist
 

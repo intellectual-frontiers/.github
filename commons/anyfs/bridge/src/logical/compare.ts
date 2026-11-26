@@ -14,7 +14,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { type Path, type Problem, type Revision, schemeOf } from "@intellectual-frontiers/anyfs/governance";
+import { type Problem, type Revision, schemeOf } from "@intellectual-frontiers/anyfs/governance";
 import type { Stat, Store } from "@intellectual-frontiers/anyfs/logical";
 import type { Comparator, Decider } from "@intellectual-frontiers/anyfs-bridge/governance";
 
@@ -78,8 +78,3 @@ export async function compare(src: Side, dst: Side, comparators: readonly Compar
   return ok({ same: false, by: "undecided" });
 }
 
-/** The digest of a path read for its own sake: used where a plan needs the bytes' hash and no stat. */
-export async function digestOfPath(store: Store<"read">, path: Path): Promise<Result<string, Problem>> {
-  const read = await store.read(path);
-  return read.kind === "err" ? read : ok(await sha256(read.value.bytes));
-}

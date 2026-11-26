@@ -1,7 +1,7 @@
 # Feature Specification: The Arch family and the Omarchy virtual machine
 
 **Spec ID:** 0003-lab-arch-family
-**Status:** Adopted
+**Status:** Active
 **Owner:** if
 **Domain:** commons
 

@@ -49,7 +49,7 @@ export interface Spec {
   readonly layout: Layout;
   /** Its title, after `# Feature Specification: ` (or, in the plain layout, after `# NNN: `). */
   readonly title: string;
-  /** `Draft`, `Adopted`, `Superseded`, or what a plain specification says; empty where it says nothing. */
+  /** `Draft`, `Active`, `Superseded`, or what a plain specification says; empty where it says nothing. */
   readonly status: string;
   /** Its owner, where it says. */
   readonly owner: string;

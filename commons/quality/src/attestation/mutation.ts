@@ -25,7 +25,7 @@ import type { LedgerEvent } from "../pure/ledger.ts";
 import { type Grade, gradeRank, GRADES } from "../pure/names.ts";
 import { dayOfText } from "../pure/time.ts";
 import { type MutationRow, mutationRowDecoder } from "../pure/tier2-events.ts";
-import { type Assurance, formatAssuranceError, foldAssurance, nextId, type RecordedMutationRun } from "./rules.ts";
+import { formatAssuranceError, foldAssurance, nextId, type RecordedMutationRun } from "./rules.ts";
 
 /** The floor of strength, in a thousandth, below which a proof's grade is lowered where the harness states no other. */
 export const DEFAULT_FLOOR_PERMILLE = 600;
@@ -153,7 +153,3 @@ export function mutationEvent(events: readonly LedgerEvent[], report: MutationRe
   return after.kind === "ok" ? ok(event) : err(formatAssuranceError(after.error));
 }
 
-/** The mutation runs of an assurance, newest first, for a listing. */
-export function listRuns(a: Assurance): readonly RecordedMutationRun[] {
-  return [...a.mutations].sort((x, y) => y.seq - x.seq);
-}

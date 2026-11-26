@@ -11,7 +11,6 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/core";
 import { showGrade } from "../pure/names.ts";
 import { showStrength } from "../attestation/mutation.ts";
 import type { TrustCapa, TrustFailure, TrustNonconformance, TrustView } from "./view.ts";
@@ -255,16 +254,3 @@ export function trustHtml(v: TrustView): string {
   return out.join("\n");
 }
 
-/** The audience's name as the page shows it, kept here so that a switch over audiences stays exhaustive in one place. */
-export function audienceWords(a: TrustView["audience"]): string {
-  switch (a) {
-    case "Public":
-      return "public";
-    case "Assessor":
-      return "assessor";
-    case "Internal":
-      return "internal";
-    default:
-      return absurd(a);
-  }
-}

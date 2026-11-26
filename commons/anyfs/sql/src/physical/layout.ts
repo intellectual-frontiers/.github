@@ -19,9 +19,6 @@ import type { Query, Sql } from "./sql.ts";
 /** The statements of the layout, by what each does. Each returns the builder of one statement. */
 export type Layout = ReturnType<typeof layoutOf>;
 
-/** The columns of the version table, in the order a row is written and a dump gives it. */
-export const VERSION_COLUMN_NAMES = ["id", "sum", "replica", "seq", "path", "parent", "merged", "kind", "blob"] as const;
-
 /** How many values a statement is given at a time where it names a list: well below the limit of any engine. */
 export const CHUNK = 400;
 

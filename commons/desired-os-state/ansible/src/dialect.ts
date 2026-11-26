@@ -33,9 +33,6 @@ export function kindsCarriedFor(family: Family): readonly string[] {
   return family === "debian" || family === "rhel" ? KINDS_CARRIED : KINDS_CARRIED.filter((k) => k !== "package");
 }
 
-/** The names of `system-setting` the dialect carries, each by files only (no module of a collection): the time zone, the locale and the keyboard layout. */
-export const SETTINGS_CARRIED = ["timezone", "locale", "keyboard"] as const;
-
 /** What a dialect is made with. */
 export type AnsibleOptions = {
   /** The version of ansible-core the machine must have (checked by the program that runs the steps). */

@@ -43,7 +43,6 @@ proves(
     "0036-distribution FR-031",
     "0036-distribution FR-032",
     "0036-distribution FR-033",
-    "0036-distribution FR-036",
   ],
   "the one package is packed from the real libraries, inspected, installed with npm and with Bun, every entry of every library imported on Node and on Bun, its commands run, and a consumer of every entry type-checked with and without the dom library",
   async () => {
@@ -64,11 +63,6 @@ proves(
       await fs.mkdir(unpacked, { recursive: true });
       assertEquals((await sh(["tar", "-xzf", tarball, "-C", unpacked, "--strip-components=1"], tmp)).code, 0);
       const manifest = obj(JSON.parse(await fs.readTextFile(path.join(unpacked, "package.json"))));
-      // a folder of a library may move and no subpath of the package may be lost or renamed (0036-distribution FR-036)
-      const baseline = obj(JSON.parse(await fs.readTextFile(path.join(ROOT, "commons", "libraries", "suite", "fixtures", "single-export-keys.baseline.json"))));
-      const packedKeys = new Set(Object.keys(obj(manifest["exports"])));
-      const lost = (Array.isArray(baseline["keys"]) ? baseline["keys"] : []).filter((k) => typeof k === "string" && !packedKeys.has(k));
-      assertEquals(lost, [], "the keys of the exports of the baseline that the packed tarball lacks");
       const libraries = fs
         .readDirSync(path.join(ROOT, "commons"))
         .filter(

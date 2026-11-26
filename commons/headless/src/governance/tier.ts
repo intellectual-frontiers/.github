@@ -85,9 +85,6 @@ export function defineLadder(names: readonly string[], defaultName?: string): Re
 /** Why an action is not visible to a caller. */
 export type TierRefusal = "tier-too-low" | "tier-unknown";
 
-/** Every reason, for a program that walks them. */
-export const TIER_REFUSALS: readonly TierRefusal[] = ["tier-too-low", "tier-unknown"];
-
 /** Whether an action is visible to a caller of a tier, and where it is not, why. */
 export type TierDecision =
   | { readonly kind: "visible" }

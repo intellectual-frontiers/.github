@@ -73,11 +73,6 @@ export function coverage(m: Mapping, sourcePaths: readonly string[]): readonly F
   return out;
 }
 
-/** The value-bearing paths of a transaction, each once. */
-export function valuePaths(t: Transaction): readonly string[] {
-  return [...new Set(entries(t).map((e) => e.path))];
-}
-
 /** Every path a transaction has: for a schema's own list of paths. */
 export const allPaths = pathsOf;
 

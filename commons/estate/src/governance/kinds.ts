@@ -35,9 +35,6 @@ const num = (name: string, summary: string, o: { required?: boolean } = {}): Att
 const bool = (name: string, summary: string): AttributeSpec => ({ name, type: "boolean", summary });
 const strs = (name: string, summary: string): AttributeSpec => ({ name, type: "strings", summary });
 
-/** The data classes an application or a service may handle, in the words of a government contractor's scope. */
-export const DATA_CLASSES = ["cui", "fci", "phi", "pii", "pci", "public"] as const;
-
 /** The coding harnesses an estate knows by name (a harness not here is `other`). */
 export const HARNESSES = ["claude-code", "codex", "herdr", "other"] as const;
 

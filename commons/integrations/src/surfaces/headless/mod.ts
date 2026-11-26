@@ -14,27 +14,7 @@ import { absurd, type Result } from "@intellectual-frontiers/core";
 import { defineReach, problem, redactor, type Problem } from "@intellectual-frontiers/headless/governance";
 import { branch, command, outcomeOf, redactOutcome, type Command, type Outcome } from "@intellectual-frontiers/headless/logical";
 import { value } from "@intellectual-frontiers/terminal/args";
-import {
-  hasErrors,
-  detect,
-  statusOf,
-  transition,
-  transactionsOf,
-  validate,
-  valuesOf,
-  type Clock,
-  type Connector,
-  type CredentialError,
-  type Acknowledgement,
-  type ExchangeState,
-  type Finding,
-  type FindingCode,
-  type PluginRegistry,
-  type ReadPort,
-  type Schema,
-  type Terminologies,
-  type Interchange,
-} from "@intellectual-frontiers/integrations/logical";
+import { hasErrors, detect, transition, transactionsOf, validate, valuesOf, type Clock, type Connector, type CredentialError, type ExchangeState, type Finding, type FindingCode, type PluginRegistry, type ReadPort, type Schema, type Terminologies, type Interchange } from "@intellectual-frontiers/integrations/logical";
 import { parseAgreementId, parseConnectorId, type AgreementId, type ConnectorId, type ExchangeAgreement } from "@intellectual-frontiers/integrations/governance";
 import type { Delivered, ExchangeTransport, TransportFailure } from "@intellectual-frontiers/integrations/transport";
 
@@ -274,9 +254,6 @@ export function integrationsCommands(deps: Deps): readonly Command[] {
 export function integrationsBranch(deps: Deps) {
   return branch({ name: "integrations", summary: "Observe systems read-only and exchange documents under standards.", children: integrationsCommands(deps) });
 }
-
-/** An acknowledgement's status, re-exported for a surface that draws it. */
-export const acknowledgementStatus = (a: Acknowledgement) => statusOf(a);
 
 /** Exhaustive over the ways a delivery fails, for a surface that draws them. */
 export function describeFailure(f: TransportFailure): string {

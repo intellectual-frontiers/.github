@@ -44,7 +44,6 @@
 
 ## Assumptions
 
-- A program that wants the old behaviour of the key pattern declares its keys; there is no setting to bring back the broad pattern.
 
 ## Open questions
 

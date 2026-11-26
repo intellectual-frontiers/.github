@@ -150,9 +150,6 @@ export const DOCS_PLACES: readonly { readonly package: string; readonly subpath:
   { package: "@intellectual-frontiers/docs", subpath: ".", mode: "per-library" },
 ];
 
-/** The package of the documentation generator of the `per-library` mode (kept for the name of the problem and its fix). */
-export const DOCS_PACKAGE = "@intellectual-frontiers/docs";
-
 const isRecord = (v: unknown): v is Readonly<Record<string, unknown>> => typeof v === "object" && v !== null;
 
 /** The entry file of an installed package for an `exports` subpath (`.` or `./docs`), as `import`, `default` or `bun`, else, for `.`, `module` or `main`. */

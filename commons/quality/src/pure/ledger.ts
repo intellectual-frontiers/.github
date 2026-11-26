@@ -711,15 +711,3 @@ export function daysBetween(from: string, to: string): number {
   return Math.round((ms(to) - ms(from)) / 86_400_000);
 }
 
-/** Every kind of event the ledger keeps. */
-export const EVENT_KINDS: readonly EventKind[] = [
-  "nonconformance-opened",
-  "nonconformance-linked",
-  "capa-opened",
-  "capa-verified",
-  "capa-closed",
-  "nonconformance-closed",
-  "statement",
-  "review",
-  "probe",
-];

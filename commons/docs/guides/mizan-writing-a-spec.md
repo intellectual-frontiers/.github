@@ -17,7 +17,6 @@ Mizan adds a small, strict layer on Spec Kit's format. The checker enforces it; 
 | Active | In force: every requirement is proven by a test or declared as reviewed. |
 | Deferred | Out of scope until its owner decides. |
 | Superseded | Another specification takes its place. |
-| Adopted | The word commons used before Mizan. Accepted until every specification has moved to Active. |
 
 ## Requirement syntax: RFC 2119 and EARS **Built, warn-only**
 

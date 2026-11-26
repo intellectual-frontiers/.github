@@ -28,9 +28,6 @@ import { MIN_SECRET, problem, type Problem } from "@intellectual-frontiers/headl
 /** What is asked for: a passphrase of a key, a password, a PIN of a token, or a yes (which is not secret, and is still asked once). */
 export type CredentialKind = "passphrase" | "password" | "pin" | "confirm";
 
-/** Every kind, for a program that walks them. */
-export const CREDENTIAL_KINDS: readonly CredentialKind[] = ["passphrase", "password", "pin", "confirm"];
-
 /** The identity of a credential within one command, the key of its one prompt (`ssh-key:~/.ssh/id_ed25519`): made only by `parseCredentialId`. */
 export type CredentialId = Brand<string, "credential id">;
 

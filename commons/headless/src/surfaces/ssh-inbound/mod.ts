@@ -18,7 +18,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { CHANNELS, type Channel, type Reached } from "@intellectual-frontiers/headless/governance";
+import { type Channel, type Reached } from "@intellectual-frontiers/headless/governance";
 
 /** What a key may do: only run what reads, or run what the policy lets its channel run. */
 export type KeyRole = "read-only" | "full";
@@ -88,7 +88,3 @@ export function matchBlock(i: MatchInput): Result<string, string> {
   );
 }
 
-/** Whether a channel is one the inbound generator is for. */
-export function isInboundChannel(c: string): c is Channel {
-  return (CHANNELS as readonly string[]).includes(c);
-}

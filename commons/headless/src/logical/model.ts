@@ -214,9 +214,6 @@ export const BUILT_IN_WORDS = ["help", "explain", "completions", "man", "run"] a
 /** The options of the model, by their keys. */
 export const STANDARD_KEYS = ["json", "sarif", "quiet", "verbose", "color", "nonInteractive", "dryRun", "check", "yes", "on", "consent"] as const;
 
-/** One of the model's standard option keys. */
-export type StandardKey = (typeof STANDARD_KEYS)[number];
-
 /** The options every command takes, and those its action's facts add: `--dry-run` where it can preview, `--check` where it can check, `--yes` where it destroys. */
 export function standardOptions(facts: ActionFacts, reach?: ReachPolicy): Spec {
   return {

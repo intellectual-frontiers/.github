@@ -101,9 +101,6 @@ const pad = (text: string, width: number): string => {
   return cut + " ".repeat(Math.max(0, width - displayWidth(cut)));
 };
 
-/** The marks of the left column: ASCII, so that a column is a column in every terminal. `skipped` is a step passed over, not done. */
-export const PLAN_MARKS = { done: "[x]", current: "[>]", pending: "[ ]", failed: "[!]", skipped: "[-]" } as const;
-
 /** The sign that a label was shortened: one column of ASCII. */
 export const ELLIPSIS = "~";
 

@@ -53,7 +53,3 @@ export function createRegistry<T extends Entry>(label: string): Registry<T> {
   };
 }
 
-/** One sentence for a problem. */
-export function describeRegistryProblem(p: RegistryProblem): string {
-  return p.kind === "duplicate" ? `${p.registry} ${p.id} is already registered` : `${p.registry} id ${p.id} is not a stable id (lower-case words joined by - or .)`;
-}

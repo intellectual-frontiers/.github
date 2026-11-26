@@ -73,7 +73,6 @@ export type CollectionConfig<T, K> = {
   readonly pause?: (attempt: number) => Promise<void>;
 };
 
-type Has<C extends Capability, K extends Capability> = K extends C ? true : false;
 type Gate<C extends Capability, Needs extends Capability, M> = [Needs] extends [C] ? M : unknown;
 
 /** What every collection has. */
@@ -97,9 +96,6 @@ export type Collection<T, K, C extends Capability> = CollectionBase<K> &
   > &
   Gate<C, "read" | "write" | "cas", { update(key: K, f: (current: Doc<T, K> | undefined) => Update<T, C> | Promise<Update<T, C>>): Promise<Result<Updated<T, K>, DocProblem>> }> &
   Gate<C, "list" | "read" | "write" | "cas", { migrate(): Promise<Result<Migrated, DocProblem>> }>;
-
-/** The same for a store that has the capability named, to read in a type: whether a capability is in a set. */
-export type CanDo<C extends Capability, K extends Capability> = Has<C, K>;
 
 const mapLimit = async <A, B>(items: readonly A[], limit: number, f: (a: A) => Promise<B>): Promise<B[]> => {
   const out: B[] = new Array<B>(items.length);

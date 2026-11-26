@@ -16,7 +16,6 @@
 - **FR-005**: `executionPlanOf` MUST make the plan of steps for the executor of headless from the entries of a plan that change something: each step MUST carry the argument vector of an apply and, where the tool has a check mode, the argument vector of a check, a step for a destructive entry MUST be refused where it has no check, and the argument vectors MUST name the digest of the rendered files so that the hash of the plan covers what is rendered.
 - **FR-006**: What a dialect renders MUST be generated: `renderHeader` MUST give the line that says so for a kind of file, `isGenerated` MUST find it, and the digest of a rendered set of files MUST be the SHA-256 of the files in the order of their paths, so that it does not depend on the order they were made.
 - **FR-007**: A step of a dialect MUST be an `ArgvStep` of `@intellectual-frontiers/core` (the words, `as` `user` or `root`, and the exit codes expected), never a shell string; `executionPlanOf` MUST carry the steps as argument vectors and a test MUST find no shell string in the output of any dialect.
-- **FR-008**: Desired OS State MUST have no dialect of a first-boot hook (cloud-init, kickstart, preseed) (0006-desired-os-state-on-workload FR-011).
 
 ## Acceptance scenarios
 

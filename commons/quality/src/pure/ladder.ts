@@ -29,7 +29,7 @@ import type { Risk } from "@intellectual-frontiers/test/record";
 import { type Declaration, isRegulated, phaseOf } from "@intellectual-frontiers/mizan/changes/declaration";
 import { type FreshnessState, type FreshnessVerdict, counts as stateCounts } from "./freshness.ts";
 import { applyEvent, type Attestation, type Ledger, type LedgerEvent, openNonconformance } from "./ledger.ts";
-import { type Grade, GRADES, gradeRank, higherGrade, NO_GRADE, showGrade } from "./names.ts";
+import { type Grade, GRADES, gradeRank, NO_GRADE, showGrade } from "./names.ts";
 import type { QualityRecord } from "./record.ts";
 import { noonOf } from "./time.ts";
 
@@ -322,13 +322,6 @@ export function shareAtOrAbove(s: Summary, grade: Grade): number {
   return GRADES.filter((g) => gradeRank(g) >= gradeRank(grade)).reduce((n, g) => n + s.byGrade[g], 0) / s.requirements;
 }
 
-/** A count of proved requirements as it may be shown: with the grade it is counted at and the review debt (FR-014, FR-028). */
-export type ProofCount = {
-  readonly proved: number;
-  readonly provedByGrade: Readonly<Record<Grade, number>>;
-  readonly reviewDebt: number;
-};
-
 /**
  * A count of requirements proved as text, never without its grade and its review debt (FR-014, FR-028, SC-003): a count that lacks the grade
  * it is counted at, or the review debt, is refused. The text is `12 proved (E4 2, E3 10), review debt 3`.
@@ -476,7 +469,3 @@ export function registerView(rows: readonly RegisterRow[], judgements: ReadonlyM
   return `${REGISTER_VIEW_HEADER}\n${lines.join("\n")}${lines.length === 0 ? "" : "\n"}# ${rows.length} requirements; ${total.kind === "ok" ? total.value : total.error}\n`;
 }
 
-/** The best grade of a list, for callers that fold grades. */
-export function bestGrade(gs: readonly Grade[]): Grade {
-  return gs.reduce(higherGrade, NO_GRADE);
-}

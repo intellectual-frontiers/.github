@@ -267,7 +267,3 @@ export function importsOf(text: string, pkg: string): Usage {
   return usagesOf(text).get(pkg) ?? { all: false, names: [] };
 }
 
-/** The union of usages. */
-export function joinUsage(a: Usage, b: Usage): Usage {
-  return { all: a.all || b.all, names: [...new Set([...a.names, ...b.names])].sort() };
-}

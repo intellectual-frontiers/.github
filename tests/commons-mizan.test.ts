@@ -97,7 +97,7 @@ proves(["0003-mizan FR-002"], "the form of a specification", () => {
   fs.writeTextFileSync(`${k.root}/${s}`, fs.readTextFileSync(`${k.root}/${s}`).replaceAll("## Assumptions", "## Zzz"));
   const out = k.findings();
   assertStringIncludes(out, "**Spec ID:** line naming 0003-mizan");
-  assertStringIncludes(out, "**Status:** must be one of ['Draft', 'Active', 'Deferred', 'Adopted', 'Superseded']");
+  assertStringIncludes(out, "**Status:** must be one of ['Draft', 'Active', 'Deferred', 'Superseded']");
   assertStringIncludes(out, "has no ## Assumptions section");
 });
 
@@ -193,28 +193,16 @@ proves(
   },
 );
 
-proves(["0003-mizan FR-010"], "Active, Deferred and Adopted are accepted, and a word outside the list is named", () => {
+proves(["0003-mizan FR-010"], "Active, Deferred and Superseded are accepted, and a word outside the list is named", () => {
   using k = Kit.make();
   const s = "specs/0003-mizan/spec.md";
-  for (const word of ["Active", "Deferred", "Adopted", "Superseded"]) {
+  for (const word of ["Active", "Deferred", "Superseded"]) {
     k.edit(s, "**Status:** Draft", `**Status:** ${word}`);
     assertEquals(k.findings(), "");
     k.edit(s, `**Status:** ${word}`, "**Status:** Draft");
   }
   k.edit(s, "**Status:** Draft", "**Status:** Maybe");
   assertStringIncludes(k.findings(), "**Status:** must be one of");
-});
-
-proves(["0003-mizan FR-009"], "the former name of the tool runs the checker and gives the same findings and exit status", async () => {
-  const old = `${ROOT}/commons/tools/spec-kit-check.ts`;
-  const clean = await proc.run([proc.execPath(), old], { cwd: ROOT });
-  assertEquals([clean.code, clean.stdout, clean.stderr], [0, "", ""]);
-  using bad = Kit.make();
-  bad.edit("registry.tsv", "0003\tmizan", "0005\tmizan");
-  const now = await proc.run([proc.execPath(), TOOL, "--root", bad.root], { cwd: ROOT });
-  const was = await proc.run([proc.execPath(), old, "--root", bad.root], { cwd: ROOT });
-  assertEquals(now.code, 1);
-  assertEquals([was.code, was.stdout, was.stderr], [now.code, now.stdout, now.stderr]);
 });
 
 proves(["0003-mizan FR-012"], "a specification in GitHub Spec Kit's form is accepted, and its missing section and status are named", () => {

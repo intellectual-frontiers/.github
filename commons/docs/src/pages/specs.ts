@@ -19,7 +19,7 @@ import { requirementEvidence } from "./quality.ts";
 const toneOf = (mechanism: Enforcement["mechanism"] | undefined): Tone =>
   mechanism === "check" || mechanism === "gate" ? "good" : mechanism === "review" ? "info" : "warn";
 
-const statusTone = (s: string): Tone => (s === "Adopted" ? "good" : s === "Superseded" ? "warn" : "neutral");
+const statusTone = (s: string): Tone => (s === "Active" ? "good" : s === "Superseded" ? "warn" : "neutral");
 
 /** The most rows a page of the matrix holds: a page ends at a specification once it has this many. */
 export const ROW_BUDGET = 150;

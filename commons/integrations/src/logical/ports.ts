@@ -85,5 +85,3 @@ export function numberOf(j: Json | undefined, key: string): number | undefined {
   return typeof v === "number" ? v : undefined;
 }
 
-/** A trace that goes nowhere. */
-export const NO_TRACE: Trace = () => undefined;

@@ -70,9 +70,6 @@ export type Assurance = {
   readonly mutations: readonly RecordedMutationRun[];
 };
 
-/** No record of Tier 2. */
-export const emptyAssurance: Assurance = { plans: [], samples: [], mutations: [] };
-
 /** Why a record of Tier 2 does not follow the ones before it. */
 export type AssuranceError = { readonly seq: number; readonly kind: LedgerEvent["kind"]; readonly reason: string };
 

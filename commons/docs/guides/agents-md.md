@@ -65,15 +65,6 @@ Nobody edits inside the marks: `bun run repoctl sync` writes the block, and a ch
 export const BUDGET = { bytes: 8 * 1024, lines: 80 } as const;
 ```
 
-On the day this page was written the file was cut from 26,532 bytes and 85 lines to under the budget. The numbers below are from commands run that day, the first for the file before the change and the second for the file after it.
-
-```text output="git show 5d687fc6:AGENTS.md | wc -lc; wc -lc AGENTS.md; 2026-11-25"
-  85   26532
-  54    7559 AGENTS.md
-```
-
-No rule was dropped by the change. Each paragraph of the old file went to a place that states it in full: a requirement that already stated it, a guide page, or a new requirement written first. The change is recorded in the issue that tracked it, with the table of where every paragraph went.
-
 ## What lives where
 
 `AGENTS.md` is one of several places that hold the repository's knowledge, and each place has one job.

@@ -10,7 +10,7 @@
 ## Requirements
 
 - **FR-001**: The runners MUST be a registry typed in the core, each with an id, a kind of the closed list `native` and `integration`, a title and the capabilities it declares from the closed list `calls`, `fan-out`, `interactive`, `judge`, `approval`, `logic`, `compensate` and `destroy`; a runner MUST be added by registering one entry (and, for an integration runner, one emitter), with no change to any workload. The runners of the commons are `native`, `bash`, `pwsh` and `github-actions`.
-- **FR-002**: The native runner MUST be the port a form's run goes through, the former executor renamed and its behavior kept: one `NativeRunner` for each form that has code, which interprets the plan of the workload, holds each node to its derived autonomy, parks for a person, attaches and detaches stores, compensates and records every fact as an event of the run. The native runner MUST declare every capability, and it MUST be the default of every policy.
+- **FR-002**: The native runner MUST be the port a form's run goes through: one `NativeRunner` for each form that has code, which interprets the plan of the workload, holds each node to its derived autonomy, parks for a person, attaches and detaches stores, compensates and records every fact as an event of the run. The native runner MUST declare every capability, and it MUST be the default of every policy.
 - **FR-003**: An integration runner MUST compile the plan of a workload into an artifact that a foreign system runs, and MUST hand it off: the library keeps the plan, the policy and the evidence, and keeps none of the run. An integration runner MUST declare only what its artifact can carry; the emitters of the commons are `bash` (0011-runner-bash), `pwsh` (0012-runner-powershell) and `github-actions` (0014-runner-github-actions).
 - **FR-004**: A form MUST say what its workload needs of a runner, as a list of needs each from the closed list of capabilities and each naming the node that has it, derived from the nodes and never declared: a call of a verb or a check needs `calls`; an `each` needs `fan-out`; an `ask` needs `interactive`; a `judge` needs `judge`; a `gate` or an approval needs `approval`; a `branch`, a diff or a plan needs `logic`; an `undo` needs `compensate`; a destroy on a durable, git or external store needs `destroy` unless a gate or an approval guards it, and then needs `approval`; and any other node that is `human-only` once the gates are applied and that no gate guards needs `interactive`. A workload that needs `interactive`, `judge`, `logic`, `compensate` or `destroy` MUST be run by the native runner.
 - **FR-005**: A `RunnerPolicy` MUST be typed data a fleet owns with a `default` runner (`native` unless the fleet says another), a `perWorkload` choice (by the id of a workload), a `perForm` choice (by a form that has code) and a `perOperator` preference of a person, MUST be decoded at the boundary into that type or refused with every reason, and a workload and a node MUST NOT name a runner.
@@ -51,7 +51,7 @@
 
 - The GitHub Actions emitter and the form `graph`: they are 0014-runner-github-actions and 0013-form-graph.
 - Running an artifact: a foreign system does, and the library only compiles it, hands it off and ingests its receipt.
-- Any POSIX `sh` subset, Windows PowerShell 5.1 and any legacy or backward compatibility: the emitters target modern Bash 5 and PowerShell 7.
+- Any POSIX `sh` subset and Windows PowerShell 5.1: the emitters target modern Bash 5 and PowerShell 7.
 
 ## Edge cases
 

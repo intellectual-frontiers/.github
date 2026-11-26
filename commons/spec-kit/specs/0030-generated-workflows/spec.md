@@ -60,7 +60,6 @@
 
 - GitHub reads `*.yml` in `.github/workflows/`, so `<name>.auto.yml` is a workflow like any other, and the name of a workflow (`name:`), which a check's name begins with, is the model's `name`, so the checks that a branch rule names do not change when a workflow becomes generated.
 - The schema of SchemaStore is the published description of the workflow format that tools use; GitHub's own is not published as a schema. Its edition is the copy kept here, fetched on 2026-11-19, and a newer one replaces it by a decision.
-- The model's first workflows are the ones that were written by hand; they were compared with their files before the files were removed (what a YAML reader makes of each, in a one-time comparison reported in the commit that made them generated), and one thing changed on purpose: the job `tests` installs PyYAML, which the test of FR-003 uses.
 - A workflow's `needs` with one job is written as a list; GitHub reads it as it reads the scalar.
 
 ## Open questions

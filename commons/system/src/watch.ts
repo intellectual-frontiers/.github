@@ -28,9 +28,6 @@ import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { hostCallSync, mapError } from "./errors.ts";
 
-/** What happened to a path: made, changed, removed, or moved from the first path to the second. */
-export type FsEventKind = "create" | "modify" | "remove" | "rename";
-
 /** One event, after the join: a path made, changed or removed, or one moved (`paths` is then `[from, to]`). Paths are absolute. */
 export type FsEvent =
   | { readonly kind: "create" | "modify" | "remove"; readonly paths: readonly [string] }

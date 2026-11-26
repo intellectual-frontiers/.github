@@ -43,9 +43,6 @@ export type IndexInput = {
   readonly objectives: readonly Evaluation[];
 };
 
-/** The file's name in a repository. */
-export const INDEX_FILE = "quality.index.auto.json";
-
 /** The command that writes it. */
 export const INDEX_COMMAND = "bun commons/quality/src/quality.ts index --out quality.index.auto.json";
 

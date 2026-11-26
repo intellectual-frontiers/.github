@@ -45,8 +45,6 @@ export function parseVersionId(text: string): Result<VersionId, string> {
   return VERSION.test(text) ? ok(text as VersionId) : err(`${JSON.stringify(text.slice(0, 50))} is not a version id: a UUID of version 7 in lower case`);
 }
 
-/** The largest time an id holds: 48 bits of milliseconds. */
-export const MAX_ID_MS = 2 ** 48 - 1;
 /** The largest counter of an id: 12 bits. */
 export const MAX_ID_COUNTER = 0xfff;
 

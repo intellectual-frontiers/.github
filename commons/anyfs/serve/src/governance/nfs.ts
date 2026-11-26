@@ -31,8 +31,6 @@ export type NfsProcedure = (typeof NFS_PROCEDURES)[number];
 
 /** The procedures of the mount protocol, by number. */
 export const MOUNT_PROCEDURES = ["NULL", "MNT", "DUMP", "UMNT", "UMNTALL", "EXPORT"] as const;
-/** One procedure of the mount protocol. */
-export type MountProcedure = (typeof MOUNT_PROCEDURES)[number];
 
 /** The statuses of RFC 1813 the server gives. */
 export const NFS_STATUS = {

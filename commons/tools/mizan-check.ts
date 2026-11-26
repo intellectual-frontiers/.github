@@ -42,7 +42,7 @@ const OPTIONAL: ReadonlySet<string> = new Set(["## Out of scope"]);
 /** The sections of a specification written in GitHub Spec Kit's form (0003-mizan FR-012), in their order; a heading may carry a suffix such as `*(mandatory)*`. */
 const KIT_SECTIONS = ["## User Scenarios & Testing", "## Requirements", "## Success Criteria"] as const;
 type Section = (typeof SECTIONS)[number] | (typeof KIT_SECTIONS)[number];
-const STATUSES = ["Draft", "Active", "Deferred", "Adopted", "Superseded"] as const;
+const STATUSES = ["Draft", "Active", "Deferred", "Superseded"] as const;
 const MECHANISMS = ["check", "gate", "review", "none"] as const;
 const REGISTRY_HEADER = "number\tslug\tstate";
 const STATES = ["in force", "retired"] as const;
@@ -141,7 +141,7 @@ export function message(p: Problem): string {
     case "no-line":
       return `has no **${p.label}:** line${p.label === "Spec ID" ? ` naming ${p.spec}` : ""}`;
     case "status":
-      return "**Status:** must be one of ['Draft', 'Active', 'Deferred', 'Adopted', 'Superseded']";
+      return "**Status:** must be one of ['Draft', 'Active', 'Deferred', 'Superseded']";
     case "part-of":
       return `**Part of:** names ${p.named}, which is not another specification of this folder`;
     case "no-section":

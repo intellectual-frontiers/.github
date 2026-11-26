@@ -95,8 +95,6 @@ export const audienceOf = (x: { readonly audience?: Audience | undefined }): Aud
 
 /** What starts a workload: a closed list. */
 export const TRIGGER_KINDS = ["manual", "schedule", "event", "alert"] as const;
-/** One kind of trigger. */
-export type TriggerKind = (typeof TRIGGER_KINDS)[number];
 
 /** How often a scheduled workload starts. */
 export const CADENCES = ["hourly", "daily", "weekly", "monthly", "quarterly", "yearly"] as const;
@@ -130,9 +128,6 @@ export const FORMS: Readonly<Record<FormId, FormEntry>> = {
   graph: { status: "built", summary: "A directed acyclic graph of nodes with edges (after), the same nodes and effects as the other forms, which an integration runner such as GitHub Actions carries." },
   campaign: { status: "reserved", summary: "A collection over a period with sampling.", criteria: "A second concrete user, besides the first, needs a collection over a period with sampling that cannot be said as a runbook with a schedule trigger." },
 };
-
-/** Whether a text names a form of the registry. */
-export const isFormId = (text: string): text is FormId => (FORM_IDS as readonly string[]).includes(text);
 
 /** Whether a text names a form that has code. */
 export const isBuiltForm = (text: string): text is BuiltFormId => (BUILT_FORM_IDS as readonly string[]).includes(text);

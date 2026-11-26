@@ -13,7 +13,6 @@
  *
  * @module
  */
-import { absurd } from "@intellectual-frontiers/core";
 import { type Day, isCounted, type Instant, type Item, type ItemId, type Severity, type StateKind } from "@intellectual-frontiers/planning/governance";
 
 /** Whether work is open, behind its day, or done. */
@@ -148,16 +147,3 @@ export function workOrders(items: readonly Item[], today: Day): readonly WorkOrd
     .sort(byDueThenId);
 }
 
-/** A sentence for a status, for a person. */
-export function describePoamStatus(s: PoamStatus): string {
-  switch (s) {
-    case "open":
-      return "open";
-    case "delayed":
-      return "delayed: past its day due";
-    case "completed":
-      return "completed";
-    default:
-      return absurd(s);
-  }
-}

@@ -66,11 +66,6 @@ export type CmsError =
   | { readonly kind: "no-recipient"; readonly message: string }
   | { readonly kind: "decrypt"; readonly message: string };
 
-/** A CMS error as one sentence. */
-export function formatCmsError(e: CmsError): string {
-  return `${e.kind}: ${e.message}`;
-}
-
 const fail = (kind: CmsError["kind"], message: string): Result<never, CmsError> => err({ kind, message });
 
 /** Every PEM block of a label (`CERTIFICATE`, `PRIVATE KEY`) in a text, as DER; none found, or a block that is not base64, is an error. */

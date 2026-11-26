@@ -16,7 +16,7 @@ import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { cadenceOf, journalOf, type CapturePolicy } from "@intellectual-frontiers/estate/governance";
 import { instantMs, parseDuration } from "@intellectual-frontiers/grc/governance";
 import { canonicalize, type LedgerEntry } from "@intellectual-frontiers/grc/logical";
-import { JOURNAL_TYPES, type CaptureFailure, type JournalType, type Observed } from "@intellectual-frontiers/evidence-capture/governance";
+import { type CaptureFailure, type JournalType, type Observed } from "@intellectual-frontiers/evidence-capture/governance";
 
 /** The file of a day's entries, by the day of the instant (UTC). */
 export function journalPath(at: string): string {
@@ -77,11 +77,6 @@ export function entryTypeFor(found: Found, before: Before, policy: CapturePolicy
   const at = instantMs(now);
   if (heartbeat === undefined || heartbeat.kind === "err" || last === undefined || at === undefined) return "capture.unchanged";
   return at - last >= heartbeat.value - 1000 ? "capture.unchanged" : undefined;
-}
-
-/** The kinds of entry the journal knows. */
-export function isJournalType(text: string): text is JournalType {
-  return (JOURNAL_TYPES as readonly string[]).includes(text);
 }
 
 /** The ids of the assets that are due to be looked at: the cadence of each (its own, or that of its state) has run since it was last looked at, within a second; an asset never looked at is due. */

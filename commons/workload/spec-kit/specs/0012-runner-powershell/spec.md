@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The `pwsh` integration runner (0010-workload-runners): it emits a plan of calls as a script of modern PowerShell 7 or later, and nothing else. There is no Windows PowerShell 5.1 and no backward compatibility. The script is only a sequence of calls to pinned CLI verbs by id, a loop over a fixed list and the order of the steps, and it sequences the same verbs as the `bash` script of the same plan (0011-runner-bash).
+**Input:** The `pwsh` integration runner (0010-workload-runners): it emits a plan of calls as a script of modern PowerShell 7 or later, and nothing else. There is no Windows PowerShell 5.1. The script is only a sequence of calls to pinned CLI verbs by id, a loop over a fixed list and the order of the steps, and it sequences the same verbs as the `bash` script of the same plan (0011-runner-bash).
 
 ## Requirements
 

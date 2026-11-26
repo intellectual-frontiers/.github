@@ -4,16 +4,16 @@ Should we move to GitHub Spec Kit, or to another well-known format? We looked at
 
 ## What we found
 
-Our harnesses had grown three dialects. Two of them already work in GitHub Spec Kit: `.specify/`, a constitution, the `/speckit-*` commands, and a `specs/NNN-name/` folder with `spec.md`, `plan.md` and `tasks.md`. Commons had a third, its own format with a register of numbers and a register of proofs, which was also called "spec-kit" and so collided with the real one.
+GitHub Spec Kit gives `.specify/`, a constitution, the `/speckit-*` commands, and a `specs/NNN-name/` folder with `spec.md`, `plan.md` and `tasks.md`. Commons' own format adds a register of numbers and a register of proofs, and is named Mizan so that it does not collide with Spec Kit.
 
 - **What Spec Kit gives us.** 
 - **What it does not give us.** 
 
 **The decision.** **Adopt Spec Kit as the method. Do not adopt it as the conformance standard.** Mizan is a *profile*: it keeps Spec Kit's commands, constitution and feature files, and adds only the registers, the tracing, the ladder, the requirement syntax and the standards rules. Replacing our register and tracing with Spec Kit's would lose the thing the compliance chain depends on.
 
-## The rename
+## Where it lives
 
-Commons' own format is now `0003-mizan`, its checker `commons/tools/mizan-check.ts` (the old `spec-kit-check.ts` remains as a wrapper for one repin cycle, so harnesses that run it keep working). The folder `commons/spec-kit/` keeps its name for the natural-language specifications; Mizan's documentation says that it holds the Mizan profile, to avoid the old confusion. **Built**
+Commons' own format is `0003-mizan`, its checker `commons/tools/mizan-check.ts`. The folder `commons/spec-kit/` keeps its name for the natural-language specifications; Mizan's documentation says that it holds the Mizan profile. **Built**
 
 ## Why not another format?
 

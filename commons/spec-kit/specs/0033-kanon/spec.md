@@ -81,7 +81,6 @@
 ## The ontology and what it replaces
 
 - **FR-015**: The ontology of commons MUST have a namespace `kanon` beside `ifr`, `ifccm`, `ifqs` and `mizan`, with the classes `kanon:Layer`, `kanon:Projection`, `kanon:Element`, `kanon:TraceEdge`, `kanon:Surface`, `kanon:Finding`, `kanon:Instance`, `kanon:Plugin`, `kanon:Family` and `kanon:Matrix`, the three layers as the members of the code list `kanon:Layer` each with its rank, its MDA viewpoint (`CIM`, `PIM`, `PSM`) and its level of data modeling (`conceptual`, `logical`, `physical`) as data, and each class MUST have a record of the standard it rests on (0018-standards-first FR-003).
-- **FR-016**: This specification MUST supersede, by citation only, the layers text of the first specification of the spec kit of `commons/data` and of the specifications of the spec kit of `commons/headless` about their layers, in this sense: where one of them states the three layers, the one-way import, the table or the check, it is an instance of FR-001 to FR-006 and its own text stays, in its own kit, until its owner changes it to cite this specification; no requirement of another library's kit is edited by this specification.
 
 ## The relation to the ladder
 
@@ -148,7 +147,6 @@ A library that states one thing and carries it out in several places of one kind
 
 ## Out of scope
 
-- Moving the copies of the check that `commons/data` and `commons/headless` keep: they switch to the library later (see the migration note below), and each stays in force until then.
 - Renaming or editing the constitution of a company or a harness: the article is drafted in the appendix for the owner to decide.
 - Clearing the name Kanon as a trademark in any jurisdiction: not needed while the name is internal (OQ-4).
 - Any commons library that is not named in FR-009.
@@ -165,10 +163,6 @@ A library that states one thing and carries it out in several places of one kind
 - An instance of package placement is checked in its own package, beside the host's folder (the host is found by the package name of `extends`); an instance of folder placement is checked with the host's files, and a relative import between two such folders is `layers/relative` as before, per FR-019.
 - A plugin and a dialect that are both of the family and import each other by name: found from the side of the importer, `plugins/undeclared`, and never allowed by a declared dependency, which names plugins only, per FR-020.
 - A model with no instances: the rule of FR-005 is as it was, and its matrix has no columns, per FR-022 and FR-023.
-
-## Migration note for the libraries that keep their own check
-
-`commons/data` and `commons/headless` switch when their owners choose: replace the `UnitClass`, `FOLDERS`, `MAY_IMPORT`, `LEVEL`, `OWN` and `STRICT` values of `tools/layers.ts` by a table in `library.ts` (`kanon`, FR-010), delete `layerFindings` and `specifiersOf` and call `findings` of `@intellectual-frontiers/kanon/host` from `tools/check.ts` (it reads the manifest's table and the folder), keep the findings' keys (they are the same: `layers/<code> <file> <about>`) so that `trace.baseline.txt` stays valid, and add `@intellectual-frontiers/kanon` to `devDependencies`.
 
 ## Assumptions
 

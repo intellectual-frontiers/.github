@@ -37,11 +37,6 @@ export function pairingCode(random: () => number): string {
   return `${word()}-${word()}-${digits}`;
 }
 
-/** Read the shape of a pairing code. */
-export function parsePairing(text: string): Result<string, string> {
-  return PAIRING.test(text) ? ok(text) : err("a pairing code is two words and four digits, such as maple-river-4821");
-}
-
 /** The id of a presented token: its first part, which is safe to write in an audit event. */
 export function tokenId(presented: string): string | undefined {
   return TOKEN.test(presented) ? presented.slice(4, 12) : undefined;

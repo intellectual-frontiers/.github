@@ -129,7 +129,6 @@ export function roleOf(text: string): Role | undefined {
   return ROLE.test(text) ? (text as Role) : undefined;
 }
 
-
 /** A subject as the ledger names it: a kind and an id. */
 export type SubjectRef = { readonly kind: string; readonly id: string };
 
@@ -200,12 +199,6 @@ export function canonicalize(value: unknown): Result<string, CanonicalError> {
   const out: string[] = [];
   const e = canonicalText(value, "$", new Set(), out);
   return e === undefined ? ok(out.join("")) : err(e);
-}
-
-/** A value's canonical JSON as UTF-8 bytes. */
-export function canonicalBytes(value: unknown): Result<Uint8Array, CanonicalError> {
-  const r = canonicalize(value);
-  return r.kind === "ok" ? ok(new TextEncoder().encode(r.value)) : r;
 }
 
 /** The address of a piece of evidence: the SHA-256 of its canonical JSON, the same on every runtime. */
@@ -373,7 +366,6 @@ export async function verifyLedger(entries: readonly LedgerEntry[], head?: Ledge
 }
 
 // ---------------------------------------------------------------------------------------------------------------------------- manifest (FR-008)
-
 
 // ---------------------------------------------------------------------------------------------------------------------------- freshness (FR-011)
 

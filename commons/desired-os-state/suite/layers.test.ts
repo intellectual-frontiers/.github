@@ -107,10 +107,3 @@ proves(["0001-desired-os-state-layers FR-006", "0006-desired-os-state-on-workloa
   }
   assertEquals(found, []);
 });
-
-proves(["0006-desired-os-state-on-workload FR-010", "0006-desired-os-state-on-workload FR-011", "0004-desired-os-state-dialects FR-008"], "the plan and approvals of Desired OS State, its converge plugin and its first-boot dialect are gone", async () => {
-  for (const gone of ["src/logical/plan.ts", "src/logical/approvals.ts", "converge", "dialect-cloud-init", "dialect-boot"]) assertEquals(await fs.stat(path.join(ROOT, gone)).then(() => true, () => false), false, gone);
-  const plugins = (library.kanon.plugins ?? []).map((p) => p.noun);
-  assertEquals(plugins, ["tool", "dns"]);
-  assert(!library.kanon.instances.some((i) => /cloud-init|boot/u.test(i.name)));
-});

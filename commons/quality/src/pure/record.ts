@@ -22,7 +22,6 @@
  */
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import type { DecodeError } from "@intellectual-frontiers/core";
-import { GENESIS } from "./primitives.ts";
 import type { JsonObject } from "@intellectual-frontiers/formats/json5";
 import {
   type AnyMap,
@@ -551,9 +550,6 @@ export async function canonicalize(input: CanonicalInput): Promise<Result<Canoni
   if (back.kind === "err") return back;
   return ok({ text, record: back.value });
 }
-
-/** The first link of the chain (FR-022): 64 zeros. */
-export const FIRST_PREVIOUS: Sha256 = GENESIS;
 
 // ---------------------------------------------------------------------------------------------------------------------------- checks (FR-020)
 

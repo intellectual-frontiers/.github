@@ -59,9 +59,6 @@ export function filesUnder(root: string, dir = ""): readonly string[] {
   return out;
 }
 
-/** The documentation blocks of a source (a block comment that begins a line): an example in one names what a reader may write, not what the module imports. */
-export const DOC_BLOCK = /^[ \t]*\/\*[\s\S]*?\*\//gm;
-
 /** The specifiers a source imports: not those of a comment, and not the text of a string that only looks like an import. */
 export const specifiersOf = (source: string): readonly string[] => importSpecifiers(source);
 

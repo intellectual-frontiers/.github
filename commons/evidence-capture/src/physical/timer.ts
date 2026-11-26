@@ -15,7 +15,6 @@ import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { freshnessWindowMs, type CapturePolicy } from "@intellectual-frontiers/estate/governance";
 import { parseDuration } from "@intellectual-frontiers/grc/governance";
 import { jobName, MINUTE_STEPS, planJob, schedule, type JobPlan, type JobSpec, type SchedulerOs } from "@intellectual-frontiers/system/job-plan";
-import { installJob, removeJob, type JobOptions, type JobReport } from "@intellectual-frontiers/system/schedule";
 
 /**
  * How often the one timer fires: the largest step of the clock (1, 2, 3, 4, 5, 6, 10, 12, 15, 20 or 30 minutes) that is not longer than the shortest cadence of the policy, so that nothing due waits for the next firing; every hour where the shortest
@@ -49,8 +48,3 @@ export function timerFor(policy: CapturePolicy, s: TimerSpec): Result<Timer, str
   return ok({ job, plan: plan.value, firesEvery: every.kind === "minutes" ? `${every.every} minutes` : "hour", windowMs: freshnessWindowMs(Math.min(...cadences)) });
 }
 
-/** Installs or removes the timer through the commons' scheduler code; `options` say where (a test gives a folder and a runner of its own). */
-export async function setTimer(action: "install" | "remove", job: JobSpec, options: JobOptions): Promise<Result<JobReport, string>> {
-  const r = action === "install" ? await installJob(job, options) : await removeJob(job, options);
-  return r.kind === "err" ? err(`${r.error.kind}: ${JSON.stringify(r.error)}`) : ok(r.value);
-}

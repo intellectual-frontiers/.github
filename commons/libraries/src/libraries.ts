@@ -114,8 +114,6 @@ export type Library = {
 
 /** The kinds of reason not to release a library: a closed union, and the only reasons there are (0001-libraries FR-024). */
 export const HOLD_KINDS = ["tests-only", "unfinished", "owner-blocked"] as const;
-/** A kind of reason not to release a library. */
-export type HoldKind = (typeof HOLD_KINDS)[number];
 
 /** One line of text of a hold: non-empty, trimmed, on one line, made only by {@link parseHoldText}. */
 export type HoldText = Brand<string, "hold text">;

@@ -20,8 +20,6 @@ import type { BuiltFormId } from "./terms.ts";
 
 /** The kinds of the events of a hand-off: a closed list, which no form's own event may use. */
 export const RUNNER_EVENT_KINDS = ["handoff", "receipt"] as const;
-/** One kind of event of a hand-off. */
-export type RunnerEventKind = (typeof RUNNER_EVENT_KINDS)[number];
 
 /** One fact of a hand-off. */
 export type RunnerEvent =

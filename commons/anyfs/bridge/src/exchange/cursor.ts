@@ -12,8 +12,6 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { describeProblem, expectAny, type Path } from "@intellectual-frontiers/anyfs/governance";
-import type { Store } from "@intellectual-frontiers/anyfs/logical";
 
 /** What a cursor holds. */
 export type CursorState = {
@@ -70,17 +68,3 @@ export function decodeCursor(text: string): Result<CursorState, string> {
   return ok({ published: o["published"], applied, quarantined });
 }
 
-/** A cursor kept as one file of a store of this replica's own (never the medium). */
-export function storeCursor(store: Store<"read" | "write">, path: Path): Cursor {
-  return {
-    load: async () => {
-      const r = await store.read(path);
-      if (r.kind === "err") return r.error.kind === "missing" ? ok(EMPTY_CURSOR) : err(describeProblem(r.error));
-      return decodeCursor(new TextDecoder().decode(r.value.bytes));
-    },
-    save: async (state) => {
-      const w = await store.write(path, new TextEncoder().encode(encodeCursor(state)), expectAny);
-      return w.kind === "err" ? err(describeProblem(w.error)) : ok(undefined);
-    },
-  };
-}

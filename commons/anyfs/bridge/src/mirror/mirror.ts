@@ -18,7 +18,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256 } from "@intellectual-frontiers/crypto/sha256";
 import { type DocId, parseDocId } from "@intellectual-frontiers/anyfs/docs";
-import { type Capability, comparePaths, type CoreCapability, type Path, type Prefix, type Problem, parsePrefix, refused, type Revision, ROOT } from "@intellectual-frontiers/anyfs/governance";
+import { type Capability, type CoreCapability, type Path, type Prefix, type Problem, parsePrefix, refused, type Revision, ROOT } from "@intellectual-frontiers/anyfs/governance";
 import { type AnyStore, type Carried, carriedCapabilities, type Done, type Handler, makeStore, type Op, type Read, type Store, supports } from "@intellectual-frontiers/anyfs/logical";
 import { type DeletePolicy, type Glob, parseGlob, type PlanRefusal } from "@intellectual-frontiers/anyfs-bridge/governance";
 import { converge, type Dest, type Endpoint, type Ledger, promote as promoteLedger, type PromoteOptions, type PromoteRefusal, type ReplicaState, replicaStatus } from "@intellectual-frontiers/anyfs-bridge/logical";
@@ -390,9 +390,4 @@ export async function openMirror<C extends Capability>(primary: Member<Store<C>>
     },
   };
   return ok(mirror);
-}
-
-/** The paths of a state that is diverged, in order; none for any other. */
-export function divergedPaths(state: ReplicaState): readonly Path[] {
-  return state.kind === "diverged" ? [...state.paths].sort(comparePaths) : [];
 }

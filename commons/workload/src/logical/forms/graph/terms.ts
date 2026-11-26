@@ -14,8 +14,6 @@
 
 /** The four kinds of node: a closed list. A verb and a check are a call, an each is a call for each member of a fixed list, a gate is a person's authority over the nodes it guards. */
 export const GRAPH_KINDS = ["verb", "check", "each", "gate"] as const;
-/** One kind of node. */
-export type GraphKind = (typeof GRAPH_KINDS)[number];
 
 /** What an `each` fans out over. */
 export const FAN_OUTS = ["tenants", "hosts", "fleets"] as const;
@@ -32,9 +30,3 @@ export const GRAPH_TERMS = ["edge", "result", "limit"] as const;
 /** One term. */
 export type GraphTerm = (typeof GRAPH_TERMS)[number];
 
-/** What each term is. */
-export const GRAPH_DEFINITIONS: Readonly<Record<GraphTerm, string>> = {
-  edge: "The word `after` of a node: the nodes it comes after, which the runner that has jobs writes as `needs`. The edges make a directed acyclic graph.",
-  result: "A node whose outcome decides the run. A node that no result comes after is unreachable: dead work.",
-  limit: "The greatest mode (read, append, mutate, destroy) that any node of the graph may declare in its effect.",
-};

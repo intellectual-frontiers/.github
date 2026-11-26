@@ -150,7 +150,6 @@ function readList<T>(
 /**
  * The record of a harness's capabilities read from its file's text (`export const rungs`, `export const capabilities` and, where it has them, `export const runs`), as data and never run. The offline
  * view derives its capabilities from the commits (0020-ifccm FR-035), and then the file needs no `capabilities` (`capabilitiesRequired` false).
- * The runs are stated here until the quality records of 0021-ifqs are read in their place.
  */
 export function decodeViewRecord(source: string, capabilitiesRequired = true): Result<ViewRecord, string> {
   const rungs = readList(source, "rungs", array(rungDecoder), true);

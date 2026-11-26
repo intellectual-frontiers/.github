@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The `bash` integration runner (0010-workload-runners): it emits a plan of calls as a script of super-safe modern Bash 5 or later, and nothing else. There is no POSIX `sh` subset and no backward compatibility. The script is only a sequence of calls to pinned CLI verbs by id, a loop over a fixed list and the order of the steps; every meaning stays in typed TypeScript.
+**Input:** The `bash` integration runner (0010-workload-runners): it emits a plan of calls as a script of super-safe modern Bash 5 or later, and nothing else. There is no POSIX `sh` subset. The script is only a sequence of calls to pinned CLI verbs by id, a loop over a fixed list and the order of the steps; every meaning stays in typed TypeScript.
 
 ## Requirements
 

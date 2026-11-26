@@ -14,7 +14,6 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import * as path from "@intellectual-frontiers/system/path";
-import * as fs from "@intellectual-frontiers/system/fs";
 import type { SqlPort, SqlRow, SqlRunner, SqlValue } from "@intellectual-frontiers/anyfs-sql/governance";
 import { Gate, gateOfFile, rowOf } from "./common.ts";
 
@@ -117,17 +116,3 @@ export async function openSqliteFile(file: string, options: SqliteOptions = {}):
 /** A value as a statement takes it: nothing to change for SQLite, which takes every value of the port. */
 export type { SqlValue };
 
-/**
- * What tells a copy of a database file from the original: the device and the file of the file system object (`dev:ino`), which `cp` does not keep and a rename does. A database opened with a fingerprint other than the one
- * it holds is a copy and takes a new replica identity. `memory` for a database in memory; where the file system has no file number, the resolved name.
- */
-export async function fingerprintOfFile(file: string): Promise<string> {
-  if (file === ":memory:") return "memory";
-  const resolved = path.resolve(file);
-  try {
-    const info = await fs.stat(resolved);
-    return info.ino === null ? `path:${resolved}` : `${info.dev}:${info.ino}`;
-  } catch {
-    return `path:${resolved}`;
-  }
-}

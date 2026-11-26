@@ -38,8 +38,6 @@ export type ReadOnlyContract = { readonly writes: "never"; readonly tokenEndpoin
 
 /** The kinds of entity an observation may carry. */
 export type EntityKind = "person" | "account" | "device" | "repository";
-/** The kinds of entity that observing produces: person, account, device and repository. */
-export const ENTITY_KINDS: readonly EntityKind[] = ["person", "account", "device", "repository"];
 
 /** What the denylist matches: a field name exactly, or a field name containing the text, ignoring case. */
 export type FieldPattern =

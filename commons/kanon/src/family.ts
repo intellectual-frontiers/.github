@@ -37,7 +37,7 @@ const templateDecoder = refine(
 /** An instance name from text, or why the text is not one. */
 export function parseInstanceName(text: string): Result<InstanceName, string> {
   const r = instanceDecoder(text, "instance");
-  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not an instance name: lower-case words joined by hyphens, as ansible or cloud-init`);
+  return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not an instance name: lower-case words joined by hyphens, as ansible or opentofu`);
 }
 
 /** A plugin noun from text, or why the text is not one. */

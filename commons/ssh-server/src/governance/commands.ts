@@ -10,8 +10,6 @@ import type { Result } from "@intellectual-frontiers/core";
 
 /** The longest command line, in characters. */
 export const MAX_COMMAND = 256;
-/** The longest word. */
-export const MAX_WORD = 96;
 /** What a word may hold. */
 export const WORD = /^[A-Za-z0-9._:=-]{1,96}$/;
 

@@ -14,8 +14,6 @@
 
 /** The eight kinds of step: a closed list. */
 export const STEP_KINDS = ["verb", "check", "ask", "judge", "branch", "each", "gate", "undo"] as const;
-/** One kind of step. */
-export type StepKind = (typeof STEP_KINDS)[number];
 
 /** What an `each` fans out over. */
 export const EACH_KINDS = ["tenants", "hosts", "fleets"] as const;
@@ -27,8 +25,3 @@ export const RUNBOOK_TERMS = ["step", "checkpoint"] as const;
 /** One term. */
 export type RunbookTerm = (typeof RUNBOOK_TERMS)[number];
 
-/** What each term is. */
-export const RUNBOOK_DEFINITIONS: Readonly<Record<RunbookTerm, string>> = {
-  step: "One element of a runbook: a verb, a check, an ask, a judge, a branch, an each, a gate or an undo.",
-  checkpoint: "A step that makes a restore point of a store before it is changed.",
-};

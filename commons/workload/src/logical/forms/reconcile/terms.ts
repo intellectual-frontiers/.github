@@ -14,8 +14,6 @@
 
 /** The six kinds of node: a closed list. */
 export const RECONCILE_KINDS = ["observe", "diff", "plan", "approve", "apply", "verify"] as const;
-/** One kind of node. */
-export type ReconcileKind = (typeof RECONCILE_KINDS)[number];
 
 /** What an observation is of: the state the world is in, or the state it should be in. */
 export const OBSERVATIONS = ["actual", "desired"] as const;
@@ -32,10 +30,3 @@ export const RECONCILE_TERMS = ["observation", "change", "plan hash", "pass"] as
 /** One term. */
 export type ReconcileTerm = (typeof RECONCILE_TERMS)[number];
 
-/** What each term is. */
-export const RECONCILE_DEFINITIONS: Readonly<Record<ReconcileTerm, string>> = {
-  observation: "The state of a store read by a verb that only reads, as named values: the actual state or the desired state.",
-  change: "One difference between the actual and the desired state: a value to create, update or delete.",
-  "plan hash": "The SHA-256 of the canonical text of the changes of a plan: what a person approves, so that a plan that changed is not approved.",
-  pass: "One evaluation of the loop from observation to verification; a new pass starts from what is observed now.",
-};

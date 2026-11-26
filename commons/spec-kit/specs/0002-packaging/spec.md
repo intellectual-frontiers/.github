@@ -17,7 +17,7 @@ the harnesses (`desired-os-state`, `toolchain`) and `erga` read one set of facts
   `managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts` and `record.ts` beside it, with individuals in `https://www.intellectualfrontiers.com/id/packaging/` (`pmid:`), each a TypeScript module of 0012-ontology FR-008 (amended 2026-11-16: the files were Turtle). A class MUST specialize a schema.org class
   where schema.org has one; every term MUST have a label and a definition.
 - **FR-002**: The data MUST hold every package manager and every operating-system row of the tables of `upt`, whatever the platform (Linux, the BSDs, macOS, Windows, Android and Haiku), so that
-  a future harness is not limited to the families the retired engine ran on. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
+  a future harness is not limited to the families listed. A test MUST fail where a manager or a row of `tests/fixtures/upt/` is missing.
 - **FR-003**: The data seeded from `upt` MUST say so, with its licence (MIT or Apache-2.0) and the identifier it leaves out (`oubes`, which is not an `os-release` ID). A command MUST say where it
   comes from (`pm:origin`: `upt`, `desired-os-state` (the commands the fleet engine runs, 0034-desired-os-state), `memory` (written from knowledge) or `upt+memory` where the non-interactive form was written from knowledge), and a command, a family or a flag run on a real computer MUST say where and
   when (`pm:verifiedOn`); one with none is unverified (0001-software-supply-chain FR-006).

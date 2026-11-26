@@ -8,7 +8,7 @@ What was decided, so that it is not decided again by accident.
 | 2 | Specifications in natural language; ontology, code, tools and tests in TypeScript 7+; Bun default, Node 26 backup. |
 | 3 | Integrations, extensions and plugins are TypeScript 7 when possible; where it cannot do the job and a hand-written parser is not good enough, the best stack for the job is chosen and used, recorded as a typed `Exception`. |
 | 4 | Rung 8 (lifecycle: retired, then archived) is an optional rung. |
-| 5 | One status vocabulary: Draft, Active, Deferred, Superseded (Adopted accepted until migrated). |
+| 5 | One status vocabulary: Draft, Active, Deferred, Superseded. |
 | 6 | New rules (EARS, Gherkin, standards) are warn-only with a shrink-only baseline. |
 | 7 | Precedence: law, then US and NIST standards, then ISO standards, then broadly used vocabularies, then state and local standards where they do not conflict. State and local law is law and applies where it applies. |
 | 8 | First regulated domains: federal security (NIST, FedRAMP), FDA's QMSR (21 CFR Part 820) and 21 CFR Part 11. Others as products need them, pulled up into commons when more than one harness reads the same facts. |
@@ -18,7 +18,7 @@ What was decided, so that it is not decided again by accident.
 | 12 | All Mizan TypeScript lives in `commons/mizan/src/`, integrations in `commons/mizan/src/integrations/` (`0019-mizan-integrations`); natural-language specifications stay in `commons/spec-kit/`. |
 | 13 | Imports only when necessary; exports to well-known forms; upstream contributions are prepared as bundles and never published without a person. |
 | 14 | Non-TypeScript tools state the platforms they support; their tests run only there. |
-| 15 | Trace and layers stay in the kernel as pure functions; `commons/mizan/src/` imports them; `spec-kit-check.ts` remains a wrapper for one repin cycle. |
+| 15 | Trace and layers stay in the kernel as pure functions; `commons/mizan/src/` imports them. |
 | 16 | The `unaligned` terms of Mizan stay `unaligned`, each due within 90 days; schema.org is fetched by pinned hash and not vendored. |
 | 17 | The ladder has eleven rungs: 0 to 7 required, 8 lifecycle (optional), 9 Evidence (observer) and 10 Workspace (environment), with `mz:RungKind` (required, optional, observer, environment). |
 | 18 | IFCCM: the unit of change is a capability; every commit names its issue on a line of its own; enforcement is a warning until a harness declares its production day, then a gate. "CCM" is never used alone. |

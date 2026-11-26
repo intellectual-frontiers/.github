@@ -127,11 +127,6 @@ export const CHARACTERISTICS: readonly string[] = [
   "safety",
 ];
 
-/** Whether a text is the name of a characteristic. */
-export function isCharacteristic(text: string): boolean {
-  return CHARACTERISTICS.includes(text);
-}
-
 /** The document names of ISO/IEC/IEEE 29119-3 that a report of a run bears (FR-017). */
 export const DOCUMENTS = {
   completion: "Test Completion Report",

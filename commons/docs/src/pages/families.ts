@@ -60,7 +60,7 @@ export interface GroupPage {
   readonly title: string;
 }
 
-/** What the title of a library says once its host and its role are taken off: `AnyFS Google Drive` under `AnyFS` is `Google Drive`, `Desired OS State plugin: boot` under `Desired OS State` is `Boot`. */
+/** What the title of a library says once its host and its role are taken off: `AnyFS Google Drive` under `AnyFS` is `Google Drive`, `Desired OS State plugin: tool` under `Desired OS State` is `Tool`. */
 export function shortTitle(title: string, hostTitle: string): string {
   const singular = hostTitle.endsWith("s") ? hostTitle.slice(0, -1) : hostTitle;
   const rest = title.startsWith(`${hostTitle} `) ? title.slice(hostTitle.length + 1) : title.startsWith(`${singular} `) ? title.slice(singular.length + 1) : title;

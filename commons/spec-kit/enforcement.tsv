@@ -31,7 +31,7 @@ requirement	mechanism	by	note
 0003-mizan FR-006	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-mizan FR-007	check	.github: bun test ./tests/	Mizan: the tool runs on commons' own folder and each rule is broken in a copy and named
 0003-mizan FR-008	check	.github: bun test ./tests/	Mizan: a Part of line naming no specification of the folder, or the specification itself, is named
-0003-mizan FR-009	check	.github: bun test ./tests/	Mizan: the old tool name runs the new one and gives the same findings
+0003-mizan FR-009	review	0003-mizan FR-009	a reviewer checks that a harness keeps the method, commands, constitution and feature files of GitHub Spec Kit and that Mizan adds only what FR-009 lists
 0003-mizan FR-010	check	.github: bun test ./tests/	Mizan: Active and Deferred are accepted, a word outside the list is named
 0003-mizan FR-011	check	.github: cd commons/libraries && bun test suite/	mizan-oscal-register.test.ts: the requirements of a folder are implemented-requirements of a component definition and the proofs observations of assessment results, both valid against the official OSCAL 1.2.3 schemas
 0003-mizan FR-012	check	.github: bun test ./tests/	Mizan: a Spec Kit form specification is accepted and its missing section and status are named
@@ -494,7 +494,6 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-136	check	.github: cd commons/patterns && bun run verify	commons/patterns: the verify of the library (its manifest); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-137	check	.github: cd commons/programs && bun run verify	commons/programs: the verify of the library (its manifest); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-138	check	.github: cd commons/standards && bun run verify	commons/standards: the verify of the library (its manifest); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
-0027-commons-libraries FR-139	check	.github: cd commons/desired-os-state && bun run verify	commons/desired-os-state: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-143	check	.github: cd commons/desired-os-state/pinned-downloads && bun run verify	commons/desired-os-state/pinned-downloads: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-145	check	.github: cd commons/desired-os-state/tool && bun run verify	commons/desired-os-state/tool: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-146	check	.github: cd commons/package-managers && bun run verify	commons/package-managers: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
@@ -545,6 +544,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-197	check	.github: cd commons/workbench && bun run verify	commons/workbench: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-198	check	.github: cd commons/workload && bun run verify	commons/workload: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-199	check	.github: cd commons/ssh-server && bun run verify	commons/ssh-server: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-200	check	.github: cd commons/desired-os-state && bun run verify	commons/desired-os-state: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0028-conformance-levels FR-001	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: Mizan's ontology holds the four levels with ranks 0 to 3, each entailing what it and the levels below it add
 0028-conformance-levels FR-002	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: every requirement is added by exactly one level and names a rule or says what else proves it
 0028-conformance-levels FR-003	check	.github: cd commons/mizan && bun test suite/	mizan-levels.test.ts: L0 adds a manifest, a verify command and a version
@@ -617,7 +617,6 @@ requirement	mechanism	by	note
 0033-kanon FR-013	check	.github: bun test ./tests/	commons-kanon.test.ts: a LayeredModel is the shape of the layered model of the documentation generator, with the kinds and the id builders agreed
 0033-kanon FR-014	check	.github: bun test ./tests/	commons-kanon.test.ts: the check of the manifests finds a library that declares kanon and whose verify does not run the check
 0033-kanon FR-015	check	.github: bun test ./tests/	commons-kanon.test.ts: the ontology kanon has the ten classes, the three layers with their MDA viewpoints, and a record of the basis of each class
-0033-kanon FR-016	review	0033-kanon FR-016	a reviewer checks that no requirement of another library's spec kit is edited by this specification
 0033-kanon FR-017	review	0033-kanon FR-017	a reviewer checks the cross-reference of the ladder and Kanon until the two are unified or kept apart by decision (OQ-2)
 0033-kanon FR-018	review	0033-kanon FR-018	a reviewer checks the typing of a Kanon library; commons/kanon is the example, and its tests prove its own (0001-kanon-checker FR-009)
 0033-kanon FR-019	check	.github: bun test ./tests/	commons-kanon.test.ts: an instance that imports another is instances/sibling; the library's own tests are in commons/kanon/suite
@@ -639,7 +638,6 @@ requirement	mechanism	by	note
 0033-kanon FR-035	check	.github: cd commons/libraries && bun test suite/	library-dir.test.ts: the host's extensions are in the host's folder
 0011-documentation FR-030	check	.github: cd commons/docs && bun run verify	pending
 0034-desired-os-state FR-001	review	0034-desired-os-state FR-001	a reviewer checks that no package, folder or command of commons is the name of one fleet's product and that what is general to a fleet is done by a library
-0034-desired-os-state FR-002	review	0034-desired-os-state FR-002	a reviewer checks that no library carries a shim, re-export or migration path for the retired engine
 0034-desired-os-state FR-003	review	0034-desired-os-state FR-003	a reviewer checks that a fleet repository names its libraries by package at exact versions and holds its own data and composition root
 0034-desired-os-state FR-004	review	0034-desired-os-state FR-004	a reviewer checks the manifest and the Kanon table of desired-os-state: governance, logical and physical hold what FR-004 says
 0034-desired-os-state FR-005	review	0034-desired-os-state FR-005	a reviewer checks the names and the family field of each dialect and plugin package; the import check of 0033-kanon holds the public-exports rule
@@ -657,7 +655,6 @@ requirement	mechanism	by	note
 0034-desired-os-state FR-017	review	0034-desired-os-state FR-017	a reviewer checks the questions of initialization, the recommendation, the plain statement of what the profile allows and the report of weaker profiles as decisions
 0034-desired-os-state FR-018	review	0034-desired-os-state FR-018	a reviewer checks that each library has its own spec kit and release name and that each adversarial review's findings are closed or recorded as Decisions
 0034-desired-os-state FR-019	review	0034-desired-os-state FR-019	a reviewer checks that the first release waits for the slice in lab virtual machines and that the first dialect's measures are in its specification
-0034-desired-os-state FR-020	review	0034-desired-os-state FR-020	a reviewer checks that the old repository is archived, backed up and deleted only at the owner's request, with its tickets moved or closed one by one
 0034-desired-os-state FR-021	review	0034-desired-os-state FR-021	a reviewer checks that the work is one parent ticket with checklist items and comments, and that no ticket exists for a library, phase or sub-task
 0011-documentation FR-031	check	.github: cd commons/docs && bun run verify	library-site.test.ts: a module comment after a // header, kit and area folders, a page and an API for every library, specifications grouped by library
 0011-documentation FR-032	check	.github: cd commons/docs && bun run verify	guides.test.ts: a guide that cannot be read is a finding, the sections are in order, every section has its guides with links resolved
@@ -710,7 +707,6 @@ requirement	mechanism	by	note
 0036-distribution FR-033	check	.github: cd commons/libraries && bun test suite/	pack-commons.test.ts: a static import of an optional peer is a finding and a dynamic one is not; commons-package.test.ts imports every entry with no optional peer installed
 0036-distribution FR-034	check	.github: cd commons/repoctl && bun test suite/	usage.test.ts: the libraries imported, reached and never touched, from the consumer's files and the installed package
 0036-distribution FR-035	review	0036-distribution FR-035	Check the published version, the Erga manifests and lockfiles, and the results of the full Erga checks against the registry installs.
-0036-distribution FR-036	check	.github: bun test ./tests/release/	commons-package.test.ts: the keys of the exports of the packed tarball include every key recorded before the folders moved
 0011-documentation FR-036	check	.github: cd commons/docs && bun run verify	newcomer.test.ts: five newcomer questions answered from the site, retired names and history words found, none on commons' site
 0011-documentation FR-037	check	.github: cd commons/docs && bun run verify	highlight.test.ts: each language cut into tokens with its colour for both schemes, the same runs every time, and the diagram drawn into the page
 0011-documentation FR-038	check	.github: cd commons/docs && bun run verify	ai-guides.test.ts: the AI guides have the headings and a prompt block, and every path, repoctl command, script and specification they name exists

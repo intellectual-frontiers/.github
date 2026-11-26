@@ -24,7 +24,7 @@ The proof register (`enforcement.tsv`) holds one row for each requirement, namin
 ## Verified for real
 
 - OSCAL 1.2.3 is the newest release (tags 1.2.4, 1.2.5 and 1.3.0 do not exist) and is public domain and CC0. NIST SP 800-53 Rev. 5.2.0 (1,196 controls with enhancements) imports from a pinned `oscal-content` commit in 0.7 s.
-- A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons used to write by hand. The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds the ontology conforms to its own shapes and rejects a broken individual; ROBOT reads the generated OWL.
+- A slice of the real schema.org 30.1 Turtle, fetched by pinned SHA-256, makes exactly the vocabulary commons states. The reader's triple counts on schema.org (17,515), PROV-O (961) and SHACL (1,112) agree exactly with rdflib; sssom-py parses the SSSOM file; pySHACL finds the ontology conforms to its own shapes and rejects a broken individual; ROBOT reads the generated OWL.
 - TypeScript 7 checks a 5,000-entry code list in 0.18 s and 85 MB, linear in its entries.
 - The GitHub, GitLab and plain Git adapters are tested with recorded exchanges written from the hosts' documented answers, a real HTTP server on loopback for the live transport, and real Git repositories. The change check, the quality branch (including signing with an SSH key made in the test where `ssh-keygen` exists) run as programs on Bun and on Node 26 against real temporary repositories.
 

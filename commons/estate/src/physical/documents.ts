@@ -255,7 +255,3 @@ export const shardedById: Layout<DocId> = ((): Layout<DocId> => {
 /** The layout of the manifest and of the observations of one asset: one file for each key directly below the folder. */
 export const flatById: Layout<DocId> = byId(JSON_EXTENSION);
 
-/** The identity of a document of an asset: the asset's identity, which is a document name. */
-export function docIdOf(asset: string): Result<DocId, string> {
-  return parseDocId(asset);
-}

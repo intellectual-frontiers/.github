@@ -40,8 +40,6 @@ requirement	mechanism	by	note
 0006-desired-os-state-on-workload FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/gate.test.ts: confirmations and second approver by profile
 0006-desired-os-state-on-workload FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: end to end through workload's runtime
 0006-desired-os-state-on-workload FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: no shell string in a dialect's output
-0006-desired-os-state-on-workload FR-010	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: the removed files and the plugin are gone
-0006-desired-os-state-on-workload FR-011	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: no dialect of a first-boot hook
 0007-desired-os-state-observe-osquery FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the pack
 0007-desired-os-state-observe-osquery FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the tables by kind and platform
 0007-desired-os-state-observe-osquery FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: names are quoted or refused
@@ -53,4 +51,3 @@ requirement	mechanism	by	note
 0001-desired-os-state-layers FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: desired-os-state depends on workload and workload does not import desired-os-state
 0002-desired-os-state-governance FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: each control is mapped or kept
 0004-desired-os-state-dialects FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: argv steps
-0004-desired-os-state-dialects FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: no first-boot dialect

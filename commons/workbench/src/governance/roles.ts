@@ -24,9 +24,6 @@ export const AUTONOMY = ["human-only", "agent-proposes", "agent-acts-human-revie
 /** One autonomy level. */
 export type Autonomy = (typeof AUTONOMY)[number];
 
-/** The level of a stage the contract marks regulated and says no more of. */
-export const DEFAULT_REGULATED: Autonomy = "agent-proposes";
-
 /** What an actor does in a workflow: a closed list. */
 export const ACTIONS = ["read", "edit", "test", "propose", "commit", "push", "approve", "publish", "tag"] as const;
 /** One action. */

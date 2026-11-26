@@ -79,10 +79,3 @@ export async function revokeAsset(store: EnrollStore, assetId: string): Promise<
   return ok(true);
 }
 
-/** The controller asks an asset to rotate its key by itself at its next `checkin`. */
-export async function requestRotation(store: EnrollStore, assetId: string): Promise<Result<true, string>> {
-  const a = (await store.assets()).find((x) => x.id === assetId);
-  if (a === undefined) return err("unknown asset");
-  await store.putAsset({ ...a, rotate: true });
-  return ok(true);
-}
