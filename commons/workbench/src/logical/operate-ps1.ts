@@ -163,7 +163,7 @@ function Install-DependencyTree {
     Exit-Step 'bun install failed' 'its message is above; a 401 or 403 means the sign-in needs read:packages and access to the packages of ${spec.registry.scope}: run gh auth refresh --hostname github.com --scopes read:packages, then run this again'
   }
   New-Item -ItemType Directory -Force -Path (Split-Path $script:Stamp) | Out-Null
-  Set-Content -Path $script:Stamp -Value $want
+  Set-Content -Path $script:Stamp -Value (Get-Stamp)
 }
 function Invoke-Converge([string]$Id, [string]$Say, [string[]]$Check, [string[]]$Run) {
   if (Test-Native $Check $script:Root) { Write-Ok $Say; return }

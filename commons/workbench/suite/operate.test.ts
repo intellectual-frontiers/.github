@@ -125,6 +125,7 @@ proves(["0007-workbench-operate FR-008"], "update fast-forwards only a clean clo
   assert(ps.includes("pull --ff-only") && ps.includes("not committed: left as it is"));
   assert(sh.includes("STAMP=\"$ROOT/.demo/operate.stamp\"") && sh.includes("--frozen-lockfile") && sh.includes("nothing changed since the last run"));
   assert(ps.includes(".demo/operate.stamp") && ps.includes("--frozen-lockfile"));
+  assert(sh.includes('printf \'%s\\n\' "$(stamp_of)" > "$STAMP"') && ps.includes("Set-Content -Path $script:Stamp -Value (Get-Stamp)"), "the stamp is of the state after the install, so the next run finds nothing to do");
 });
 
 proves(["0007-workbench-operate FR-009"], "a converge step is two argument vectors run without a shell, and run only where check fails", () => {
