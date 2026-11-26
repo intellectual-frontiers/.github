@@ -97,6 +97,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["assessment", "pattern"],
   ["tenancy", "pattern"],
   ["gate", "pattern"],
+  ["actor", "pattern"],
   ["dossier", "pattern"],
   ["dossier-assurance", "program"],
   ["workbench", "pattern"],

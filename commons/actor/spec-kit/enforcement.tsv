@@ -1,0 +1,19 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-actor-layers FR-001	check	.github: cd commons/actor && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and no import is outside its row
+0001-actor-layers FR-002	check	.github: cd commons/actor && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0002-actor-roles FR-001	check	.github: cd commons/actor && bun run verify	suite/roles.test.ts: an actor is decoded with its kind, an id and for an agent the reported model
+0002-actor-roles FR-002	check	.github: cd commons/actor && bun run verify	suite/roles.test.ts: an agent as initiator, reviewer or approver does not type check and is refused with the role named
+0002-actor-roles FR-003	check	.github: cd commons/actor && bun run verify	suite/roles.test.ts: executor, assistant and preparer take only their kinds
+0002-actor-roles FR-004	check	.github: cd commons/actor && bun run verify	suite/roles.test.ts: the directive belongs to the initiator, the findings and the tasking levels
+0003-actor-retention FR-001	check	.github: cd commons/actor && bun run verify	suite/retention.test.ts: the rules are data with a source, and only the Security Rule was read
+0003-actor-retention FR-002	check	.github: cd commons/actor && bun run verify	suite/retention.test.ts: the period is the longest rule that was read, else six years; an override never goes under the floor
+0003-actor-retention FR-003	check	.github: cd commons/actor && bun run verify	suite/retention.test.ts: dropping digests is a record, and never early
+0004-actor-trailers FR-001	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: the trailers are encoded in the form git reads
+0004-actor-trailers FR-002	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: the trailers are decoded back to the same actors
+0004-actor-trailers FR-003	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: an agent as author, reviewer or signer is found
+0004-actor-trailers FR-004	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: an undirected draft and a malformed trailer are found
+0004-actor-trailers FR-005	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: the words of FR-014 are found of an agent and not of a person
+0004-actor-trailers FR-006	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: the lint skips code and does not judge style
+0004-actor-trailers FR-007	check	.github: cd commons/actor && bun run verify	suite/trailers.test.ts: the history gives the trailers and the files of each commit, and writes nothing

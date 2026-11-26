@@ -78,6 +78,7 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/telemetry`](https://www.npmjs.com/package/@intellectual-frontiers/telemetry) | Foundation | The OpenTelemetry data model | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/terminal`](https://www.npmjs.com/package/@intellectual-frontiers/terminal) | Foundation | A typed command-line parser (`args`) whose options are declared once as data | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/test`](https://www.npmjs.com/package/@intellectual-frontiers/test) | Foundation | Tests that run unchanged under `bun test` and `node --test` | - | L1 | GitHub, npm |
+| [`@intellectual-frontiers/actor`](https://www.npmjs.com/package/@intellectual-frontiers/actor) | Pattern | Who did what in a regulated act | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/assessment`](commons/assessment) | Pattern | Assessment-objective evidence | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/content`](https://www.npmjs.com/package/@intellectual-frontiers/content) | Pattern | Collects governed claims and their evidence into a checked model for publication | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/dossier`](commons/dossier) | Pattern | A sealed, point-in-time file on one subject | layers, plugins | L1 | GitHub |
