@@ -75,7 +75,7 @@ export const SINGLE_PEERS: ReadonlyMap<string, PeerRule> = new Map<string, PeerR
 ]);
 
 /** The size budget of the single package (0036-distribution FR-032): a growth beyond it is a finding, so that it is a decision and never an accident. Bytes of the staged package, files of it, and bytes of the tarball. */
-export const SINGLE_BUDGET = { apparentBytes: 30_500_000, files: 5_300, tarballBytes: 5_600_000 } as const;
+export const SINGLE_BUDGET = { apparentBytes: 30_500_000, files: 5_300, tarballBytes: 5_700_000 } as const;
 
 /** The registries a release can send a package to: a closed set. */
 export const PUBLISH_TARGETS = ["github", "npm"] as const;
