@@ -50,13 +50,13 @@
 - `proves([FR], ...)` with `const FR = "100-remote-access FR-003"` in the same file: the requirement is proved, per FR-006.
 - A requirement proved only by a call that builds its id at run time (`FR(3)`): not read, so `trace/unproved` until a literal, a `const` or a `// Proves:` line names it, per FR-006 and FR-007.
 - A spec with status `Draft`, or with no requirement any test proves: no `trace/unproved` for a Draft spec, per FR-007.
-- `src/archon/assets.auto.ts` with no `Spec:` line: exempt, per FR-007.
+- `src/desired-os-state/assets.auto.ts` with no `Spec:` line: exempt, per FR-007.
 - A baseline entry for a file that now has its `Spec:` line: stale, and the check fails until the line is deleted, per FR-002.
 - A baseline with its lines out of order: read as the set it is, and written sorted, per FR-002.
-- `src/archon/model/mod.ts` matched by the folder `src/archon/model/` and by `src/**/mod.ts`: on the rung of `src/**/mod.ts`, a home that names files, per FR-009.
+- `src/desired-os-state/model/mod.ts` matched by the folder `src/desired-os-state/model/` and by `src/**/mod.ts`: on the rung of `src/**/mod.ts`, a home that names files, per FR-009.
 - A file of rung 4 that imports a file of rung 2, when rung 4 may rely on 0, 1 and 3: `layers/around`, per FR-010.
 - `import type { X } from "../model/types.ts"`: an import like any other, per FR-010.
-- On Windows, a file under `src\\archon\\core`: read as `src/archon/core/...`, per FR-011.
+- On Windows, a file under `src\\desired-os-state\\core`: read as `src/desired-os-state/core/...`, per FR-011.
 - An import of `@intellectual-frontiers/core`: not a finding, per FR-010.
 
 ## Assumptions

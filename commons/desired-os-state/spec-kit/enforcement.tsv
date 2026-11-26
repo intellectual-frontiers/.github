@@ -1,0 +1,56 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-desired-os-state-layers FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: every file of the real tree is in a unit and a file in none is layers/unclassified
+0001-desired-os-state-layers FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: below may not import above and each unit imports only what its row allows
+0001-desired-os-state-layers FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: the package exports the library, its layers and the dialect port
+0001-desired-os-state-layers FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: verify runs every check of the library
+0001-desired-os-state-layers FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: the release record agrees with the manifest and the package
+0002-desired-os-state-governance FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: names are made only by their functions
+0002-desired-os-state-governance FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: the catalogue has kinds for machines, zones and cloud accounts
+0002-desired-os-state-governance FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: a requirement is defined or refused with every reason
+0002-desired-os-state-governance FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: text that looks like a secret is found by its path
+0002-desired-os-state-governance FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: each profile gives every control and the profiles are ranked
+0002-desired-os-state-governance FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: an override has a reason and a date and is kept
+0002-desired-os-state-governance FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: the floor is data and no control or override lowers it
+0002-desired-os-state-governance FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: a change of assurance is judged by the assurance in force
+0003-desired-os-state-logical FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the order keeps what matches and refuses a requirement twice in a layer
+0003-desired-os-state-logical FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: a higher layer replaces a lower one and the order records it
+0003-desired-os-state-logical FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the order is sequenced after dependencies and a missing dependency and a cycle are refused
+0003-desired-os-state-logical FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the plan says none, create, update or remove for each requirement
+0003-desired-os-state-logical FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the canonical text and digest of a plan are stable and change with any entry
+0003-desired-os-state-logical FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the approvals a plan needs follow its destructive entries, tiers and the assurance
+0003-desired-os-state-logical FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/logical.test.ts: the gate opens only when each approval needed is given
+0004-desired-os-state-dialects FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: a dialect is a value of the port
+0004-desired-os-state-dialects FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: a dialect's guarantees are data
+0004-desired-os-state-dialects FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: what a dialect expresses of a requirement
+0004-desired-os-state-dialects FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: the matrix and its totals and unexpressed annotations
+0004-desired-os-state-dialects FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: the plan of steps names the digest and refuses a destructive step with no check
+0004-desired-os-state-dialects FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: rendered files say they are generated and their digest is stable
+0005-desired-os-state-assembly FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/assembly.test.ts
+0005-desired-os-state-assembly FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/assembly.test.ts
+0005-desired-os-state-assembly FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/assembly.test.ts
+0005-desired-os-state-assembly FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/assembly.test.ts
+0006-desired-os-state-on-workload FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts and workload suite/no-desired-os-state.test.ts: workload imports nothing of desired-os-state
+0006-desired-os-state-on-workload FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: reconcileOf is a loop workload's check accepts
+0006-desired-os-state-on-workload FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: the states
+0006-desired-os-state-on-workload FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: the plan is workload's diff
+0006-desired-os-state-on-workload FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: the hash is stable and is workload's
+0006-desired-os-state-on-workload FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: the mode of the apply
+0006-desired-os-state-on-workload FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/gate.test.ts: confirmations and second approver by profile
+0006-desired-os-state-on-workload FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/reconcile.test.ts: end to end through workload's runtime
+0006-desired-os-state-on-workload FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: no shell string in a dialect's output
+0006-desired-os-state-on-workload FR-010	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: the removed files and the plugin are gone
+0006-desired-os-state-on-workload FR-011	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: no dialect of a first-boot hook
+0007-desired-os-state-observe-osquery FR-001	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the pack
+0007-desired-os-state-observe-osquery FR-002	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the tables by kind and platform
+0007-desired-os-state-observe-osquery FR-003	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: names are quoted or refused
+0007-desired-os-state-observe-osquery FR-004	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: strict rows
+0007-desired-os-state-observe-osquery FR-005	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: observed from rows
+0007-desired-os-state-observe-osquery FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: drift is the plan
+0007-desired-os-state-observe-osquery FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the fallback
+0007-desired-os-state-observe-osquery FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the capture of real osqueryi 5.12.1 decodes and is observed
+0001-desired-os-state-layers FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: desired-os-state depends on workload and workload does not import desired-os-state
+0002-desired-os-state-governance FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: each control is mapped or kept
+0004-desired-os-state-dialects FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: argv steps
+0004-desired-os-state-dialects FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: no first-boot dialect

@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/linux-services",
   "private": true,
   "version": "0.1.0",
-  "description": "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Archon (packages, files, directories and services), with the secret never in the model.",
+  "description": "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Desired OS State (packages, files, directories and services), with the secret never in the model.",
   "type": "module",
   "engines": {
     "node": ">=26"
@@ -20,7 +20,7 @@
     "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
   },
   "devDependencies": {
-    "@intellectual-frontiers/archon": "link:../archon",
+    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/kanon": "link:../kanon",

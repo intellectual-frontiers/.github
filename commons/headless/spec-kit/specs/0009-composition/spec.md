@@ -5,12 +5,12 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The fleet engine (issue #11) needs one command, `archon`, whose verbs come from several packages (`archon-server`, `archon-device`, and so on) that are installed separately and assembled in a small composition root. Headless had one program tree written in one place. This increment builds one program from a host and the plugins it is given: one tree, so one help, one completion script, one man page, one run log and one tier gate; a typed contract with stable identifiers; conflicts as values; and a conformance suite that a plugin runs on itself.
+**Input:** The fleet engine (issue #11) needs one command, `desired-os-state`, whose verbs come from several packages (`desired-os-state-server`, `desired-os-state-device`, and so on) that are installed separately and assembled in a small composition root. Headless had one program tree written in one place. This increment builds one program from a host and the plugins it is given: one tree, so one help, one completion script, one man page, one run log and one tier gate; a typed contract with stable identifiers; conflicts as values; and a conformance suite that a plugin runs on itself.
 
 ## The plugin and its contract
 
-- **FR-001**: A plugin MUST be the value that a package exports (`Plugin`, made only by `definePlugin`), and a host MUST take a plugin's nodes through that value alone, never by reading a file of the package: its stable identity is the program's name, a hyphen and a noun (`PluginId`, a branded type made only by `parsePluginId` or `parsePluginIdText`), its contract is the number `PLUGIN_CONTRACT`, and it holds its version, its summary, the nodes it contributes (each with the path of the branch it is placed in, the root where none) and the plugins it requires. `definePlugin` MUST return every problem of a definition as a value (`plugin/id`, `plugin/version`, `plugin/summary`, `plugin/empty`, `plugin/root-claim`, `plugin/requires`), and MUST NOT throw. Taken from: the plan of `archon`, whose plugins are packages named `archon-<noun>`.
-- **FR-002**: A plugin MUST place a node at the root of the program only under its own noun (`archon-server` contributes the word `server`), so that a root word names the plugin that owns it; below another branch it MAY place nodes where that branch exists.
+- **FR-001**: A plugin MUST be the value that a package exports (`Plugin`, made only by `definePlugin`), and a host MUST take a plugin's nodes through that value alone, never by reading a file of the package: its stable identity is the program's name, a hyphen and a noun (`PluginId`, a branded type made only by `parsePluginId` or `parsePluginIdText`), its contract is the number `PLUGIN_CONTRACT`, and it holds its version, its summary, the nodes it contributes (each with the path of the branch it is placed in, the root where none) and the plugins it requires. `definePlugin` MUST return every problem of a definition as a value (`plugin/id`, `plugin/version`, `plugin/summary`, `plugin/empty`, `plugin/root-claim`, `plugin/requires`), and MUST NOT throw. Taken from: the plan of `desired-os-state`, whose plugins are packages named `desired-os-state-<noun>`.
+- **FR-002**: A plugin MUST place a node at the root of the program only under its own noun (`desired-os-state-server` contributes the word `server`), so that a root word names the plugin that owns it; below another branch it MAY place nodes where that branch exists.
 
 ## Composition
 
@@ -27,7 +27,7 @@
 
 1. **Given** a host and two plugins (`server`, `device`), **When** they are composed in either order, **Then** the tree, its owners and its help are the same, per FR-003 and FR-006.
 2. **Given** two plugins that each place a command at `server list`, **When** they are composed, **Then** the result is a `claimed-twice` conflict naming both, per FR-004.
-3. **Given** a plugin that claims the root word `device` while being `archon-server`, **When** it is defined, **Then** it is `plugin/root-claim`, per FR-002.
+3. **Given** a plugin that claims the root word `device` while being `desired-os-state-server`, **When** it is defined, **Then** it is `plugin/root-claim`, per FR-002.
 4. **Given** a composed program, **When** a command runs, **Then** the run log names the plugin it came from, per FR-006.
 5. **Given** a plugin with a command with no reach policy, **When** the conformance suite runs, **Then** `conformance/reach` fails and says which, per FR-007.
 

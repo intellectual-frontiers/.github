@@ -157,7 +157,7 @@ export function message(p: Problem): string {
     case "edge-cites-unknown":
       return `an edge case cites a requirement that is not here: ${p.item}`;
     case "bare-citation":
-      return `cites ${p.cite}, which is not a specification here; name the repository before the number of another's (for example \`archon 0002-specs\`)`;
+      return `cites ${p.cite}, which is not a specification here; name the repository before the number of another's (for example \`desired-os-state 0002-specs\`)`;
     case "enforcement-missing":
       return "the enforcement register is missing";
     case "row-shape":

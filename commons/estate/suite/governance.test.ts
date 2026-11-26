@@ -14,7 +14,7 @@ proves(["0002-estate-governance FR-001"], "the identities are made only by their
   assert(r.kind === "err" && r.error.includes("not an asset id"));
   assertEquals(parseAssetKind("network-device").kind, "ok");
   assertEquals(parseAssetKind("Network").kind, "err");
-  assertEquals(parseSystemId("archon").kind, "ok");
+  assertEquals(parseSystemId("desired-os-state").kind, "ok");
   assertEquals(parseSystemId("a.b").kind, "err");
 });
 
@@ -38,28 +38,28 @@ proves(["0002-estate-governance FR-002", "0002-estate-governance FR-003"], "each
 });
 
 proves(["0002-estate-governance FR-004"], "an asset says for every capability, in order, that it is offered and by whom, or that it is not and why", () => {
-  const a = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon" } });
+  const a = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(a.kind === "ok");
   assertEquals(a.value.capabilities.map((c) => c.capability), [...CAPABILITIES]);
   const converge = a.value.capabilities.find((c) => c.capability === "converge");
   assert(converge !== undefined && !converge.offered && converge.reason.includes("never changed"));
-  assertEquals(ownerOf(a.value, "observe"), "archon");
+  assertEquals(ownerOf(a.value, "observe"), "desired-os-state");
   assertEquals(ownerOf(a.value, "converge"), undefined);
   const d = defineAsset({ id: "printer", kind: "device", state: "discovered", owners: {} });
   assert(d.kind === "ok" && d.value.capabilities.filter((c) => !c.offered).length === 10, "every capability of a discovered asset carries a reason");
 });
 
 proves(["0002-estate-governance FR-005"], "an asset is refused, with every reason, for an owner of what its state does not offer, a missing owner, and a name that is not well formed", () => {
-  const owned = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", converge: "archon" } });
-  assert(owned.kind === "err" && owned.error.some((m) => m.includes("converge is owned by archon") && m.includes("does not offer it")));
-  const missing = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "archon" } });
+  const owned = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "desired-os-state", verify: "desired-os-state", converge: "desired-os-state" } });
+  assert(owned.kind === "err" && owned.error.some((m) => m.includes("converge is owned by desired-os-state") && m.includes("does not offer it")));
+  const missing = defineAsset({ id: "synthetic-server-01", kind: "server", state: "adopted", owners: { observe: "desired-os-state" } });
   assert(missing.kind === "err" && missing.error.length === 1 && missing.error.every((m) => m.includes("has no owner")));
-  const bad = defineAsset({ id: "Synthetic-Server-01", kind: "Server", state: "discovered", owners: { observe: "Archon" } });
+  const bad = defineAsset({ id: "Synthetic-Server-01", kind: "Server", state: "discovered", owners: { observe: "Desired OS State" } });
   assert(bad.kind === "err" && bad.error.length === 3, JSON.stringify(bad));
 });
 
 proves(["0002-estate-governance FR-006"], "a typed estate makes each asset by its key, refuses a link that is wrong as data, and does not compile a link to an asset that is not there", () => {
-  const owners = { observe: "archon", verify: "archon" } as const;
+  const owners = { observe: "desired-os-state", verify: "desired-os-state" } as const;
   const estate = defineEstate({ "synthetic-server-01": { kind: "server", state: "adopted", owners }, "synthetic-workstation-01": { kind: "workstation", state: "adopted", owners } }, [{ from: "synthetic-workstation-01", to: "synthetic-server-01", kind: "boots" }]);
   assert(estate.kind === "ok");
   assertEquals(estate.value.ids, ["synthetic-server-01", "synthetic-workstation-01"]);
@@ -72,14 +72,14 @@ proves(["0002-estate-governance FR-006"], "a typed estate makes each asset by it
   assert(bad.kind === "err" && bad.error.some((m) => m.includes("nowhere, which is no asset")));
   const loop = defineEstate({ "synthetic-server-01": { kind: "server", state: "adopted", owners } }, [{ from: "synthetic-server-01", to: "synthetic-server-01", kind: "uses" }]);
   assert(loop.kind === "err" && loop.error.some((m) => m.includes("linked to itself")));
-  const asset = defineEstate({ x: { kind: "server", state: "adopted", owners: { observe: "archon" } } }, []);
+  const asset = defineEstate({ x: { kind: "server", state: "adopted", owners: { observe: "desired-os-state" } } }, []);
   assert(asset.kind === "err", "an asset that is refused refuses the estate");
 });
 
 proves(["0002-estate-governance FR-007"], "an asset says where it came from, a managed asset is provisioned by default, only a managed asset can be, an inherited managed asset does not offer provision, and any other word is refused", () => {
-  const paired = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const paired = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(paired.kind === "ok" && paired.value.origin === "paired" && installOf(paired.value) === "inherited");
-  const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "archon"]));
+  const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "desired-os-state"]));
   const provisioned = defineAsset({ id: "synthetic-server-01", kind: "server", state: "managed", owners: all });
   assert(provisioned.kind === "ok" && provisioned.value.origin === "provisioned" && installOf(provisioned.value) === "provisioned", "provisioned is the default origin of a managed asset");
   assert(provisioned.value.capabilities.every((c) => c.offered), "a provisioned asset offers every capability");
@@ -90,10 +90,10 @@ proves(["0002-estate-governance FR-007"], "an asset says where it came from, a m
   assert(line !== undefined && !line.offered && line.reason.includes("installed by someone else"), "an inherited asset does not offer provision");
   assertEquals(inherited.value.capabilities.filter((c) => c.offered).length, CAPABILITIES.length - 1);
   const owned = defineAsset({ id: "synthetic-server-01", kind: "server", state: "managed", origin: "paired", owners: all });
-  assert(owned.kind === "err" && owned.error.some((m) => m.includes("provision is owned by archon")));
-  const wrong = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "provisioned", owners: { observe: "archon", verify: "archon" } });
+  assert(owned.kind === "err" && owned.error.some((m) => m.includes("provision is owned by desired-os-state")));
+  const wrong = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "provisioned", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(wrong.kind === "err" && wrong.error.some((m) => m.includes("only a managed asset can be provisioned")));
   // @ts-expect-error an origin outside the closed list does not compile
-  const unknown = defineAsset({ id: "x", kind: "server", state: "adopted", origin: "wandered-in", owners: { observe: "archon", verify: "archon" } });
+  const unknown = defineAsset({ id: "x", kind: "server", state: "adopted", origin: "wandered-in", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(unknown.kind === "err" && unknown.error.some((m) => m.includes("is not an origin")));
 });

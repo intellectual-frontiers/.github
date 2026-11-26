@@ -57,7 +57,7 @@ The codes are a closed list, and each has a sentence. The import checks are in [
 - The checker and its specifications: [the Kanon library](../../kanon/), with the specification of the checker (0001-kanon-checker) and of the content checks (0002-kanon-content-checks) in its own spec kit.
 - The worked example of the imports and adoption pages: `commons/kanon/suite/examples/reminders`, tested by `commons/kanon/suite/examples.test.ts`.
 - Headless, whose command model, tool server and REST service are projections of one description: [the library](../../headless/).
-- AnyFS, a host with thirteen extensions: [the library](../../anyfs/). Archon, a host with plugins and dialects: [the library](../../archon/).
+- AnyFS, a host with thirteen extensions: [the library](../../anyfs/). Desired OS State, a host with plugins and dialects: [the library](../../desired-os-state/).
 - The Content library, for claims and renditions: [the library](../../content/), and the method it serves, [the content method](../../spec-kit/specs/0039-content-method/spec.md), a draft.
 - The wider method: [Mizan](concept-mizan.md), and in particular [the ladder](mizan-ladder.md), [standards first](mizan-standards-first.md) and [the typed ontology](mizan-ontology.md).
 

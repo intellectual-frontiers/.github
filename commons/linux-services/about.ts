@@ -10,7 +10,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 /** Linux Services. */
 export const about: About = {
   title: "Linux Services",
-  summary: "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Archon (packages, files, directories and services), with the secret never in the model.",
+  summary: "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Desired OS State (packages, files, directories and services), with the secret never in the model.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: what the library is, as data and types.", mayImport: ["core, by package name"] },

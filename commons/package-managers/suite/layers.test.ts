@@ -44,11 +44,11 @@ proves(["0001-package-managers-layers FR-002", "0001-package-managers-layers FR-
   assertEquals(rules([at("src/governance/a.ts", `import { x } from "${PKG}/logical";\n`)]), ["layers/above"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/governance";\n`)]), []);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "../governance/commands.ts";\n`)]), ["layers/relative"]);
-  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/archon/governance";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/desired-os-state/governance";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "@intellectual-frontiers/system/proc";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "node:fs";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/physical/a.ts", `import * as proc from "@intellectual-frontiers/system/proc";\n`)]), []);
-  assertEquals(rules([at("src/physical/a.ts", `import { x } from "@intellectual-frontiers/archon-dialect-ansible";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/physical/a.ts", `import { x } from "@intellectual-frontiers/desired-os-state-ansible";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/physical/a.ts", `import { x } from "${PKG}/logical";\n`)]), []);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/physical";\n`)]), ["layers/above"]);
 });

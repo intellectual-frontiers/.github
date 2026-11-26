@@ -293,7 +293,7 @@ export function describe(f: Finding): string {
     case "install-interactive":
       return `family ${f.family}: ${f.manager} needs an install command with a non-interactive form`;
     case "install-not-harness":
-      return `family ${f.family}: the non-interactive install of ${f.manager} must come from a harness (origin archon), not from ${f.origin || "nowhere"}`;
+      return `family ${f.family}: the non-interactive install of ${f.manager} must come from a harness (origin desired-os-state), not from ${f.origin || "nowhere"}`;
     case "no-admin-install":
       return `family ${f.family} is supported and has no command for a person with administrator rights`;
     case "no-query-installed":
@@ -590,7 +590,7 @@ export function decode(o: Ontology): Result<Table, Finding[]> {
     const install = m.commands.get("install");
     if (install === undefined || install.noninteractive === null)
       bad.push({ kind: "install-interactive", family: id, manager: f.preferred });
-    else if (install.origin !== "archon")
+    else if (install.origin !== "desired-os-state")
       bad.push({ kind: "install-not-harness", family: id, manager: f.preferred, origin: install.origin });
     if (f.adminInstall === "") bad.push({ kind: "no-admin-install", family: id });
     if (!m.commands.has("query-installed")) bad.push({ kind: "no-query-installed", family: id, manager: f.preferred });

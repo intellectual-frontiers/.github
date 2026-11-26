@@ -6,7 +6,7 @@
  * @remarks
  * A path is on the rung of the home that matches it most specifically: one path beats every glob, a glob whose last segment names files
  * beats a folder, and among the rest the one with more literal characters wins. So `src/**\/mod.ts` (the guides) takes
- * `src/archon/model/mod.ts` from the folder `src/archon/model/`, and `src/archon/model/types.ts` takes it from both.
+ * `src/desired-os-state/model/mod.ts` from the folder `src/desired-os-state/model/`, and `src/desired-os-state/model/types.ts` takes it from both.
  *
  * @limits
  * It reads relative imports only: a package by its name is another repository's ladder. It reads the text, not the syntax tree.

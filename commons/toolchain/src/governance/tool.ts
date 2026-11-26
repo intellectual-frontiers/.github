@@ -25,7 +25,7 @@
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { sha256Of, type Sha256 } from "@intellectual-frontiers/crypto/sha256";
-import { findSecretLike } from "@intellectual-frontiers/archon/governance";
+import { findSecretLike } from "@intellectual-frontiers/desired-os-state/governance";
 import { compareVersions, parseManagerId, parsePinId, parseToolName, parseVersion, type ManagerId, type PinId, type ToolName, type Version } from "./ids.ts";
 
 /** A platform a pin can have a download for. */

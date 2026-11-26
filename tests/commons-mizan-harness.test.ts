@@ -93,7 +93,7 @@ proves(
       assertStringIncludes(findings(h.kit), "a number of three or four digits");
       // a bare citation of a missing specification, written with three digits, is found in a three-digit folder
       fs.writeTextFileSync(`${h.registers}/registry.tsv`, "number\tslug\tstate\n001\tfirst\tin force\n002\tsecond\tin force\n");
-      fs.writeTextFileSync(`${h.kit}/specs/002-second/spec.md`, spec("002-second", "\nIt names (009-missing) and archon 005-other.\n"));
+      fs.writeTextFileSync(`${h.kit}/specs/002-second/spec.md`, spec("002-second", "\nIt names (009-missing) and desired-os-state 005-other.\n"));
       const out = findings(h.kit);
       assertStringIncludes(out, "cites 009-missing, which is not a specification here");
       assertEquals(out.includes("005-other"), false, "another repository's, named by its repository, is not read");

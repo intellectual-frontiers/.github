@@ -11,7 +11,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
+import { findSecretLike, type JsonValue } from "@intellectual-frontiers/desired-os-state/governance";
 import { DOMAIN, MAILBOX, NAME, PORTS } from "@intellectual-frontiers/linux-services/governance";
 import { authorizedKeysLine } from "@intellectual-frontiers/headless/ssh-inbound";
 import type { CertificateProfile, MailRelayProfile, McpAccessProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";

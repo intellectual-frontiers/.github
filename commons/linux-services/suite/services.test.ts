@@ -9,7 +9,7 @@ import type { AddressInfo } from "node:net";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
+import { findSecretLike, type JsonValue } from "@intellectual-frontiers/desired-os-state/governance";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { canaryText } from "@intellectual-frontiers/test/canaries";
 import { certificateRequirements, issueUnit, mailRelayRequirements, mainCf, mcpAccessRequirements, mcpAuthorizedKeys, parseCertificate, parseMailRelay, parseMcpAccess, parsePostgres, planDns, postgresDropIn, postgresRequirements, recipientMap, senderMap, isEmpty } from "../src/logical/mod.ts";
@@ -94,9 +94,9 @@ const rec = (name: string, content: string, extra: Partial<FoundRecord> = {}): F
 proves(["0002-linux-services-profiles FR-007"], "a plan changes only the records the profile claims and leaves the rest of the zone", () => {
   const want = [rec("a.example.org", "192.0.2.1"), rec("b.example.org", "192.0.2.2", { ttl: 60 }), rec("new.example.org", "192.0.2.9")];
   const found = [
-    rec("a.example.org", "192.0.2.1", { comment: "managed by archon" }),
-    rec("b.example.org", "192.0.2.20", { comment: "managed by archon" }),
-    rec("gone.example.org", "192.0.2.3", { comment: "managed by archon" }),
+    rec("a.example.org", "192.0.2.1", { comment: "managed by desired-os-state" }),
+    rec("b.example.org", "192.0.2.20", { comment: "managed by desired-os-state" }),
+    rec("gone.example.org", "192.0.2.3", { comment: "managed by desired-os-state" }),
     rec("others.example.org", "192.0.2.4"),
   ];
   const plan = planDns(want, found);
@@ -107,7 +107,7 @@ proves(["0002-linux-services-profiles FR-007"], "a plan changes only the records
 });
 
 proves(["0002-linux-services-profiles FR-008"], "the Cloudflare provider pages the list, applies a plan, sends the token in the header only and puts it in no error", async () => {
-  const zone: Record<string, unknown>[] = Array.from({ length: 3 }, (_, i) => ({ id: `r${i}`, type: "A", name: `h${i}.example.org`, content: `192.0.2.${i}`, ttl: 300, proxied: false, comment: i === 0 ? "managed by archon" : null }));
+  const zone: Record<string, unknown>[] = Array.from({ length: 3 }, (_, i) => ({ id: `r${i}`, type: "A", name: `h${i}.example.org`, content: `192.0.2.${i}`, ttl: 300, proxied: false, comment: i === 0 ? "managed by desired-os-state" : null }));
   const seen: { method: string; url: string; auth: string | null; body: string }[] = [];
   const json = (res: ServerResponse, status: number, value: unknown) => {
     res.writeHead(status, { "content-type": "application/json" });
@@ -136,10 +136,10 @@ proves(["0002-linux-services-profiles FR-008"], "the Cloudflare provider pages t
     const dns = cloudflare({ zoneId: "z1", token: "sekrit-value", base });
     const found = await dns.list();
     assertEquals(found.map((f) => f.name), ["h0.example.org", "h1.example.org", "h2.example.org"]);
-    assertEquals(found[0]?.comment, "managed by archon");
+    assertEquals(found[0]?.comment, "managed by desired-os-state");
     await dns.apply({ create: [{ type: "A", name: "n.example.org", content: "192.0.2.50", ttl: 300, proxied: false }], update: [], remove: [found[0]!] });
     const posted = seen.find((s) => s.method === "POST");
-    assert(posted?.body.includes("managed by archon") === true);
+    assert(posted?.body.includes("managed by desired-os-state") === true);
     assert(seen.every((s) => s.auth === "Bearer sekrit-value" && !s.url.includes("sekrit") && !s.body.includes("sekrit")));
     const wrong = cloudflare({ zoneId: "z1", token: "wrong-token", base });
     let message = "";

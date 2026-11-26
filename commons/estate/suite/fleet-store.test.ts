@@ -103,7 +103,7 @@ proves(["0006-estate-fleet-store FR-003"], "an asset is written with the expecta
 });
 
 const defineOwn = (id: string, kind: string) => {
-  const made = defineAsset({ id, kind, state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const made = defineAsset({ id, kind, state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(made.kind === "ok");
   return made.value;
 };

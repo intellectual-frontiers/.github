@@ -12,7 +12,7 @@
  *
  * @module
  */
-import type { DialectId } from "@intellectual-frontiers/archon/governance";
+import type { DialectId } from "@intellectual-frontiers/desired-os-state/governance";
 import { compareVersions, type ToolName } from "@intellectual-frontiers/toolchain/governance";
 import type { Context, Resolution } from "./resolve.ts";
 

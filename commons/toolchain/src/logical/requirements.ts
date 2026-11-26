@@ -1,8 +1,8 @@
 // Spec: 0003-toolchain-logical FR-006
 /**
- * The requirements of Archon for a resolution: one of kind `tool` for each resolved tool, with the id `tool.<name>`, a dependency on the requirement of each tool it needs, and as its desired state
+ * The requirements of Desired OS State for a resolution: one of kind `tool` for each resolved tool, with the id `tool.<name>`, a dependency on the requirement of each tool it needs, and as its desired state
  * data that names the tool, the version it is carried out at, its program, its other names, its minimum, its scope, its phases, the dialect and the source (the download a pin gave, or the packages). They are made, never
- * written: the version and the hash in them come from the pin, and Archon orders and plans them for the dialect that was chosen.
+ * written: the version and the hash in them come from the pin, and Desired OS State orders and plans them for the dialect that was chosen.
  *
  * @example
  * ```ts
@@ -13,7 +13,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { defineRequirement, type JsonValue, type Requirement, type SubjectSelectorInput } from "@intellectual-frontiers/archon/governance";
+import { defineRequirement, type JsonValue, type Requirement, type SubjectSelectorInput } from "@intellectual-frontiers/desired-os-state/governance";
 import type { Resolution, ResolvedTool, Source } from "./resolve.ts";
 
 function sourceOf(source: Source): JsonValue {

@@ -32,7 +32,7 @@ number	slug	state
 0031	install-locations	in force
 0032	libraries-by-concern	in force
 0033	kanon	in force
-0034	archon	in force
+0034	desired-os-state	in force
 0035	licensing	in force
 0036	distribution	in force
 0037	planning	in force

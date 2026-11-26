@@ -10,7 +10,7 @@ import type { About } from "@intellectual-frontiers/core/about";
 /** Linux Observe. */
 export const about: About = {
   title: "Linux Observe",
-  summary: "What a Linux machine is, read with no change: the resources that an Archon requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
+  summary: "What a Linux machine is, read with no change: the resources that an Desired OS State requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
   folders: [
     { path: "spec-kit/", what: "The library's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: what the library is, as data and types.", mayImport: ["core, by package name"] },

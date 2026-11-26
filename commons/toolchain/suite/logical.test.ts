@@ -1,15 +1,15 @@
 /**
  * Tests of the Logical layer of Toolchain (commons toolchain 0003-toolchain-logical FR-001 to FR-007): the guarantees of a dialect as data, the control `toolIntegrity` and every reason a dialect does
  * not meet it, the resolution of tools in the order of needs to the first dialect that can with the downloads of a source of pins, the refusal of a tool no dialect can carry out, the plan against
- * what is installed, the requirements of Archon from which an order is built, and that the library does not read the ontology. The dialects and the source of pins here are values of their ports
+ * what is installed, the requirements of Desired OS State from which an order is built, and that the library does not read the ontology. The dialects and the source of pins here are values of their ports
  * (the dialects with real tools are tested in their own packages); every address, hash and name is made up.
  *
  * @module
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { parseDialectId, parseSubjectName, type DialectId, type JsonValue } from "@intellectual-frontiers/archon/governance";
-import { buildOrder } from "@intellectual-frontiers/archon/logical";
+import { parseDialectId, parseSubjectName, type DialectId, type JsonValue } from "@intellectual-frontiers/desired-os-state/governance";
+import { buildOrder } from "@intellectual-frontiers/desired-os-state/logical";
 import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { path } from "@intellectual-frontiers/system";
 import {
@@ -66,7 +66,7 @@ function dialect(name: string, g: Partial<ToolGuarantees> = {}, managerId?: stri
   return managerId === undefined ? base : { ...base, manager: manager(managerId) };
 }
 
-const PINNED = dialect("native-pinned");
+const PINNED = dialect("pinned-downloads");
 const BREW = dialect("homebrew", { pin: "rolling", integrity: "none", scopes: ["user"], platforms: ["macos-arm64", "macos-x64", "linux-x64", "linux-arm64"], binds: "package" }, "manager-brew");
 const APT = dialect("apt", { pin: "release-line", integrity: "signature", scopes: ["system"], platforms: ["linux-x64", "linux-arm64"], binds: "package" }, "manager-apt");
 const BUILDER = dialect("builder", { binds: "package", sourceBuild: true }, "manager-builder");
@@ -102,7 +102,7 @@ function isRecord(v: JsonValue | undefined): v is { readonly [key: string]: Json
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-const CTX: Context = { platform: "linux-x64", preference: [id("native-pinned"), id("homebrew"), id("apt")], integrity: "rolling", systemCopy: "minimum" };
+const CTX: Context = { platform: "linux-x64", preference: [id("pinned-downloads"), id("homebrew"), id("apt")], integrity: "rolling", systemCopy: "minimum" };
 
 proves(["0003-toolchain-logical FR-001"], "a dialect declares its guarantees as data", () => {
   assertEquals(Object.keys(PINNED.guarantees).sort(), ["binds", "integrity", "pin", "platforms", "scopes", "sourceBuild"]);
@@ -125,14 +125,14 @@ proves(["0003-toolchain-logical FR-002"], "meetsIntegrity names every reason a d
 proves(["0003-toolchain-logical FR-003"], "tools and what they need are resolved in the order of needs, each to the first dialect that can", () => {
   const r = resolveTools(catalog(), ["gh", "jq"], [PINNED, BREW, APT], PINS, CTX);
   assert(r.kind === "ok");
-  assertEquals(r.value.entries.map((e) => `${e.tool.name}:${e.dialect}`), ["git:apt", "gh:native-pinned", "jq:native-pinned"]);
+  assertEquals(r.value.entries.map((e) => `${e.tool.name}:${e.dialect}`), ["git:apt", "gh:pinned-downloads", "jq:pinned-downloads"]);
   assertEquals(r.value.entries.map((e) => e.version), [undefined, "1.0.0", "1.0.0"]);
   const rolling = defineCatalog([tool("curl", { pin: "rolling" })]);
   assert(rolling.kind === "ok");
-  const prefer = resolveTools(rolling.value, ["curl"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
+  const prefer = resolveTools(rolling.value, ["curl"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("pinned-downloads")] });
   assert(prefer.kind === "ok" && prefer.value.entries[0]?.dialect === "homebrew");
-  const exact = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("native-pinned")] });
-  assert(exact.kind === "ok" && exact.value.entries[0]?.dialect === "native-pinned", "an exactly pinned tool is not carried out by a rolling dialect, whatever the preference");
+  const exact = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, preference: [id("homebrew"), id("pinned-downloads")] });
+  assert(exact.kind === "ok" && exact.value.entries[0]?.dialect === "pinned-downloads", "an exactly pinned tool is not carried out by a rolling dialect, whatever the preference");
   const mac = resolveTools(catalog(), ["jq"], [PINNED, BREW, APT], PINS, { ...CTX, platform: "macos-arm64" });
   assert(mac.kind === "ok" && mac.value.entries[0]?.source.kind === "download");
   const unknown = resolveTools(catalog(), ["nothing"], [PINNED], PINS, CTX);
@@ -144,7 +144,7 @@ proves(["0003-toolchain-logical FR-004"], "a tool no dialect can carry out is re
   assert(strict.kind === "err");
   const p = strict.error[0];
   assert(p?.kind === "unexpressed" && p.tool === "jq");
-  assertEquals(p.reasons.map((r) => r.dialect), ["native-pinned", "homebrew", "apt"]);
+  assertEquals(p.reasons.map((r) => r.dialect), ["pinned-downloads", "homebrew", "apt"]);
   assert(p.reasons[0]?.reason.includes("windows-x64"));
   assert(p.reasons[1]?.reason.includes("windows-x64"));
   const hashed = resolveTools(catalog(), ["jq"], [BREW], PINS, { ...CTX, preference: [id("homebrew")], integrity: "exact-hashed" });
@@ -170,7 +170,7 @@ proves(["0003-toolchain-logical FR-004"], "a tool no dialect can carry out is re
 });
 
 proves(["0003-toolchain-logical FR-005"], "the plan says none, install or replace, and a copy on the path counts only where the policy allows", () => {
-  const res = resolveTools(catalog(), ["jq", "gh"], [PINNED, APT], PINS, { ...CTX, preference: [id("native-pinned"), id("apt")] });
+  const res = resolveTools(catalog(), ["jq", "gh"], [PINNED, APT], PINS, { ...CTX, preference: [id("pinned-downloads"), id("apt")] });
   assert(res.kind === "ok");
   const name = (n: string) => n as ToolName;
   const act = (observed: ReadonlyMap<ToolName, { version: string; from: "path" | "store" | "manager" }>, ctx: Context = CTX) => Object.fromEntries(planTools(res.value, observed, ctx).entries.map((e) => [e.tool, e.action]));
@@ -195,8 +195,8 @@ proves(["0003-toolchain-logical FR-005"], "actionFor is the one rule, for a dial
   assertEquals(actionFor({ ...base, version: undefined, seen: { version: "0.0.1", from: "manager" } }), "none");
 });
 
-proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are valid for Archon, depend on the tools needed, hold no secret, and an order is built from them", () => {
-  const res = resolveTools(catalog(), ["gh", "jq"], [PINNED, APT], PINS, { ...CTX, preference: [id("native-pinned"), id("apt")] });
+proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are valid for Desired OS State, depend on the tools needed, hold no secret, and an order is built from them", () => {
+  const res = resolveTools(catalog(), ["gh", "jq"], [PINNED, APT], PINS, { ...CTX, preference: [id("pinned-downloads"), id("apt")] });
   assert(res.kind === "ok");
   const reqs = requirementsFor(res.value, { by: "all" });
   assert(reqs.kind === "ok");
@@ -207,7 +207,7 @@ proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are val
   const desired = gh?.desired;
   assert(isRecord(desired));
   assertEquals(desired["tool"], "gh");
-  assertEquals(desired["dialect"], "native-pinned");
+  assertEquals(desired["dialect"], "pinned-downloads");
   assertEquals(desired["version"], "1.0.0");
   const source = desired["source"];
   assert(isRecord(source) && source["kind"] === "download" && source["pin"] === "gh" && source["sha256"] === SHA);
@@ -222,19 +222,19 @@ proves(["0003-toolchain-logical FR-006"], "the requirements of kind tool are val
 });
 
 proves(["0003-toolchain-logical FR-007"], "downloads come from a source of pins; a pin with no download, or a version below the minimum, is a reason; the library does not read the ontology", async () => {
-  const noDownload = resolveTools(catalog(), ["jq"], [PINNED], PINS, { ...CTX, platform: "linux-arm64", preference: [id("native-pinned")] });
+  const noDownload = resolveTools(catalog(), ["jq"], [PINNED], PINS, { ...CTX, platform: "linux-arm64", preference: [id("pinned-downloads")] });
   assert(noDownload.kind === "err");
   const nd = noDownload.error[0];
   assert(nd?.kind === "unexpressed" && nd.reasons[0]?.reason.includes("jq") && nd.reasons[0].reason.includes("linux-arm64"));
   const old = defineCatalog([tool("old", { minimum: "1.0.0" })]);
   assert(old.kind === "ok");
-  const below = resolveTools(old.value, ["old"], [PINNED], PINS, { ...CTX, preference: [id("native-pinned")] });
+  const below = resolveTools(old.value, ["old"], [PINNED], PINS, { ...CTX, preference: [id("pinned-downloads")] });
   assert(below.kind === "err");
   const b = below.error[0];
   assert(b?.kind === "unexpressed" && b.reasons[0]?.reason.includes("below the minimum"));
   let asked = 0;
   const counting: PinSource = { lookup: (pin, platform) => { asked++; return PINS.lookup(pin, platform); } };
-  resolveTools(catalog(), ["jq"], [PINNED], counting, { ...CTX, preference: [id("native-pinned")] });
+  resolveTools(catalog(), ["jq"], [PINNED], counting, { ...CTX, preference: [id("pinned-downloads")] });
   assertEquals(asked, 1);
   const root = path.resolve(path.dirname(path.fromFileUrl(import.meta.url)), "..");
   const files = await runtime.readSources(root, ["src"]);

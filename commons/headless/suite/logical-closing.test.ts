@@ -12,7 +12,7 @@ import { fixSplitter } from "../src/logical/fix.ts";
 import { outcomeOf } from "../src/logical/outcome.ts";
 
 /** The commands a fleet program's fixes call. */
-const FLEET = { commands: ["bun run fleetctl", "fleetctl", "archon", "git", "gh", "sudo", "ssh", "bun"], own: ["bun run fleetctl", "archon", "fleetctl"] };
+const FLEET = { commands: ["bun run fleetctl", "fleetctl", "desired-os-state", "git", "gh", "sudo", "ssh", "bun"], own: ["bun run fleetctl", "desired-os-state", "fleetctl"] };
 const split = fixSplitter(FLEET);
 const FIX = { commands: ["tool", "git"], own: ["tool"] };
 

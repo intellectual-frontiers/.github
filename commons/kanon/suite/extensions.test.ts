@@ -69,7 +69,10 @@ proves(["0001-kanon-checker FR-010"], "a host's table declares its family, insta
 proves(["0001-kanon-checker FR-010"], "a malformed instance, plugin or family is refused with a sentence", () => {
   assertStringIncludes(refused(withHost({ family: undefined })), "naming rule");
   assertStringIncludes(refused(withHost({ family: { dialect: "{host}-x", plugin: "{host}-{name}" } })), "template");
-  assertStringIncludes(refused(withHost({ family: { dialect: "{host}-{name}", plugin: "{host}-{name}" } })), "same");
+  assertStringIncludes(
+    refused(withHost({ family: { dialect: "{host}-{name}", plugin: "{host}-{name}" }, instances: [{ name: "a", instanceOf: "src/physical/dialect/", placement: "package" }], plugins: [{ noun: "a" }] })),
+    "both",
+  );
   assertStringIncludes(refused(withHost({ instances: [{ name: "ansible", instanceOf: "src/nowhere/", placement: "package" }] })), "no layered unit");
   assertStringIncludes(refused(withHost({ instances: [{ name: "Bad Name", instanceOf: "src/physical/dialect/", placement: "package" }] })), "instance name");
   assertStringIncludes(refused(withHost({ instances: [{ name: "a", instanceOf: "src/physical/dialect/", placement: "folder" }] })), "instances: true");

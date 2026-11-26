@@ -5,14 +5,14 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Mizan (Arabic *mizan*, "balance, scale") is the IF Spec Profile: a profile of GitHub Spec Kit that adds what Spec Kit lacks. The format every Intellectual Frontiers harness keeps for its specifications, its register of numbers and its register of what enforces each requirement, and one tool with no dependency that checks a folder against it, so that a new harness starts with the same discipline and `archon` and commons do not each keep their own copy of the rules.
+**Input:** Mizan (Arabic *mizan*, "balance, scale") is the IF Spec Profile: a profile of GitHub Spec Kit that adds what Spec Kit lacks. The format every Intellectual Frontiers harness keeps for its specifications, its register of numbers and its register of what enforces each requirement, and one tool with no dependency that checks a folder against it, so that a new harness starts with the same discipline and `desired-os-state` and commons do not each keep their own copy of the rules.
 
 ## The format
 
 - **FR-001**: A spec-kit folder MUST hold `registry.tsv` (header `number`, `slug`, `state`; one row for every number ever assigned, `in force` or `retired`, with no number twice and no gap), `enforcement.tsv` and `specs/NNN-slug/spec.md` or `specs/NNNN-slug/spec.md` for each specification, where NNN or NNNN is a number of three or four digits (amended 2026-11-18, FR-041) and a slug is lower-case words joined by hyphens. A specification in force MUST have a folder; a retired one MUST NOT.
 - **FR-002**: A specification MUST begin `# Feature Specification: <title>`, carry `**Spec ID:**` naming its folder, `**Status:**` (Draft, Active, Deferred or Superseded, and Adopted until a harness has moved to Active, FR-010), `**Owner:**` and `**Domain:**`, and hold `**Input:**`, `## Edge cases`, `## Assumptions`, `## Open questions`, `## Key entities`, `## Success criteria` and `## Review & acceptance checklist` in that order, with `## Mizan and GitHub Spec Kit## Out of scope` (optional) before `## Edge cases`.
 - **FR-003**: A requirement is `- **FR-nnn**:`, numbered in increasing order and never reused in its specification; every edge case MUST cite the requirements it exercises, and every one it cites MUST exist in its specification.
-- **FR-004**: A specification of another repository MUST be cited with the repository's name before its number (`archon 0002-specs`); a bare number names a specification of the same folder and MUST exist there.
+- **FR-004**: A specification of another repository MUST be cited with the repository's name before its number (`desired-os-state 0002-specs`); a bare number names a specification of the same folder and MUST exist there.
 - **FR-005**: `enforcement.tsv` MUST have exactly one row, with four tab-separated columns (requirement, mechanism, who, note), for every requirement of every specification, and none for a requirement that does not exist. The mechanism is `check`, `gate`, `review` or `none`; `check` and `gate` name who as `<repository>: <command>`; `review` names the requirement that defines the review; `none` has `-` for who and says why in the note.
 
 ## The tool
@@ -62,7 +62,7 @@
 
 ## Out of scope
 
-- The rules a harness adds (owners from an ontology, commands that exist, control maps): `archon 0024-spec-format` and `archon 0002-specs`.
+- The rules a harness adds (owners from an ontology, commands that exist, control maps): `desired-os-state 0024-spec-format` and `desired-os-state 0002-specs`.
 
 ## Edge cases
 
@@ -101,11 +101,11 @@
 
 ## Assumptions
 
-- `archon`'s format is the model: commons keeps it small, and a harness adds its own rules.
+- `desired-os-state`'s format is the model: commons keeps it small, and a harness adds its own rules.
 
 ## Open questions
 
-- **OQ-1**: Whether `archon`'s own format check should run this tool for the rules they share, once the two have been compared line by line.
+- **OQ-1**: Whether `desired-os-state`'s own format check should run this tool for the rules they share, once the two have been compared line by line.
 
 ## Key entities
 

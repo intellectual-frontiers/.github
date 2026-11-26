@@ -3,7 +3,7 @@
  * and the commands no harness may run, each with its reason.
  *
  * Seeded from the tables of sigoden/upt (https://github.com/sigoden/upt), dual-licensed MIT or Apache-2.0, copyright its authors; see tests/fixtures/upt/README.md.
- * What the engine that `commons/archon` (0034-archon) replaced ran, and what it knew about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
+ * What the engine that `commons/desired-os-state` (0034-desired-os-state) replaced ran, and what it knew about privileges and package names, is added to it. A command with pm:origin "memory", and every needsAdministrator value,
  * is written from knowledge and unverified: nothing acts on it until its family is supported and the command carries pm:verifiedOn.
  *
  * @module
@@ -327,7 +327,7 @@ export const commands = [
     operation: operations.Install,
     template: "apk add {packages}",
     nonInteractive: "apk add --no-cache {packages}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-apk-remove"), {
     commandOf: managerApk,
@@ -376,8 +376,8 @@ export const commands = [
     operation: operations.Install,
     template: "apt install {packages}",
     nonInteractive: "apt-get install -y {packages}",
-    origin: "archon",
-    verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",
+    origin: "desired-os-state",
+    verifiedOn: "Debian 13 under WSL 2, by desired-os-state-bootstrap.sh and desired-os-state update, 2026-10-16",
   }),
   Command.make(term(PMID, "cmd-apt-remove"), {
     commandOf: managerApt,
@@ -408,8 +408,8 @@ export const commands = [
     operation: operations.Refresh,
     template: "apt update",
     nonInteractive: "apt-get update",
-    origin: "archon",
-    verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",
+    origin: "desired-os-state",
+    verifiedOn: "Debian 13 under WSL 2, by desired-os-state-bootstrap.sh and desired-os-state update, 2026-10-16",
   }),
   Command.make(term(PMID, "cmd-apt-upgrade-all"), {
     commandOf: managerApt,
@@ -428,22 +428,22 @@ export const commands = [
     operation: operations.QueryInstalled,
     template: "dpkg-query -W -f=${Status} {package}",
     missingExitStatus: 1,
-    origin: "archon",
-    verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",
+    origin: "desired-os-state",
+    verifiedOn: "Debian 13 under WSL 2, by desired-os-state-bootstrap.sh and desired-os-state update, 2026-10-16",
   }),
   Command.make(term(PMID, "cmd-apt-query-candidate"), {
     commandOf: managerApt,
     operation: operations.QueryCandidate,
     template: "apt-cache policy {package}",
-    origin: "archon",
-    verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",
+    origin: "desired-os-state",
+    verifiedOn: "Debian 13 under WSL 2, by desired-os-state-bootstrap.sh and desired-os-state update, 2026-10-16",
   }),
   Command.make(term(PMID, "cmd-brew-install"), {
     commandOf: managerBrew,
     operation: operations.Install,
     template: "brew install {packages}",
     nonInteractive: "brew install {packages}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-brew-remove"), {
     commandOf: managerBrew,
@@ -583,7 +583,7 @@ export const commands = [
     operation: operations.Install,
     template: "dnf install {packages}",
     nonInteractive: "dnf install -y {packages}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-dnf-remove"), {
     commandOf: managerDnf,
@@ -966,7 +966,7 @@ export const commands = [
     operation: operations.Install,
     template: "pacman -S {packages}",
     nonInteractive: "pacman -S --needed --noconfirm {packages}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-pacman-remove"), {
     commandOf: managerPacman,
@@ -1008,13 +1008,13 @@ export const commands = [
     commandOf: managerPacman,
     operation: operations.QueryInstalled,
     template: "pacman -Qi {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-pacman-query-candidate"), {
     commandOf: managerPacman,
     operation: operations.QueryCandidate,
     template: "pacman -Si {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-freebsd-pkg-install"), {
     commandOf: managerFreebsdPkg,
@@ -1615,56 +1615,56 @@ export const commands = [
     commandOf: managerDnf,
     operation: operations.QueryInstalled,
     template: "rpm -q {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-dnf-query-candidate"), {
     commandOf: managerDnf,
     operation: operations.QueryCandidate,
     template: "dnf -q repoquery --latest-limit=1 --qf %{version} {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-apk-query-installed"), {
     commandOf: managerApk,
     operation: operations.QueryInstalled,
     template: "apk info -e {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-apk-query-candidate"), {
     commandOf: managerApk,
     operation: operations.QueryCandidate,
     template: "apk policy {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-brew-query-installed"), {
     commandOf: managerBrew,
     operation: operations.QueryInstalled,
     template: "brew list --formula {package}",
     missingExitStatus: 1,
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-brew-query-candidate"), {
     commandOf: managerBrew,
     operation: operations.QueryCandidate,
     template: "brew info --json=v2 {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-apt-query-version"), {
     commandOf: managerApt,
     operation: operations.QueryVersion,
     template: "dpkg-query -W -f=${Version} {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-pacman-query-version"), {
     commandOf: managerPacman,
     operation: operations.QueryVersion,
     template: "pacman -Q {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-dnf-query-version"), {
     commandOf: managerDnf,
     operation: operations.QueryVersion,
     template: "rpm -q --qf %{VERSION}-%{RELEASE} {package}",
-    origin: "archon",
+    origin: "desired-os-state",
   }),
   Command.make(term(PMID, "cmd-brew-query-version"), {
     commandOf: managerBrew,

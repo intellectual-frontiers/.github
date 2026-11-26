@@ -21,7 +21,7 @@ export const about: About = {
     {
       path: "ontology/src/supply-chain/packaging/",
       what:
-        "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, `record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `archon` runs. " +
+        "The packaging vocabulary (`packaging.ts`) and its data (`managers.ts`, `families.ts`, `programs.ts`, `pins.ts`, `rules.ts`, `record.ts`), seeded from the tables of [`upt`](https://github.com/sigoden/upt) (MIT or Apache-2.0) and from what `desired-os-state` runs. " +
         "It is TypeScript, typed by the RDF library; its Turtle is generated, never a source.",
       mayImport: ["rdf/src/mod.ts", "ontology/"],
     },

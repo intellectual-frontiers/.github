@@ -14,7 +14,7 @@
  * @module
  */
 import { err, ok, type ArgvStep, type Result } from "@intellectual-frontiers/core";
-import type { Requirement } from "@intellectual-frontiers/archon/governance";
+import type { Requirement } from "@intellectual-frontiers/desired-os-state/governance";
 import { parseManagerId } from "@intellectual-frontiers/toolchain/governance";
 import type { ToolGuarantees } from "@intellectual-frontiers/toolchain/logical";
 import { jobArgv, jobOf, type CommandSource, type ManagerSpec } from "./manager.ts";

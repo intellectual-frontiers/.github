@@ -5,8 +5,8 @@
  *
  * @module
  */
-import { defineRequirement, type JsonValue, type Requirement } from "@intellectual-frontiers/archon/governance";
-import { sameJson } from "@intellectual-frontiers/archon/governance";
+import { defineRequirement, type JsonValue, type Requirement } from "@intellectual-frontiers/desired-os-state/governance";
+import { sameJson } from "@intellectual-frontiers/desired-os-state/governance";
 import { textOf, type Executor, type Output } from "@intellectual-frontiers/headless/logical";
 import { readMachineSpec } from "@intellectual-frontiers/lab/logical";
 import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physical";

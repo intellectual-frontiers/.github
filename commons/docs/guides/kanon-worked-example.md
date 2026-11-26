@@ -157,8 +157,8 @@ A projection is only as good as the test that compares it with its source. Headl
 *Source: `commons/headless/suite/mcp-rest.test.ts`, lines 87 to 88.*
 
 ```ts source=commons/headless/suite/mcp-rest.test.ts#L87-L88
-  assertEquals(byName("archon_server_list")?.annotations, { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
-  assertEquals([byName("archon_server_wipe")?.annotations.destructiveHint, byName("archon_server_wipe")?.annotations.readOnlyHint], [true, false]);
+  assertEquals(byName("desired_os_state_server_list")?.annotations, { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false });
+  assertEquals([byName("desired_os_state_server_wipe")?.annotations.destructiveHint, byName("desired_os_state_server_wipe")?.annotations.readOnlyHint], [true, false]);
 ```
 
 The tool of the read command is read-only, and the tool of the wipe is destructive and not read-only. The same program's OpenAPI document makes the matching claim:
@@ -167,7 +167,7 @@ The tool of the read command is read-only, and the tool of the wipe is destructi
 
 ```ts source=commons/headless/suite/mcp-rest.test.ts#L203-L205
   const list = pub.paths["/v1/server/list"]?.["get"];
-  assertEquals([list?.operationId, list?.["x-effect"], list?.["x-tier"]], ["archon_server_list", "read", "public"]);
+  assertEquals([list?.operationId, list?.["x-effect"], list?.["x-tier"]], ["desired_os_state_server_list", "read", "public"]);
   assertEquals(list?.parameters?.map((p) => [p.name, p.in, p.required]), [["limit", "query", false], ["all", "query", false], ["name", "query", false]]);
 ```
 

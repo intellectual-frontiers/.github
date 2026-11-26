@@ -44,7 +44,7 @@ proves(["0008-estate-workstations FR-001", "0008-estate-workstations FR-002"], "
   const spec = kindSpec("workshop");
   assert(spec !== undefined && spec.attributes.every((a) => a.required !== true));
   assertEquals(spec.attributes.map((a) => a.name), ["role", "disposability", "isolation", "os-family", "distro", "omarchy", "harnesses", "agents-policy"]);
-  made(defineAsset({ id: "synthetic-workshop-01", kind: "workshop", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
+  made(defineAsset({ id: "synthetic-workshop-01", kind: "workshop", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } }));
   assertEquals(checkAttributes("workshop", AGENT), []);
   assert(checkAttributes("workshop", { role: "robot" })[0]?.includes("none of agent-workspace, build, test, other") === true);
   assert(checkAttributes("workshop", { isolation: "bare" }).length === 1 && checkAttributes("workshop", { role: "bot" }).length === 1 && checkAttributes("workshop", { "os-family": "beos" }).length === 1);
@@ -64,7 +64,7 @@ proves(["0008-estate-workstations FR-001"], "a workstation is the operator's sid
   assertEquals(checkAttributes("workstation", { role: "operator", "os-family": "macos", distro: "macos", harnesses: ["claude-code", "codex"] }), []);
   assert(checkAttributes("workstation", { role: "agent-workspace" })[0]?.includes("none of developer, operator, other") === true, "agent-workspace is a role of a workshop");
   for (const name of ["agents-policy", "disposability", "isolation", "omarchy"]) assert(checkAttributes("workstation", { [name]: "disposable" })[0]?.includes(`has no attribute ${name}`) === true, name);
-  made(defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
+  made(defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } }));
   const adopted = { state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" } } as const;
   const links = [{ from: "codex-on-box", to: "box", kind: "runs-on" }] as const;
   for (const kind of ["workshop", "workstation"] as const) {
@@ -145,7 +145,7 @@ proves(["0008-estate-workstations FR-011"], "retire is a system's only for a dis
   const bySystem = { ...workshopOwners({ system: "opsfolio", state: "managed", disposability: "disposable" }) };
   assert(refusal(ws("keepbox", "managed", persistent, bySystem, "paired")).includes("a persistent workshop is never retired by a system"));
   made(ws("keepbox", "managed", persistent, workshopOwners({ system: "opsfolio", state: "managed", disposability: "persistent" }), "paired"));
-  assert(refusal(ws("keepbox", "managed", persistent, { ...bySystem, retire: "archon" }, "paired")).includes("owned by archon"));
+  assert(refusal(ws("keepbox", "managed", persistent, { ...bySystem, retire: "desired-os-state" }, "paired")).includes("owned by desired-os-state"));
   assert(refusal(ws("anybox", "managed", { role: "build" }, bySystem, "paired")).includes("does not say it is disposable"));
   made(ws("anybox", "managed", { role: "build", disposability: "disposable" }, bySystem, "paired"));
   made(ws("anybox", "managed", { role: "build" }, workshopOwners({ system: "opsfolio", state: "managed" }), "paired"));
@@ -163,7 +163,7 @@ proves(["0008-estate-workstations FR-013"], "NoAuthorityWithoutScope is checked 
   assert(violations([holds])[0]?.message.includes("holds harnesses") === true);
   assertEquals(violations([made(ws("agentbox", "adopted", AGENT, workshopOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
   assertEquals(violations([made(ws("synthetic-workshop-01", "adopted", {}, workshopOwners({ system: "opsfolio", state: "adopted" }), "paired")), made(ws("devbox", "adopted", { role: "build" }, workshopOwners({ system: "opsfolio", state: "adopted" }), "paired"))]), []);
-  const server = made(defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } }));
+  const server = made(defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } }));
   assertEquals(violations([server]), []);
 });
 

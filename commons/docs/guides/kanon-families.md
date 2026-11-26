@@ -31,7 +31,7 @@ The arrows run from the extension to the host, never the other way. The host doe
 - A **host** is a library that is Kanon and is extended by packages of its own.
 - An **extension** is a package that extends a host, through the host's public `exports` only.
 - A **plugin** is an extension that adds a noun to the host's one program. AnyFS has plugins for `s3`, `ssh`, `git` and the rest. A plugin may depend on other plugins, by declaration.
-- A **dialect** is an extension that is an **instance** of one of the host's physical units. Archon has a dialect for each tool it drives: `apt`, `homebrew`, `mise`, `winget`, `ansible`, `cloud-init`, `opentofu` and `native-pinned`.
+- A **dialect** is an extension that is an **instance** of one of the host's physical units. Desired OS State has a dialect for each tool it drives: `apt`, `homebrew`, `mise`, `winget`, `ansible`, `cloud-init`, `opentofu` and `pinned-downloads`.
 - A **family** is the host with its extensions, and the **naming rule** of their packages, which is data of the host's table.
 
 ## The host declares the family
@@ -50,16 +50,16 @@ Here is how AnyFS, the host, declares itself. Its manifest says it is the host o
 
 The `family` line is the naming rule: a plugin's package is named `{host}-{name}`, so the plugin `s3` is the package `@intellectual-frontiers/anyfs-s3`, and a dialect would be named `{host}-dialect-{name}`. The package of a member is **made from the rule and never written a second time**, so a package whose name the rule does not make is `family/name`.
 
-Archon declares eight dialects, each an instance of the same physical unit, placed in a package of its own, and four plugins:
+Desired OS State declares eight dialects, each an instance of the same physical unit, placed in a package of its own, and four plugins:
 
-*Source: `commons/archon/library.ts`, lines 20 to 33.*
+*Source: `commons/desired-os-state/library.ts`, lines 20 to 33.*
 
-```ts source=commons/archon/library.ts#L20-L33
+```ts source=commons/desired-os-state/library.ts#L20-L33
   kanon: {
-    package: "@intellectual-frontiers/archon",
+    package: "@intellectual-frontiers/desired-os-state",
     family: { dialect: "{host}-dialect-{name}", plugin: "{host}-{name}" },
     instances: [
-      { name: "native-pinned", instanceOf: "src/physical/dialect/", placement: "package" },
+      { name: "pinned-downloads", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "apt", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "homebrew", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "mise", instanceOf: "src/physical/dialect/", placement: "package" },
@@ -118,7 +118,7 @@ Three consequences follow, and each is a boundary an agent can obey:
 
 ## Where the folder lives
 
-A family owns the folders of its extensions: the folder of a plugin or a dialect is inside the folder of its host. In this repository, `commons/anyfs/` holds the host and `commons/anyfs/s3/`, `commons/anyfs/ssh/` and the rest hold the extensions. Archon is laid out the same way: `commons/archon/` and, under it, `commons/archon/dialect-apt/`, `commons/archon/boot/` and the rest. The host's table, its spec kit and its generated files do not name an extension by a path built from its name. The package name, which consumers import, stays the same whatever the folder.
+A family owns the folders of its extensions: the folder of a plugin or a dialect is inside the folder of its host. In this repository, `commons/anyfs/` holds the host and `commons/anyfs/s3/`, `commons/anyfs/ssh/` and the rest hold the extensions. Desired OS State is laid out the same way: `commons/desired-os-state/` and, under it, `commons/desired-os-state/dialect-apt/`, `commons/desired-os-state/boot/` and the rest. The host's table, its spec kit and its generated files do not name an extension by a path built from its name. The package name, which consumers import, stays the same whatever the folder.
 
 ## How small is the core, really
 
@@ -127,7 +127,7 @@ The core is the smaller part of the family. A count of the non-test TypeScript l
 | Family | Host `src/` | Extensions' `src/` (together) | Host's share |
 | --- | --- | --- | --- |
 | AnyFS (host and 13 extensions) | 5,894 lines | 24,203 lines | about 20% |
-| Archon (host, 4 plugins, 8 dialects) | 1,223 lines | 3,858 lines | about 24% |
+| Desired OS State (host, 4 plugins, 8 dialects) | 1,223 lines | 3,858 lines | about 24% |
 
 The host is not tiny in absolute terms. AnyFS's core is nearly six thousand lines. What the table shows is the shape: **most of the code is in the extensions, each of which is a small package** (the largest AnyFS extension is about 3,900 lines, and the smallest about 560), and the part that every extension depends on is the minority of the family.
 

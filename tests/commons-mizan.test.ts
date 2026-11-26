@@ -123,7 +123,7 @@ proves(["0003-mizan FR-003"], "requirement numbers and edge cases", () => {
 
 proves(["0003-mizan FR-004"], "a bare citation of another repository's spec", () => {
   using k = Kit.make();
-  k.edit("specs/0003-mizan/spec.md", "`archon 0024-spec-format` and `archon 0002-specs`.", "0136-machine-bootstrap of archon.");
+  k.edit("specs/0003-mizan/spec.md", "`desired-os-state 0024-spec-format` and `desired-os-state 0002-specs`.", "0136-machine-bootstrap of desired-os-state.");
   assertStringIncludes(k.findings(), "cites 0136-machine-bootstrap");
 });
 

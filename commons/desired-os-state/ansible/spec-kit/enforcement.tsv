@@ -1,0 +1,18 @@
+# What enforces each requirement in this library's specs (0024-spec-format FR-011 - FR-014).
+# mechanism: check | gate | review | none. by: "<repo>: <command>" for check and gate, the defining requirement for review, "-" for none.
+requirement	mechanism	by	note
+0001-ansible-layers FR-001	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/layers.test.ts
+0001-ansible-layers FR-002	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/layers.test.ts
+0001-ansible-layers FR-003	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/layers.test.ts
+0001-ansible-layers FR-004	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/layers.test.ts
+0001-ansible-layers FR-005	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/layers.test.ts
+0002-ansible-dialect FR-001	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts
+0002-ansible-dialect FR-002	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts
+0002-ansible-dialect FR-003	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts
+0002-ansible-dialect FR-004	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts
+0002-ansible-dialect FR-005	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts
+0002-ansible-dialect FR-006	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/dialect.test.ts: on a disposable machine with the real ansible-core; skipped with its reason where there is no container runtime
+0003-ansible-families FR-001	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-002	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-003	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/families.test.ts
+0003-ansible-families FR-004	check	.github: cd commons/desired-os-state/ansible && bun run verify	suite/families.test.ts

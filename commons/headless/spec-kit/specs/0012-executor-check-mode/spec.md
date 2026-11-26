@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** `archon` delegates convergence to real tools (Ansible, OpenTofu, DSC) through the `Executor` port and shows a person a plan before it applies one, with a hash a signature can cover (issue #11). The port ran one argument vector and returned when it ended. This increment gives it plan-versus-apply semantics: a plan of steps run in `check` or `apply` mode, a typed plan and result a surface can render, a canonical form and SHA-256 hash of a plan (no signing here), and typed events streamed to a surface while the run goes.
+**Input:** `desired-os-state` delegates convergence to real tools (Ansible, OpenTofu, DSC) through the `Executor` port and shows a person a plan before it applies one, with a hash a signature can cover (issue #11). The port ran one argument vector and returned when it ended. This increment gives it plan-versus-apply semantics: a plan of steps run in `check` or `apply` mode, a typed plan and result a surface can render, a canonical form and SHA-256 hash of a plan (no signing here), and typed events streamed to a surface while the run goes.
 
 ## Plan, mode and hash
 
@@ -30,7 +30,7 @@
 
 ## Out of scope
 
-- Signing, verifying and storing signatures (`signing`), and what a person must see before approving (`archon`).
+- Signing, verifying and storing signatures (`signing`), and what a person must see before approving (`desired-os-state`).
 - Rolling back an applied plan.
 - Running the steps of a plan in parallel.
 

@@ -291,12 +291,12 @@ proves(["0007-ssh-coverage FR-007"], "every way a fleet program calls ssh, in a 
   const alpha = T("alpha", { user: "admin" });
   const pinnedHost = T("pin", { user: "ops", port: 2222, address: "10.0.0.7", credential: "probe" });
   const shapes: readonly { shape: string; argv: readonly string[]; has: readonly string[]; lacks: readonly string[] }[] = [
-    { shape: "a credential pushed by stdin to a server, with a prompt allowed", argv: argvOf(sshArgv(alpha, [], { ...BASE, family: "interactive", connectTimeoutSec: 10 }, "archon web credential")), has: ["ConnectTimeout=10", "admin@alpha.example", "archon web credential"], lacks: ["BatchMode=yes"] },
-    { shape: "a one-shot read in batch", argv: argvOf(sshArgv(alpha, [], BASE, "archon data --json")), has: ["BatchMode=yes", "ConnectTimeout=10", "archon data --json"], lacks: ["-t"] },
+    { shape: "a credential pushed by stdin to a server, with a prompt allowed", argv: argvOf(sshArgv(alpha, [], { ...BASE, family: "interactive", connectTimeoutSec: 10 }, "desired-os-state web credential")), has: ["ConnectTimeout=10", "admin@alpha.example", "desired-os-state web credential"], lacks: ["BatchMode=yes"] },
+    { shape: "a one-shot read in batch", argv: argvOf(sshArgv(alpha, [], BASE, "desired-os-state data --json")), has: ["BatchMode=yes", "ConnectTimeout=10", "desired-os-state data --json"], lacks: ["-t"] },
     { shape: "a command with a tight time out and the two known-hosts files", argv: argvOf(sshArgv(alpha, [], { ...BASE, connectTimeoutSec: 8 }, "x")), has: ["ConnectTimeout=8", "UserKnownHostsFile=/repo/known_hosts.auto /home/a/.ssh/known_hosts", "ServerAliveInterval=15"], lacks: [] },
     { shape: "a script as sh -s", argv: argvOf(sshArgv(alpha, [], BASE, "sh -s")), has: ["sh -s"], lacks: [] },
     { shape: "a pinned host with its own keys, a port and a probe key", argv: argvOf(sshArgv(pinnedHost, [], { ...BASE, family: "pinned", knownHostsRepository: "/tmp/pinned" }, "request")), has: ["UserKnownHostsFile=/tmp/pinned", "StrictHostKeyChecking=yes", "-p", "2222", "IdentitiesOnly=yes", "/keys/probe", "ops@10.0.0.7"], lacks: ["/home/a/.ssh/known_hosts"] },
-    { shape: "a session for MCP with a longer keep-alive", argv: argvOf(sshArgv(alpha, [], { ...BASE, serverAliveSec: 30 }, "archon mcp")), has: ["-T", "ServerAliveInterval=30", "archon mcp"], lacks: [] },
+    { shape: "a session for MCP with a longer keep-alive", argv: argvOf(sshArgv(alpha, [], { ...BASE, serverAliveSec: 30 }, "desired-os-state mcp")), has: ["-T", "ServerAliveInterval=30", "desired-os-state mcp"], lacks: [] },
   ];
   for (const s of shapes) {
     for (const h of s.has) assert(s.argv.includes(h), `${s.shape}: ${h} in ${s.argv.join(" ")}`);

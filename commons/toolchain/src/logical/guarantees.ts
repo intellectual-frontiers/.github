@@ -11,7 +11,7 @@
  *
  * @module
  */
-import type { Controls, DialectId } from "@intellectual-frontiers/archon/governance";
+import type { Controls, DialectId } from "@intellectual-frontiers/desired-os-state/governance";
 import { PIN_POLICIES, type ManagerId, type Platform, type PinPolicy, type Scope } from "@intellectual-frontiers/toolchain/governance";
 
 /** How a dialect checks what it installs. */

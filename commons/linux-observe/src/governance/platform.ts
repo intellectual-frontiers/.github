@@ -11,7 +11,7 @@
  * @module
  */
 
-/** The families of Linux that Archon tells apart, by how packages are managed: `debian` (dpkg and apt), `rhel` (rpm and dnf), `suse` (rpm and zypper), `arch` (pacman). */
+/** The families of Linux that Desired OS State tells apart, by how packages are managed: `debian` (dpkg and apt), `rhel` (rpm and dnf), `suse` (rpm and zypper), `arch` (pacman). */
 export const FAMILIES = ["debian", "rhel", "suse", "arch"] as const;
 /** A family. */
 export type Family = (typeof FAMILIES)[number];
@@ -49,7 +49,7 @@ export const FAMILY_OF_ID: Readonly<Record<string, Family>> = {
   endeavouros: "arch",
 };
 
-/** The family of a distribution from the `ID` and the `ID_LIKE` of its `os-release`, or nothing where neither is one Archon knows (it is then said, never guessed). */
+/** The family of a distribution from the `ID` and the `ID_LIKE` of its `os-release`, or nothing where neither is one Desired OS State knows (it is then said, never guessed). */
 export function familyOf(id: string, idLike: string = ""): Family | undefined {
   const own = FAMILY_OF_ID[id.toLowerCase()];
   if (own !== undefined) return own;

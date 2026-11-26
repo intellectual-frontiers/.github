@@ -321,6 +321,6 @@ proves(
 );
 
 proves(["0033-kanon FR-024"], "the names held for the fleet libraries are refused to a library of no family, with no folder", () => {
-  assertEquals(reservationFindings([{ name: "archon-dialect-x" }]).length, 1);
+  assertEquals(reservationFindings([{ name: "desired-os-state-x" }]).length, 1);
   assertEquals(reservationFindings([{ name: "estate", family: { host: "estate", role: "host" } }]), []);
 });

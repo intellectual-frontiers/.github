@@ -33,15 +33,15 @@ export type Match = { readonly kind: "exact"; readonly name: string } | { readon
 export type Reservation = { readonly match: Match; readonly host: string; readonly reason: string };
 
 /** The reason the names of the retired fleet engine are held (intellectual-frontiers/.github#11). */
-const ARCHON = "held for the fleet library and its dialects and plugins, which replace the retired fleet engine (intellectual-frontiers/.github#11)";
+const DESIRED_OS_STATE = "held for the fleet library and its dialects and plugins, which replace the retired fleet engine (intellectual-frontiers/.github#11)";
 
 /** The reason the names of the library of Kanon for content are held (intellectual-frontiers/.github#22). */
 const CONTENT = "held for the content library, Kanon for content, and its renditions, named content-rendition-<name> (intellectual-frontiers/.github#22)";
 
 /** The names held, as data: the check reads them and no folder holds them. */
 export const RESERVED: readonly Reservation[] = [
-  { match: { kind: "exact", name: "archon" }, host: "archon", reason: ARCHON },
-  { match: { kind: "prefix", prefix: "archon-" }, host: "archon", reason: ARCHON },
+  { match: { kind: "exact", name: "desired-os-state" }, host: "desired-os-state", reason: DESIRED_OS_STATE },
+  { match: { kind: "prefix", prefix: "desired-os-state-" }, host: "desired-os-state", reason: DESIRED_OS_STATE },
   { match: { kind: "exact", name: "signing" }, host: "signing", reason: "held for the signing library of the fleet libraries (intellectual-frontiers/.github#11)" },
   { match: { kind: "exact", name: "gitops" }, host: "gitops", reason: "held for the gitops library of the fleet libraries (intellectual-frontiers/.github#11)" },
   { match: { kind: "exact", name: "anyfs" }, host: "anyfs", reason: "held for the AnyFS library and its backends, plugins named anyfs-<noun> (intellectual-frontiers/.github#21)" },
@@ -119,7 +119,7 @@ export function familyFindings(libraries: readonly Entry[]): readonly string[] {
         const rule = host.kanon.family;
         const pkg = parsePackageName(`${SCOPE}${l.name}`);
         const member = rule === undefined || pkg.kind === "err" ? undefined : classify(rule, host.kanon.package, pkg.value);
-        if (member === undefined || member.kind !== f.role)
+        if (member === undefined || (member.kind !== f.role && rule?.dialect !== rule?.plugin))
           out.push(`commons/${l.name}: the family rule of ${f.host} does not read the name as a ${f.role} (0033-kanon FR-021)`);
         const declared =
           f.role === "dialect"

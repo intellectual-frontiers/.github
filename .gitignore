@@ -1,4 +1,4 @@
-# a build cache that archon's checks leave when they are pointed at commons/
+# a build cache that desired-os-state's checks leave when they are pointed at commons/
 commons/build/
 # the documentation site commons/docs builds (commons 0011-documentation FR-020); it is published, never committed
 _site/

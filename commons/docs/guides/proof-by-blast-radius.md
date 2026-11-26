@@ -95,7 +95,7 @@ T2 seam (budget 120s)
           the public surface of core changed in plain, which this library imports
   run   seam headless to repoctl
           the public surface of headless changed in Io, which this library imports
-  skip  T2 seam core to archon, archon-dialect-apt, archon-dialect-homebrew, archon-dialect-mise and 23 more: these 27 importers import other symbols of core than plain (symbols-unused)
+  skip  T2 seam core to desired-os-state, desired-os-state-apt, desired-os-state-homebrew, desired-os-state-mise and 23 more: these 27 importers import other symbols of core than plain (symbols-unused)
   skip  T3 packaging: no class of this change needs it (source) (class-needs-none)
   skip  T4 end to end: it runs on main, nightly, release, and this change reaches none of what it proves (tier-scheduled)
 8 of 33 libraries are proved

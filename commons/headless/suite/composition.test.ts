@@ -31,11 +31,11 @@ import { memoryStore, world } from "./world.ts";
 const reach = defineReach({ channels: ["local"], readOnly: true, idempotent: true });
 const verb = (name: string, extra: { tier?: typeof OPERATOR } = {}) =>
   command({ name, summary: `The ${name} verb.`, options: {}, action: { kind: "report", reach, ...extra }, run: () => Promise.resolve(outcomeOf(null, { text: `${name} ran` })) });
-const host: Omit<ProgramConfig, "children"> = { name: "archon", summary: "The fleet.", version: "1.0.0" };
+const host: Omit<ProgramConfig, "children"> = { name: "desired-os-state", summary: "The fleet.", version: "1.0.0" };
 const hostConfig: ProgramConfig = { ...host, children: [verb("version-info")] };
 
 function plugin(noun: string, nodes: readonly Node[], extra: { at?: readonly string[]; requires?: readonly string[] } = {}): Plugin {
-  const r = definePlugin({ program: "archon", noun, version: "1.0.0", summary: `The ${noun} plugin.`, contributes: nodes.map((node) => ({ node, ...(extra.at === undefined ? {} : { at: extra.at }) })), ...(extra.requires === undefined ? {} : { requires: extra.requires }) });
+  const r = definePlugin({ program: "desired-os-state", noun, version: "1.0.0", summary: `The ${noun} plugin.`, contributes: nodes.map((node) => ({ node, ...(extra.at === undefined ? {} : { at: extra.at }) })), ...(extra.requires === undefined ? {} : { requires: extra.requires }) });
   if (r.kind === "err") throw new Error(JSON.stringify(r.error));
   return r.value;
 }
@@ -47,17 +47,17 @@ const okOf = (r: ReturnType<typeof compose>): Composed => {
 };
 
 proves(["0009-composition FR-001", "0009-composition FR-002"], "a plugin is a value made by definePlugin with a stable id, and every problem of a definition is returned as a value", () => {
-  assertEquals(parsePluginId("archon", "server").kind === "ok" && String((parsePluginId("archon", "server") as { value: string }).value), "archon-server");
-  for (const [program, noun] of [["Archon", "x"], ["archon", "two-words"], ["archon", ""], ["", "x"]] as const) assertEquals(parsePluginId(program, noun).kind, "err", `${program} ${noun}`);
-  assertEquals(parsePluginIdText("archon-server").kind, "ok");
+  assertEquals(parsePluginId("desired-os-state", "server").kind === "ok" && String((parsePluginId("desired-os-state", "server") as { value: string }).value), "desired-os-state-server");
+  for (const [program, noun] of [["Desired OS State", "x"], ["desired-os-state", "two-words"], ["desired-os-state", ""], ["", "x"]] as const) assertEquals(parsePluginId(program, noun).kind, "err", `${program} ${noun}`);
+  assertEquals(parsePluginIdText("desired-os-state-server").kind, "ok");
   assertEquals(parsePluginIdText("Server").kind, "err");
   const p = server();
-  assertEquals([String(p.id), p.contract, p.program, p.noun, p.requires], ["archon-server", PLUGIN_CONTRACT, "archon", "server", []]);
+  assertEquals([String(p.id), p.contract, p.program, p.noun, p.requires], ["desired-os-state-server", PLUGIN_CONTRACT, "desired-os-state", "server", []]);
   const rules = (d: Parameters<typeof definePlugin>[0]) => {
     const r = definePlugin(d);
     return r.kind === "err" ? r.error.map((x) => x.rule) : [];
   };
-  const base = { program: "archon", noun: "server", version: "1.0.0", summary: "S.", contributes: [{ node: verb("server") }] };
+  const base = { program: "desired-os-state", noun: "server", version: "1.0.0", summary: "S.", contributes: [{ node: verb("server") }] };
   assertEquals(rules(base), []);
   assertEquals(rules({ ...base, noun: "Server" }), ["plugin/id", "plugin/root-claim"]);
   assertEquals(rules({ ...base, version: "one" }), ["plugin/version"]);
@@ -65,22 +65,22 @@ proves(["0009-composition FR-001", "0009-composition FR-002"], "a plugin is a va
   assertEquals(rules({ ...base, contributes: [] }), ["plugin/empty"]);
   assertEquals(rules({ ...base, contributes: [{ node: verb("device") }] }), ["plugin/root-claim"], "a plugin claims only its noun at the root");
   assertEquals(rules({ ...base, contributes: [{ at: ["device"], node: verb("list") }] }), [], "below another branch it may place nodes");
-  assertEquals(rules({ ...base, requires: ["archon-server"] }), ["plugin/requires"]);
+  assertEquals(rules({ ...base, requires: ["desired-os-state-server"] }), ["plugin/requires"]);
   assertEquals(rules({ ...base, requires: ["nope!"] }), ["plugin/requires"]);
 });
 
 proves(["0009-composition FR-003", "0009-composition FR-006"], "composing a host and plugins gives one program with the owner of every command, the same in any order of the plugins, with one help, completions, man page and verb ids", () => {
   const composed = okOf(compose(hostConfig, [server(), device()]));
-  assertEquals(verbIds(composed.program), ["archon device list", "archon server list", "archon server show", "archon version-info"]);
+  assertEquals(verbIds(composed.program), ["desired-os-state device list", "desired-os-state server list", "desired-os-state server show", "desired-os-state version-info"]);
   assertEquals(Object.fromEntries(Object.entries(composed.owners).map(([k, o]) => [k, o.kind === "host" ? "host" : String(o.id)])), {
     "version-info": "host",
-    "server list": "archon-server",
-    "server show": "archon-server",
-    "device list": "archon-device",
+    "server list": "desired-os-state-server",
+    "server show": "desired-os-state-server",
+    "device list": "desired-os-state-device",
   });
-  assertEquals(composed.plugins.map(String), ["archon-device", "archon-server"]);
-  assertEquals(composed.program.origins["server show"], "archon-server");
-  assertEquals(composed.program.origins["version-info"], "archon");
+  assertEquals(composed.plugins.map(String), ["desired-os-state-device", "desired-os-state-server"]);
+  assertEquals(composed.program.origins["server show"], "desired-os-state-server");
+  assertEquals(composed.program.origins["version-info"], "desired-os-state");
   const reversed = okOf(compose(hostConfig, [device(), server()]));
   assertEquals(helpFor(reversed.program, []), helpFor(composed.program, []));
   assertEquals(manPage(reversed.program), manPage(composed.program));
@@ -100,12 +100,12 @@ proves(["0009-composition FR-003", "0009-composition FR-006"], "composing a host
 
 proves(["0009-composition FR-004"], "two plugins claiming one verb is a conflict value naming both owners, no winner is chosen, and the other errors are values too", () => {
   const rival = plugin("server", [branch({ name: "server", summary: "Servers again.", children: [verb("list")] })]);
-  const twice = definePlugin({ program: "archon", noun: "zeta", version: "1.0.0", summary: "Zeta.", contributes: [{ at: ["server"], node: verb("list") }, { node: branch({ name: "zeta", summary: "Z.", children: [verb("a")] }) }] });
+  const twice = definePlugin({ program: "desired-os-state", noun: "zeta", version: "1.0.0", summary: "Zeta.", contributes: [{ at: ["server"], node: verb("list") }, { node: branch({ name: "zeta", summary: "Z.", children: [verb("a")] }) }] });
   assertEquals(twice.kind, "ok");
   const clash = compose(hostConfig, [server(), twice.kind === "ok" ? twice.value : server()]);
   assertEquals(clash.kind, "err");
   const kinds = clash.kind === "err" ? clash.error.map((e) => (e.kind === "conflict" ? `${e.conflict.kind} ${e.conflict.path.join(" ")} ${e.conflict.owners.map((o) => (o.kind === "host" ? "host" : String(o.id))).join(",")}` : e.kind)) : [];
-  assertEquals(kinds, ["claimed-twice server list archon-server,archon-zeta"]);
+  assertEquals(kinds, ["claimed-twice server list desired-os-state-server,desired-os-state-zeta"]);
   const duplicate = compose(hostConfig, [server(), server()]);
   assertEquals(duplicate.kind === "err" && duplicate.error.some((e) => e.kind === "duplicate-plugin"), true);
   assertEquals(rival.id, server().id);
@@ -115,7 +115,7 @@ proves(["0009-composition FR-004"], "two plugins claiming one verb is a conflict
   const future: Plugin = { ...server(), contract: PLUGIN_CONTRACT + 1 };
   const old = compose(hostConfig, [future]);
   assertEquals(old.kind === "err" && old.error.map((e) => e.kind), ["contract"]);
-  const needy = plugin("device", [branch({ name: "device", summary: "D.", children: [verb("x")] })], { requires: ["archon-server"] });
+  const needy = plugin("device", [branch({ name: "device", summary: "D.", children: [verb("x")] })], { requires: ["desired-os-state-server"] });
   const missing = compose(hostConfig, [needy]);
   assertEquals(missing.kind === "err" && missing.error.map((e) => e.kind), ["missing-requirement"]);
   assertEquals(compose(hostConfig, [needy, server()]).kind, "ok");
@@ -127,7 +127,7 @@ proves(["0009-composition FR-004"], "two plugins claiming one verb is a conflict
   const below = plugin("keys", [verb("a")], { at: ["version-info"] });
   assertEquals((() => { const r = compose(hostConfig, [below]); return r.kind === "err" && r.error.map((e) => (e.kind === "conflict" ? e.conflict.kind : e.kind)); })(), ["parent-is-command"]);
   const merged = okOf(compose(hostConfig, [server(), plugin("keys", [verb("added")], { at: ["server"] })]));
-  assertEquals(verbIds(merged.program).filter((i) => i.includes("server")), ["archon server added", "archon server list", "archon server show"], "two contributions of one branch merge");
+  assertEquals(verbIds(merged.program).filter((i) => i.includes("server")), ["desired-os-state server added", "desired-os-state server list", "desired-os-state server show"], "two contributions of one branch merge");
 });
 
 proves(["0009-composition FR-005"], "the composed program is checked as one: a command with no reach policy and a tier that is not on the ladder are errors of the composition", () => {
@@ -151,8 +151,8 @@ proves(["0009-composition FR-006"], "a composed program runs as one: its command
   await run(composed.program, ["device", "list"], world({ store, env, pid: 2 }));
   const logs = [...store.files.entries()].filter(([f]) => f.endsWith(".log"));
   assertEquals(logs.length, 2, "each run has its log under the one folder of the one program");
-  assert(logs.some(([, v]) => v.text.includes("server list") && v.text.includes("from archon-server")));
-  assert(logs.some(([, v]) => v.text.includes("device list") && v.text.includes("from archon-device")));
+  assert(logs.some(([, v]) => v.text.includes("server list") && v.text.includes("from desired-os-state-server")));
+  assert(logs.some(([, v]) => v.text.includes("device list") && v.text.includes("from desired-os-state-device")));
   const folders = new Set(logs.map(([f]) => f.slice(0, f.lastIndexOf("/"))));
   assertEquals(folders.size, 1);
 });
@@ -160,7 +160,7 @@ proves(["0009-composition FR-006"], "a composed program runs as one: its command
 proves(["0009-composition FR-007"], "the conformance suite gives a result for every rule, passes a good plugin and fails, by rule, a plugin that breaks one", () => {
   const good = pluginConformance(server(), host);
   assertEquals(good.results.map((r) => r.rule), [...CONFORMANCE_RULES]);
-  assertEquals([good.passed, String(good.plugin)], [true, "archon-server"]);
+  assertEquals([good.passed, String(good.plugin)], [true, "desired-os-state-server"]);
   const failed = (p: Plugin, h: Omit<ProgramConfig, "children"> = host): string[] => pluginConformance(p, h).results.filter((r) => !r.passed).map((r) => r.rule);
   assertEquals(failed({ ...server(), contract: 99 }), ["conformance/contract", "conformance/ids"]);
   assertEquals(failed(server(), { ...host, name: "other" }), ["conformance/program", "conformance/ids"]);
@@ -170,6 +170,6 @@ proves(["0009-composition FR-007"], "the conformance suite gives a result for ev
   assert(report.results.find((r) => r.rule === "conformance/reach")?.messages.some((m) => m.includes("model/no-reach-policy")));
   const sneaky: Plugin = { ...server(), contributes: [{ at: [], node: verb("device") }] };
   assertEquals(failed(sneaky), ["conformance/definition", "conformance/root-claim"]);
-  const needy = plugin("device", [branch({ name: "device", summary: "D.", children: [verb("x")] })], { requires: ["archon-server"] });
+  const needy = plugin("device", [branch({ name: "device", summary: "D.", children: [verb("x")] })], { requires: ["desired-os-state-server"] });
   assertEquals(pluginConformance(needy, host).passed, true, "the plugins it requires stand in");
 });

@@ -39,7 +39,7 @@ proves(["0002-oto FR-001"], "the ontology has its namespace, a version and a des
 proves(["0002-oto FR-002"], "the nine domains are numbered 1 to 9 in order, with the source's entities and the libraries that realize them", () => {
   const all = Object.values(domains);
   assertEquals(all.map((d) => d.values.domainNumber), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-  assertEquals(domains.InfrastructureAndPlatform.values.realizedBy, ["estate", "archon", "toolchain"]);
+  assertEquals(domains.InfrastructureAndPlatform.values.realizedBy, ["estate", "desired-os-state", "toolchain"]);
   assert((domains.OrganizationalStructure.values.entity ?? []).includes("Delegation of Authority"));
   assertEquals(domains.ProcessAndWorkflow.values.realizedBy, [], "a domain no library realizes lists none");
 });

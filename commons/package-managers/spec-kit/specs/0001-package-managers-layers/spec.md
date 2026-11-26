@@ -1,4 +1,4 @@
-# Feature Specification: The shared kit of the dialects that drive a package manager for Archon (commons archon 0004-archon-dialects) and Toolchain (commons toolchain 0003-toolchain-logical): it is a library in the layers of Kanon, and the dialects of Homebrew, apt, WinGet and mise are packages of their own that hold only the data of a manager. Kanon lets a dialect reach its host and no other member of the family, so the code the dialects share lives in a library that is no member.
+# Feature Specification: The shared kit of the dialects that drive a package manager for Desired OS State (commons desired-os-state 0004-desired-os-state-dialects) and Toolchain (commons toolchain 0003-toolchain-logical): it is a library in the layers of Kanon, and the dialects of Homebrew, apt, WinGet and mise are packages of their own that hold only the data of a manager. Kanon lets a dialect reach its host and no other member of the family, so the code the dialects share lives in a library that is no member.
 
 **Spec ID:** 0001-package-managers-layers
 **Status:** Active
@@ -10,7 +10,7 @@
 ## Requirements
 
 - **FR-001**: The library MUST be Kanon: its manifest `library.ts` MUST declare the table of its units in the field `kanon`, with `src/governance/`, `src/logical/` and `src/physical/`, and the shared checker of `@intellectual-frontiers/kanon` MUST find no import that the table does not allow.
-- **FR-002**: Governance MUST import nothing but `@intellectual-frontiers/core`; Logical MUST import Governance, `core`, and the governance and dialect port of Archon and the governance and logical of Toolchain; Physical MUST import Governance, Logical, `core`, the process module of `@intellectual-frontiers/system`, and Archon and Toolchain by their exports; no unit MUST import a dialect package.
+- **FR-002**: Governance MUST import nothing but `@intellectual-frontiers/core`; Logical MUST import Governance, `core`, and the governance and dialect port of Desired OS State and the governance and logical of Toolchain; Physical MUST import Governance, Logical, `core`, the process module of `@intellectual-frontiers/system`, and Desired OS State and Toolchain by their exports; no unit MUST import a dialect package.
 - **FR-003**: The package MUST export `.`, `./governance`, `./logical` and `./physical`.
 - **FR-004**: `bun run verify` in the folder of the library MUST run the TypeScript 7 compiler, the checks of the specification kit, the check of the level L1, the layers check of Kanon, the trace check, the tests under Bun and the check of the package, and MUST fail on any finding that is not held by a baseline that only shrinks.
 - **FR-005**: The library MUST be released as `package-managers-v<version>` (commons 0026-works-versioning).

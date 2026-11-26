@@ -14,7 +14,7 @@ const R = ["erga 009-machine-bootstrap FR-088"] as const;
 proves(R, "the public README carries no setup instructions", async () => {
   const readme = await fs.readTextFile(path.join(ROOT, "README.md"));
   assert(!readme.includes("## Set up a new computer"));
-  for (const old of ["bootstrap-archon", "archon-bootstrap.sh", "archon-setup.sh"]) assert(!readme.includes(old), old);
+  for (const old of ["bootstrap-desired-os-state", "desired-os-state-bootstrap.sh", "desired-os-state-setup.sh"]) assert(!readme.includes(old), old);
 });
 
 proves(R, "the repository has only the top-level entries it is meant to have", async () => {

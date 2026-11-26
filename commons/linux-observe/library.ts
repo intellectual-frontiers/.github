@@ -15,13 +15,13 @@ export const library = {
   distribution: ["github"],
   held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
   exports: [".", "./governance", "./logical", "./physical"],
-  summary: "What a Linux machine is, read with no change: the resources that an Archon requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
+  summary: "What a Linux machine is, read with no change: the resources that an Desired OS State requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
   kanon: {
     package: "@intellectual-frontiers/linux-observe",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance"] }] },
-      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/archon", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
+      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance"] }] },
+      { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical"] }, { name: "@intellectual-frontiers/linux-observe", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },
       { folder: "tools/", own: true },

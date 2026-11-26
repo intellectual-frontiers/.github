@@ -1,6 +1,6 @@
 /**
  * The programs a computer needs for a harness's setup (required) and for the everyday comfort tools (comfort), and what each family calls their packages.
- * From archon-bootstrap.sh's package lists. A name left out for a family means that family needs no package for it.
+ * From desired-os-state-bootstrap.sh's package lists. A name left out for a family means that family needs no package for it.
  *
  * @module
  */

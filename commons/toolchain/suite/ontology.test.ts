@@ -6,7 +6,7 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { parseDialectId } from "@intellectual-frontiers/archon/governance";
+import { parseDialectId } from "@intellectual-frontiers/desired-os-state/governance";
 import { pinIds, platformNames } from "@intellectual-frontiers/ontology/supply-chain/downloads";
 import * as runtime from "@intellectual-frontiers/mizan/host/trace";
 import { path } from "@intellectual-frontiers/system";
@@ -74,7 +74,7 @@ proves(["0004-toolchain-ontology FR-004"], "no source of this library holds a ve
 });
 
 proves(["0004-toolchain-ontology FR-001"], "a tool that is pinned in the ontology resolves at the version of its pin", () => {
-  const d = parseDialectId("native-pinned");
+  const d = parseDialectId("pinned-downloads");
   assert(d.kind === "ok");
   const dialect: ToolDialect = { id: d.value, guarantees: { pin: "exact", integrity: "hash", scopes: ["user"], platforms: ["linux-x64", "linux-arm64", "macos-x64", "macos-arm64", "windows-x64"], binds: "pin", sourceBuild: false } };
   const bun = defineTool({ name: "bun", summary: "Bun.", pin: "exact", program: "bun", versionArgs: ["--version"], phases: ["core"], scope: "user", bindings: [{ kind: "pin", pin: "bun" }] });

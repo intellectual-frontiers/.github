@@ -5,7 +5,7 @@
     "": {
       "name": "@intellectual-frontiers/toolchain",
       "devDependencies": {
-        "@intellectual-frontiers/archon": "link:../archon",
+        "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/crypto": "link:../crypto",
         "@intellectual-frontiers/formats": "link:../formats",
@@ -23,7 +23,7 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/archon": ["@intellectual-frontiers/archon@link:../archon", {}],
+    "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:../desired-os-state", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 

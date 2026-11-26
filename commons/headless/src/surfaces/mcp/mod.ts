@@ -6,7 +6,7 @@
  * @example
  * ```ts
  * import { toolName } from "@intellectual-frontiers/headless/mcp";
- * toolName("archon", ["server", "list"]); // "archon_server_list"
+ * toolName("desired-os-state", ["server", "list"]); // "desired_os_state_server_list"
  * ```
  *
  * @module

@@ -1,7 +1,7 @@
 // Spec: 0002-enrollment-protocol FR-007
 /**
  * The install plan: an ordered list of typed steps, never a script. A step names what to do in fields of a small alphabet, and an argument vector is a list of words, never a shell string. The controller builds a plan (for
- * example from the output of an Archon dialect) and a person approves it; the bootstrap script executes only these steps, without a shell, and verifies the SHA-256 of every download before it uses it.
+ * example from the output of an Desired OS State dialect) and a person approves it; the bootstrap script executes only these steps, without a shell, and verifies the SHA-256 of every download before it uses it.
  *
  * @module
  */

@@ -20,7 +20,7 @@
     "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
   },
   "devDependencies": {
-    "@intellectual-frontiers/archon": "link:../archon",
+    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/estate": "link:../estate",
     "@intellectual-frontiers/grc": "link:../grc",

@@ -7,7 +7,7 @@
  *
  * @remarks
  * Pure and deterministic: the plugins are placed in the order of their ids, so the tree does not depend on the order in which a program imports its packages. A plugin may
- * place a node at the root only under its own noun (`archon-server` contributes `server`), and below another branch (`at`) where that branch exists; two contributions of the same branch name merge,
+ * place a node at the root only under its own noun (`desired-os-state-server` contributes `server`), and below another branch (`at`) where that branch exists; two contributions of the same branch name merge,
  * and the same verb claimed twice is a `conflict`. A plugin names the plugins it needs, and a missing one is an error. The tier of every command MUST be on the host's ladder: the one gate.
  *
  * @example
@@ -29,7 +29,7 @@ import { programOf, type Program, type ProgramConfig } from "./program.ts";
 /** The version of the plugin contract, which a plugin states and a host checks. */
 export const PLUGIN_CONTRACT = 1;
 
-/** The stable identity of a plugin: the program's name, a hyphen and the noun (`archon-server`). Made only by `parsePluginId`. */
+/** The stable identity of a plugin: the program's name, a hyphen and the noun (`desired-os-state-server`). Made only by `parsePluginId`. */
 export type PluginId = Brand<string, "plugin id">;
 
 const WORD = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
@@ -43,7 +43,7 @@ export function parsePluginId(program: string, noun: string): Result<PluginId, s
   return r.kind === "ok" ? ok(r.value) : err(`${program}-${noun} is not a plugin id`);
 }
 
-/** A plugin id from text that already is one (`archon-server`), for a requirement of another plugin. */
+/** A plugin id from text that already is one (`desired-os-state-server`), for a requirement of another plugin. */
 export function parsePluginIdText(text: string): Result<PluginId, string> {
   const r = idDecoder(text, "id");
   return r.kind === "ok" ? ok(r.value) : err(`${JSON.stringify(text)} is not a plugin id: <program>-<noun>`);
@@ -236,7 +236,7 @@ export function compose(host: ProgramConfig, plugins: readonly Plugin[]): Result
   return ok({ program, plugins: ordered.map((p) => p.id), owners: tree.owners });
 }
 
-/** The stable identifiers of the verbs of a program: the words of each command below the program's name, sorted, as `archon server list`. A plugin's test holds them in a snapshot. */
+/** The stable identifiers of the verbs of a program: the words of each command below the program's name, sorted, as `desired-os-state server list`. A plugin's test holds them in a snapshot. */
 export function verbIds(program: Program): readonly string[] {
   return placedCommands(program.children)
     .map((p) => `${program.name} ${p.id}`)

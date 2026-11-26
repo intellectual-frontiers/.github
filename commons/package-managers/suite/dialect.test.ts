@@ -1,13 +1,13 @@
 /**
- * Tests of the dialect made from a manager's data (commons package-managers 0004-package-managers-dialect FR-001 to FR-006): its guarantees as data, the plan file rendered from Archon's order and plan
+ * Tests of the dialect made from a manager's data (commons package-managers 0004-package-managers-dialect FR-001 to FR-006): its guarantees as data, the plan file rendered from Desired OS State's order and plan
  * with only its own tools, the steps with their check where the missing status is known, the runner under a limit of time (with real programs that hang and that start others), and the observation
  * of what is installed through a made-up manager that is a real program. Every name is made up.
  *
  * @module
  */
-import { buildOrder, planOf as planOfOrder } from "@intellectual-frontiers/archon/logical";
-import { executionPlanOf, isGenerated } from "@intellectual-frontiers/archon/dialect";
-import { defineRequirement, parseSubjectName, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/archon/governance";
+import { buildOrder, planOf as planOfOrder } from "@intellectual-frontiers/desired-os-state/logical";
+import { executionPlanOf, isGenerated } from "@intellectual-frontiers/desired-os-state/dialect";
+import { defineRequirement, parseSubjectName, type JsonValue, type Requirement, type RequirementId } from "@intellectual-frontiers/desired-os-state/governance";
 import { defineCatalog, defineTool, meetsIntegrity, requirementsFor, resolveTools } from "@intellectual-frontiers/toolchain";
 import * as fs from "@intellectual-frontiers/system/fs";
 import * as path from "@intellectual-frontiers/system/path";
@@ -75,7 +75,7 @@ proves(["0004-package-managers-dialect FR-002"], "the plan file is rendered with
   assert(rendered.kind === "ok");
   const text = rendered.value.files.get("fakepm/plan.json") ?? "";
   assert(isGenerated(text));
-  assertEquals((JSON.parse(text).tools as { tool: string }[]).map((t) => t.tool), ["git", "jq"], "the tools are in the order of Archon");
+  assertEquals((JSON.parse(text).tools as { tool: string }[]).map((t) => t.tool), ["git", "jq"], "the tools are in the order of Desired OS State");
   assertEquals(/-----BEGIN|password|token/i.test(text), false);
   const bad = orderOf(toolRequirements(FAKE, [{ name: "a", packages: ["-x"] }, { name: "b", packages: ["c;d"] }]));
   const refused = await managerDialect(FAKE, commandsOf()).render(bad, planOfOrder(bad, new Map()));
@@ -131,7 +131,7 @@ proves(["0004-package-managers-dialect FR-004"], "the runner answers with the st
   });
 });
 
-proves(["0004-package-managers-dialect FR-005"], "Archon is given the desired state for a tool at the version asked, a differing state for another version, and nothing for an absent tool or an answer with no version", async () => {
+proves(["0004-package-managers-dialect FR-005"], "Desired OS State is given the desired state for a tool at the version asked, a differing state for another version, and nothing for an absent tool or an answer with no version", async () => {
   if (!posix) return;
   await fs.withTempDir(async (dir) => {
     const f = path.join(dir, "ver");

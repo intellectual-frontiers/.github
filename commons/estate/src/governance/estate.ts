@@ -7,7 +7,7 @@
  * ```ts
  * import { defineEstate } from "./estate.ts";
  * const estate = defineEstate(
- *   { synthetic-server-01: { kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon", access: "archon" } } },
+ *   { synthetic-server-01: { kind: "server", state: "adopted", owners: { observe: "desired-os-state", verify: "desired-os-state", access: "desired-os-state" } } },
  *   [],
  * );
  * estate.kind; // "ok"

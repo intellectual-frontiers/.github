@@ -5,7 +5,7 @@
  * @module
  */
 import { argvFindings } from "@intellectual-frontiers/core";
-import { defineRequirement, type JsonValue, type Requirement } from "@intellectual-frontiers/archon/governance";
+import { defineRequirement, type JsonValue, type Requirement } from "@intellectual-frontiers/desired-os-state/governance";
 import { commandOf, exactVersionOf, parseManagerId } from "@intellectual-frontiers/ontology/supply-chain/commands";
 import { meetsIntegrity } from "@intellectual-frontiers/toolchain/logical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";

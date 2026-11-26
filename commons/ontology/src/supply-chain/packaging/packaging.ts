@@ -131,7 +131,7 @@ export const FIELD_TYPES = ["text", "boolean", "date"] as const;
 /** Where the IDs that detect a family come from. */
 export const DETECT_SOURCES = ["os-release", "platform", "any"] as const;
 /** Where a command comes from (commons 0002-packaging FR-003). */
-export const ORIGINS = ["upt", "archon", "memory", "upt+memory"] as const;
+export const ORIGINS = ["upt", "desired-os-state", "memory", "upt+memory"] as const;
 /** The operating systems of a platform (commons 0002-packaging FR-014). */
 export const OPERATING_SYSTEMS = ["linux", "macos", "windows"] as const;
 /** The formats of what a download gives (commons 0002-packaging FR-017): a zip archive, a tar archive (plain or compressed) or the one file itself. */
@@ -511,7 +511,7 @@ export const properties = [
     domain: pm.Command,
     range: xsd.string,
     definition: en(
-      "Where the command comes from: upt, archon (the commands the fleet engine runs), memory (written from knowledge, unverified) or upt+memory.",
+      "Where the command comes from: upt, desired-os-state (the commands the fleet engine runs), memory (written from knowledge, unverified) or upt+memory.",
     ),
   }),
   DatatypeProperty.make(pm.verifiedOn, {

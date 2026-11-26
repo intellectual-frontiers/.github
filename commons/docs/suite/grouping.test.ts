@@ -31,9 +31,9 @@ proves(["0001-docs FR-044"], "a family is one folder of the navigation: its host
     { slug: "anyfs", title: "AnyFS", family: "anyfs", role: "host" },
     { slug: "anyfs-bridge", title: "AnyFS Bridge", family: "anyfs", role: "plugin" },
     { slug: "anyfs-cli", title: "AnyFS command line", family: "anyfs", role: "plugin" },
-    { slug: "archon", title: "Archon", family: "archon", role: "host" },
-    { slug: "archon-dns", title: "Archon plugin: dns", family: "archon", role: "plugin" },
-    { slug: "archon-dialect-ansible", title: "Archon dialect: Ansible", family: "archon", role: "dialect" },
+    { slug: "desired-os-state", title: "Desired OS State", family: "desired-os-state", role: "host" },
+    { slug: "desired-os-state-dns", title: "Desired OS State plugin: dns", family: "desired-os-state", role: "plugin" },
+    { slug: "desired-os-state-ansible", title: "Desired OS State dialect: Ansible", family: "desired-os-state", role: "dialect" },
     { slug: "catalog-soc2", title: "Catalog Soc2", family: "catalogs", role: "member" },
     { slug: "catalog-nist-sp800", title: "Catalog Nist Sp800", family: "catalogs", role: "member" },
     { slug: "lonely", title: "Lonely", family: "lonely", role: "member" },
@@ -41,8 +41,8 @@ proves(["0001-docs FR-044"], "a family is one folder of the navigation: its host
   ]);
   assertEquals(placements.get("anyfs-bridge"), { parent: "anyfs", navTitle: "Bridge", navKind: "Plugins" });
   assertEquals(placements.get("anyfs-cli")?.navTitle, "Command line");
-  assertEquals(placements.get("archon-dns"), { parent: "archon", navTitle: "Dns", navKind: "Plugins" });
-  assertEquals(placements.get("archon-dialect-ansible"), { parent: "archon", navTitle: "Ansible", navKind: "Dialects" });
+  assertEquals(placements.get("desired-os-state-dns"), { parent: "desired-os-state", navTitle: "Dns", navKind: "Plugins" });
+  assertEquals(placements.get("desired-os-state-ansible"), { parent: "desired-os-state", navTitle: "Ansible", navKind: "Dialects" });
   assertEquals(placements.get("catalog-soc2")?.parent, "group:catalogs");
   assertEquals(groupPages, [{ key: "catalogs", title: "Catalogs" }]);
   assertEquals(placements.has("anyfs"), false, "a host is the page of its folder");

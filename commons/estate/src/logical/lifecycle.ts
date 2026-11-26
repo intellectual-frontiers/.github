@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { moveState } from "./lifecycle.ts";
- * // moveState(asset, "managed", { converge: "archon", ... }) is a Result of the asset in its new state
+ * // moveState(asset, "managed", { converge: "desired-os-state", ... }) is a Result of the asset in its new state
  * ```
  *
  * @module

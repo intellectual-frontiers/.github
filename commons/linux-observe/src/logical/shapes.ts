@@ -11,7 +11,7 @@
  *
  * @module
  */
-import type { JsonValue } from "@intellectual-frontiers/archon/governance";
+import type { JsonValue } from "@intellectual-frontiers/desired-os-state/governance";
 
 type Obj = { readonly [key: string]: JsonValue };
 

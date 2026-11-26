@@ -11,7 +11,7 @@
  * @example
  * ```ts
  * import { toolName } from "./tools.ts";
- * toolName("archon", ["server", "dry-list"]); // "archon_server_dry_list"
+ * toolName("desired-os-state", ["server", "dry-list"]); // "desired_os_state_server_dry_list"
  * ```
  *
  * @module
@@ -34,7 +34,7 @@ export type McpTool = {
   readonly annotations: { readonly readOnlyHint: boolean; readonly destructiveHint: boolean; readonly idempotentHint: boolean; readonly openWorldHint: boolean };
 };
 
-/** The name of the tool of a command: the program's name and its words joined by underscores (`archon_server_list`). */
+/** The name of the tool of a command: the program's name and its words joined by underscores (`desired_os_state_server_list`). */
 export function toolName(program: string, path: readonly string[]): string {
   return [program, ...path].join("_").replace(/[^A-Za-z0-9_]/g, "_");
 }

@@ -10,7 +10,7 @@ import { defineAsset, type Asset } from "../src/governance/mod.ts";
 import { checkInvariants, INVARIANT_COVERAGE } from "../src/logical/mod.ts";
 
 function adopted(): Asset {
-  const a = defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", owners: { observe: "archon", verify: "archon" } });
+  const a = defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   if (a.kind === "err") throw new Error(a.error.join("; "));
   return a.value;
 }

@@ -332,7 +332,7 @@ export type Found = { readonly dir: string; readonly library: Library } | { read
  * The hosts whose extensions the check holds to the folder FR-026 derives: a family is added here with the commit that moves it, and the set is every host of the repository when the last family is moved
  * (the folders of a host's extensions are then a rule and not a plan).
  */
-export const LAYOUT_HOSTS: ReadonlySet<string> = new Set<string>(["archon", "anyfs"]);
+export const LAYOUT_HOSTS: ReadonlySet<string> = new Set<string>(["desired-os-state", "anyfs"]);
 
 /** The folders of `commons/` that hold no library of their own and are never searched for one. */
 const NOT_LIBRARY_FOLDERS: ReadonlySet<string> = new Set(["node_modules", "dist", "generated", "spec-kit", "src", "suite", "tools"]);

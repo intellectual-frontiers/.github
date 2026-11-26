@@ -1,7 +1,7 @@
 // Spec: 0001-kanon-checker FR-010, FR-011; 0002-kanon-content-checks FR-004, FR-005
 /**
  * The family of a Kanon library (commons 0033-kanon FR-021): the naming rule of the packages that extend a host, as data of the host's table, and the names that rule makes and reads. A host
- * `@scope/archon` has dialects `@scope/archon-dialect-<tool>` and plugins `@scope/archon-<noun>`; the rule is two templates, never a pattern in a program.
+ * `@scope/desired-os-state` has dialects `@scope/desired-os-state-<tool>` and plugins `@scope/desired-os-state-<noun>`; the rule is two templates, never a pattern in a program.
  *
  * @remarks
  * Parse, don't validate: an instance name, a plugin noun and a template are branded types made only by their smart constructors, so a function that takes one never checks it again. The name of a
@@ -95,7 +95,7 @@ export function memberPackage(
     case "plugin": {
       const name = `${scope}${rule.plugin.replace("{host}", base).replace("{name}", member.noun)}`;
       const back = classify(rule, host, name);
-      if (back?.kind === "dialect") return err(`${JSON.stringify(member.noun)} would name a dialect, not a plugin: ${name}`);
+      if (back?.kind === "dialect" && rule.dialect !== rule.plugin) return err(`${JSON.stringify(member.noun)} would name a dialect, not a plugin: ${name}`);
       return parsePackageName(name);
     }
     default:

@@ -12,7 +12,7 @@ This page has two parts. The first is a one-page brief for technical executives 
 
 1. **Less drift.** A fact stated in one place and derived everywhere else cannot quietly diverge. *Shown* by Headless, where a destructive command's hint on a tool server, its method in a REST service and its confirmation on the command line come from one fact.
 2. **Guardrails for agents.** Constraints that a program checks keep an agent inside its task and tell it, specifically, when it leaves. *Shown* by the import check and its findings. *Expectation:* tasks that stay inside one layer or one package are less likely to need rework. Measure it.
-3. **A tiny core with extensions.** For a library of medium or high complexity, a small host and many extension packages that reach it only through its public exports. *Measured:* in AnyFS and Archon the host holds about a fifth to a quarter of the family's source.
+3. **A tiny core with extensions.** For a library of medium or high complexity, a small host and many extension packages that reach it only through its public exports. *Measured:* in AnyFS and Desired OS State the host holds about a fifth to a quarter of the family's source.
 4. **Nothing silently lost.** Every promise at the top ends expressed, carried or named as not yet enforced, with a reason. *Shown* by the matrix and its `kanon/dropped` finding.
 
 **What it costs.**
@@ -56,8 +56,8 @@ These numbers were taken on 2026-11-24 from this repository. They show that the 
 | Baselines held by those libraries | none | no `kanon.baseline.txt` exists |
 | Time for all 58 checks | 20 seconds in total | one run, one machine |
 | Time for one check | 0.48 seconds (Headless) | `time bun ../kanon/src/check.ts` |
-| Host share of a family's source | about 20% (AnyFS) and 24% (Archon) | non-test TypeScript lines under `src/` |
-| Extensions of AnyFS and Archon | 12 and 12 | their manifests |
+| Host share of a family's source | about 20% (AnyFS) and 24% (Desired OS State) | non-test TypeScript lines under `src/` |
+| Extensions of AnyFS and Desired OS State | 12 and 12 | their manifests |
 
 Two honest notes. First, these figures describe adoption inside one repository maintained by one organization, not a field study. Second, there is no record in this repository of a defect that the check caught that we can cite, so the evidence for fewer defects is structural, not statistical. If you adopt Kanon, the table in the brief is where to start collecting your own.
 
@@ -79,7 +79,7 @@ Two honest notes. First, these figures describe adoption inside one repository m
 | **Architecture that is data.** | The layers and rules are a table the build reads, not a diagram that ages. | shown |
 | **Traceability.** | From any physical element, walk up to the statement that says why it exists. | shown |
 | **An accounting of promises.** | The matrix says which implementation honours which annotation, and why not. | shown |
-| **A shape for growth.** | A tiny host and many extensions, each in its own package, released on its own. | shown (AnyFS, Archon) |
+| **A shape for growth.** | A tiny host and many extensions, each in its own package, released on its own. | shown (AnyFS, Desired OS State) |
 | **A policy seam.** | What a finding does to a build is a typed, dated decision of the host, not a property of the finding. | shown (content gate) |
 | **Evolvability of the rule.** | A change to the rule is one change plus the tests that compare projections. | expectation |
 

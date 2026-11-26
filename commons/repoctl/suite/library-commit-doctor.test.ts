@@ -25,7 +25,7 @@ const SESSION = "https://claude.ai/code/session_test";
 const BEGIN = `${"-----"}BEGIN`;
 const HELD: readonly Held[] = [
   { match: { kind: "exact", name: "toolchain" }, host: "toolchain" },
-  { match: { kind: "prefix", prefix: "archon-" }, host: "archon" },
+  { match: { kind: "prefix", prefix: "desired-os-state-" }, host: "desired-os-state" },
 ];
 
 proves(["0005-repoctl-library-commit-doctor FR-001"], "the scaffold has every file of a library, each with the name in it, and a title is made of the name", () => {
@@ -50,7 +50,7 @@ proves(["0005-repoctl-library-commit-doctor FR-002"], "an invalid, a reserved an
     const r = acceptName(name, HELD, ["core", "widget"], "commons");
     return r.kind === "ok" ? "ok" : r.error.code;
   };
-  assertEquals(["Bad_Name", "9x", "", "ok-name", "toolchain", "archon-dialect-x", "widget", "archon"].map(code), ["E-LIBRARY-NAME", "E-LIBRARY-NAME", "E-LIBRARY-NAME", "ok", "E-LIBRARY-RESERVED", "E-LIBRARY-RESERVED", "E-LIBRARY-EXISTS", "ok"]);
+  assertEquals(["Bad_Name", "9x", "", "ok-name", "toolchain", "desired-os-state-x", "widget", "desired-os-state"].map(code), ["E-LIBRARY-NAME", "E-LIBRARY-NAME", "E-LIBRARY-NAME", "ok", "E-LIBRARY-RESERVED", "E-LIBRARY-RESERVED", "E-LIBRARY-EXISTS", "ok"]);
 });
 
 proves(["0005-repoctl-library-commit-doctor FR-003"], "the role is written into the map of roles, after the last library of its role, once", () => {
@@ -77,7 +77,7 @@ proves(["0005-repoctl-library-commit-doctor FR-001", "0005-repoctl-library-commi
     const doc = JSON.parse(dry.out) as { data: { files: string[] } };
     assert(doc.data.files.includes("commons/widget/library.ts"));
     assertEquals(await fs.exists(path.join(dir, "commons/widget")), false);
-    for (const [name, code] of [["Bad_Name", "E-LIBRARY-NAME"], ["archon-x", "E-LIBRARY-RESERVED"], ["core", "E-LIBRARY-EXISTS"]] as const) {
+    for (const [name, code] of [["Bad_Name", "E-LIBRARY-NAME"], ["desired-os-state-x", "E-LIBRARY-RESERVED"], ["core", "E-LIBRARY-EXISTS"]] as const) {
       const r = await execute(host, ["new", "library", name, "--summary", "x"]);
       assertEquals(r.code, 1, `${name}: ${r.err}`);
       assertStringIncludes(r.err, code);

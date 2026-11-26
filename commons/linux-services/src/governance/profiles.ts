@@ -21,7 +21,7 @@ export const MAILBOX = /^[A-Za-z0-9._%+-]{1,64}@([a-z0-9]([a-z0-9-]{0,61}[a-z0-9
 /** The ports a service of a machine listens on, without the privileged ones. */
 export const PORTS = { min: 1024, max: 65535 } as const;
 /** The marker a DNS record of a profile carries in its comment, so that a plan removes only what a profile made. */
-export const MARKER = "managed by archon";
+export const MARKER = "managed by desired-os-state";
 
 /** A PostgreSQL cluster, the one Ubuntu's package makes (`<version>/main`). */
 export type PostgresProfile = {

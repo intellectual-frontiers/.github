@@ -14,7 +14,7 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import type { Controls, DialectId } from "@intellectual-frontiers/archon/governance";
+import type { Controls, DialectId } from "@intellectual-frontiers/desired-os-state/governance";
 import { compareVersions, type Catalog, type Download, type ManagerId, type PinId, type Platform, type Tool, type ToolName } from "@intellectual-frontiers/toolchain/governance";
 import { meetsIntegrity, pinOfControl, pinRank, type ToolDialect } from "./guarantees.ts";
 

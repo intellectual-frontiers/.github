@@ -1,5 +1,5 @@
 /**
- * The record a setup script keeps of how an account was set up (commons 0002-packaging FR-016): the fields of ~/.config/erga/install.toml (archon kept it in ~/.config/archon/), in the order written, so that the script
+ * The record a setup script keeps of how an account was set up (commons 0002-packaging FR-016): the fields of ~/.config/erga/install.toml (desired-os-state kept it in ~/.config/desired-os-state/), in the order written, so that the script
  * that writes it and the harness that reads it cannot drift.
  *
  * @module

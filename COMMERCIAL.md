@@ -10,7 +10,7 @@ A commercial license is an agreement between Intellectual Frontiers LLC and the 
 - the libraries and programs of this repository the licensee names, at the versions it names or later, for use in the licensee's business;
 - hosting, embedding, distributing and reselling the licensee needs, where the agreement says so;
 - the term, the number of seats, sites or deployments, support and updates, where the agreement says so;
-- what it does not cover: the trademarks (Mizan, Kanon, Archon and the logos) unless the agreement grants a use of them, and the software of others listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), which stays under its own license.
+- what it does not cover: the trademarks (Mizan, Kanon, Desired OS State and the logos) unless the agreement grants a use of them, and the software of others listed in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md), which stays under its own license.
 
 Terms differ by use: the owner may offer terms for managed service providers, for products that embed the software and for internal use in a company, and may decline a use.
 

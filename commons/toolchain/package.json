@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/toolchain",
   "private": true,
   "version": "0.1.6",
-  "description": "Toolchain in the layers of Kanon: which programs a computer needs to do its work, declared once (a pinned version, a pin policy, a scope, the phase that needs it, and the bindings by which each dialect obtains it), resolved to the dialect that carries each out and planned; dialects are packages on the port of Archon.",
+  "description": "Toolchain in the layers of Kanon: which programs a computer needs to do its work, declared once (a pinned version, a pin policy, a scope, the phase that needs it, and the bindings by which each dialect obtains it), resolved to the dialect that carries each out and planned; dialects are packages on the port of Desired OS State.",
   "type": "module",
   "engines": {
     "node": ">=26"
@@ -21,7 +21,7 @@
     "pack": "bun tools/pack.ts"
   },
   "devDependencies": {
-    "@intellectual-frontiers/archon": "link:../archon",
+    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/crypto": "link:../crypto",
     "@intellectual-frontiers/formats": "link:../formats",

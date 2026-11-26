@@ -27,7 +27,7 @@ export const named = (text: string): ReplicaName => {
 
 /** An adopted asset with a made up identity. */
 export function adopted(id: string, kind = "server"): Asset {
-  const made = defineAsset({ id, kind, state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const made = defineAsset({ id, kind, state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(made.kind === "ok", `${id} is an asset`);
   return made.value;
 }
@@ -38,7 +38,7 @@ export function managed(id: string): Asset {
     id,
     kind: "server",
     state: "managed",
-    owners: { provision: "archon", identity: "archon", plan: "archon", converge: "archon", verify: "archon", observe: "archon", update: "archon", access: "archon", backup: "archon", retire: "archon" },
+    owners: { provision: "desired-os-state", identity: "desired-os-state", plan: "desired-os-state", converge: "desired-os-state", verify: "desired-os-state", observe: "desired-os-state", update: "desired-os-state", access: "desired-os-state", backup: "desired-os-state", retire: "desired-os-state" },
   });
   assert(made.kind === "ok", `${id} is an asset`);
   return made.value;

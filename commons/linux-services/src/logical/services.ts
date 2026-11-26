@@ -1,6 +1,6 @@
 // Spec: 0002-linux-services-profiles FR-003, FR-004, FR-005, FR-006
 /**
- * The requirements of Archon that a profile makes, over the kinds it has (package, directory, file, service), and the text of each file. Nothing here runs a program or reads a machine.
+ * The requirements of Desired OS State that a profile makes, over the kinds it has (package, directory, file, service), and the text of each file. Nothing here runs a program or reads a machine.
  *
  * @example
  * ```ts
@@ -12,11 +12,11 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { defineRequirement, type Requirement, type RequirementInput } from "@intellectual-frontiers/archon/governance";
+import { defineRequirement, type Requirement, type RequirementInput } from "@intellectual-frontiers/desired-os-state/governance";
 import { authorizedKeysLine } from "@intellectual-frontiers/headless/ssh-inbound";
 import type { CertificateProfile, MailRelayProfile, McpAccessProfile, PostgresProfile } from "@intellectual-frontiers/linux-services/governance";
 
-const HEADER = "# Rendered by archon from the model of the fleet. Do not edit: change the model.\n";
+const HEADER = "# Rendered by desired-os-state from the model of the fleet. Do not edit: change the model.\n";
 
 /** Where the secrets of the services are put on a machine, by the owner and never in the model. */
 export const SECRET_PATHS = {
@@ -55,7 +55,7 @@ export function postgresRequirements(p: PostgresProfile): Result<readonly Requir
   return build([
     { id: `${base}.package`, summary: `PostgreSQL ${p.version} is installed from the archive.`, why, subject: subjectOf(p.machine), kind: "package", desired: { name: `postgresql-${p.version}` }, change: "additive" },
     { id: `${base}.confd`, summary: `The drop-in folder of the PostgreSQL ${p.version} cluster is there.`, why, subject: subjectOf(p.machine), kind: "directory", desired: { path: dir, mode: "0755", ...OWNED }, change: "additive", dependsOn: [`${base}.package`] },
-    { id: `${base}.config`, summary: `The cluster listens on ${p.listen.join(",")} port ${p.port} and logs connections.`, why, subject: subjectOf(p.machine), kind: "file", desired: { path: `${dir}/50-archon.conf`, content: postgresDropIn(p), mode: "0644", ...OWNED }, change: "mutating", dependsOn: [`${base}.confd`] },
+    { id: `${base}.config`, summary: `The cluster listens on ${p.listen.join(",")} port ${p.port} and logs connections.`, why, subject: subjectOf(p.machine), kind: "file", desired: { path: `${dir}/50-desired-os-state.conf`, content: postgresDropIn(p), mode: "0644", ...OWNED }, change: "mutating", dependsOn: [`${base}.confd`] },
     { id: `${base}.service`, summary: `The cluster ${p.version}/main runs and starts at boot.`, why, subject: subjectOf(p.machine), kind: "service", desired: { name: unit, running: true, enabled: true }, change: "mutating", dependsOn: [`${base}.config`] },
   ]);
 }
@@ -71,7 +71,7 @@ export function mailName(p: MailRelayProfile): string {
 export function mainCf(p: MailRelayProfile): string {
   const [host = "", port = ""] = p.relay.split(":");
   return [
-    "# Rendered by archon from the model of the fleet. Do not edit: change the model.",
+    "# Rendered by desired-os-state from the model of the fleet. Do not edit: change the model.",
     "# A send-only null client: relays this machine's mail to the fleet's relay.",
     "compatibility_level = 3.6",
     `myhostname = ${mailName(p)}`,
@@ -90,8 +90,8 @@ export function mainCf(p: MailRelayProfile): string {
     "smtp_sasl_auth_enable = yes",
     "smtp_sasl_security_options = noanonymous",
     `smtp_sasl_password_maps = texthash:${SECRET_PATHS.mailSasl}`,
-    "smtp_generic_maps = regexp:/etc/postfix/archon-sender.regexp",
-    "recipient_canonical_maps = regexp:/etc/postfix/archon-recipients.regexp",
+    "smtp_generic_maps = regexp:/etc/postfix/desired-os-state-sender.regexp",
+    "recipient_canonical_maps = regexp:/etc/postfix/desired-os-state-recipients.regexp",
     "",
   ].join("\n");
 }
@@ -110,7 +110,7 @@ export function recipientMap(p: MailRelayProfile): string {
 export function mailRelayRequirements(p: MailRelayProfile): Result<readonly Requirement[], readonly string[]> {
   const base = "services.mail-relay";
   const why = ["0002-linux-services-profiles FR-004", "SC-8 transmission confidentiality", "SI-4 system monitoring (the machine can tell its owner)"];
-  const files = [["main", "/etc/postfix/main.cf", mainCf(p)], ["sender", "/etc/postfix/archon-sender.regexp", senderMap(p)], ["recipients", "/etc/postfix/archon-recipients.regexp", recipientMap(p)]] as const;
+  const files = [["main", "/etc/postfix/main.cf", mainCf(p)], ["sender", "/etc/postfix/desired-os-state-sender.regexp", senderMap(p)], ["recipients", "/etc/postfix/desired-os-state-recipients.regexp", recipientMap(p)]] as const;
   return build([
     { id: `${base}.package`, summary: "Postfix is installed from the archive.", why, subject: subjectOf(p.machine), kind: "package", desired: { name: "postfix" }, change: "additive" },
     ...files.map(([part, path, content]) => ({ id: `${base}.${part}`, summary: `${path} makes the machine a send-only client of ${p.relay}.`, why, subject: subjectOf(p.machine), kind: "file", desired: { path, content, mode: "0644", ...OWNED }, change: "mutating", dependsOn: [`${base}.package`] })),
@@ -121,7 +121,7 @@ export function mailRelayRequirements(p: MailRelayProfile): Result<readonly Requ
 /** The `cli.ini` of certbot: the authority, the account's contact, the DNS plugin and where its credentials are. */
 export function certbotCli(p: CertificateProfile): string {
   return [
-    "# Rendered by archon from the model of the fleet. Do not edit: change the model.",
+    "# Rendered by desired-os-state from the model of the fleet. Do not edit: change the model.",
     `server = ${p.directory}`,
     `email = ${p.contact}`,
     "agree-tos = true",
@@ -145,7 +145,7 @@ export function certificateRequirements(p: CertificateProfile): Result<readonly 
   const name = (p.names[0] ?? "").replace(/^\*\./, "");
   const base = `services.certificate-${name.replace(/[^a-z0-9]+/g, "-")}`;
   const why = ["0002-linux-services-profiles FR-005", "SC-12 key establishment", "SC-17 public key infrastructure certificates"];
-  const unit = `archon-cert-${name}.service`;
+  const unit = `desired-os-state-cert-${name}.service`;
   return build([
     { id: `${base}.certbot`, summary: "certbot is installed from the archive.", why, subject: subjectOf(p.machine), kind: "package", desired: { name: "certbot" }, change: "additive" },
     { id: `${base}.plugin`, summary: "certbot's Cloudflare DNS plugin is installed from the archive.", why, subject: subjectOf(p.machine), kind: "package", desired: { name: "python3-certbot-dns-cloudflare" }, change: "additive", dependsOn: [`${base}.certbot`] },
@@ -165,7 +165,7 @@ export function mcpAuthorizedKeys(p: McpAccessProfile): Result<string, readonly 
     if (line.kind === "ok") lines.push(line.value);
     else problems.push(`${key.name}: ${line.error}`);
   }
-  return problems.length > 0 ? err(problems) : ok(`# Rendered by archon from the model of the fleet. Do not edit: change the model.\n${lines.join("\n")}\n`);
+  return problems.length > 0 ? err(problems) : ok(`# Rendered by desired-os-state from the model of the fleet. Do not edit: change the model.\n${lines.join("\n")}\n`);
 }
 
 /** The requirements of a machine that serves a program as a tool server over ssh: the account's `.ssh` folder and its `authorized_keys`, which let in only the keys of the profile and only to that program. */

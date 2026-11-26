@@ -29,7 +29,7 @@ proves(["0004-linux-observe-platform FR-001", "0004-linux-observe-platform FR-00
   assertEquals(familyOf("somearchspin", "arch"), "arch");
   assertEquals(familyOf("elementary", "ubuntu debian"), "debian");
   const unknown = platformOfOsRelease("ID=plan9\nID_LIKE=none\n");
-  assert(unknown.kind === "err" && unknown.error.includes("plan9") && unknown.error.includes("no family Archon knows"));
+  assert(unknown.kind === "err" && unknown.error.includes("plan9") && unknown.error.includes("no family Desired OS State knows"));
   assertEquals(platformOfOsRelease("NAME=x\n").kind, "err");
   assertEquals(osReleaseTable("A='b c'\nB=\"d\"\n#x\nC=e").get("A"), "b c");
   assertEquals([architectureOf("amd64\n"), architectureOf("arm64"), architectureOf("aarch64"), architectureOf("riscv64")], ["x86_64", "aarch64", "aarch64", undefined]);

@@ -20,7 +20,7 @@ flowchart TB
   end
   subgraph programs["Programs and domain libraries"]
     direction LR
-    archon["archon"] ~~~ data["data"] ~~~ grc["grc"] ~~~ libraries["libraries"]
+    desired-os-state["desired-os-state"] ~~~ data["data"] ~~~ grc["grc"] ~~~ libraries["libraries"]
   end
   subgraph patterns["Patterns: one definition, projected"]
     direction LR
@@ -89,14 +89,14 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/workbench`](https://www.npmjs.com/package/@intellectual-frontiers/workbench) | Pattern | The workbench: what a human or an agent needs to do their job with a repository | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/workload`](https://www.npmjs.com/package/@intellectual-frontiers/workload) | Pattern | Workload: units of operated work (not running software) as typed data of a form | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-cli`](commons/anyfs/cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) | layers, extension | L1 | not released (unfinished) |
-| [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon-dialect-ansible`](commons/archon/dialect-ansible) | Program | The dialect of Archon that converges a Linux host with Ansible | layers, extension | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/archon-dialect-native-pinned`](https://www.npmjs.com/package/@intellectual-frontiers/archon-dialect-native-pinned) | Program | The default dialect of tools | layers, extension | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon-dialect-opentofu`](commons/archon/dialect-opentofu) | Program | The dialect of Archon for cloud resources with OpenTofu | layers, extension | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/archon-dns`](commons/archon/dns) | Program | The plugin that gives `archon` its verbs for DNS | layers, extension | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/archon-tool`](commons/archon/tool) | Program | The plugin that gives `archon` its verbs for tools | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/change-control`](commons/change-control) | Program | Change control for a fleet's repository | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/data`](https://www.npmjs.com/package/@intellectual-frontiers/data) | Program | Governance (what a business domain is and what must be true of its data) | layers | L1 | GitHub, npm |
+| [`@intellectual-frontiers/desired-os-state`](https://www.npmjs.com/package/@intellectual-frontiers/desired-os-state) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
+| [`@intellectual-frontiers/desired-os-state-ansible`](commons/desired-os-state/ansible) | Program | The dialect of Desired OS State that converges a Linux host with Ansible | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/desired-os-state-dns`](commons/desired-os-state/dns) | Program | The plugin that gives `desired-os-state` its verbs for DNS | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/desired-os-state-opentofu`](commons/desired-os-state/opentofu) | Program | The dialect of Desired OS State for cloud resources with OpenTofu | layers, extension | L1 | not released (owner-blocked) |
+| [`@intellectual-frontiers/desired-os-state-pinned-downloads`](https://www.npmjs.com/package/@intellectual-frontiers/desired-os-state-pinned-downloads) | Program | The default dialect of tools | layers, extension | L1 | GitHub, npm |
+| [`@intellectual-frontiers/desired-os-state-tool`](commons/desired-os-state/tool) | Program | The plugin that gives `desired-os-state` its verbs for tools | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/docs`](https://www.npmjs.com/package/@intellectual-frontiers/docs) | Program | The generator of a repository's documentation site | - | L1 | GitHub, npm |
 | [`@intellectual-frontiers/estate`](commons/estate) | Program | The assets of an organization (machines, services, accounts) as discovered | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/estate-endpoints`](commons/estate-endpoints) | Program | Finds the endpoints of an estate from what describes or shows them | layers | L1 | not released (owner-blocked) |
@@ -250,6 +250,6 @@ The code is public to read and is licensed by Intellectual Frontiers LLC under t
 - **Needs a commercial license**: any commercial use, hosting, embedding, reselling and building a competing product. Open an issue titled **Commercial license** at <https://github.com/intellectual-frontiers/.github/issues>.
 - **Where to read more**: [`LICENSING.md`](LICENSING.md) (in plain words), [`COMMERCIAL.md`](COMMERCIAL.md) (what a commercial license covers), [`NOTICE`](NOTICE), [`CONTRIBUTING.md`](CONTRIBUTING.md) (contributions are licensed to the LLC under the public and commercial licenses; sign off with `git commit -s`) and [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
-Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Mizan, Kanon and Archon and the logos are not licensed beyond saying what the software is.
+Every library folder carries the same `LICENSE`, and every published package declares the same identifier; `bun commons/libraries/src/license.ts` writes them and `--check` proves them. The names Mizan, Kanon and Desired OS State and the logos are not licensed beyond saying what the software is.
 
 Nothing here claims compliance with any regulation; it records evidence.

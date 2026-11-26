@@ -2,7 +2,7 @@
   "name": "@intellectual-frontiers/linux-observe",
   "private": true,
   "version": "0.1.0",
-  "description": "What a Linux machine is, read with no change: the resources that an Archon requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
+  "description": "What a Linux machine is, read with no change: the resources that an Desired OS State requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
   "type": "module",
   "engines": {
     "node": ">=26"
@@ -20,7 +20,7 @@
     "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
   },
   "devDependencies": {
-    "@intellectual-frontiers/archon": "link:../archon",
+    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
     "@intellectual-frontiers/core": "link:../core",
     "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/lab": "link:../lab",

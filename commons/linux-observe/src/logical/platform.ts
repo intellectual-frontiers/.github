@@ -25,20 +25,20 @@ export function osReleaseTable(text: string): ReadonlyMap<string, string> {
   return table;
 }
 
-/** The architecture `uname -m` says, where Archon knows it (`arm64` is `aarch64`, `amd64` is `x86_64`). */
+/** The architecture `uname -m` says, where Desired OS State knows it (`arm64` is `aarch64`, `amd64` is `x86_64`). */
 export function architectureOf(unameM: string): Architecture | undefined {
   const m = unameM.trim();
   const same = m === "amd64" ? "x86_64" : m === "arm64" ? "aarch64" : m;
   return (ARCHITECTURES as readonly string[]).includes(same) ? (same as Architecture) : undefined;
 }
 
-/** The platform an `os-release` describes, or the reason it is not one Archon knows: an `ID` and an `ID_LIKE` of no known family are named, never guessed. */
+/** The platform an `os-release` describes, or the reason it is not one Desired OS State knows: an `ID` and an `ID_LIKE` of no known family are named, never guessed. */
 export function platformOfOsRelease(text: string, unameM?: string): Result<Observed, string> {
   const t = osReleaseTable(text);
   const id = t.get("ID");
   if (id === undefined || id === "") return err("os-release has no ID");
   const family = familyOf(id, t.get("ID_LIKE") ?? "");
-  if (family === undefined) return err(`${id} is of no family Archon knows (${FAMILIES.join(", ")}); its ID_LIKE is ${t.get("ID_LIKE") ?? "not said"}`);
+  if (family === undefined) return err(`${id} is of no family Desired OS State knows (${FAMILIES.join(", ")}); its ID_LIKE is ${t.get("ID_LIKE") ?? "not said"}`);
   const arch = unameM === undefined ? undefined : architectureOf(unameM);
   return ok({ family, distro: id.toLowerCase(), release: t.get("VERSION_ID") ?? "", ...(arch === undefined ? {} : { arch }) });
 }

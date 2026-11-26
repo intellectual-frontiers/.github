@@ -51,8 +51,8 @@ proves(["0015-trace FR-011"], "a tree read, its findings held against a baseline
 });
 
 proves(["0015-trace FR-011"], "every path is relative and /-separated on every system, Windows included", async () => {
-  assertEquals(posixPath("archon\\core\\x.ts"), "archon/core/x.ts");
-  assertEquals(posixPath("archon/core/x.ts"), "archon/core/x.ts");
+  assertEquals(posixPath("desired-os-state\\core\\x.ts"), "desired-os-state/core/x.ts");
+  assertEquals(posixPath("desired-os-state/core/x.ts"), "desired-os-state/core/x.ts");
   await withTempDir(async (root) => {
     await mkdir(join(root, "src", "a", "b"), { recursive: true });
     await writeTextFile(join(root, "src", "a", "b", "c.ts"), "export {};\n");

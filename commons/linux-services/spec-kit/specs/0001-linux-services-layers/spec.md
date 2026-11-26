@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Archon (packages, files, directories and services), with the secret never in the model. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
+**Input:** The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Desired OS State (packages, files, directories and services), with the secret never in the model. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
 
 ## Requirements
 

@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** What a Linux machine is, read with no change: the resources that an Archon requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
+**Input:** What a Linux machine is, read with no change: the resources that an Desired OS State requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program. It is built to Kanon (commons 0033-kanon): Governance says what it is, Logical is the model it reasons with, and Physical is what touches the world.
 
 ## Requirements
 

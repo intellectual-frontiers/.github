@@ -23,7 +23,7 @@
 
 1. **Given** a name and a summary, **When** `new library --dry-run` runs, **Then** the files are listed and none is written, per FR-001.
 2. **Given** a name and a summary, **When** `new library` runs in a copy of the repository, **Then** the library is there, its `verify` passes and `sync --check` ends with 0, per FR-001 and FR-003.
-3. **Given** `Bad_Name`, `archon-x` and an existing folder, **When** `new library` runs, **Then** each is refused with its code and nothing is written, per FR-002.
+3. **Given** `Bad_Name`, `desired-os-state-x` and an existing folder, **When** `new library` runs, **Then** each is refused with its code and nothing is written, per FR-002.
 4. **Given** a staged file, **When** `commit` runs, **Then** the commit has the identity as author and committer, whatever the checkout's configuration says, per FR-004.
 5. **Given** a subject, an issue and a session address, **When** the message is made, **Then** the trailers are in the order of FR-005, each on its own line.
 6. **Given** a staged `.claude/settings.json`, a `.env` or a file with a private key, **When** `commit` runs, **Then** it is refused and no commit is made, per FR-006.

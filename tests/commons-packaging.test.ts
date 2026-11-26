@@ -183,7 +183,7 @@ proves(["0002-packaging FR-004"], "Generated: a supported family is complete and
     const m = doc(doc(t.managers)[text(f.preferred)]);
     const install = doc(doc(m.commands).install);
     assert("noninteractive" in install, fid);
-    assertEquals(install.origin, "archon", `${fid}: a harness must have run it`);
+    assertEquals(install.origin, "desired-os-state", `${fid}: a harness must have run it`);
     assert("query-installed" in doc(m.commands), fid);
     assert(f.admin_install, fid);
   }
@@ -542,11 +542,11 @@ proves(
   },
 );
 
-// ---- Names: archon is the library of commons (0002-packaging FR-023) ---------------------------------------------------------------------------------------------
+// ---- Names: desired-os-state is the library of commons (0002-packaging FR-023) ---------------------------------------------------------------------------------------------
 
 proves(
   ["0002-packaging FR-023"],
-  "Names: the ontology and its generated files say archon only of commons/archon and of the origin archon",
+  "Names: the ontology and its generated files say desired-os-state only of commons/desired-os-state and of the origin desired-os-state",
   () => {
     const sources = [...files.map((f) => `${ONTOLOGY}/${f.name}.ts`), "ontology/src/supply-chain/downloads.ts"].map((rel) =>
       fs.readTextFileSync(`${COMMONS}/${rel}`),
@@ -554,9 +554,9 @@ proves(
     for (const f of ["packaging.auto.ttl", "packaging.auto.toml", "packaging.auto.sh", "packaging.auto.ts", "pins.auto.env"])
       sources.push(fs.readTextFileSync(`${COMMONS}/generated/${f}`));
     for (const text of sources) {
-      assertNotMatch(text, /archon \(a harness\)|archon's runtime|archon runs|archon starts|archon installs|program archon|Python archon/);
+      assertNotMatch(text, /desired-os-state \(a harness\)|desired-os-state's runtime|desired-os-state runs|desired-os-state starts|desired-os-state installs|program desired-os-state|Python desired-os-state/);
     }
-    assertStringIncludes(fs.readTextFileSync(`${COMMONS}/${ONTOLOGY}/managers.ts`), "`commons/archon` (0034-archon)");
+    assertStringIncludes(fs.readTextFileSync(`${COMMONS}/${ONTOLOGY}/managers.ts`), "`commons/desired-os-state` (0034-desired-os-state)");
   },
 );
 
@@ -774,7 +774,7 @@ proves(["0002-packaging FR-009"], "Generator: --check fails where a generated fi
 proves(["0002-packaging FR-010"], "Generator: it names every rule the ontology breaks and writes nothing", async () => {
   await refused(
     (c) => {
-      c.edit("families.ts", /\s*verifiedOn: "Debian 13 under WSL 2, by archon-bootstrap.sh and archon update, 2026-10-16",/, "");
+      c.edit("families.ts", /\s*verifiedOn: "Debian 13 under WSL 2, by desired-os-state-bootstrap.sh and desired-os-state update, 2026-10-16",/, "");
       c.edit("families.ts", /detectedBy: \[\s*"ubuntu",/, 'detectedBy: ["ubuntu", "fedora",');
       c.edit("families.ts", /\s*removalHint: "sudo userdel -r NAME",/, "");
     },
@@ -964,11 +964,11 @@ proves(["0001-software-supply-chain FR-003"], "Module: the TypeScript module say
   assertEquals(mod.schema, t.schema);
 });
 
-test("Specs: every commons spec is of the commons domain, and cites archon's and erga's by repository", () => {
+test("Specs: every commons spec is of the commons domain, and cites desired-os-state's and erga's by repository", () => {
   for (const d of [...fs.readDirSync(`${COMMONS}/spec-kit/specs`)].filter((e) => e.isDirectory)) {
     const t = fs.readTextFileSync(`${COMMONS}/spec-kit/specs/${d.name}/spec.md`);
     assertStringIncludes(t, "**Domain:** commons", d.name);
-    assert(!/(?<!archon )0136-machine-bootstrap/.test(t), "a spec of archon is not cited by its bare id from here");
+    assert(!/(?<!desired-os-state )0136-machine-bootstrap/.test(t), "a spec of desired-os-state is not cited by its bare id from here");
     assert(!/(?<!erga )009-machine-bootstrap/.test(t), "a spec of erga is not cited by its bare id from here");
   }
 });

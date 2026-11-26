@@ -11,7 +11,7 @@
  *
  * @module
  */
-import { findSecretLike } from "@intellectual-frontiers/archon/governance";
+import { findSecretLike } from "@intellectual-frontiers/desired-os-state/governance";
 import { OSQUERY_TABLES, osqueryRelation, osquerySelect } from "@intellectual-frontiers/estate-query/governance";
 import type { Table, Value } from "@intellectual-frontiers/lang-sql/aide/relational";
 import { err, ok, type Result } from "@intellectual-frontiers/core";

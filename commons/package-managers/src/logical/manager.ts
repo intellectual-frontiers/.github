@@ -13,8 +13,8 @@
  * @module
  */
 import { err, ok, type Result } from "@intellectual-frontiers/core";
-import { GENERATED_MARK } from "@intellectual-frontiers/archon/dialect";
-import type { JsonValue, Requirement } from "@intellectual-frontiers/archon/governance";
+import { GENERATED_MARK } from "@intellectual-frontiers/desired-os-state/dialect";
+import type { JsonValue, Requirement } from "@intellectual-frontiers/desired-os-state/governance";
 import type { ManagerId } from "@intellectual-frontiers/toolchain/governance";
 import type { ToolGuarantees } from "@intellectual-frontiers/toolchain/logical";
 import { commandArgv, type Argv, type Shape } from "./argv.ts";

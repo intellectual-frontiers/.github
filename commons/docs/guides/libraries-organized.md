@@ -4,7 +4,7 @@ Every library of commons is a folder with a manifest, `library.ts`, and the pack
 
 ## Hosts and their extensions
 
-A host is a library whose Kanon table declares plugins or dialects; its extensions are libraries of their own. An extension is in the folder of its host: the plugin `anyfs-s3` of the host `anyfs` is at `commons/anyfs/s3/`, and the dialect `archon-dialect-apt` of `archon` at `commons/archon/dialect-apt/`. The name of the library is still `anyfs-s3`, so no import changes when a folder moves (0027-commons-libraries FR-026, 0036-distribution FR-036).
+A host is a library whose Kanon table declares plugins or dialects; its extensions are libraries of their own. An extension is in the folder of its host: the plugin `anyfs-s3` of the host `anyfs` is at `commons/anyfs/s3/`, and the dialect `desired-os-state-apt` of `desired-os-state` at `commons/desired-os-state/dialect-apt/`. The name of the library is still `anyfs-s3`, so no import changes when a folder moves (0027-commons-libraries FR-026, 0036-distribution FR-036).
 
 - The host keeps its own sources in its own folders (`src/`, `suite/`, `spec-kit/`); the folders of its extensions are not part of it, so a change to an extension does not reach the host.
 - Where a program needs the folder of a library, it asks the one resolver of `commons/libraries` (`libraryDir`), which reads it from where the manifest is.

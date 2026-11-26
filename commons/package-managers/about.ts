@@ -16,8 +16,8 @@ export const about: About = {
   folders: [
     { path: "spec-kit/", what: "The package's own specifications, numbered from 0001.", mayImport: ["nothing: Markdown and TSV"] },
     { path: "src/governance/", what: "Layer 1: the operations, the command of an operation, how a version is written, and the form a name must have.", mayImport: ["core, by package name"] },
-    { path: "src/logical/", what: "Layer 2: the argument vectors, the jobs a tool asks, the plan file, and the reading of a version. Pure.", mayImport: ["governance", "archon and toolchain, by their exports", "core, by package name"] },
-    { path: "src/physical/", what: "Layer 3: the runner and the dialect made from a manager's data.", mayImport: ["governance and logical", "archon and toolchain, by their exports", "core and system, by package name"] },
+    { path: "src/logical/", what: "Layer 2: the argument vectors, the jobs a tool asks, the plan file, and the reading of a version. Pure.", mayImport: ["governance", "desired-os-state and toolchain, by their exports", "core, by package name"] },
+    { path: "src/physical/", what: "Layer 3: the runner and the dialect made from a manager's data.", mayImport: ["governance and logical", "desired-os-state and toolchain, by their exports", "core and system, by package name"] },
     { path: "suite/", what: "The tests: every requirement, with made-up managers that are real programs.", mayImport: ["src/", "the test module of commons' runtime, by package name"] },
     { path: "tools/", what: "The trace check and the packer `bun run verify` runs.", mayImport: ["the kernel, the runtime and the packer of commons, by package name"] },
   ],

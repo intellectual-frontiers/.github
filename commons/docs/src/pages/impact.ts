@@ -129,7 +129,7 @@ export async function impactPage(b: Build): Promise<void> {
       blocks.push({ kind: "heading", level: 2, id: "specifications", text: [text("Specifications changed")] });
       blocks.push({ kind: "list", ordered: false, items: specs.slice(0, 60).map((c) => {
         const id = /\/specs\/([^/]+)\/spec\.md$/.exec(c.path)?.[1] ?? "";
-        return [{ kind: "paragraph" as const, inlines: [id === "" ? code(c.path) : { kind: "link" as const, href: { kind: "page" as const, path: specPage(id) }, children: [text(id)] }, text(c.status === "A" ? " (new)" : "")] }];
+        return [{ kind: "paragraph" as const, inlines: [id === "" || !b.pages.some((p) => p.path === specPage(id)) ? code(id === "" ? c.path : id) : { kind: "link" as const, href: { kind: "page" as const, path: specPage(id) }, children: [text(id)] }, text(c.status === "A" ? " (new)" : "")] }];
       }) });
     }
   }

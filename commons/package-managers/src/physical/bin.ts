@@ -5,8 +5,8 @@
  * is the digest-named file a person reviewed, and never through a shell. Every failure names the tool, the step and the one action that is next.
  *
  * ```sh
- * bun bin.ts check .archon/<digest>/<dialect>/plan.json
- * bun bin.ts apply .archon/<digest>/<dialect>/plan.json
+ * bun bin.ts check .desired-os-state/<digest>/<dialect>/plan.json
+ * bun bin.ts apply .desired-os-state/<digest>/<dialect>/plan.json
  * ```
  *
  * @module

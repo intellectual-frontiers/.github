@@ -7,7 +7,7 @@
  * @example
  * ```ts
  * import { defineAsset } from "./asset.ts";
- * const a = defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+ * const a = defineAsset({ id: "synthetic-server-02", kind: "server", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
  * a.kind; // "ok"
  * ```
  *

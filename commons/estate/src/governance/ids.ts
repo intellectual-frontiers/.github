@@ -18,7 +18,7 @@ import { err, ok, type Brand, type Result } from "@intellectual-frontiers/core";
 export type AssetId = Brand<string, "estate asset id">;
 /** The kind of an asset (`server`, `workstation`, `workshop`, `network-device`, `cloud-account`, `service`): lower case words joined by hyphens. */
 export type AssetKind = Brand<string, "estate asset kind">;
-/** A system that owns a capability of an asset (`archon`): lower case words joined by hyphens. */
+/** A system that owns a capability of an asset (`desired-os-state`): lower case words joined by hyphens. */
 export type SystemId = Brand<string, "estate system id">;
 
 const word = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;

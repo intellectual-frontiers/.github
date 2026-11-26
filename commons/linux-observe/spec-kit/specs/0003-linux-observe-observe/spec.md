@@ -19,7 +19,7 @@
 
 ## Out of scope
 
-- Changing the machine: a dialect of Archon.
+- Changing the machine: a dialect of Desired OS State.
 
 ## Edge cases
 

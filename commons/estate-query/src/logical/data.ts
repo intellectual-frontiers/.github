@@ -10,7 +10,7 @@
  *
  * @module
  */
-import { findSecretLike, type JsonValue } from "@intellectual-frontiers/archon/governance";
+import { findSecretLike, type JsonValue } from "@intellectual-frontiers/desired-os-state/governance";
 import { installOf, serviceByName, SERVICES, type Asset } from "@intellectual-frontiers/estate/governance";
 import { judgePolicy, type AcceptedRisk, type Observation, type PolicyOutcome, type Truth, type Violation } from "@intellectual-frontiers/estate/logical";
 import type { Table, Value } from "@intellectual-frontiers/lang-sql/aide/relational";

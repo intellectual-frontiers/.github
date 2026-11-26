@@ -51,8 +51,8 @@ proves(["0001-toolchain-layers FR-002"], "below may not import above, a unit rea
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/internal";\n`)]), ["layers/private"]);
   assertEquals(rules([at("src/governance/a.ts", `import { x } from "node:fs";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/governance/a.ts", `import { sha256Of } from "@intellectual-frontiers/crypto/sha256";\n`)]), []);
-  assertEquals(rules([at("src/governance/a.ts", `import { findSecretLike } from "@intellectual-frontiers/archon/governance";\n`)]), []);
-  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/archon/logical";\n`)]), ["layers/external"]);
+  assertEquals(rules([at("src/governance/a.ts", `import { findSecretLike } from "@intellectual-frontiers/desired-os-state/governance";\n`)]), []);
+  assertEquals(rules([at("src/governance/a.ts", `import { x } from "@intellectual-frontiers/desired-os-state/logical";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/logical/a.ts", `import { sha256 } from "@intellectual-frontiers/crypto/sha256";\n`)]), ["layers/external"]);
   assertEquals(rules([at("src/governance/a.ts", `import { x } from "${PKG}/ontology";\n`)]), ["layers/above"]);
   assertEquals(rules([at("src/logical/a.ts", `import { x } from "${PKG}/ontology";\n`)]), ["layers/above"]);

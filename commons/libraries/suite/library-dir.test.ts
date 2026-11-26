@@ -44,14 +44,14 @@ proves([`${SPEC} FR-026`], "an extension of a host is found inside the folder of
 });
 
 proves([`${SPEC} FR-026`, "0033-kanon FR-035"], "the folder a manifest derives: under the host for an extension, by name for any other library", () => {
-  const hosts = new Set(["anyfs", "archon"]);
+  const hosts = new Set(["anyfs", "desired-os-state"]);
   const of = (name: string, f?: Record<string, unknown>): string => {
     const r = decodeLibrarySource(manifest({ name, ...f }));
     assert(r.kind === "ok", r.kind === "err" ? r.error : "");
     return derivedDir(r.value, hosts);
   };
   assertEquals(of("anyfs-s3", family("anyfs", "plugin")), "anyfs/s3");
-  assertEquals(of("archon-dialect-ansible", family("archon", "dialect")), "archon/dialect-ansible");
+  assertEquals(of("desired-os-state-ansible", family("desired-os-state", "dialect")), "desired-os-state/ansible");
   assertEquals(of("anyfs", family("anyfs", "host")), "anyfs");
   assertEquals(of("core"), "core");
   assertEquals(of("catalog-soc2"), "catalog-soc2");
@@ -75,14 +75,14 @@ proves([`${SPEC} FR-026`, `${SPEC} FR-011`], "the number a library keeps is read
     "",
     "<!-- libraries:begin -->",
     "",
-    "- **FR-140**: `commons/archon/dialect-ansible` MUST be a library",
+    "- **FR-140**: `commons/desired-os-state/ansible` MUST be a library",
     "- **FR-141**: `commons/core` MUST be a library",
     "",
     "<!-- libraries:end -->",
     "",
   ].join("\n");
   const ids = idsIn(spec);
-  assertEquals(ids.get("archon-dialect-ansible"), "FR-140");
+  assertEquals(ids.get("desired-os-state-ansible"), "FR-140");
   assertEquals(ids.get("core"), "FR-141");
-  assertEquals(ids.has("archon"), false);
+  assertEquals(ids.has("desired-os-state"), false);
 });

@@ -35,7 +35,7 @@ The group is written so that each reader can stop when they have what they need.
 | [One rule through three layers](kanon-worked-example.md) | The real code of Headless, from one fact to three surfaces |
 | [The trace graph and nothing silently dropped](kanon-trace-and-dropped.md) | How a promise is accounted for, with the real matrix |
 | [Imports run one way](kanon-imports.md) | The table, the check and the findings it prints |
-| [Families, hosts and plugins](kanon-families.md) | A tiny core with extensions: AnyFS and Archon |
+| [Families, hosts and plugins](kanon-families.md) | A tiny core with extensions: AnyFS and Desired OS State |
 | [Content and renditions](kanon-content.md) | The same pattern for claims published in several media |
 | [Adopting Kanon in a library](kanon-adopting.md) | A runnable example, step by step |
 | [What consumers gain](kanon-gains.md) | The executive brief and the benefits by reader, with evidence |

@@ -10,7 +10,7 @@ import { checkAttributes, checkLink, defineAsset, defineEstate, kindSpec, KINDS,
 import { assetCodec } from "../src/physical/mod.ts";
 import { bytes } from "./support.ts";
 
-const OWNED = { observe: "archon", verify: "archon" } as const;
+const OWNED = { observe: "desired-os-state", verify: "desired-os-state" } as const;
 const endpoint = (attributes: Record<string, string | number | boolean | readonly string[]>) => defineAsset({ id: "api-public", kind: "endpoint", state: "discovered", owners: {}, attributes });
 
 proves(["0007-estate-kinds FR-001"], "the catalog names the kinds with attributes, each attribute has a type, and the lists of values are not empty", () => {
@@ -77,7 +77,7 @@ proves(["0007-estate-kinds FR-004"], "the services are a catalog by name with a 
 });
 
 proves(["0007-estate-kinds FR-005"], "a document written before the attributes existed decodes with none, an asset with attributes is written and read back with them, and a stored attribute that is not right for its kind is refused", () => {
-  const old = assetCodec.decode(bytes(JSON.stringify({ id: "synthetic-server-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" }, $version: 1 })));
+  const old = assetCodec.decode(bytes(JSON.stringify({ id: "synthetic-server-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" }, $version: 1 })));
   assert(old.kind === "ok" && old.value.value.attributes === undefined, JSON.stringify(old));
   const made = endpoint({ scheme: "https", host: "api.example.test", port: 443 });
   assert(made.kind === "ok");

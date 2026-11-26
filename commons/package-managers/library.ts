@@ -14,7 +14,7 @@ export const library = {
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary:
-    "The shared kit of the dialects that drive a package manager for Archon and Toolchain: the commands of the packaging ontology as argument vectors (no shell), the exact version written as each manager writes it, the jobs a tool asks of a manager, the plan file, the observation of what is installed, and the dialect made from a manager's data.",
+    "The shared kit of the dialects that drive a package manager for Desired OS State and Toolchain: the commands of the packaging ontology as argument vectors (no shell), the exact version written as each manager writes it, the jobs a tool asks of a manager, the plan file, the observation of what is installed, and the dialect made from a manager's data.",
   kanon: {
     package: "@intellectual-frontiers/package-managers",
     units: [
@@ -28,7 +28,7 @@ export const library = {
         layer: "logical",
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
-          { name: "@intellectual-frontiers/archon", subpaths: ["governance", "dialect"] },
+          { name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance", "dialect"] },
           { name: "@intellectual-frontiers/toolchain", subpaths: ["governance", "logical"] },
         ],
       },
@@ -38,7 +38,7 @@ export const library = {
         packages: [
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/system", subpaths: ["proc", "fs", "path"] },
-          { name: "@intellectual-frontiers/archon", subpaths: ["governance", "logical", "dialect"] },
+          { name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance", "logical", "dialect"] },
           { name: "@intellectual-frontiers/toolchain", subpaths: ["logical"] },
           { name: "@intellectual-frontiers/ontology", subpaths: ["supply-chain/commands"] },
         ],

@@ -49,7 +49,7 @@
 
 - Installing Omarchy's own packages into a container, or building Omarchy from its installer.
 - ARM images of Omarchy and Apple Silicon.
-- A pacman dialect for Archon or for `linux-observe`: it is needed only if a later specification manages the packages of a fleet.
+- A pacman dialect for Desired OS State or for `linux-observe`: it is needed only if a later specification manages the packages of a fleet.
 
 ## Edge cases
 

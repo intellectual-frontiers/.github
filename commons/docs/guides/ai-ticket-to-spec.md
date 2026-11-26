@@ -9,7 +9,7 @@ When a ticket or a request describes what someone wants, in their words, and you
 - `AGENTS.md`.
 - The text of the ticket or request, copied whole, with no secret in it.
 - The library or libraries it touches, and the specification nearest to it.
-- Where tracking lives: one parent ticket with a checklist, never a ticket for each task (`commons/spec-kit/specs/0034-archon/spec.md`).
+- Where tracking lives: one parent ticket with a checklist, never a ticket for each task (`commons/spec-kit/specs/0034-desired-os-state/spec.md`).
 
 ## The prompt
 
@@ -19,7 +19,7 @@ Read AGENTS.md. Below is a request. Turn it into a specification for the library
 <paste the request>
 
 1. Say in two sentences what is being asked, and what is not. Quote the words of the request you rely on.
-2. Write the specification the way commons/archon/spec-kit/specs/0004-archon-dialects/spec.md is written: numbered requirements with MUST or MUST NOT that a test can judge, acceptance scenarios and edge cases that cite requirements, assumptions, and open questions.
+2. Write the specification the way commons/desired-os-state/spec-kit/specs/0004-desired-os-state-dialects/spec.md is written: numbered requirements with MUST or MUST NOT that a test can judge, acceptance scenarios and edge cases that cite requirements, assumptions, and open questions.
 3. Where the request is silent or unclear, add an open question marked as open. Do not decide it for me, and do not invent a company fact.
 4. List what is out of scope, and the smallest first slice that could be built and proved.
 5. Do not open a ticket for each task. Give me the checklist lines to add to the one parent ticket.

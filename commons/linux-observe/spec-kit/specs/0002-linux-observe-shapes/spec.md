@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** What a command printed, read in the shape that an Archon requirement declares its resource in, as pure functions.
+**Input:** What a command printed, read in the shape that an Desired OS State requirement declares its resource in, as pure functions.
 
 ## Requirements
 

@@ -220,7 +220,6 @@ function decodeMembers(
   if (dialect.kind === "err") return err(`kanon.family.dialect: ${dialect.error}`);
   const plugin = parseNameTemplate(form.family.plugin);
   if (plugin.kind === "err") return err(`kanon.family.plugin: ${plugin.error}`);
-  if (dialect.value === plugin.value) return err("kanon.family: the dialect and the plugin templates are the same, so a package would be both");
   const contract = form.family.contract;
   if (contract !== undefined && !/^\.\/[A-Za-z0-9_./-]+$/.test(contract))
     return err(`kanon.family.contract: ${JSON.stringify(contract)} is not an export subpath, as ./plugin`);
@@ -262,6 +261,7 @@ function decodeMembers(
     if (nouns.has(noun.value)) return err(`kanon.plugins[${i}].noun ${JSON.stringify(f.noun)} is declared twice`);
     const pkg = memberPackage(family, host, { kind: "plugin", noun: noun.value });
     if (pkg.kind === "err") return err(`kanon.plugins[${i}]: ${pkg.error}`);
+    if (instances.some((x) => x.kind === "package" && x.package === pkg.value)) return err(`kanon.plugins[${i}]: ${pkg.value} is declared as a dialect too, so the package would be both`);
     nouns.set(noun.value, { noun: noun.value, package: pkg.value, deps: f.dependsOn ?? [] });
   }
   const plugins: Plugin[] = [];

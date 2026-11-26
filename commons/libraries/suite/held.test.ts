@@ -36,14 +36,14 @@ const UNFINISHED = decodeHoldOf(UNFINISHED_INPUT);
 const TESTS = decodeHoldOf(TESTS_INPUT);
 
 proves([`${SPEC} FR-024`], "a library with no hold is released; a hold is one of the closed kinds with its text, an unfinished one names what is missing and what lifts it, and any other shape is refused", () => {
-  assertEquals(lib("archon").held, undefined);
+  assertEquals(lib("desired-os-state").held, undefined);
   assertEquals([...HOLD_KINDS], ["tests-only", "unfinished", "owner-blocked"]);
-  assertEquals(lib("archon", { held: OWNER_INPUT }).held, OWNER);
-  assertEquals(lib("archon", { held: UNFINISHED_INPUT }).held, UNFINISHED);
-  assertEquals(lib("archon", { held: TESTS_INPUT }).held, TESTS);
+  assertEquals(lib("desired-os-state", { held: OWNER_INPUT }).held, OWNER);
+  assertEquals(lib("desired-os-state", { held: UNFINISHED_INPUT }).held, UNFINISHED);
+  assertEquals(lib("desired-os-state", { held: TESTS_INPUT }).held, TESTS);
   // the text is one trimmed non-empty line, and the kind is one of the three
   const refused = (held: unknown): string => {
-    const r = decodeLibrarySource(manifest("archon", { held }));
+    const r = decodeLibrarySource(manifest("desired-os-state", { held }));
     assert(r.kind === "err", `${JSON.stringify(held)} is refused`);
     return r.error;
   };
@@ -62,17 +62,17 @@ proves([`${SPEC} FR-024`], "a library with no hold is released; a hold is one of
 });
 
 proves([`${SPEC} FR-024`], "a held library may declare any distribution and is refused with publishes or bundle; without a hold a distribution of no registry is still refused", () => {
-  assertEquals(lib("archon", { held: OWNER_INPUT, distribution: [] }).distribution, []);
-  assertEquals(lib("archon", { held: OWNER_INPUT, distribution: ["npm"] }).distribution, ["npm"]);
-  const both = decodeLibrarySource(manifest("archon", { held: OWNER_INPUT, publishes: "@intellectual-frontiers/other" }));
+  assertEquals(lib("desired-os-state", { held: OWNER_INPUT, distribution: [] }).distribution, []);
+  assertEquals(lib("desired-os-state", { held: OWNER_INPUT, distribution: ["npm"] }).distribution, ["npm"]);
+  const both = decodeLibrarySource(manifest("desired-os-state", { held: OWNER_INPUT, publishes: "@intellectual-frontiers/other" }));
   assert(both.kind === "err");
   assertStringIncludes(both.error, "library.held");
   assertEquals(decodeLibrarySource(manifest("foundation", { held: OWNER_INPUT, bundle: "foundation" })).kind, "err");
-  assertEquals(decodeLibrarySource(manifest("archon", { distribution: [] })).kind, "err");
+  assertEquals(decodeLibrarySource(manifest("desired-os-state", { distribution: [] })).kind, "err");
 });
 
 proves([`${SPEC} FR-024`], "a held library is in no set even where it declares npm, and every hold says itself in one sentence", () => {
-  assertEquals(isConsumerFacing(lib("archon", { held: OWNER_INPUT, distribution: ["github", "npm"] })), false);
+  assertEquals(isConsumerFacing(lib("desired-os-state", { held: OWNER_INPUT, distribution: ["github", "npm"] })), false);
   assertEquals(isConsumerFacing(lib("widget", { distribution: ["github", "npm"] })), true);
   assertEquals(holdSentence(TESTS), "tests only: disposable machines that nothing depends on at run time");
   assertEquals(holdSentence(OWNER), "owner-blocked: the owner publishes the fleet libraries together");
@@ -97,21 +97,21 @@ proves([`${SPEC} FR-024`, `${SPEC} FR-026`], "the plan says for each library tha
     exportsChange: undefined,
   };
   const held = [
-    { name: "archon", hold: OWNER },
+    { name: "desired-os-state", hold: OWNER },
     { name: "lab", hold: TESTS },
   ];
   const planned = planRelease([facts], new Map(), held);
   assert(planned.kind === "ok");
   assertEquals(planned.value.steps.map((s) => s.slug as string), ["widget"]);
-  assertEquals(planned.value.held.map((h) => h.name), ["archon", "lab"]);
+  assertEquals(planned.value.held.map((h) => h.name), ["desired-os-state", "lab"]);
   const lines = planLines({ tty: false, colour: false, emoji: false, columns: 80 }, planned.value);
   assertEquals(lines.filter((l) => l.includes("not released")).length, 2);
-  assert(lines.some((l) => l.includes("archon not released") && l.includes("owner-blocked: the owner publishes the fleet libraries together")));
+  assert(lines.some((l) => l.includes("desired-os-state not released") && l.includes("owner-blocked: the owner publishes the fleet libraries together")));
   assert(lines.some((l) => l.includes("lab not released") && l.includes("tests only:")));
-  const raised = planRelease([facts], new Map([["archon", undefined]]), held);
+  const raised = planRelease([facts], new Map([["desired-os-state", undefined]]), held);
   assert(raised.kind === "err");
-  assertStringIncludes(raised.error, "archon (not released: owner-blocked: the owner publishes the fleet libraries together)");
-  const made = rowOf(lib("archon", { held: OWNER_INPUT }), "A program. More.");
+  assertStringIncludes(raised.error, "desired-os-state (not released: owner-blocked: the owner publishes the fleet libraries together)");
+  const made = rowOf(lib("desired-os-state", { held: OWNER_INPUT }), "A program. More.");
   assert(made.kind === "ok");
   const row = tableOf([made.value]);
   assertStringIncludes(row, "not released (owner-blocked)");

@@ -114,7 +114,7 @@ export const domains = codes(DomainSchema, OTO, {
     definition: en("The technical substrate on which operations run: infrastructure is declarative and inspectable, and identity and access are graph-connected to roles and policies."),
     domainNumber: 4,
     entity: ["Systems", "Services", "Environments", "Assets", "Identities", "Access Controls", "Configurations", "Dependencies"],
-    realizedBy: ["estate", "archon", "toolchain"],
+    realizedBy: ["estate", "desired-os-state", "toolchain"],
   },
   EvidenceAndTelemetry: {
     label: en("Evidence and telemetry as truth anchors"),

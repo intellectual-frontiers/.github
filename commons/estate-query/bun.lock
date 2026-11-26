@@ -5,7 +5,7 @@
     "": {
       "name": "@intellectual-frontiers/estate-query",
       "devDependencies": {
-        "@intellectual-frontiers/archon": "link:../archon",
+        "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
         "@intellectual-frontiers/core": "link:../core",
         "@intellectual-frontiers/estate": "link:../estate",
         "@intellectual-frontiers/grc": "link:../grc",
@@ -22,7 +22,7 @@
     },
   },
   "packages": {
-    "@intellectual-frontiers/archon": ["@intellectual-frontiers/archon@link:../archon", {}],
+    "@intellectual-frontiers/desired-os-state": ["@intellectual-frontiers/desired-os-state@link:../desired-os-state", {}],
 
     "@intellectual-frontiers/core": ["@intellectual-frontiers/core@link:../core", {}],
 

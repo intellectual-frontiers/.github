@@ -29,13 +29,13 @@ const destroying = defineReach({ channels: ["local", "mcp", "rest"], confirmatio
 const said = (name: string) => () => Promise.resolve(outcomeOf({ said: name }, { text: `${name} ran` }));
 
 /** A program with a verb for each way a surface decides, and a plugin that contributed two of them. */
-const archon = (): Program =>
+const fleetProgram = (): Program =>
   programOf({
-    name: "archon",
+    name: "desired-os-state",
     summary: "The fleet.",
     version: "1.0.0",
-    origins: { "server list": "archon-server", "server restart": "archon-server" },
-    catalogue: { "E100-UNREACHABLE": { title: "Unreachable", what: "The host did not answer.", why: "It is down or the network is.", fix: "archon server list", doc: "reach" } },
+    origins: { "server list": "desired-os-state-server", "server restart": "desired-os-state-server" },
+    catalogue: { "E100-UNREACHABLE": { title: "Unreachable", what: "The host did not answer.", why: "It is down or the network is.", fix: "desired-os-state server list", doc: "reach" } },
     children: [
       branch({
         name: "server",
@@ -58,15 +58,15 @@ const ids = (m: LayeredModel, kind: string): readonly string[] => m.elements.fil
 const byId = (m: LayeredModel, id: string): ModelElement => the(m.elements.find((e) => e.id === id), id);
 
 proves(["0015-describe FR-001"], "describe gives one model for each tier of the ladder, lowest first, with the three layers, pure and deterministic, and describeChecked says why where the name is not an id", () => {
-  const p = archon();
+  const p = fleetProgram();
   const models = describe(p);
-  assertEquals(models.map((m) => m.name), ["archon-public", "archon-operator", "archon-administrator"]);
+  assertEquals(models.map((m) => m.name), ["desired-os-state-public", "desired-os-state-operator", "desired-os-state-administrator"]);
   assertEquals(models.map((m) => m.library), ["headless", "headless", "headless"]);
   for (const m of models) {
     assertEquals(m.layers.map((l) => l.id), ["governance", "logical", "physical"]);
     assertEquals(m.instances, []);
   }
-  assertEquals(describe(archon()), models);
+  assertEquals(describe(fleetProgram()), models);
   const checked = describeChecked(p);
   assert(checked.kind === "ok" && checked.value.length === 3);
   const bad = describeChecked(programOf({ name: " odd ", summary: "S.", version: "1.0.0", children: [] }));
@@ -75,59 +75,59 @@ proves(["0015-describe FR-001"], "describe gives one model for each tier of the 
 });
 
 proves(["0015-describe FR-002", "0015-describe FR-003"], "every element has the layer of its kind and an id made by the agreed forms: verbs, commands, tools, routes, options and operands", () => {
-  const m = modelOf(archon(), ADMINISTRATOR);
+  const m = modelOf(fleetProgram(), ADMINISTRATOR);
   for (const e of m.elements) {
     assert((KINDS as readonly string[]).includes(e.kind), `${e.id}: ${e.kind} is a kind`);
     assertEquals(e.layer, layerOf(KINDS.find((k) => k === e.kind) ?? "action"), e.id);
     assert(e.source.file !== "" && e.source.line >= 1, e.id);
   }
   assertEquals(new Set(m.elements.map((e) => e.id)).size, m.elements.length);
-  assertEquals(ids(m, "verb").filter((i) => i.startsWith("headless:archon/server ")), ["headless:archon/server list", "headless:archon/server restart", "headless:archon/server wipe", "headless:archon/server key-set"]);
-  assert(ids(m, "cli-command").includes("cli:archon server list"));
-  assert(ids(m, "mcp-tool").includes("mcp:archon_server_list"));
+  assertEquals(ids(m, "verb").filter((i) => i.startsWith("headless:desired-os-state/server ")), ["headless:desired-os-state/server list", "headless:desired-os-state/server restart", "headless:desired-os-state/server wipe", "headless:desired-os-state/server key-set"]);
+  assert(ids(m, "cli-command").includes("cli:desired-os-state server list"));
+  assert(ids(m, "mcp-tool").includes("mcp:desired_os_state_server_list"));
   assert(ids(m, "rest-route").includes("rest:GET /v1/server/list"));
   assert(ids(m, "rest-route").includes("rest:POST /v1/server/restart"));
-  assert(ids(m, "option").includes("headless:archon/server list#--limit"));
-  assert(ids(m, "option").includes("headless:archon/server wipe#--yes"));
-  assert(ids(m, "operand").includes("headless:archon/server restart#host"));
-  assertEquals(byId(m, "headless:archon/server list#--limit").parent, "headless:archon/server list");
-  assertEquals(byId(m, "headless:archon/server list#--limit").properties["short"], "l");
-  assertEquals(byId(m, "headless:archon/server restart#host").properties["arity"], "one");
-  assertEquals(byId(m, "action:archon/server list").layer, "governance");
-  assertEquals(byId(m, "openapi:archon").kind, "openapi-document");
+  assert(ids(m, "option").includes("headless:desired-os-state/server list#--limit"));
+  assert(ids(m, "option").includes("headless:desired-os-state/server wipe#--yes"));
+  assert(ids(m, "operand").includes("headless:desired-os-state/server restart#host"));
+  assertEquals(byId(m, "headless:desired-os-state/server list#--limit").parent, "headless:desired-os-state/server list");
+  assertEquals(byId(m, "headless:desired-os-state/server list#--limit").properties["short"], "l");
+  assertEquals(byId(m, "headless:desired-os-state/server restart#host").properties["arity"], "one");
+  assertEquals(byId(m, "action:desired-os-state/server list").layer, "governance");
+  assertEquals(byId(m, "openapi:desired-os-state").kind, "openapi-document");
 });
 
 proves(["0015-describe FR-004"], "governance holds the action of each verb with its annotations, the problem codes with their explanation and the exit statuses by name", () => {
-  const m = modelOf(archon(), PUBLIC);
-  const wipe = byId(m, "action:archon/server wipe");
+  const m = modelOf(fleetProgram(), PUBLIC);
+  const wipe = byId(m, "action:desired-os-state/server wipe");
   assertEquals([wipe.properties["kind"], wipe.properties["effect"], wipe.properties["idempotent"], wipe.properties["tier"], wipe.properties["dryRun"]], ["action", "destructive", false, "administrator", true]);
   assertEquals(wipe.properties["reachConfirmation"], "flag");
-  assertEquals(byId(m, "action:archon/bare").properties["reachChannels"], null);
-  assertEquals(byId(m, "action:archon/server key-set").properties["humanOnly"], ["passphrase"]);
-  const code = byId(m, "problem-code:archon/E100-UNREACHABLE");
+  assertEquals(byId(m, "action:desired-os-state/bare").properties["reachChannels"], null);
+  assertEquals(byId(m, "action:desired-os-state/server key-set").properties["humanOnly"], ["passphrase"]);
+  const code = byId(m, "problem-code:desired-os-state/E100-UNREACHABLE");
   assertEquals(code.definition, "Unreachable: The host did not answer.");
-  assertEquals([code.properties["why"], code.properties["fix"], code.properties["doc"]], ["It is down or the network is.", "archon server list", "reach"]);
-  assert(ids(m, "problem-code").includes("problem-code:archon/E000-FAILED"), "the generic codes are there");
-  assertEquals(byId(m, "outcome:archon/usage").properties["status"], 2);
-  assertStringIncludes(byId(m, "outcome:archon/ok").definition, "Status 0");
+  assertEquals([code.properties["why"], code.properties["fix"], code.properties["doc"]], ["It is down or the network is.", "desired-os-state server list", "reach"]);
+  assert(ids(m, "problem-code").includes("problem-code:desired-os-state/E000-FAILED"), "the generic codes are there");
+  assertEquals(byId(m, "outcome:desired-os-state/usage").properties["status"], 2);
+  assertStringIncludes(byId(m, "outcome:desired-os-state/ok").definition, "Status 0");
   assertEquals(ids(m, "outcome").length, 12);
 });
 
 proves(["0015-describe FR-005"], "the logical layer holds the program, the verbs with their options, standard ones included, operands and examples, and the plugin that contributed a verb as its parent", () => {
-  const m = modelOf(archon(), ADMINISTRATOR);
-  const program = byId(m, "headless:archon");
+  const m = modelOf(fleetProgram(), ADMINISTRATOR);
+  const program = byId(m, "headless:desired-os-state");
   assertEquals([program.kind, program.properties["version"], program.properties["tiers"]], ["program", "1.0.0", ["public", "operator", "administrator"]]);
-  const list = byId(m, "headless:archon/server list");
-  assertEquals([list.parent, list.properties["origin"]], ["plugin:archon-server", "archon-server"]);
-  assertEquals(list.properties["examples"], ["archon server list --all  # Every server, retired too."]);
-  assertEquals(byId(m, "headless:archon/login").parent, "headless:archon");
-  assertEquals(byId(m, "plugin:archon-server").properties["verbs"], ["headless:archon/server list", "headless:archon/server restart"]);
-  assertEquals(ids(m, "plugin"), ["plugin:archon-server"]);
-  const standard = ids(m, "option").filter((i) => i.startsWith("headless:archon/server wipe#"));
-  for (const flagName of ["--json", "--quiet", "--dry-run", "--yes"]) assert(standard.includes(`headless:archon/server wipe#${flagName}`), flagName);
-  assertEquals(byId(m, "headless:archon/server wipe#--yes").properties["standard"], true);
-  assertEquals(byId(m, "headless:archon/server key-set#--passphrase").properties["humanOnly"], true);
-  assertEquals(byId(m, "headless:archon/server list#--color").properties["default"], "true");
+  const list = byId(m, "headless:desired-os-state/server list");
+  assertEquals([list.parent, list.properties["origin"]], ["plugin:desired-os-state-server", "desired-os-state-server"]);
+  assertEquals(list.properties["examples"], ["desired-os-state server list --all  # Every server, retired too."]);
+  assertEquals(byId(m, "headless:desired-os-state/login").parent, "headless:desired-os-state");
+  assertEquals(byId(m, "plugin:desired-os-state-server").properties["verbs"], ["headless:desired-os-state/server list", "headless:desired-os-state/server restart"]);
+  assertEquals(ids(m, "plugin"), ["plugin:desired-os-state-server"]);
+  const standard = ids(m, "option").filter((i) => i.startsWith("headless:desired-os-state/server wipe#"));
+  for (const flagName of ["--json", "--quiet", "--dry-run", "--yes"]) assert(standard.includes(`headless:desired-os-state/server wipe#${flagName}`), flagName);
+  assertEquals(byId(m, "headless:desired-os-state/server wipe#--yes").properties["standard"], true);
+  assertEquals(byId(m, "headless:desired-os-state/server key-set#--passphrase").properties["humanOnly"], true);
+  assertEquals(byId(m, "headless:desired-os-state/server list#--color").properties["default"], "true");
 });
 
 proves(["0015-describe FR-006"], "the problems of the model are findings of the element they are about, and nothing is thrown", () => {
@@ -147,7 +147,7 @@ proves(["0015-describe FR-006"], "the problems of the model are findings of the 
   assertEquals(reserved.element, "headless:odd/help one");
   assertStringIncludes(reserved.message, "json");
   assertEquals(the(m.findings.find((f) => f.rule === "model/built-in-word")).element, "headless:odd");
-  assertEquals(archon().children.length > 0 && modelOf(archon(), PUBLIC).findings.filter((f) => f.rule.startsWith("describe/")).length, 0);
+  assertEquals(fleetProgram().children.length > 0 && modelOf(fleetProgram(), PUBLIC).findings.filter((f) => f.rule.startsWith("describe/")).length, 0);
 });
 
 /** The names of the tools and the paths of the routes a model draws. */
@@ -157,7 +157,7 @@ const drawn = (m: LayeredModel) => ({
 });
 
 proves(["0015-describe FR-007"], "the tools of a model are those the tool server serves for the tier and the routes are the paths of the OpenAPI document, drawn by the reach and the audience", () => {
-  const p = archon();
+  const p = fleetProgram();
   for (const tier of p.tiers.ladder) {
     const m = modelOf(p, tier);
     const s = served(p, tier);
@@ -166,18 +166,18 @@ proves(["0015-describe FR-007"], "the tools of a model are those the tool server
     assertEquals([...drawn(m).paths].sort(), [...pathKeys(openApiOf(p, tier))].sort());
   }
   const publicModel = modelOf(p, PUBLIC);
-  assert(!ids(publicModel, "mcp-tool").includes("mcp:archon_login"), "a verb for a person has no tool");
-  assert(!ids(publicModel, "mcp-tool").includes("mcp:archon_version_info"), "a verb of the local channel has no tool");
-  assert(ids(publicModel, "cli-command").includes("cli:archon login"));
-  const tool = byId(publicModel, "mcp:archon_server_list");
+  assert(!ids(publicModel, "mcp-tool").includes("mcp:desired_os_state_login"), "a verb for a person has no tool");
+  assert(!ids(publicModel, "mcp-tool").includes("mcp:desired_os_state_version_info"), "a verb of the local channel has no tool");
+  assert(ids(publicModel, "cli-command").includes("cli:desired-os-state login"));
+  const tool = byId(publicModel, "mcp:desired_os_state_server_list");
   assertEquals([tool.properties["readOnlyHint"], tool.properties["destructiveHint"], tool.properties["inputs"]], [true, false, ["limit", "all", "name"]]);
   const route = byId(publicModel, "rest:GET /v1/server/list");
-  assertEquals([route.parent, route.properties["method"], route.properties["operationId"], route.properties["effect"]], ["openapi:archon", "GET", "archon_server_list", "read"]);
-  assertEquals(byId(publicModel, "openapi:archon").properties["paths"], drawn(publicModel).paths.length);
+  assertEquals([route.parent, route.properties["method"], route.properties["operationId"], route.properties["effect"]], ["openapi:desired-os-state", "GET", "desired_os_state_server_list", "read"]);
+  assertEquals(byId(publicModel, "openapi:desired-os-state").properties["paths"], drawn(publicModel).paths.length);
 });
 
 proves(["0015-describe FR-008", "0015-describe FR-009"], "the trace goes from the action to the verb to each projection, every visible verb traces to a command, and a verb a tier hides is there with no projection and says why", () => {
-  const p = archon();
+  const p = fleetProgram();
   const publicModel = modelOf(p, PUBLIC);
   const admin = modelOf(p, ADMINISTRATOR);
   for (const m of [publicModel, admin]) {
@@ -187,27 +187,27 @@ proves(["0015-describe FR-008", "0015-describe FR-009"], "the trace goes from th
       assertEquals(t.how, "projects to");
     }
     for (const placed of placedCommands(p.children)) {
-      const verb = `headless:archon/${placed.id}`;
-      assertEquals(m.trace.some((t) => t.from === `action:archon/${placed.id}` && t.to === verb), true, verb);
+      const verb = `headless:desired-os-state/${placed.id}`;
+      assertEquals(m.trace.some((t) => t.from === `action:desired-os-state/${placed.id}` && t.to === verb), true, verb);
       const visible = tierGate(p.tiers, placed.facts.tier, m.name.endsWith("public") ? PUBLIC : ADMINISTRATOR).kind === "visible";
-      assertEquals(m.trace.some((t) => t.from === verb && t.to === `cli:archon ${placed.id}`), visible, verb);
+      assertEquals(m.trace.some((t) => t.from === verb && t.to === `cli:desired-os-state ${placed.id}`), visible, verb);
     }
   }
-  assert(admin.trace.some((t) => t.from === "headless:archon/server wipe" && t.to === "mcp:archon_server_wipe"));
-  assert(admin.trace.some((t) => t.from === "headless:archon/server wipe" && t.to === "rest:POST /v1/server/wipe"));
-  const hidden = byId(publicModel, "headless:archon/server wipe");
+  assert(admin.trace.some((t) => t.from === "headless:desired-os-state/server wipe" && t.to === "mcp:desired_os_state_server_wipe"));
+  assert(admin.trace.some((t) => t.from === "headless:desired-os-state/server wipe" && t.to === "rest:POST /v1/server/wipe"));
+  const hidden = byId(publicModel, "headless:desired-os-state/server wipe");
   assertEquals(hidden.properties["projections"], []);
   const why = hidden.properties["notProjected"];
   assert(Array.isArray(why) && why.length === 3 && why.every((w) => w.includes("administrator")), "each surface says why");
   assert(!publicModel.elements.some((e) => e.kind !== "verb" && e.kind !== "action" && e.id.includes("server wipe") && e.layer === "physical"));
-  const tier = the(publicModel.dispositions.find((d) => d.element === "action:archon/server wipe" && d.annotation === "tier"));
+  const tier = the(publicModel.dispositions.find((d) => d.element === "action:desired-os-state/server wipe" && d.annotation === "tier"));
   assert(tier.outcome === "unexpressed");
   assertStringIncludes(tier.reason, "administrator");
-  const shown = the(admin.dispositions.find((d) => d.element === "action:archon/server wipe" && d.annotation === "tier"));
-  assertEquals([shown.outcome, targetOf(shown)], ["expressed", "cli:archon server wipe"]);
-  const login = byId(publicModel, "headless:archon/login").properties["notProjected"];
+  const shown = the(admin.dispositions.find((d) => d.element === "action:desired-os-state/server wipe" && d.annotation === "tier"));
+  assertEquals([shown.outcome, targetOf(shown)], ["expressed", "cli:desired-os-state server wipe"]);
+  const login = byId(publicModel, "headless:desired-os-state/login").properties["notProjected"];
   assert(Array.isArray(login) && login.some((w) => w.startsWith("mcp: ")) && login.some((w) => w.includes("does not name the mcp channel")));
-  const bare = byId(publicModel, "headless:archon/bare").properties["notProjected"];
+  const bare = byId(publicModel, "headless:desired-os-state/bare").properties["notProjected"];
   assert(Array.isArray(bare) && bare.every((w) => w.includes("no reach policy")));
 });
 
@@ -223,28 +223,28 @@ const accounted = (m: LayeredModel): void => {
 };
 
 proves(["0015-describe FR-010"], "every annotation of every action, problem code and exit status ends in a disposition, so that the check of Kanon finds nothing dropped", () => {
-  const p = archon();
+  const p = fleetProgram();
   for (const m of describe(p)) accounted(m);
   const m = modelOf(p, ADMINISTRATOR);
   const of = (element: string, annotation: string) => the(m.dispositions.find((d) => d.element === element && d.annotation === annotation));
-  const dry = of("action:archon/server wipe", "dryRun");
-  assertEquals([dry.outcome, targetOf(dry)], ["expressed", "headless:archon/server wipe#--dry-run"]);
-  const destroy = of("action:archon/server wipe", "effect");
-  assertEquals([destroy.outcome, targetOf(destroy)], ["expressed", "headless:archon/server wipe#--yes"]);
-  const reach = of("action:archon/server list", "reachChannels");
-  assertEquals([reach.outcome, targetOf(reach)], ["expressed", "mcp:archon_server_list"]);
-  assertEquals(of("action:archon/server list", "kind").outcome, "carried");
-  assertEquals(of("action:archon/login", "reachChannels").outcome, "carried");
-  const none = of("action:archon/bare", "reachChannels");
+  const dry = of("action:desired-os-state/server wipe", "dryRun");
+  assertEquals([dry.outcome, targetOf(dry)], ["expressed", "headless:desired-os-state/server wipe#--dry-run"]);
+  const destroy = of("action:desired-os-state/server wipe", "effect");
+  assertEquals([destroy.outcome, targetOf(destroy)], ["expressed", "headless:desired-os-state/server wipe#--yes"]);
+  const reach = of("action:desired-os-state/server list", "reachChannels");
+  assertEquals([reach.outcome, targetOf(reach)], ["expressed", "mcp:desired_os_state_server_list"]);
+  assertEquals(of("action:desired-os-state/server list", "kind").outcome, "carried");
+  assertEquals(of("action:desired-os-state/login", "reachChannels").outcome, "carried");
+  const none = of("action:desired-os-state/bare", "reachChannels");
   assert(none.outcome === "unexpressed" && none.reason.includes("no reach policy"));
-  assertEquals(of("problem-code:archon/E100-UNREACHABLE", "fix").outcome, "unexpressed");
+  assertEquals(of("problem-code:desired-os-state/E100-UNREACHABLE", "fix").outcome, "unexpressed");
 });
 
 proves(["0015-describe FR-011"], "where an element is written is what the caller says, and the name of the program or of the plugin and the line 1 where it says nothing", () => {
-  const p = archon();
+  const p = fleetProgram();
   const m = modelOf(p, PUBLIC);
-  assertEquals(byId(m, "headless:archon/server list").source, { file: "archon-server", line: 1 });
-  assertEquals(byId(m, "headless:archon/login").source, { file: "archon", line: 1 });
+  assertEquals(byId(m, "headless:desired-os-state/server list").source, { file: "desired-os-state-server", line: 1 });
+  assertEquals(byId(m, "headless:desired-os-state/login").source, { file: "desired-os-state", line: 1 });
   const asked: Subject[] = [];
   const located = the(
     describe(p, {
@@ -254,9 +254,9 @@ proves(["0015-describe FR-011"], "where an element is written is what the caller
       },
     })[0],
   );
-  assertEquals(byId(located, "headless:archon/server list").source, { file: "src/server-list.ts", line: 7 });
-  assertEquals(byId(located, "mcp:archon_server_list").source, { file: "src/server-list.ts", line: 7 });
-  assertEquals(byId(located, "headless:archon").source, { file: "archon", line: 1 });
+  assertEquals(byId(located, "headless:desired-os-state/server list").source, { file: "src/server-list.ts", line: 7 });
+  assertEquals(byId(located, "mcp:desired_os_state_server_list").source, { file: "src/server-list.ts", line: 7 });
+  assertEquals(byId(located, "headless:desired-os-state").source, { file: "desired-os-state", line: 1 });
   assert(asked.some((s) => s.kind === "program") && asked.some((s) => s.kind === "problem-code") && asked.some((s) => s.kind === "outcome"));
 });
 

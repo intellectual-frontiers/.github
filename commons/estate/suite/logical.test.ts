@@ -8,7 +8,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { defineAsset, installOf, ownerOf, type Asset } from "../src/governance/mod.ts";
 import { moveCapability, moveState, operationalTruth, unexpectedAssets, type AcceptanceRecord } from "../src/logical/mod.ts";
 
-const ALL = { provision: "fleetctl", identity: "fleetctl", plan: "fleetctl", converge: "fleetctl", verify: "archon", observe: "archon", update: "fleetctl", access: "archon", backup: "fleetctl", retire: "fleetctl" } as const;
+const ALL = { provision: "fleetctl", identity: "fleetctl", plan: "fleetctl", converge: "fleetctl", verify: "desired-os-state", observe: "desired-os-state", update: "fleetctl", access: "desired-os-state", backup: "fleetctl", retire: "fleetctl" } as const;
 
 function asset(state: "discovered" | "adopted" | "managed", owners: Record<string, string>): Asset {
   const a = defineAsset({ id: "synthetic-server-01", kind: "server", state, owners });
@@ -20,11 +20,11 @@ proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adop
   const discovered = asset("discovered", {});
   const none = moveState(discovered, "adopted");
   assert(none.kind === "err" && none.error.length === 2, "observe and verify need an owner");
-  const adopted = moveState(discovered, "adopted", { observe: "archon", verify: "archon" });
-  assert(adopted.kind === "ok" && ownerOf(adopted.value, "observe") === "archon" && ownerOf(adopted.value, "verify") === "archon");
+  const adopted = moveState(discovered, "adopted", { observe: "desired-os-state", verify: "desired-os-state" });
+  assert(adopted.kind === "ok" && ownerOf(adopted.value, "observe") === "desired-os-state" && ownerOf(adopted.value, "verify") === "desired-os-state");
   const released = moveState(adopted.kind === "ok" ? adopted.value : discovered, "discovered");
   assert(released.kind === "ok" && released.value.capabilities.every((c) => !c.offered), "a released asset offers nothing");
-  const paired = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const paired = defineAsset({ id: "synthetic-workstation-01", kind: "workstation", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(paired.kind === "ok");
   const back = moveState(paired.value, "discovered");
   assert(back.kind === "ok" && back.value.origin === "paired", "where it came from is kept");
@@ -42,7 +42,7 @@ proves(["0002-estate-governance FR-003", "0003-estate-logical FR-001"], "an adop
 const HASH = `sha256:${"a".repeat(64)}`;
 
 proves(["0003-estate-logical FR-008"], "an adopted asset is taken over only with an approval and an owner for each capability that is new, keeps where it came from, is then inherited and does not offer provision, and cannot go back", () => {
-  const adopted = defineAsset({ id: "synthetic-workstation-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+  const adopted = defineAsset({ id: "synthetic-workstation-01", kind: "server", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
   assert(adopted.kind === "ok");
   const { provision: _p, ...rest } = ALL;
   const noApproval = moveState(adopted.value, "managed", rest);
@@ -61,25 +61,25 @@ proves(["0003-estate-logical FR-008"], "an adopted asset is taken over only with
 
 proves(["0003-estate-logical FR-002"], "a capability moves to another system only with a passed acceptance test for this asset, this capability and that system", () => {
   const managed = asset("managed", ALL);
-  const record: AcceptanceRecord = { asset: "synthetic-server-01", capability: "converge", system: "archon", test: "synthetic-network-01-AT-06", passedAt: "2026-12-01T10:00:00Z" };
-  const none = moveCapability(managed, "converge", "archon", undefined);
+  const record: AcceptanceRecord = { asset: "synthetic-server-01", capability: "converge", system: "desired-os-state", test: "synthetic-network-01-AT-06", passedAt: "2026-12-01T10:00:00Z" };
+  const none = moveCapability(managed, "converge", "desired-os-state", undefined);
   assert(none.kind === "err" && none.error[0]?.includes("only when its acceptance test has passed") === true);
   for (const wrong of [{ ...record, asset: "other" }, { ...record, capability: "update" as const }, { ...record, system: "someone" }]) {
-    const r = moveCapability(managed, "converge", "archon", wrong);
+    const r = moveCapability(managed, "converge", "desired-os-state", wrong);
     assert(r.kind === "err" && r.error[0]?.includes("acceptance record is for") === true);
   }
-  const moved = moveCapability(managed, "converge", "archon", record);
-  assert(moved.kind === "ok" && ownerOf(moved.value, "converge") === "archon" && ownerOf(moved.value, "update") === "fleetctl");
-  const same = moveCapability(moved.kind === "ok" ? moved.value : managed, "converge", "archon", record);
+  const moved = moveCapability(managed, "converge", "desired-os-state", record);
+  assert(moved.kind === "ok" && ownerOf(moved.value, "converge") === "desired-os-state" && ownerOf(moved.value, "update") === "fleetctl");
+  const same = moveCapability(moved.kind === "ok" ? moved.value : managed, "converge", "desired-os-state", record);
   assert(same.kind === "err" && same.error[0]?.includes("already owned") === true);
-  const adopted = asset("adopted", { observe: "archon", verify: "archon" });
-  const notOffered = moveCapability(adopted, "converge", "archon", record);
+  const adopted = asset("adopted", { observe: "desired-os-state", verify: "desired-os-state" });
+  const notOffered = moveCapability(adopted, "converge", "desired-os-state", record);
   assert(notOffered.kind === "err" && notOffered.error[0]?.includes("not offered") === true);
   assertEquals(moveCapability(managed, "converge", "Not A System", record).kind, "err");
 });
 
 proves(["0003-estate-logical FR-003"], "operational truth tells what differs between declared and observed, how old the observation is, and never says an unobserved asset agrees", () => {
-  const adopted = asset("adopted", { observe: "archon", verify: "archon" });
+  const adopted = asset("adopted", { observe: "desired-os-state", verify: "desired-os-state" });
   const declared = { "pkg.git": { version: "2.43.0" }, "svc.ssh": { enabled: true } };
   const base = { asset: adopted, declared, now: "2026-12-01T12:00:00Z", within: "PT24H" };
   const same = operationalTruth({ ...base, observed: { at: "2026-12-01T11:00:00Z", source: "probe", state: declared } });

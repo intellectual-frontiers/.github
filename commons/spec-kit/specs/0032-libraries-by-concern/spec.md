@@ -11,7 +11,7 @@
 ## The libraries
 
 - **FR-001**: The code of commons MUST be organized by concern: each part of it is a library, a top-level folder `commons/<name>/` that is a package named `@intellectual-frontiers/<name>` in this repository (and in `per-library` mode on a registry, and in `single` mode inside the one package, under that name, 0036-distribution FR-021) and is registered by a manifest (0027-commons-libraries FR-012), and no folder of commons MUST be named for a language or a runtime (`ts`, `js`, `node`, `bun`).
-- **FR-002**: The libraries MUST be those of the table below, in layers: a library of a layer MUST depend only on libraries of the layers below it (FR-003). `docs`, `data`, `repoctl`, `headless`, `kanon` and the libraries of the integrations and of Archon are libraries of their own, each with its own specifications; the table lists those that the others are built on.
+- **FR-002**: The libraries MUST be those of the table below, in layers: a library of a layer MUST depend only on libraries of the layers below it (FR-003). `docs`, `data`, `repoctl`, `headless`, `kanon` and the libraries of the integrations and of Desired OS State are libraries of their own, each with its own specifications; the table lists those that the others are built on.
 
   | Layer | Library | Concern |
   |---|---|---|

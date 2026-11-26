@@ -49,7 +49,7 @@ proves([`${DIST} FR-004`], "a manifest of github alone is read (a private packag
 });
 
 proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in ROLE_OF, commons holds the four, a library held back is in none and a library with no role is a problem", () => {
-  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("repoctl", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("archon-dialect-ansible", { distribution: ["github"] }), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
+  const libs = [lib("core", {}, "0.1.5"), lib("kanon", {}, "0.2.1"), lib("repoctl", {}, "0.4.7"), lib("mizan", {}, "0.1.2"), lib("desired-os-state-ansible", { distribution: ["github"] }), lib("data", { publishes: "@intellectual-frontiers/arcactl" }, "0.9.0")];
   const names = (b: (typeof BUNDLES)[number]): readonly string[] => {
     const m = membersOf(b, libs);
     assert(m.kind === "ok");
@@ -59,8 +59,8 @@ proves([`${DIST} FR-006`, `${SPEC} FR-023`], "the set of a role is the role's in
   assertEquals(names("patterns"), ["kanon"]);
   assertEquals(names("programs"), ["data", "repoctl"], "ordered by package: arcactl, repoctl");
   assertEquals(names("standards"), ["mizan"]);
-  assertEquals(names("commons"), ["data", "core", "kanon", "mizan", "repoctl"], "ordered by package name; archon-dialect-ansible declares github only and is in none");
-  assert(HELD_BACK instanceof Map && !isConsumerFacing(lib("archon-dialect-ansible", { distribution: ["github"] })));
+  assertEquals(names("commons"), ["data", "core", "kanon", "mizan", "repoctl"], "ordered by package name; desired-os-state-ansible declares github only and is in none");
+  assert(HELD_BACK instanceof Map && !isConsumerFacing(lib("desired-os-state-ansible", { distribution: ["github"] })));
   assertEquals(isConsumerFacing(lib("p", { distribution: ["github"] })), false, "a private package is in no set");
   assertEquals(isConsumerFacing(lib("foundation", { bundle: "foundation" })), false);
   const none = membersOf("commons", [lib("brand-new")]);
@@ -205,7 +205,7 @@ proves([`${DIST} FR-008`, `${DIST} FR-015`, `${DIST} FR-009`], "on a real reposi
     put(dir, "data", { publishes: "@intellectual-frontiers/arcactl" });
     put(dir, "foundation", { bundle: "foundation" });
     put(dir, "programs", { bundle: "programs" });
-    put(dir, "archon", { held: "not published yet", distribution: [] });
+    put(dir, "desired-os-state", { held: "not published yet", distribution: [] });
     await g("add", ".");
     await g("commit", "-q", "-m", "Start");
     for (const t of ["core-v0.1.0", "data-v0.1.0", "foundation-v0.1.0", "programs-v0.1.0"]) await g("tag", t);
@@ -215,7 +215,7 @@ proves([`${DIST} FR-008`, `${DIST} FR-015`, `${DIST} FR-009`], "on a real reposi
     const found = await factsOf(dir, offlineRegistry);
     assert(found.kind === "ok", found.kind === "err" ? found.error : "");
     const by = new Map(found.value.map((f) => [f.slug as string, f]));
-    assertEquals(by.has("archon"), false, "a held library is not in the facts of the release");
+    assertEquals(by.has("desired-os-state"), false, "a held library is not in the facts of the release");
     assertEquals(by.get("foundation")?.imports.map(String), ["core"]);
     assertEquals(by.get("programs")?.imports.map(String), ["data"]);
     assertEquals(by.get("data")?.package, "@intellectual-frontiers/arcactl");

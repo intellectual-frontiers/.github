@@ -43,7 +43,7 @@
 
 ## Success criteria
 
-- **SC-001**: Every machine that Archon converges has a platform that is read or declared, and a dialect never carries a package by a program of a family the machine is not.
+- **SC-001**: Every machine that Desired OS State converges has a platform that is read or declared, and a dialect never carries a package by a program of a family the machine is not.
 
 ## Review & acceptance checklist
 

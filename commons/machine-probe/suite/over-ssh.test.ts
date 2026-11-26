@@ -84,7 +84,7 @@ proves(
       });
 
       await t.step("an estate tells it aligned, and drifted when an administrator is added", async () => {
-        const asset = defineAsset({ id: "synthetic-server-03", kind: "server", state: "adopted", origin: "paired", owners: { observe: "archon", verify: "archon" } });
+        const asset = defineAsset({ id: "synthetic-server-03", kind: "server", state: "adopted", origin: "paired", owners: { observe: "desired-os-state", verify: "desired-os-state" } });
         assert(asset.kind === "ok");
         const first = await observe(send);
         assert(first.kind === "ok");

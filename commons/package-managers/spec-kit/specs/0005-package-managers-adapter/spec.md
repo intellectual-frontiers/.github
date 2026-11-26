@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The operating system package managers are one table-driven adapter, keyed by the package manager fact (`apt`, `dnf`, `yum`, `zypper`, `apk`, `pacman`, `brew`, `winget`, `mise`), and no longer one library for each manager (the former `archon-dialect-apt`, `-homebrew`, `-mise` and `-winget`, which differed only in data). A row is the data of a manager; the commands are the ontology's; the steps are `ArgvStep`s of core: words, never a shell string (commons archon 0004-archon-dialects FR-007).
+**Input:** The operating system package managers are one table-driven adapter, keyed by the package manager fact (`apt`, `dnf`, `yum`, `zypper`, `apk`, `pacman`, `brew`, `winget`, `mise`), and no longer one library for each manager (the former `desired-os-state-apt`, `-homebrew`, `-mise` and `-winget`, which differed only in data). A row is the data of a manager; the commands are the ontology's; the steps are `ArgvStep`s of core: words, never a shell string (commons desired-os-state 0004-desired-os-state-dialects FR-007).
 
 ## Requirements
 

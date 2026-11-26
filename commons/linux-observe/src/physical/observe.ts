@@ -13,7 +13,7 @@
  */
 import { err, type Result } from "@intellectual-frontiers/core";
 import type { Family, Observed } from "@intellectual-frontiers/linux-observe/governance";
-import type { JsonValue, Requirement, RequirementId } from "@intellectual-frontiers/archon/governance";
+import type { JsonValue, Requirement, RequirementId } from "@intellectual-frontiers/desired-os-state/governance";
 import { textOf, type Executor } from "@intellectual-frontiers/headless/logical";
 import { platformOfOsRelease, groupShape, keyFileOf, keyShape, pacmanPackageShape, packageShape, pathShape, parseStat, rpmPackageShape, serviceShape, settingFileOf, settingShape, userShape } from "@intellectual-frontiers/linux-observe/logical";
 
@@ -75,7 +75,7 @@ export async function observeRequirements(executor: Executor, requirements: read
   return out;
 }
 
-/** The platform of the machine, read with no change from `/etc/os-release` and `uname -m`, or why it is not one Archon knows. */
+/** The platform of the machine, read with no change from `/etc/os-release` and `uname -m`, or why it is not one Desired OS State knows. */
 export async function observePlatform(executor: Executor, elevate: readonly string[] = []): Promise<Result<Observed, string>> {
   const run = async (argv: readonly string[]): Promise<string | undefined> => {
     const r = await executor.exec([...elevate, ...argv]);

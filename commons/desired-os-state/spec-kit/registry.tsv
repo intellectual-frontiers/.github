@@ -1,0 +1,8 @@
+number	slug	state
+0001	desired-os-state-layers	in force
+0002	desired-os-state-governance	in force
+0003	desired-os-state-logical	in force
+0004	desired-os-state-dialects	in force
+0005	desired-os-state-assembly	in force
+0006	desired-os-state-on-workload	in force
+0007	desired-os-state-observe-osquery	in force

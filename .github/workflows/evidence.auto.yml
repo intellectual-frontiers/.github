@@ -217,7 +217,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        library: [integrations-github, catalog-nist-csf-2, archon-dns, catalog-nist-sp800, integrations-x12, lab]
+        library: [integrations-github, catalog-nist-csf-2, desired-os-state-dns, catalog-nist-sp800, integrations-x12, lab]
     steps:
       - uses: actions/checkout@v4
         continue-on-error: true
