@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { isGenerated } from "@intellectual-frontiers/archon/dialect";
+import { isGenerated, stepFindings } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
 import { buildOrder, planOf } from "@intellectual-frontiers/archon/logical";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
@@ -129,6 +129,7 @@ proves(["0002-opentofu-dialect FR-006"], "the steps are none where nothing chang
   assert(rendered.kind === "ok");
   const steps = d.steps(plan, rendered.value);
   assertEquals(steps.length, 2);
+  for (const step of steps) assertEquals(stepFindings(step), [], "every step is words of core and no shell string (0004-archon-dialects FR-007)");
   const [init, apply] = steps;
   const dir = `.archon/${rendered.value.digest}/opentofu`;
   const work = `/var/lib/archon/state/govcloud/${rendered.value.digest}`;

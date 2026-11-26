@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { executionPlanOf, isGenerated } from "@intellectual-frontiers/archon/dialect";
+import { executionPlanOf, isGenerated, stepFindings } from "@intellectual-frontiers/archon/dialect";
 import { defineRequirement, parseSubjectName, type Requirement } from "@intellectual-frontiers/archon/governance";
 import { buildOrder, planOf, type Observed } from "@intellectual-frontiers/archon/logical";
 import { readMachineSpec } from "@intellectual-frontiers/lab/logical";
@@ -90,6 +90,7 @@ proves(["0002-ansible-dialect FR-005"], "the steps check with the difference and
   assert(rendered.kind === "ok");
   const steps = d.steps(plan, rendered.value);
   assertEquals(steps.length, 1);
+  for (const step of steps) assertEquals(stepFindings(step), [], "every step is words of core and no shell string (0004-archon-dialects FR-007)");
   const s = steps[0]!;
   assertEquals(s.covers.map(String).sort(), REQS.map((r) => String(r.id)).sort());
   assertEquals(s.changedExit, 2);
