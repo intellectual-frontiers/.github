@@ -16,7 +16,7 @@
 import { err, ok, type Result } from "@intellectual-frontiers/core";
 import { pae } from "@intellectual-frontiers/crypto/dsse";
 import { proc } from "@intellectual-frontiers/system";
-import type { SignatureFacts } from "@intellectual-frontiers/grc/logical";
+import { APPROVAL_NAMESPACE, canonicalize, type PersonKeys, REGISTRY_PAYLOAD_TYPE, type SignatureFacts, type SignedDocument } from "@intellectual-frontiers/grc/logical";
 import type { Envelope, SignProblem, Signer } from "@intellectual-frontiers/grc/physical";
 
 /** The namespace of the evidence of grc: a signature made for something else does not verify here. */
@@ -252,3 +252,12 @@ export const approvalVerifier = {
     return r.kind === "ok" ? r : err(r.error.message);
   },
 };
+
+/**
+ * The signature of a version of the registry of the keys of persons by the key of a registry administrator (spec 0020-grc-approval FR-029): the envelope of DSSE with the canonical JSON of the version as its payload, in the namespace `ifc-approval`, which
+ * `registryOfChain` verifies. It signs with `ssh-keygen -Y sign` and reads no private key itself.
+ */
+export async function signRegistry(registry: PersonKeys, key: SignKey): Promise<Result<SignedDocument, string>> {
+  const r = await sshsigSignerFor(APPROVAL_NAMESPACE as Namespace).sign(REGISTRY_PAYLOAD_TYPE, new TextEncoder().encode(canonicalize(registry)), [key]);
+  return r.kind === "ok" ? ok(r.value as SignedDocument) : err(r.error.message);
+}
