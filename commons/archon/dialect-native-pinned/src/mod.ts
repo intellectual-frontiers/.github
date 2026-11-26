@@ -9,5 +9,6 @@ export * from "./dialect.ts";
 export * from "./observe.ts";
 export * from "./pin.ts";
 export * from "./plan-file.ts";
+export * from "./steps.ts";
 export * from "./store.ts";
 export { describeInstallError, programFile, unpackVerified, type InstallError, type InstallSpec, type Os } from "./install.ts";

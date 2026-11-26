@@ -36,3 +36,7 @@ requirement	mechanism	by	note
 0002-native-pinned-install FR-007	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/links.test.ts: a Node release and a Temurin JRE unpack with their links, and each way a link cannot be trusted is refused with its reason
 0002-native-pinned-install FR-008	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/links.test.ts: hard links are copies, execute bits are given, links are copies where the system has none
 0003-native-pinned-store FR-008	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/store.test.ts: an xz-compressed tar with links is installed with its links, its execute bits and its record
+0006-native-pinned-steps FR-001	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/steps.test.ts
+0006-native-pinned-steps FR-002	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/steps.test.ts
+0006-native-pinned-steps FR-003	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/steps.test.ts
+0006-native-pinned-steps FR-004	check	.github: cd commons/archon/dialect-native-pinned && bun run verify	suite/steps.test.ts
