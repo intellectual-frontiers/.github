@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** One command, `archon`, whose verbs come from plugins (`archon-tool`, `archon-server`, `archon-device`, and so on) that are installed separately and assembled by a fleet in a small composition root (commons 0034-archon, commons headless 0009-composition). Archon is the host: it names the program, holds the ladder of tiers, has one verb of its own that says what was assembled, and runs the composed program. Which verbs a caller sees is governance (tier, audience, effect); where a verb runs is reach.
+**Input:** One command, `archon`, whose verbs come from plugins (`archon-tool`, `archon-dns`, and so on) that are installed separately and assembled by a fleet in a small composition root (commons 0034-archon, commons headless 0009-composition). Archon is the host: it names the program, holds the ladder of tiers, has one verb of its own that says what was assembled, and runs the composed program. Which verbs a caller sees is governance (tier, audience, effect); where a verb runs is reach.
 
 ## Requirements
 

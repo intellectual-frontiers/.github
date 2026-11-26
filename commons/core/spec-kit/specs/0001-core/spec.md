@@ -21,6 +21,8 @@
 - **FR-007**: Core MUST depend on nothing, MUST import nothing outside its own files, MUST name no host global, and MUST be published as compiled modules with their declarations as `@intellectual-frontiers/core` (commons 0032-libraries-by-concern FR-005), so that it runs on Bun, on Node 26 and in a browser with no build step.
 - **FR-008**: Core MUST give the types of the facts a library states of itself for its documentation (`About` and the types it is made of: its title, its summary, the specification it implements, its folders with what each may import, its commands, its rules with what enforces each, its areas, layers and facts) as a type-only entry `@intellectual-frontiers/core/about`, which exports no value, so that a library types its `about.ts` by Core and depends on nothing else for it.
 
+- **FR-009**: Core MUST give `ArgvStep`, a step of a command as data: `{ argv: readonly string[], as: "user" | "root", expect: readonly number[], evidence?: ArgvEvidence }`, words only and never a shell string, with a decoder and `argvFindings`, which MUST refuse an empty argument vector, a word with a NUL, an empty program, an empty or out of range `expect`, and a program that is a shell given a command string (`sh`, `bash`, `zsh`, `dash` with `-c`; `cmd` with `/c`; `powershell` or `pwsh` with `-Command`); it MUST be a pure type with no host.
+
 ## Acceptance scenarios
 
 1. **Given** a `switch` over a union that leaves an alternative out, **When** it ends in `absurd`, **Then** it does not compile, per FR-001.

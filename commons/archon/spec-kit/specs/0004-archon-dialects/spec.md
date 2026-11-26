@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A dialect is the package that turns an order into the input of one real tool (Ansible, OpenTofu, Microsoft DSC, cloud-init) and reads what the tool says back. This specification is the port that every dialect implements, in the Physical layer of Archon: what a dialect declares about what it can guarantee, what it renders, the plan of steps it gives the executor of headless, and the matrix that says, for every requirement and every dialect, what is expressed and what is not. A dialect builds no convergence engine: the tool is the engine.
+**Input:** A dialect is the package that turns an order into the input of one real tool (Ansible, OpenTofu, Microsoft DSC) and reads what the tool says back. This specification is the port that every dialect implements, in the Physical layer of Archon: what a dialect declares about what it can guarantee, what it renders, the plan of steps it gives the executor of headless, and the matrix that says, for every requirement and every dialect, what is expressed and what is not. A dialect builds no convergence engine: the tool is the engine.
 
 ## Requirements
 
@@ -15,6 +15,10 @@
 - **FR-004**: `matrixOf` MUST give, for a list of requirements and a list of dialects, one row for each requirement and one cell for each dialect, each cell with the state of each annotation, and `matrixTotals` MUST count the cells by state, so that an unexpressed annotation is a named finding and never a surprise.
 - **FR-005**: `executionPlanOf` MUST make the plan of steps for the executor of headless from the entries of a plan that change something: each step MUST carry the argument vector of an apply and, where the tool has a check mode, the argument vector of a check, a step for a destructive entry MUST be refused where it has no check, and the argument vectors MUST name the digest of the rendered files so that the hash of the plan covers what is rendered.
 - **FR-006**: What a dialect renders MUST be generated: `renderHeader` MUST give the line that says so for a kind of file, `isGenerated` MUST find it, and the digest of a rendered set of files MUST be the SHA-256 of the files in the order of their paths, so that it does not depend on the order they were made.
+- **FR-007**: A step of a dialect MUST be an `ArgvStep` of `@intellectual-frontiers/core` (the words, `as` `user` or `root`, and the exit codes expected), never a shell string; `executionPlanOf` MUST carry the steps as argument vectors and a test MUST find no shell string in the output of any dialect.
+- **FR-008**: The operating system package managers MUST be ONE table-driven adapter keyed by the package manager fact (`apt`, `dnf`, `yum`, `zypper`, `apk`, `pacman`, `brew`, `winget`, `mise`), each row the data of the manager (what it guarantees, how it writes an exact version, the exit code of a missing package, whether it needs the administrator), and the adapter MUST give the steps of a plan as `ArgvStep`s; a manager that is not a key of the table MUST be refused naming the keys.
+- **FR-009**: The dialect of pinned native tools MUST keep in TypeScript only the choice of the pin, the typed fetch step (url, SHA-256 and destination) and the verify step (the hash check), and MUST leave the extraction of an archive to the tools of the operating system as `ArgvStep`s (`tar`, `unzip`, `msiexec`, `installer`).
+- **FR-010**: Archon MUST have no dialect of a first-boot hook (cloud-init, kickstart, preseed) (0006-archon-on-workload FR-012).
 
 ## Acceptance scenarios
 

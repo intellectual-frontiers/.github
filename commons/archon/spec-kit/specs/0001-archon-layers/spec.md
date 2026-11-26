@@ -14,6 +14,7 @@
 - **FR-003**: The package MUST export `.`, `./governance`, `./logical`, `./dialect` and `./cli`, and a dialect package or a plugin of the command MUST reach the library only through them.
 - **FR-004**: `bun run verify` in the folder of the library MUST run the TypeScript 7 compiler, the checks of the specification kit, the check of the level L1, the trace check, the layers check of Kanon, the tests under Bun and the check of the package, and MUST fail on any finding that is not held by a baseline that only shrinks.
 - **FR-005**: The library MUST be released as `archon-v<version>` (commons 0026-works-versioning) with its release record `release.ts`, and MUST be published to the registries its manifest names.
+- **FR-006**: Archon MUST depend on `@intellectual-frontiers/workload` and on `@intellectual-frontiers/core` for what is generic (0006-archon-on-workload FR-001), and a check MUST prove that workload imports nothing of Archon.
 
 ## Acceptance scenarios
 
