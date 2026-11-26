@@ -41,6 +41,7 @@ export const library = {
           { name: "@intellectual-frontiers/system", subpaths: "any" },
           { name: "@intellectual-frontiers/telemetry", subpaths: "any" },
           { name: "node:async_hooks", subpaths: [] },
+          { name: "node:net", subpaths: [] },
           { name: "node:fs", subpaths: [] },
           { name: "node:path", subpaths: [] },
           { name: "node:process", subpaths: [] },
