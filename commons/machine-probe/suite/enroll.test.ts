@@ -8,7 +8,8 @@
 import { readMachineSpec } from "@intellectual-frontiers/lab/logical";
 import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physical";
 import { acceptRisk } from "@intellectual-frontiers/estate/logical";
-import { fs, path } from "@intellectual-frontiers/system";
+import { spawn } from "node:child_process";
+import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { evaluate, judgeObserved, type Observed } from "../src/logical/mod.ts";
 import { enrollProbe, loginExecutor, observe, parseSsh, probeExecutor, probeScript, sendVia, sendViaStdin } from "../src/physical/mod.ts";
@@ -116,6 +117,23 @@ proves(["0007-machine-probe-enroll FR-005", "0007-machine-probe-enroll FR-006"],
     assert(seen.kind === "ok", seen.kind === "err" ? seen.error.message : "");
     assertEquals(seen.value.os.family, "ubuntu");
     assertEquals((await m.executor.exec(["test", "-e", "/home/admin/.local/bin/machine-probe"])).code, 1, "and still nothing is left after asking");
+    // the person's own key in an ssh agent, none named: the same login, with no key file at all
+    const sock = path.join(dir, "agent.sock");
+    const agent = spawn("ssh-agent", ["-D", "-a", sock], { stdio: "ignore" });
+    const sockBefore = process.env["SSH_AUTH_SOCK"];
+    try {
+      for (let n = 0; n < 50 && !(await fs.exists(sock)); n += 1) await new Promise((r) => setTimeout(r, 100));
+      process.env["SSH_AUTH_SOCK"] = sock;
+      assert((await proc.run(["ssh-add", m.identityFile])).success, "the agent holds the person's key");
+      const viaAgent = loginExecutor(done.value.reach, known);
+      assert(viaAgent.kind === "ok");
+      const again = await observe(sendViaStdin(viaAgent.value, await probeScript("posix")));
+      assert(again.kind === "ok", again.kind === "err" ? again.error.message : "");
+    } finally {
+      if (sockBefore === undefined) delete process.env["SSH_AUTH_SOCK"];
+      else process.env["SSH_AUTH_SOCK"] = sockBefore;
+      agent.kill();
+    }
   });
   await m.stop();
 });

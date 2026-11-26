@@ -112,7 +112,7 @@ export async function enrollProbe(ssh: EnrollTarget, o: EnrollOptions): Promise<
 
 /** The way to log in to a machine read in the mode `stdin`: the ssh client with the pinned host keys and the person's own key, a file where one is given and the agent or the default key where none is. */
 export function loginExecutor(reach: ProbeReach, knownHosts: string, identity?: string): Result<Executor, string> {
-  const t = targetOf(reach.credential, reach, reach.credential);
+  const t = targetOf(reach.credential, reach, identity === undefined ? undefined : reach.credential);
   if (t.kind === "err") return t;
   return ok(sshExecutor(t.value, [t.value], { knownHostsRepository: knownHosts, knownHostsUser: knownHosts, ...(identity === undefined ? {} : { identityFor: (n: string) => (n === reach.credential ? identity : undefined) }) }));
 }
