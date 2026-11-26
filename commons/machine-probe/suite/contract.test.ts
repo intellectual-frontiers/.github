@@ -5,6 +5,9 @@
  * @module
  */
 import { spawnSync } from "node:child_process";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { target } from "@intellectual-frontiers/headless/logical";
@@ -109,4 +112,19 @@ proves(["0002-machine-probe-contract FR-006"], "PSScriptAnalyzer finds nothing i
   if (!has(["if (Get-Module -ListAvailable PSScriptAnalyzer) { exit 0 } else { exit 1 }"])) return;
   const r = spawnSync("pwsh", ["-NoProfile", "-Command", `Invoke-ScriptAnalyzer -Path '${file}' | ForEach-Object { $_.RuleName + ' ' + $_.Line }`], { encoding: "utf8" });
   assertEquals(r.stdout.trim(), "");
+});
+
+proves(["0002-machine-probe-contract FR-006"], "the POSIX script run on the machine itself answers an osquery request given as words, as a forced command would give it", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "probe-"));
+  try {
+    const fake = join(dir, "osqueryi");
+    writeFileSync(fake, '#!/bin/sh\nprintf \'[{"echoed":"%s"}]\\n\' "$2"\n');
+    chmodSync(fake, 0o755);
+    const argv = probeCommand("posix", probeScriptPath("posix"), encodeRequest({ kind: "osquery", sql: "SELECT 1" }));
+    const r = await proc.run(["sh", "-c", `PATH=${dir}:$PATH; exec "$@"`, "sh", ...argv], {});
+    assertEquals(r.code, 0, r.stderr);
+    assertEquals(r.stdout.trim(), '[{"echoed":"SELECT 1"}]');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

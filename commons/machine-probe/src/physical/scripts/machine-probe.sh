@@ -6,7 +6,7 @@
 set -u
 LC_ALL=C; export LC_ALL
 PATH="$PATH:/usr/sbin:/sbin:/usr/local/bin:/opt/homebrew/bin"
-req=${SSH_ORIGINAL_COMMAND:-${1:-facts}}
+req=${SSH_ORIGINAL_COMMAND:-${*:-facts}}
 kv() { printf '%s=%s\n' "$1" "$(printf '%s' "$2" | tr '\n' ' ' | sed 's/[[:space:]]*$//')"; }
 has() { command -v "$1" >/dev/null 2>&1; }
 os=$(uname -s 2>/dev/null || echo unknown)

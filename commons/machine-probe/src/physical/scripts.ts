@@ -29,7 +29,7 @@ export function probeScriptPath(kind: ScriptKind): string {
   return path.join(HERE, "scripts", kind === "posix" ? "machine-probe.sh" : "machine-probe.ps1");
 }
 
-/** The command that runs a script on the machine itself: `sh` for the POSIX script, PowerShell 7 (`pwsh`) with no profile and no prompt for the Windows one. The request is the words of the probe, each its own argument, which both scripts join as a forced command would give them. */
+/** The command that runs a script on the machine itself: `sh` for the POSIX script, PowerShell 7 (`pwsh`) with no profile and no prompt for the Windows one. The request is the words of the probe, each its own argument, which both scripts join with a space, as a forced command would give them. */
 export function probeCommand(kind: ScriptKind, scriptPath: string, request: string): readonly string[] {
   const words = request.split(" ").filter((w) => w !== "");
   return kind === "posix" ? ["sh", scriptPath, ...words] : ["pwsh", "-NoProfile", "-NonInteractive", "-File", scriptPath, ...words];
