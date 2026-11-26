@@ -64,7 +64,7 @@ Every problem the static check of a workload finds has one code in a closed cata
 | Code | What happened | Who fixes it | What it says | The fix |
 |---|---|---|---|---|
 | `E-WL-HARNESS-UNSUITABLE` | The dialect cannot carry the workload | person | The dialect chosen lacks something the workload needs, and the run is not moved to another dialect by itself. | choose another dialect for the run, or give {dialect} what it lacks: {lacks} |
-| `E-WL-HARNESS-COMMAND-INVALID` | The command of a projection is not words and a path | agent | The command a harness is told to call a verb with has a character of shell syntax in it (a semicolon, a pipe, a quote, a dollar, a bracket), is empty, has a blank run or is longer than 200 characters, so a rule built from it could allow more than one program. | give the verb command as words and a path only, such as `opsfolio verb` |
+| `E-WL-HARNESS-COMMAND-INVALID` | The command of a projection is not words and a path | agent | The command a harness is told to call a verb with has a character of shell syntax in it (a semicolon, a pipe, a quote, a dollar, a bracket), is empty, has a blank run or is longer than 200 characters, so a rule built from it could allow more than one program. | give the verb command as words and a path only, such as `acme verb` |
 
 ### Judge
 

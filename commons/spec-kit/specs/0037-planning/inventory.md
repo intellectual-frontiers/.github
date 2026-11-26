@@ -34,7 +34,7 @@ The scope of the first version is the existing issue uses (entries 1 to 14). The
 | 19 | The ledger of nonconformances and corrective and preventive actions of Quality (typed events folded: `nonconformance-opened`, `nonconformance-linked`, `capa-opened`, `capa-verified`, and the closing of a nonconformance that the module's header says only follows the closing of its action; the opener is a system or a person; an attestation is by a person or an agent) | A nonconformance with its requirement, evidence and reason, and its action | `id` | a path of states, closed only after its action | Quality System findings: the later phase | Not modeled now |
 | 20 | Risks and exceptions of GRC (`title`, `likelihood`, `impact`, `level`, `treatment`, `owner`, `reviewBy`, `controls`) and the hash-chained journal entries (`seq`, `previous`, `type`, `subject`, `evidence`, `digest`, a day's file `journal/YYYY/MM/DD.jsonl`) | Evidence and a ledger | `digest`, `seq` | as listed | An item cites a journal entry by its file and line, never reads it as an item (OQ-3) | Not modeled |
 | 21 | Findings of an acceptance kit (`FINDINGS.md`: `K1`, `K2`, a weight of blocker, major or minor) | A table of what a tester found | `K<n>` | | A later source of Markdown | Later |
-| 22 | Pen test findings of the Opsfolio line, and Quality System findings | Not present in this repository | | | The later phase | Not modeled |
+| 22 | Pen test findings of a host product, and Quality System findings | Not present in this repository | | | The later phase | Not modeled |
 
 ## C. Entries that were searched and are not issue records
 

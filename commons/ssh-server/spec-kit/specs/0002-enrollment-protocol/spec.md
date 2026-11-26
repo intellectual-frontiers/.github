@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** A device enrolls inbound over `ssh -p 2222 s-enroll@opsfolio COMMAND` against our own server. The commands are a closed registry of typed definitions, the dialogue is a pure state machine, and a person approves unless a policy says otherwise. The server is a host of conversations (FR-016): enrollment is the first.
+**Input:** A device enrolls inbound over `ssh -p 2222 s-enroll@HOST COMMAND` against our own server. The commands are a closed registry of typed definitions, the dialogue is a pure state machine, and a person approves unless a policy says otherwise. The server is a host of conversations (FR-016): enrollment is the first.
 
 ## Requirements
 

@@ -10,20 +10,21 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { OSQUERY_PINS, archOf, defaultPlan, renderBootstrapPs, renderBootstrapSh } from "@intellectual-frontiers/ssh-server/logical";
-import { syntheticFacts } from "./helpers.ts";
+import { TEST_BRAND, TEST_IDENTITY, syntheticFacts } from "./helpers.ts";
 
 const SESSION = { id: "en-abcdefghijklmnop" };
-const ENDPOINT = { host: "opsfolio", port: 2222 };
+const ENDPOINT = TEST_IDENTITY.endpoint;
+const BRAND = TEST_BRAND;
 const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPlaceholderPlaceholderPlaceholderPlace";
-const SH = (): string => renderBootstrapSh(SESSION, OSQUERY_PINS, ENDPOINT, { hostKey: KEY, pairing: { kind: "digits", length: 6 } });
-const PS = (): string => renderBootstrapPs(SESSION, OSQUERY_PINS, ENDPOINT, { hostKey: KEY, pairing: { kind: "digits", length: 6 } });
+const SH = (): string => renderBootstrapSh(SESSION, OSQUERY_PINS, ENDPOINT, { brand: BRAND, hostKey: KEY, pairing: { kind: "digits", length: 6 } });
+const PS = (): string => renderBootstrapPs(SESSION, OSQUERY_PINS, ENDPOINT, { brand: BRAND, hostKey: KEY, pairing: { kind: "digits", length: 6 } });
 const SAMPLES = join(import.meta.dirname ?? ".", "samples");
 const has = (program: string, args: string[]): boolean => spawnSync(program, args, { stdio: "ignore" }).status === 0;
 
 proves(["0004-scripts FR-004"], "a script is deterministic, holds no secret and no real name, and its hash is that of its bytes", () => {
   assertEquals(SH(), SH());
   assertEquals(PS(), PS());
-  assert(SH() !== renderBootstrapSh({ id: "en-bbbbbbbbbbbbbbbb" }, OSQUERY_PINS, ENDPOINT), "the session is in the script");
+  assert(SH() !== renderBootstrapSh({ id: "en-bbbbbbbbbbbbbbbb" }, OSQUERY_PINS, ENDPOINT, { brand: BRAND }), "the session is in the script");
   for (const text of [SH(), PS()]) {
     assert(!/(password|secret|passphrase)\s*=\s*['"][^'"]+['"]/i.test(text), "no secret");
     assert(!/BEGIN [A-Z ]*PRIVATE KEY/.test(text), "no private key");
@@ -46,7 +47,7 @@ proves(["0004-scripts FR-001", "0004-scripts FR-002", "0004-scripts FR-007"], "t
   assert(sh.includes("ssh-keygen -q -t ed25519"), "the key is made on the device");
   assert(sh.includes("/dev/tty"), "consent is asked on the terminal");
   assert(sh.indexOf("ask_consent; then") < sh.indexOf("step_install_package \"$f1\""), "consent comes before the install");
-  assertEquals(SH().includes("opsfolio enroll approve"), true);
+  assertEquals(SH().includes("synth enroll approve"), true);
   const ps = PS();
   assert(ps.startsWith("#Requires -Version 7.0"));
   assert(ps.includes("Set-StrictMode -Version Latest") && ps.includes("$ErrorActionPreference = 'Stop'"));
@@ -67,7 +68,7 @@ proves(["0004-scripts FR-005"], "the scripts are what the committed samples are 
 proves(["0004-scripts FR-006"], "shellcheck and PSScriptAnalyzer find nothing in the scripts, and the shell and PowerShell parse them", () => {
   const dir = mkdtempSync(join(tmpdir(), "ssh-server-scripts-"));
   try {
-    const variants: [string, string][] = [["a.sh", SH()], ["b.sh", renderBootstrapSh(SESSION, OSQUERY_PINS, ENDPOINT, { pairing: { kind: "letters", length: 4 } })]];
+    const variants: [string, string][] = [["a.sh", SH()], ["b.sh", renderBootstrapSh(SESSION, OSQUERY_PINS, ENDPOINT, { brand: BRAND, pairing: { kind: "letters", length: 4 } })]];
     for (const [name, text] of variants) {
       writeFileSync(join(dir, name), text);
       assertEquals(spawnSync("sh", ["-n", join(dir, name)]).status, 0, `${name} parses`);
@@ -76,7 +77,7 @@ proves(["0004-scripts FR-006"], "shellcheck and PSScriptAnalyzer find nothing in
         assertEquals(r.status, 0, r.stdout);
       }
     }
-    const ps = [["a.ps1", PS()], ["b.ps1", renderBootstrapPs(SESSION, OSQUERY_PINS, ENDPOINT, { pairing: { kind: "letters", length: 4 } })]] as const;
+    const ps = [["a.ps1", PS()], ["b.ps1", renderBootstrapPs(SESSION, OSQUERY_PINS, ENDPOINT, { brand: BRAND, pairing: { kind: "letters", length: 4 } })]] as const;
     if (has("pwsh", ["-NoProfile", "-Command", "exit 0"])) {
       for (const [name, text] of ps) {
         writeFileSync(join(dir, name), text);

@@ -25,13 +25,13 @@ function withoutValue(cookie: string): string {
   return [`${(pair ?? "").split("=")[0]}=`, ...attrs].join(";");
 }
 
-/** One HEAD request to `url`, over TLS where the address is https. */
-export async function probeEndpoint(url: string, timeoutMs: number): Promise<Probed> {
+/** One HEAD request to `url`, over TLS where the address is https, as the user agent given (a product gives its own). */
+export async function probeEndpoint(url: string, timeoutMs: number, userAgent = "ifc-tls-check"): Promise<Probed> {
   const u = new URL(url);
   const tls = u.protocol === "https:";
   const port = u.port === "" ? (tls ? 443 : 80) : Number(u.port);
   return await new Promise<Probed>((resolve, reject) => {
-    const options = { method: "HEAD", host: u.hostname, port, path: `${u.pathname}`, timeout: timeoutMs, headers: { "user-agent": "opsfolio-tls-check", accept: "*/*", connection: "close" }, ...(tls ? { rejectUnauthorized: false, servername: u.hostname } : {}) };
+    const options = { method: "HEAD", host: u.hostname, port, path: `${u.pathname}`, timeout: timeoutMs, headers: { "user-agent": userAgent, accept: "*/*", connection: "close" }, ...(tls ? { rejectUnauthorized: false, servername: u.hostname } : {}) };
     const req = (tls ? httpsRequest : httpRequest)(options, (res) => {
       const headers: Record<string, string> = {};
       for (const [k, v] of Object.entries(res.headers)) if (k !== "set-cookie" && v !== undefined) headers[k] = Array.isArray(v) ? v.join(", ") : v;

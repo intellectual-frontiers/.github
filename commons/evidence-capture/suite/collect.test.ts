@@ -50,7 +50,7 @@ async function withRig<T>(f: (r: Rig) => Promise<T>): Promise<T> {
       store,
       states,
       async run(now, policy = policyOf(), more = {}) {
-        const r = await collect({ store, policy, assets: more.assets ?? [{ id: "synthetic-server-03", state: "managed" }], observe, now, runtime: path.join(dir, ".git", "opsfolio-evidence"), ...(more.only === undefined ? {} : { only: more.only }), ...(more.limits === undefined ? {} : { limits: more.limits }) });
+        const r = await collect({ store, policy, assets: more.assets ?? [{ id: "synthetic-server-03", state: "managed" }], observe, now, runtime: path.join(dir, ".git", "evidence-capture"), ...(more.only === undefined ? {} : { only: more.only }), ...(more.limits === undefined ? {} : { limits: more.limits }) });
         assert(r.kind === "ok", r.kind === "err" ? r.error : "");
         return r.value;
       },
@@ -72,7 +72,7 @@ proves(["0003-evidence-capture-collect FR-001", "0003-evidence-capture-collect F
       assertEquals([run.assets[0]?.outcome, run.assets[0]?.journaled, run.commit, run.pending], ["unchanged", true, undefined, i + 1], "no state commit, the entry waits");
     }
     assertEquals(await count(r.dir), 1, "nothing was committed while nothing changed and the batch was not due");
-    const pendingFile = await fs.readTextFile(path.join(r.dir, ".git", "opsfolio-evidence", "pending.jsonl"));
+    const pendingFile = await fs.readTextFile(path.join(r.dir, ".git", "evidence-capture", "pending.jsonl"));
     assertEquals(pendingFile.split("\n").filter((l) => l !== "").length, 3, "the waiting entries are in a file of the run's own");
     const batch = await r.run("2026-12-01T11:00:00Z");
     assert(batch.commit !== undefined && batch.pending === 0, "the batch interval of an hour has run");
@@ -145,7 +145,7 @@ proves(["0003-evidence-capture-collect FR-004"], "only the assets that are due a
       running -= 1;
       return { kind: "ok", value: { stateText: "{}\n" } };
     };
-    const done = await collect({ store: r.store, policy: policyOf(), assets: many, observe, now: "2026-12-02T10:00:00Z", runtime: path.join(r.dir, ".git", "opsfolio-evidence"), limits: { concurrency: 2, perHostTimeoutMs: 1000 } });
+    const done = await collect({ store: r.store, policy: policyOf(), assets: many, observe, now: "2026-12-02T10:00:00Z", runtime: path.join(r.dir, ".git", "evidence-capture"), limits: { concurrency: 2, perHostTimeoutMs: 1000 } });
     assert(done.kind === "ok");
     assertEquals(most, 2);
   });
@@ -153,7 +153,7 @@ proves(["0003-evidence-capture-collect FR-004"], "only the assets that are due a
 
 proves(["0003-evidence-capture-collect FR-005"], "a run does not wait for the lock: it ends with an error that says so and changes nothing", async () => {
   await withRig(async (r) => {
-    const runtime = path.join(r.dir, ".git", "opsfolio-evidence");
+    const runtime = path.join(r.dir, ".git", "evidence-capture");
     await fs.mkdir(runtime, { recursive: true });
     const held = await acquireLock(path.join(runtime, "lock"), { wait: false, command: "another run" });
     assert(held !== undefined);
@@ -219,7 +219,7 @@ proves(["0003-evidence-capture-collect FR-007"], "the journal is read back in or
   await withRig(async (r) => {
     await r.run("2026-12-01T10:00:00Z");
     await r.run("2026-12-01T10:15:00Z");
-    const waiting = await fs.readTextFile(path.join(r.dir, ".git", "opsfolio-evidence", "pending.jsonl"));
+    const waiting = await fs.readTextFile(path.join(r.dir, ".git", "evidence-capture", "pending.jsonl"));
     assertEquals(waiting.split("\n").filter((l) => l !== "").length, 1);
     const later = await r.run("2026-12-01T11:00:00Z");
     assert(later.commit !== undefined, "a later run commits what waited");

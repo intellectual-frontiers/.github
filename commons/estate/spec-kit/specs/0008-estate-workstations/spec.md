@@ -31,7 +31,7 @@
 ## Invariants
 
 - **FR-013**: A workshop whose `role` is `agent-workspace` MUST state `agents-policy`, the digest of the typed `agents` policy that bounds what its harnesses may do; the estate MUST report a violation where it does not. This is the invariant `NoAuthorityWithoutScope` of the Operational Truth Ontology ("every authority has a scope", commons ontology 0002-oto FR-003) that an estate lists today as `not checked`: the estate checks it for the kind `workshop` and no other: the typed `agents` policy of a harness IS an authority, and its digest its scope (decided 2026-11-22, OQ-5). A workshop that states `harnesses` and no `agents-policy` is a violation as well; a workstation states no `agents-policy`, and the client harnesses it holds are no authority of the estate.
-- **FR-014**: A persistent agent workspace (a workshop with `disposability: persistent` and `role: agent-workspace`; the invariant is `PersistentWorkshopApproved`) MUST have an explicit approval record to be `managed` and to hold `harnesses`; the record is the one of FR-012, kept as the opsfolio records of approvals are (`fleets/<fleet>/records/`), and a disposable workshop MUST NOT need one.
+- **FR-014**: A persistent agent workspace (a workshop with `disposability: persistent` and `role: agent-workspace`; the invariant is `PersistentWorkshopApproved`) MUST have an explicit approval record to be `managed` and to hold `harnesses`; the record is the one of FR-012, kept as the records of approvals of the host product are (`fleets/<fleet>/records/`), and a disposable workshop MUST NOT need one.
 - **FR-015**: A workshop MUST hold no ambient secret: its observation (FR-018) lists the **names** of the variables in the environment of the harness's account that look like secrets, and one is a violation of a policy (FR-017) and never an invariant of OTO; the value of a variable MUST NOT be observed, and an observation that carries one where a name belongs MUST be a violation (`NoSecretValuesObserved`).
 - **FR-016**: A workshop whose role is `agent-workspace` MUST be observed within its freshness window (0003-estate-logical FR-003, `operationalTruth`): the capture policy (0004-estate-capture) gives an adopted asset one day and a managed one 15 minutes by default, and a day is too long for a machine on which an agent is acting, so the policy has a cadence by `role` (`perRole`, beside `perAsset`, an additive field; the cadence of an asset is its own, then that of its role, then that of its state), `PT15M` for such a workshop whether adopted or managed, and a journal for disposable assets (`journal.disposable`) of granularity `changes-and-heartbeat`, which `journalOf` gives an asset that states `disposability: disposable`, to limit what is kept (`WORKSHOP_CAPTURE` is the policy of this paragraph); the longest window stays seven days (`LONGEST_WINDOW_MS`). Such a workshop that was never observed, or not within its window, MUST be a violation (`WorkshopObserved`) where the estate is checked with the instant and the policy.
 
@@ -50,23 +50,23 @@
 - **FR-018**: The probe MUST gain a section `@agent` with the facts of FR-017: `harnesses` (the harnesses found, from `mise` and the `PATH`, never by running a `mise` shim, which in Omarchy 4.5.0 starts an install over the network), `ambient-secret-names`, `uid`, and `virt` (what `systemd-detect-virt` says, or `none`); the probe's script, `parseProbe` and the pack are machine-probe's and are specified and proved there (machine-probe 0008-machine-probe-agent-workspace; that specification says what ran on a real machine and what did not), and the facts are: they are the facts that the real Omarchy 4.5.0 image could give and that were **not** probed.
 - **FR-019**: The probe's `supportedOs` MUST be told that a family which says `(arch)` is Arch (rolling), because it reads `os.family.split(" ")[0]` and `omarchy (arch)` would give `omarchy`, which it does not know, so that `supported-os` of an Omarchy machine was `unknown` and is now `pass`; it is fixed in machine-probe (machine-probe 0008-machine-probe-agent-workspace FR-004).
 
-## Declaring one: the fleet and Opsfolio
+## Declaring one: the fleet and the host product
 
-- **FR-020**: A tenant MUST declare a workshop as it declares any machine, a host file `fleets/<fleet>/hosts/<id>.ts` that exports `{ kind: "workshop", state, origin, owners, attributes }` (the form `opsfolio` reads: `kind`, `state`, `origin`, `owners`, `attributes`, `accepted`, `declared`), for example:
+- **FR-020**: A tenant MUST declare a workshop as it declares any machine, a host file `fleets/<fleet>/hosts/<id>.ts` that exports `{ kind: "workshop", state, origin, owners, attributes }` (the form the host product reads: `kind`, `state`, `origin`, `owners`, `attributes`, `accepted`, `declared`), for example:
 
   ```ts
   export const agentbox = {
     kind: "workshop",
     state: "adopted",
     origin: "paired",
-    owners: { observe: "opsfolio", verify: "opsfolio" },
+    owners: { observe: "synth", verify: "synth" },
     attributes: { role: "agent-workspace", disposability: "disposable", isolation: "vm", "os-family": "arch", distro: "arch", omarchy: true, harnesses: ["claude-code", "codex", "herdr"], "agents-policy": "sha256:0000000000000000000000000000000000000000000000000000000000000000" },
   };
   ```
 
-  and the commands MUST work for it as they do for a server: `opsfolio asset enroll` (the SSH reach and the host key compared, with the restricted key of the probe), `opsfolio asset observe` (the probe, which now says `@agent`), `opsfolio asset adopt` for a discovered device (FR-008; wiring it is erga's, after the next release of commons), and `opsfolio asset manage` (the approval by the hash of the change to the host file). The digest in the example is not a real policy's.
+  and the commands MUST work for it as they do for a server: `asset enroll` of the host product (the SSH reach and the host key compared, with the restricted key of the probe), `asset observe` of the host product (the probe, which now says `@agent`), `asset adopt` of the host product for a discovered device (FR-008; wiring it is erga's, after the next release of commons), and `asset manage` of the host product (the approval by the hash of the change to the host file). The digest in the example is not a real policy's.
 - **FR-021**: An asset MUST have one owner for each capability (0002-estate-governance FR-004): where the owner of a workshop's `converge` is a system the caller names, no other system MAY also own it, and the estate MUST hold no view on which system that is or on how the workshop was set up (OQ-6).
-- **FR-022**: Every observation of a workshop MUST name its source (the invariant `NoEvidenceWithoutAttribution` already checked, 0003-estate-logical FR-007), `opsfolio probe` or the name and version of the program that wrote it; and an observation that a machine writes about itself is the evidence of an asset of origin `self`.
+- **FR-022**: Every observation of a workshop MUST name its source (the invariant `NoEvidenceWithoutAttribution` already checked, 0003-estate-logical FR-007), `the probe` or the name and version of the program that wrote it; and an observation that a machine writes about itself is the evidence of an asset of origin `self`.
 
 ## Acceptance scenarios
 
@@ -91,11 +91,11 @@
 | The probe reads `ID` and `ID_LIKE` | `machine-probe.sh` | read; `supportedOs` and `omarchy (arch)` (FR-019) found, not run |
 | Policies are functions | `machine-probe/src/logical/policies.ts` | read; the data form is new (FR-017) |
 | The facts of `@agent` | machine-probe 0008-machine-probe-agent-workspace | script and parser written and proved against recorded output; that specification says what ran on a real machine |
-| How `opsfolio asset` handles the kind `workshop` | the host-file form read in erga's `opsfolio` | read in part: `adopt` as another kind is not supported (FR-008) |
+| How the host product handles the kind `workshop` | the host-file form read by the host product | read in part: `adopt` as another kind is not supported (FR-008) |
 
 ## Out of scope
 
-- Any change to erga's `opsfolio` commands, and the ontology.
+- Any change to the commands of the host product, and the ontology.
 - Sessions as assets (FR-004), a harness's accounts or models, and the management of an operator's workstation.
 
 ## Edge cases

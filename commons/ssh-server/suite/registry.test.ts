@@ -6,16 +6,17 @@
 import { createHash } from "node:crypto";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { err, ok } from "@intellectual-frontiers/core";
-import { DEFAULT_SERVER_POLICY, wordsOf } from "../src/governance/mod.ts";
+import { serverPolicy, wordsOf } from "../src/governance/mod.ts";
 import type { SessionId } from "../src/governance/mod.ts";
 import { BUILTIN, CONVERSATIONS, builtinRegistry, commandOf, defineCommand, makeRegistry, runCommand } from "../src/logical/mod.ts";
 import type { CommandContext } from "../src/logical/mod.ts";
 import { seeded } from "./governance.test.ts";
+import { TEST_IDENTITY } from "./helpers.ts";
 
 const registry = builtinRegistry();
 const ctx = (over: Partial<CommandContext> = {}): CommandContext => ({
   now: 1000,
-  policy: DEFAULT_SERVER_POLICY,
+  policy: serverPolicy(TEST_IDENTITY),
   enroll: { rules: [] },
   registry,
   pins: [],

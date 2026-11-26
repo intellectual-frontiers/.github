@@ -30,7 +30,7 @@ function startScript(f: Fixture, script: string, env: Record<string, string> = {
   const child = spawn("sh", [], {
     stdio: ["pipe", "pipe", "pipe"],
     detached,
-    env: { ...process.env, OPSFOLIO_HOST: "127.0.0.1", OPSFOLIO_PORT: String(f.port), OPSFOLIO_SSH_OPTS: "-F none -o LogLevel=ERROR", OPSFOLIO_POLL: "1", OPSFOLIO_WAIT_MAX: "30", OPSFOLIO_DIR: dir, ...env },
+    env: { ...process.env, SYNTH_HOST: "127.0.0.1", SYNTH_PORT: String(f.port), SYNTH_SSH_OPTS: "-F none -o LogLevel=ERROR", SYNTH_POLL: "1", SYNTH_WAIT_MAX: "30", SYNTH_DIR: dir, ...env },
   });
   child.stdout.on("data", (d: Buffer) => (stdout += d.toString()));
   child.stderr.on("data", (d: Buffer) => (stderr += d.toString()));
@@ -82,7 +82,7 @@ proves(["0004-scripts FR-003", "0004-scripts FR-007", "0002-enrollment-protocol 
   const f = await fixture();
   try {
     const script = await bootstrap(f);
-    const r = await runWithPerson(f, script, echoPlan, { OPSFOLIO_CONSENT: "yes" });
+    const r = await runWithPerson(f, script, echoPlan, { SYNTH_CONSENT: "yes" });
     assertEquals(r.code, 0, r.stdout + r.stderr);
     assert(r.stdout.includes("This script will:"), "it says what it will do first");
     assert(r.stdout.includes("step 0: run"), r.stdout);
@@ -110,7 +110,7 @@ proves(["0002-enrollment-protocol FR-008"], "a person refuses: the script ends a
   const f = await fixture();
   try {
     const script = await bootstrap(f);
-    const dev = startScript(f, script, { OPSFOLIO_CONSENT: "yes" });
+    const dev = startScript(f, script, { SYNTH_CONSENT: "yes" });
     await dev.code();
     assertEquals((await refuse(f.store, await waitForSession(f.store), "synthetic-person-01", "not ours")).kind, "ok");
     const r = await dev.done;
@@ -148,7 +148,7 @@ proves(["0004-scripts FR-007"], "a download whose SHA-256 is wrong stops the ins
     for (const [sha, want] of [["0".repeat(64), "does not match the plan"], [good, "sha256 verified"]] as const) {
       const script = await bootstrap(f);
       const plan: InstallPlan = { steps: [{ kind: "install-package", osFamily: "linux", name: "synthetic-package", version: "1.0", url, sha256: sha, installer: "deb" }] };
-      const r = await runWithPerson(f, script, plan, { OPSFOLIO_CONSENT: "yes", CURL_CA_BUNDLE: crt, SSL_CERT_FILE: crt });
+      const r = await runWithPerson(f, script, plan, { SYNTH_CONSENT: "yes", CURL_CA_BUNDLE: crt, SSL_CERT_FILE: crt });
       assert((r.stdout + r.stderr).includes(want), `${want}: ${r.stdout}${r.stderr}`);
       assertEquals((await f.store.listSessions()).find((s) => s.plan?.steps[0]?.kind === "install-package" && s.state === "approved") !== undefined || sha === good, true);
     }
@@ -165,7 +165,7 @@ proves(["0005-enrollment-policy FR-001", "0005-enrollment-policy FR-002", "0002-
   try {
     const tok = await issueToken(f.store, { tenant: "synthetic-tenant-01", fleet: "synthetic-fleet-01", labels: ["lab"] }, 60_000);
     const script = await bootstrap(f, [`token=${tok.secret}`]);
-    const r = await startScript(f, script, { OPSFOLIO_CONSENT: "yes" }).done;
+    const r = await startScript(f, script, { SYNTH_CONSENT: "yes" }).done;
     assertEquals(r.code, 0, r.stdout + r.stderr);
     assert(r.stdout.includes("synthetic-step-ran"));
     const s = (await f.store.listSessions())[0];
@@ -176,7 +176,7 @@ proves(["0005-enrollment-policy FR-001", "0005-enrollment-policy FR-002", "0002-
     assertEquals(decision?.rule, 0);
     const p = await issuePairing(f.store, { tenant: "synthetic-tenant-02" });
     const joined = await ssh(f.port, ["join", p.code], "", "s-enroll", KI);
-    const r2 = await startScript(f, joined.stdout, { OPSFOLIO_CONSENT: "yes" }).done;
+    const r2 = await startScript(f, joined.stdout, { SYNTH_CONSENT: "yes" }).done;
     assertEquals(r2.code, 0, r2.stdout + r2.stderr);
     const second = (await f.store.listSessions()).find((x) => x.binding?.kind === "pairing");
     assertEquals(second?.decision?.rule, 1);
@@ -192,7 +192,7 @@ proves(["0005-enrollment-policy FR-003"], "a device that an asset already descri
     const machineId = ["/etc/machine-id", "/var/lib/dbus/machine-id"].map((p) => { try { return readFileSync(p, "utf8").trim(); } catch { return ""; } }).find((x) => x !== "") ?? "unknown";
     await f.store.putAsset({ id: "asset-existing", machineId, macs: [], hostKeys: [], keys: [] });
     const script = await bootstrap(f);
-    const r = await runWithPerson(f, script, { steps: [] }, { OPSFOLIO_CONSENT: "yes" });
+    const r = await runWithPerson(f, script, { steps: [] }, { SYNTH_CONSENT: "yes" });
     assertEquals(r.code, 0, r.stdout + r.stderr);
     const assets = await f.store.assets();
     assertEquals(assets.length, 1);
@@ -208,7 +208,7 @@ proves(["0002-enrollment-protocol FR-019"], "three wrong codes typed by the pers
   const f = await fixture();
   try {
     const script = await bootstrap(f);
-    const dev = startScript(f, script, { OPSFOLIO_CONSENT: "yes" });
+    const dev = startScript(f, script, { SYNTH_CONSENT: "yes" });
     const code = await dev.code();
     const id = await waitForSession(f.store);
     const wrong = code === "000000" ? "111111" : "000000";
@@ -235,7 +235,7 @@ proves(["0004-scripts FR-010", "0002-enrollment-protocol FR-018"], "the host key
     const script = await bootstrap(f);
     const forged = script.replace(/HKB64='[^']*'/, `HKB64='${other.server.hostKey.publicKey.split(" ")[1]}'`);
     assert(forged !== script, "the key was replaced");
-    const dev = startScript(f, forged, { OPSFOLIO_CONSENT: "yes" });
+    const dev = startScript(f, forged, { SYNTH_CONSENT: "yes" });
     const r = await dev.done;
     assert(r.code !== 0, "the script stops");
     assert(!r.stdout.includes("Your pairing code"), r.stdout);
@@ -272,7 +272,7 @@ proves(["0004-scripts FR-010"], "the one-liners embed the known_hosts line and c
       assert(!refused.stdout.startsWith("#!/bin/sh"), "another host key is refused");
       assert(refused.stderr.includes("Host key verification failed") || refused.stderr.includes("REMOTE HOST IDENTIFICATION"), refused.stderr);
     }
-    const ps = renderOneLiner("ps", { host: "opsfolio", port: 2222 }, f.server.hostKey.publicKey);
+    const ps = renderOneLiner("ps", { host: "synth-host", port: 2222 }, f.server.hostKey.publicKey);
     assert(ps.kind === "ok" && ps.value.includes("bootstrap-ps | pwsh") && ps.value.includes("StrictHostKeyChecking=yes"), JSON.stringify(ps));
     assertEquals(renderOneLiner("sh", endpoint, "not a key").kind, "err");
   } finally {
@@ -288,7 +288,7 @@ proves(["0002-enrollment-protocol FR-011", "0002-enrollment-protocol FR-022", "0
     const script = await bootstrap(f);
     const plan: InstallPlan = { steps: [{ kind: "pin-controller", host: "127.0.0.1", port: f.port, publicKey: f.server.hostKey.publicKey }, { kind: "run", argv: ["/bin/true"], as: "user", expect: [0] }] };
     const dir = join(t.dir, "device");
-    const r = await runWithPerson(f, script, plan, { OPSFOLIO_CONSENT: "yes", OPSFOLIO_DIR: dir });
+    const r = await runWithPerson(f, script, plan, { SYNTH_CONSENT: "yes", SYNTH_DIR: dir });
     assertEquals(r.code, 0, r.stdout + r.stderr);
     assert(r.stdout.includes("enrolled"));
     const key = join(dir, "device_key");

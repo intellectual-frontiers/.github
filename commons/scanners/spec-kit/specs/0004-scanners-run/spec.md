@@ -23,7 +23,7 @@
 
 ## Out of scope
 
-- Installing or fetching a tool, and pinning it: the owner does, with `opsfolio scan pin`.
+- Installing or fetching a tool, and pinning it: the owner does, with the pin command of the product that runs the scanners (`RunInput.program` names it in the refusal and in the temporary folder).
 
 ## Edge cases
 

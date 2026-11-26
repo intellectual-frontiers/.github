@@ -34,7 +34,7 @@ const names = [
 const plan = names.map((title, i) => ({ id: `synthetic-step-${String(i + 1).padStart(2, "0")}`, title }));
 const ids = plan.map((p) => p.id);
 const ORDER = "01a2151b-247d-7190-8f73-3620e294318b";
-const COMMAND = `opsfolio work run ${ORDER} --apply --in host=synthetic-host-01`;
+const COMMAND = `synth work run ${ORDER} --apply --in host=synthetic-host-01`;
 
 const retry = (evidence: readonly string[] = []): FlowStep => ({
   id: "synthetic-retry-01",
@@ -167,7 +167,7 @@ proves(["0002-ui FR-016"], "at 60x24 the command is whole beside the failure, th
   const p = pane(asked);
   const text = p.join("\n");
   // The command, whole, in its own paragraph; the id is never cut.
-  assertStringIncludes(text, "Command: opsfolio work run");
+  assertStringIncludes(text, "Command: synth work run");
   assertStringIncludes(text, ORDER);
   assertStringIncludes(text, "host=synthetic-host-01");
   assert(p.some((l) => l.includes("(more")), text);
@@ -183,7 +183,7 @@ proves(["0002-ui FR-016"], "the failure is drawn with the command beside it at 6
   for (const rows of [24, 30]) {
     const { frame } = await failureAt(60, rows, [`order: ${ORDER}`, "a: b", "c: d", "e: f", "g: h"], ids.slice(0, 15), []);
     const text = pane(frame).join("\n");
-    assertStringIncludes(text, "Command: opsfolio work run");
+    assertStringIncludes(text, "Command: synth work run");
     assertStringIncludes(text, ORDER);
     assertStringIncludes(text, "[failed]");
     assertStringIncludes(text, "program.run");
@@ -225,7 +225,7 @@ proves(["0002-ui FR-016"], "a command in say is kept like the command of the ste
     clock: fakeClock(),
   });
   const text = pane(seen).join("\n");
-  assertStringIncludes(text, "Command: opsfolio work run");
+  assertStringIncludes(text, "Command: synth work run");
   assertStringIncludes(text, ORDER);
   assertStringIncludes(text, "(more");
 });

@@ -1,5 +1,5 @@
 #Requires -Version 7.0
-# opsfolio enrollment bootstrap, for PowerShell 7 on Windows. Read it before you run it: ssh -p 2222 s-enroll@opsfolio bootstrap-ps > enroll.ps1
+# Synth enrollment bootstrap, for PowerShell 7 on Windows. Read it before you run it: ssh -p 2222 s-enroll@synth-host bootstrap-ps > enroll.ps1
 # It reports facts about this machine, waits for a person to approve, asks you before it installs anything, and runs only the typed steps of the plan.
 # It holds no secret. It never evaluates what the server sends: it reads fields of a small alphabet and runs argument vectors without a shell.
 Set-StrictMode -Version Latest
@@ -8,19 +8,19 @@ $nl = [string][char]10
 $tab = [string][char]9
 
 $Session = 'en-abcdefghijklmnop'
-$EnrollHost = if ($env:OPSFOLIO_HOST) { $env:OPSFOLIO_HOST } else { 'opsfolio' }
-$Port = if ($env:OPSFOLIO_PORT) { $env:OPSFOLIO_PORT } else { '2222' }
-$WaitMax = if ($env:OPSFOLIO_WAIT_MAX) { [int]$env:OPSFOLIO_WAIT_MAX } else { 1800 }
-$Poll = if ($env:OPSFOLIO_POLL) { [int]$env:OPSFOLIO_POLL } else { 10 }
+$EnrollHost = if ($env:SYNTH_HOST) { $env:SYNTH_HOST } else { 'synth-host' }
+$Port = if ($env:SYNTH_PORT) { $env:SYNTH_PORT } else { '2222' }
+$WaitMax = if ($env:SYNTH_WAIT_MAX) { [int]$env:SYNTH_WAIT_MAX } else { 1800 }
+$Poll = if ($env:SYNTH_POLL) { [int]$env:SYNTH_POLL } else { 10 }
 $Offered = @('osquery 5.24.1')
 $HostKeyAlgo = 'ssh-ed25519'
 $HostKeyBlob = 'AAAAC3NzaC1lZDI1NTE5AAAAIPlaceholderPlaceholderPlaceholderPlace'
 $PairKind = 'digits'
 $PairLen = '6'
 $Alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ'
-$CommitTag = 'opsfolio-commit-v1'
-$SasTag = 'opsfolio-sas-v1'
-$Dir = if ($env:OPSFOLIO_DIR) { $env:OPSFOLIO_DIR } else { Join-Path $env:ProgramData 'opsfolio' }
+$CommitTag = 'ifc-enroll-commit-v1'
+$SasTag = 'ifc-enroll-sas-v1'
+$Dir = if ($env:SYNTH_DIR) { $env:SYNTH_DIR } else { Join-Path $env:ProgramData 'synth' }
 
 if (-not $IsWindows) { throw 'This script is for Windows: on Linux or macOS run the script for sh (bootstrap).' }
 
@@ -31,7 +31,7 @@ function Say {
 
 function Invoke-Door {
     param([string[]]$Words, [string]$Text = '')
-    $extra = if ($env:OPSFOLIO_SSH_OPTS) { @($env:OPSFOLIO_SSH_OPTS -split ' ') } else { @() }
+    $extra = if ($env:SYNTH_SSH_OPTS) { @($env:SYNTH_SSH_OPTS -split ' ') } else { @() }
     $output = $Text | & ssh -p $Port -i $script:KeyPath -o IdentitiesOnly=yes -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no -o ConnectTimeout=15 -o "UserKnownHostsFile=$($script:KnownHosts)" -o "StrictHostKeyChecking=$($script:Strict)" -o HashKnownHosts=no @extra "s-enroll@$EnrollHost" @Words
     if ($LASTEXITCODE -ne 0) { throw "the server refused: ssh ended with $LASTEXITCODE" }
     return @($output)
@@ -103,9 +103,9 @@ function Get-Fact {
 }
 
 function Get-Consent {
-    if ($env:OPSFOLIO_CONSENT -eq 'yes') { Say 'consent given by OPSFOLIO_CONSENT=yes'; return $true }
+    if ($env:SYNTH_CONSENT -eq 'yes') { Say 'consent given by SYNTH_CONSENT=yes'; return $true }
     if (-not [Console]::IsInputRedirected) { return ((Read-Host 'Run the steps above on this machine? Type yes to agree') -eq 'yes') }
-    Say 'No terminal to ask you on (the script came in on the standard input): save it and run it from a file, or set OPSFOLIO_CONSENT=yes.'
+    Say 'No terminal to ask you on (the script came in on the standard input): save it and run it from a file, or set SYNTH_CONSENT=yes.'
     return $false
 }
 
@@ -184,7 +184,7 @@ if ($HostKeyAlgo) {
     $script:Strict = 'accept-new'
     Say 'warning: this script holds no host key of the controller, so the first connection trusts what answers (trust on first use). On a network you do not trust, use the one-liner the controller prints.'
 }
-& ssh-keygen -q -t ed25519 -N '' -C opsfolio-device -f $script:KeyPath
+& ssh-keygen -q -t ed25519 -N '' -C synth-device -f $script:KeyPath
 $devicePub = ((Get-Content -LiteralPath "$($script:KeyPath).pub" -TotalCount 1).Split(' ')[0..1]) -join ' '
 $null = Invoke-Door -Words @('status', $Session)
 $seen = @(Get-Content -LiteralPath $script:KnownHosts | Where-Object { $_ })[0].Split(' ')
@@ -207,7 +207,7 @@ Say "sending facts to $($EnrollHost):$Port"
 $null = Invoke-Door -Words @('report', $Session) -Text $facts
 Say ''
 Say "Your pairing code is: $code"
-Say "A person types it into the controller to approve this machine: opsfolio enroll approve $Session --code $code"
+Say "A person types it into the controller to approve this machine: synth enroll approve $Session --code $code"
 Say 'If the code the controller expects is another, stop: someone is between this machine and the controller.'
 Say ''
 Say "waiting for a person to approve this machine (session $Session)"

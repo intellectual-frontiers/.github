@@ -10,8 +10,8 @@ import { RELATIONS } from "../src/governance/mod.ts";
 import { CATALOG, formatTable, fromSnapshot, openEstateQuery, tablesOf, type EstateData } from "../src/logical/mod.ts";
 
 function asset(id: string, state: "discovered" | "adopted" | "managed", more: { origin?: "provisioned" | "paired" | "integration" | "self" } = {}): Asset {
-  const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "opsfolio"]));
-  const owners = state === "managed" ? (more.origin === "paired" ? Object.fromEntries(Object.entries(all).filter(([k]) => k !== "provision")) : all) : state === "adopted" ? { observe: "opsfolio", verify: "opsfolio" } : {};
+  const all = Object.fromEntries(CAPABILITIES.map((c) => [c, "synth"]));
+  const owners = state === "managed" ? (more.origin === "paired" ? Object.fromEntries(Object.entries(all).filter(([k]) => k !== "provision")) : all) : state === "adopted" ? { observe: "synth", verify: "synth" } : {};
   const r = defineAsset({ id, kind: "server", state, ...(more.origin === undefined ? {} : { origin: more.origin }), owners });
   if (r.kind === "err") throw new Error(r.error.join("; "));
   return r.value;
@@ -109,7 +109,7 @@ proves(["0003-estate-query-run FR-001"], "a text is answered only where it is on
 
 proves(["0003-estate-query-run FR-002"], "a question is run with joins, grouping, a common table expression, a subquery and values given apart, and a value is never put into the text", () => {
   assertEquals(rows("select state, count(*) as n from asset group by state order by n desc, state"), [["managed", 2], ["adopted", 1], ["discovered", 1]]);
-  assertEquals(rows("select a.id, c.owner from asset a join capability c on c.asset = a.id where c.capability = 'converge' and a.state = 'managed' order by a.id"), [["synthetic-server-02", "opsfolio"], ["synthetic-server-03", "opsfolio"]]);
+  assertEquals(rows("select a.id, c.owner from asset a join capability c on c.asset = a.id where c.capability = 'converge' and a.state = 'managed' order by a.id"), [["synthetic-server-02", "synth"], ["synthetic-server-03", "synth"]]);
   assertEquals(rows("with inherited as (select id from asset where install = 'inherited') select id from inherited order by id"), [["synthetic-server-03"], ["synthetic-server-04"]]);
   assertEquals(rows("select id from asset where id not in (select asset from observation) order by id"), [["printer"], ["synthetic-server-03"], ["synthetic-server-04"]]);
   assertEquals(rows("select id from asset where state = ? and origin = $2", ["managed", "paired"]), [["synthetic-server-03"]]);

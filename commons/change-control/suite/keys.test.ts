@@ -101,11 +101,11 @@ proves(["0004-change-control-keys FR-004", "0004-change-control-keys FR-005", "0
     const wrong = await testSign(keyFile, pub.value, "daily");
     assert(wrong.kind === "err" && wrong.error.includes("wrong passphrase"), JSON.stringify(wrong));
     process.env["KEYS_TEST_PASSPHRASE"] = "correct horse";
-    assertEquals(await installHook(repo, "opsfolio keys check-push").then((r) => r.kind === "ok" && r.value), "installed");
-    assertEquals(await installHook(repo, "opsfolio keys check-push").then((r) => r.kind === "ok" && r.value), "already");
+    assertEquals(await installHook(repo, "synth keys check-push").then((r) => r.kind === "ok" && r.value), "installed");
+    assertEquals(await installHook(repo, "synth keys check-push").then((r) => r.kind === "ok" && r.value), "already");
     assert((await readFacts({ repo, keyFile, dailyPub: pub.value, recoveryListed: true, recoveryKeyFile: undefined, recoveryCheckedAt: undefined, signersText: listed })).hookInstalled);
     writeFileSync(join(repo, ".git", "hooks", "pre-push"), "#!/bin/sh\n# somebody else's hook\n");
-    const foreign = await installHook(repo, "opsfolio keys check-push");
+    const foreign = await installHook(repo, "synth keys check-push");
     assert(foreign.kind === "err" && foreign.error.includes("not overwritten") && !foreign.error.includes(HOOK_MARKER));
     writeFileSync(join(repo, "a.txt"), "one\n");
     const sha = await commitSigned(repo, keyFile, "a signed change", { paths: ["a.txt"] });

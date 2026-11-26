@@ -16,12 +16,14 @@ import type { ScriptOptions } from "./script-sh.ts";
 import { quoted, script } from "./script-text.ts";
 
 /** Render the bootstrap script for PowerShell 7. */
-export function renderBootstrapPs(session: ScriptSession, pins: readonly Pin[], endpoint: Endpoint, options: ScriptOptions = {}): string {
+export function renderBootstrapPs(session: ScriptSession, pins: readonly Pin[], endpoint: Endpoint, options: ScriptOptions): string {
+  const brand = options.brand;
+  const P = brand.envPrefix;
   const pairing = options.pairing ?? DEFAULT_SCRIPT_OPTIONS.pairing;
   const [hkAlgo = "", hkB64 = ""] = (options.hostKey ?? "").split(" ");
   const offer = offered(pins, "windows").map((p) => `'${p}'`).join(", ") || "'nothing is offered for this system'";
   return script`#Requires -Version 7.0
-# opsfolio enrollment bootstrap, for PowerShell 7 on Windows. Read it before you run it: ssh -p ${String(endpoint.port)} s-enroll@${endpoint.host} bootstrap-ps > enroll.ps1
+# ${brand.name} enrollment bootstrap, for PowerShell 7 on Windows. Read it before you run it: ssh -p ${String(endpoint.port)} s-enroll@${endpoint.host} bootstrap-ps > enroll.ps1
 # It reports facts about this machine, waits for a person to approve, asks you before it installs anything, and runs only the typed steps of the plan.
 # It holds no secret. It never evaluates what the server sends: it reads fields of a small alphabet and runs argument vectors without a shell.
 Set-StrictMode -Version Latest
@@ -30,10 +32,10 @@ $nl = [string][char]10
 $tab = [string][char]9
 
 $Session = ${quoted(session.id)}
-$EnrollHost = if ($env:OPSFOLIO_HOST) { $env:OPSFOLIO_HOST } else { ${quoted(endpoint.host)} }
-$Port = if ($env:OPSFOLIO_PORT) { $env:OPSFOLIO_PORT } else { ${quoted(String(endpoint.port))} }
-$WaitMax = if ($env:OPSFOLIO_WAIT_MAX) { [int]$env:OPSFOLIO_WAIT_MAX } else { 1800 }
-$Poll = if ($env:OPSFOLIO_POLL) { [int]$env:OPSFOLIO_POLL } else { 10 }
+$EnrollHost = if ($env:${P}_HOST) { $env:${P}_HOST } else { ${quoted(endpoint.host)} }
+$Port = if ($env:${P}_PORT) { $env:${P}_PORT } else { ${quoted(String(endpoint.port))} }
+$WaitMax = if ($env:${P}_WAIT_MAX) { [int]$env:${P}_WAIT_MAX } else { 1800 }
+$Poll = if ($env:${P}_POLL) { [int]$env:${P}_POLL } else { 10 }
 $Offered = @(${offer})
 $HostKeyAlgo = ${quoted(hkAlgo)}
 $HostKeyBlob = ${quoted(hkB64)}
@@ -42,7 +44,7 @@ $PairLen = ${quoted(String(pairing.length))}
 $Alphabet = ${quoted(LETTERS)}
 $CommitTag = ${quoted(COMMIT_TAG)}
 $SasTag = ${quoted(SAS_TAG)}
-$Dir = if ($env:OPSFOLIO_DIR) { $env:OPSFOLIO_DIR } else { Join-Path $env:ProgramData 'opsfolio' }
+$Dir = if ($env:${P}_DIR) { $env:${P}_DIR } else { Join-Path $env:ProgramData ${quoted(brand.stateDir.windows)} }
 
 if (-not $IsWindows) { throw 'This script is for Windows: on Linux or macOS run the script for sh (bootstrap).' }
 
@@ -53,7 +55,7 @@ function Say {
 
 function Invoke-Door {
     param([string[]]$Words, [string]$Text = '')
-    $extra = if ($env:OPSFOLIO_SSH_OPTS) { @($env:OPSFOLIO_SSH_OPTS -split ' ') } else { @() }
+    $extra = if ($env:${P}_SSH_OPTS) { @($env:${P}_SSH_OPTS -split ' ') } else { @() }
     $output = $Text | & ssh -p $Port -i $script:KeyPath -o IdentitiesOnly=yes -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o KbdInteractiveAuthentication=no -o ConnectTimeout=15 -o "UserKnownHostsFile=$($script:KnownHosts)" -o "StrictHostKeyChecking=$($script:Strict)" -o HashKnownHosts=no @extra "s-enroll@$EnrollHost" @Words
     if ($LASTEXITCODE -ne 0) { throw "the server refused: ssh ended with $LASTEXITCODE" }
     return @($output)
@@ -125,9 +127,9 @@ function Get-Fact {
 }
 
 function Get-Consent {
-    if ($env:OPSFOLIO_CONSENT -eq 'yes') { Say 'consent given by OPSFOLIO_CONSENT=yes'; return $true }
+    if ($env:${P}_CONSENT -eq 'yes') { Say 'consent given by ${P}_CONSENT=yes'; return $true }
     if (-not [Console]::IsInputRedirected) { return ((Read-Host 'Run the steps above on this machine? Type yes to agree') -eq 'yes') }
-    Say 'No terminal to ask you on (the script came in on the standard input): save it and run it from a file, or set OPSFOLIO_CONSENT=yes.'
+    Say 'No terminal to ask you on (the script came in on the standard input): save it and run it from a file, or set ${P}_CONSENT=yes.'
     return $false
 }
 
@@ -206,7 +208,7 @@ if ($HostKeyAlgo) {
     $script:Strict = 'accept-new'
     Say 'warning: this script holds no host key of the controller, so the first connection trusts what answers (trust on first use). On a network you do not trust, use the one-liner the controller prints.'
 }
-& ssh-keygen -q -t ed25519 -N '' -C opsfolio-device -f $script:KeyPath
+& ssh-keygen -q -t ed25519 -N '' -C ${brand.keyComment} -f $script:KeyPath
 $devicePub = ((Get-Content -LiteralPath "$($script:KeyPath).pub" -TotalCount 1).Split(' ')[0..1]) -join ' '
 $null = Invoke-Door -Words @('status', $Session)
 $seen = @(Get-Content -LiteralPath $script:KnownHosts | Where-Object { $_ })[0].Split(' ')
@@ -229,7 +231,7 @@ Say "sending facts to $($EnrollHost):$Port"
 $null = Invoke-Door -Words @('report', $Session) -Text $facts
 Say ''
 Say "Your pairing code is: $code"
-Say "A person types it into the controller to approve this machine: opsfolio enroll approve $Session --code $code"
+Say "A person types it into the controller to approve this machine: ${brand.approveHint("$Session", "$code")}"
 Say 'If the code the controller expects is another, stop: someone is between this machine and the controller.'
 Say ''
 Say "waiting for a person to approve this machine (session $Session)"

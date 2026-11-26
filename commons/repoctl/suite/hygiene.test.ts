@@ -191,25 +191,25 @@ proves(["0007-repoctl-hygiene FR-006", "0007-repoctl-hygiene FR-003"], "a reposi
     // the layout of a monorepo of independent packages: no root package.json, a lockfile of each kind next to each package.json
     await put(dir, "lib/ts/agora-domain/package.json", manifest("agora-domain"));
     await put(dir, "lib/ts/agora-domain/bun.lock", lockOf("0.1.5"));
-    await put(dir, "services/opsfolio/package.json", manifest("opsfolio", { [CORE]: "0.1.6" }));
-    await put(dir, "services/opsfolio/package-lock.json", npmLockOf("0.1.6"));
-    await put(dir, "services/opsfolio/node_modules/@intellectual-frontiers/core/package.json", JSON.stringify({ name: CORE, version: "0.1.6" }));
+    await put(dir, "services/synth/package.json", manifest("synth", { [CORE]: "0.1.6" }));
+    await put(dir, "services/synth/package-lock.json", npmLockOf("0.1.6"));
+    await put(dir, "services/synth/node_modules/@intellectual-frontiers/core/package.json", JSON.stringify({ name: CORE, version: "0.1.6" }));
     await put(dir, "services/www/deep/site/package.json", manifest("site"));
     await put(dir, "services/www/deep/site/bun.lock", lockOf("0.1.5"));
     // a package.json of what is built, fetched or installed is not judged
-    await put(dir, "services/opsfolio/dist/package.json", manifest("built"));
-    await put(dir, "services/opsfolio/node_modules/other/package.json", manifest("other"));
+    await put(dir, "services/synth/dist/package.json", manifest("built"));
+    await put(dir, "services/synth/node_modules/other/package.json", manifest("other"));
     // a package.json that declares nothing needs no lockfile
     await put(dir, "tools/empty/package.json", JSON.stringify({ name: "empty" }));
     const world = systemWorld(dir, () => undefined, { libraries: undefined });
     const facts = await gatherHygieneFacts(world, POLICY);
     assertEquals(facts.folders.map((f) => [f.folder, f.locks.map((l) => l.file)]), [
       ["lib/ts/agora-domain", ["lib/ts/agora-domain/bun.lock"]],
-      ["services/opsfolio", ["services/opsfolio/package-lock.json"]],
+      ["services/synth", ["services/synth/package-lock.json"]],
       ["services/www/deep/site", ["services/www/deep/site/bun.lock"]],
       ["tools/empty", []],
     ]);
-    assertEquals(facts.folders.find((f) => f.folder === "services/opsfolio")?.installed.get(CORE)?.map((c) => c.version), ["0.1.6"]);
+    assertEquals(facts.folders.find((f) => f.folder === "services/synth")?.installed.get(CORE)?.map((c) => c.version), ["0.1.6"]);
     // two folders install two versions of one package: each its own install, so no duplicate and no warning
     assertEquals(hygiene(facts, POLICY), []);
     const out = await execute(hostOf(world, WITH_POLICY), ["hygiene", "--json"]);

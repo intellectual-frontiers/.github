@@ -7,8 +7,8 @@ import { spawn } from "node:child_process";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Facts, ServerPolicy } from "../src/governance/mod.ts";
-import { DEFAULT_SERVER_POLICY } from "../src/governance/mod.ts";
+import type { Brand, Facts, ServerIdentity } from "../src/governance/mod.ts";
+import { SERVER_POLICY_DEFAULTS } from "../src/governance/mod.ts";
 import { createEnrollServer, fingerprintOfBlob, memoryStore } from "../src/physical/mod.ts";
 import type { EnrollServer, EnrollServerOptions, EnrollStore } from "../src/physical/mod.ts";
 
@@ -18,17 +18,23 @@ export async function temp(): Promise<{ readonly dir: string; readonly done: () 
   return { dir, done: () => rm(dir, { recursive: true, force: true }) };
 }
 
+/** A synthetic brand: what a product passes to the library (the library has none of its own). */
+export const TEST_BRAND: Brand = { name: "Synth", envPrefix: "SYNTH", stateDir: { posix: "/etc/synth", windows: "synth" }, keyComment: "synth-device", serverIdent: "synth-enroll_0.1", approveHint: (id, code) => `synth enroll approve ${id} --code ${code}` };
+
+/** The identity of tests: a synthetic endpoint and brand. */
+export const TEST_IDENTITY: ServerIdentity = { endpoint: { host: "synth-host", port: 2222 }, brand: TEST_BRAND };
+
 /** The policy of tests: the defaults with short penalties and a roomy bucket. */
-export const FAST: Partial<ServerPolicy> = { penalty: { baseMs: 1, maxMs: 2 }, bucket: { capacity: 1000, refillPerSecond: 1000 }, handshakeTimeoutMs: 5000 };
+export const FAST: Partial<typeof SERVER_POLICY_DEFAULTS> = { penalty: { baseMs: 1, maxMs: 2 }, bucket: { capacity: 1000, refillPerSecond: 1000 }, handshakeTimeoutMs: 5000 };
 
 /** A running server for a test. */
 export type Fixture = { readonly server: EnrollServer; readonly store: EnrollStore; readonly port: number; readonly dir: string; readonly done: () => Promise<void> };
 
 /** Start a server on a free loopback port with a store in memory, and its folder. */
-export async function fixture(more: Partial<EnrollServerOptions> = {}): Promise<Fixture> {
+export async function fixture(more: Partial<Omit<EnrollServerOptions, "policy">> & { readonly policy?: Partial<typeof SERVER_POLICY_DEFAULTS> } = {}): Promise<Fixture> {
   const t = await temp();
   const store = more.store ?? memoryStore();
-  const server = await createEnrollServer({ port: 0, host: "127.0.0.1", ...more, hostKeyPath: join(t.dir, "host_key"), policy: { ...FAST, ...(more.policy ?? {}) }, store });
+  const server = await createEnrollServer({ port: 0, host: "127.0.0.1", ...more, hostKeyPath: join(t.dir, "host_key"), policy: { ...TEST_IDENTITY, ...FAST, ...(more.policy ?? {}) }, store });
   return { server, store, port: server.address.port, dir: t.dir, done: async () => { await server.close(); await t.done(); } };
 }
 
@@ -92,4 +98,4 @@ export function syntheticFacts(n = 1): Facts {
   };
 }
 
-export { DEFAULT_SERVER_POLICY };
+export { SERVER_POLICY_DEFAULTS };

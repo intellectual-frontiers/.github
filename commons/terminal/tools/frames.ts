@@ -22,7 +22,7 @@ const typed = (s: SelectState, text: string): SelectState => [...text].reduce((s
 type Z = { columns: number; rows: number };
 type Draw = (size: Z, caps: Dress) => Drawn;
 const homeOf = (state: SelectState, size: Z, caps: Dress): Drawn =>
-  renderHome({ title: "Opsfolio", chips, body: (s) => renderSelect(state, s, caps), footer: FOOTER }, size, caps);
+  renderHome({ title: "Synth", chips, body: (s) => renderSelect(state, s, caps), footer: FOOTER }, size, caps);
 
 const hosts = {
   columns: [
@@ -47,7 +47,7 @@ const flow: Draw = (size, caps) =>
       skipped: new Set(["p2"]),
       failed: new Set(["p3"]),
       current: "p1",
-      pane: ["[human] Compare the fingerprint", ...wrap("Read the fingerprint on the host console and compare it with the one shown here.", 34, 2), "", ...wrap("Command: opsfolio enroll --host synthetic-host-02", 34, 2), "", "  > "],
+      pane: ["[human] Compare the fingerprint", ...wrap("Read the fingerprint on the host console and compare it with the one shown here.", 34, 2), "", ...wrap("Command: synth enroll --host synthetic-host-02", 34, 2), "", "  > "],
       pinned: 1,
       protect: [4, 5],
       status: "waiting for you",

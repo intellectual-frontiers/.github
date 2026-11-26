@@ -81,7 +81,7 @@ proves(["0008-machine-probe-agent-workspace FR-003", "0008-machine-probe-agent-w
   const bad = good.replace("uid=1000", "uid=0").replace("ambient-secret-names=", "ambient-secret-names=GH_TOKEN").replace("isolation=vm", "isolation=physical");
   assertEquals(evaluateWorkshop(parseProbe(bad), observed(bad), DECLARED, NOW).map((r) => r.status), ["fail", "fail", "pass", "warn", "pass"]);
   // an estate judges them and finds every result traceable
-  const box = defineAsset({ id: "agentbox", kind: "workshop", state: "adopted", origin: "paired", owners: { observe: "opsfolio", verify: "opsfolio" } });
+  const box = defineAsset({ id: "agentbox", kind: "workshop", state: "adopted", origin: "paired", owners: { observe: "synth", verify: "synth" } });
   assert(box.kind === "ok");
   assertEquals(checkInvariants({ assets: [box.value], observations: [], results: real.map((r) => ({ asset: "agentbox", id: r.id, status: r.status, controls: r.controls })) }), []);
   const supported = (family: string, version: string) => evaluate(observed(`@probe\nat=2026-11-21T00:00:00Z\nversion=1\n@os\nfamily=${family}\nversion=${version}\n`), NOW).find((r) => r.id === "supported-os")?.status;

@@ -10,7 +10,7 @@ import { createHash } from "node:crypto";
 import { verifyChain } from "../src/logical/mod.ts";
 import type { ChainedEvent } from "../src/governance/mod.ts";
 import { confirm, createEnrollServer, fileStore, issuePairing, issueToken, loadOrCreateHostKey, memoryStore } from "../src/physical/mod.ts";
-import { fixture, keyPair, ssh, syntheticFacts, temp, withKey } from "./helpers.ts";
+import { TEST_IDENTITY, fixture, keyPair, ssh, syntheticFacts, temp, withKey } from "./helpers.ts";
 
 const sha = (t: string): string => createHash("sha256").update(t).digest("hex");
 const KI = ["-F", "none", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-o", "LogLevel=ERROR", "-o", "PubkeyAuthentication=no"] as const;
@@ -50,7 +50,7 @@ proves(["0003-server-policy FR-001"], "another user and a reserved account are r
     for (const user of ["root", "s-operator", "s-agent", "s-assist", "admin"]) {
       const r = await ssh(f.port, ["hello"], "", user, KI);
       assert(r.code !== 0, `${user} is refused`);
-      assert(!r.stdout.includes("opsfolio"), `${user} got nothing`);
+      assert(!r.stdout.includes("Synth"), `${user} got nothing`);
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
   } finally {
@@ -68,7 +68,7 @@ proves(["0003-server-policy FR-004"], "no shell, no pty, no subsystem, no forwar
     const fwd = await ssh(f.port, ["-o", "ExitOnForwardFailure=yes", "-R", "0:127.0.0.1:22", "hello"], "", "s-enroll", KI);
     assert(fwd.code !== 0, "no remote forward");
     const pty = await ssh(f.port, ["-tt", "hello"], "", "s-enroll", KI);
-    assert(pty.stdout.includes("opsfolio") || pty.code !== 0, "a pty is refused and hello still answers or ends");
+    assert(pty.stdout.includes("Synth") || pty.code !== 0, "a pty is refused and hello still answers or ends");
     const env = await ssh(f.port, ["-o", "SendEnv=LANG", "hello"], "", "s-enroll", KI);
     assertEquals(env.code, 0);
     const log = (await f.store.audit()).filter((e) => e.kind === "refused").map((e) => e.detail).join("|");
@@ -183,12 +183,12 @@ proves(["0003-server-policy FR-009", "0003-server-policy FR-013"], "the host key
     }
     assert(failed, "a damaged key is an error, never a new key");
     assertEquals(await readFile(path, "utf8"), "not a key");
-    const s1 = await createEnrollServer({ port: 0, host: "127.0.0.1", hostKeyPath: join(t.dir, "h2"), store: memoryStore() });
+    const s1 = await createEnrollServer({ port: 0, host: "127.0.0.1", hostKeyPath: join(t.dir, "h2"), store: memoryStore(), policy: TEST_IDENTITY });
     const fp = s1.hostKey.fingerprint;
     assertEquals(s1.address.host, "127.0.0.1");
     assert(s1.address.port > 0 && s1.connections() === 0 && s1.policy.accounts.length === 2);
     await s1.close();
-    const s2 = await createEnrollServer({ port: 0, host: "127.0.0.1", hostKeyPath: join(t.dir, "h2"), store: memoryStore() });
+    const s2 = await createEnrollServer({ port: 0, host: "127.0.0.1", hostKeyPath: join(t.dir, "h2"), store: memoryStore(), policy: TEST_IDENTITY });
     assertEquals(s2.hostKey.fingerprint, fp);
     await s2.close();
   } finally {

@@ -83,10 +83,10 @@ proves(["0002-policy-gate FR-006"], "the builders make rules of an attribute and
 
 proves(["0002-policy-gate FR-008"], "the verdict is SARIF 2.1.0 with an error or a warning for each violation and a suppression for a waived one", () => {
   const v = evaluate({ before: [], after: [db(), { id: "n", kind: "application", attributes: {} }] }, BASELINE, [W], NOW);
-  const s = toSarif(v, "opsfolio-gate");
+  const s = toSarif(v, "synth-gate");
   assertEquals(s.version, "2.1.0");
   const run = s.runs[0] as { tool: { driver: { name: string; rules: { id: string }[] } }; results: { ruleId: string; level: string; suppressions?: { justification: string }[] }[] };
-  assertEquals(run.tool.driver.name, "opsfolio-gate");
+  assertEquals(run.tool.driver.name, "synth-gate");
   assert(run.tool.driver.rules.some((r) => r.id === "has-owner"));
   const owner = run.results.find((r) => r.ruleId === "has-owner");
   assertEquals(owner?.level, "warning");

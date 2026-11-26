@@ -146,21 +146,21 @@ proves(["0004-workload-projections FR-010"], "every projection is made from the 
 });
 
 proves(["0004-workload-projections FR-011"], "a host says its own verb command: every skill, the Codex block and every rule call it, the default is the same bytes as before, and a command with shell syntax is refused with its code", () => {
-  const command = "opsfolio verb";
+  const command = "synth verb";
   const own = projectAll([V], DIALECT_IMPLS, { verbCommand: command });
   const text = Object.values(own).flat().map((f) => f.text).join("\n");
   assert(text.includes(`Bash(${command} store.checkpoint *)`) && text.includes(`called by its id as \`${command} <id>\``) && text.includes(`called as \`${command} <id>\``));
   assert(!text.includes("bun run workload verb"), "no file names the default command");
   const claude = own["claude-code"] ?? [];
   const settings = JSON.parse(claude.find((f) => f.path === ".claude/workload.settings.json")?.text ?? "{}").permissions as Record<string, readonly string[]>;
-  for (const rule of [...(settings["allow"] ?? []), ...(settings["ask"] ?? []), ...(settings["deny"] ?? [])]) assert(/^Bash\(opsfolio verb [a-z.]+ \*\)$/u.test(rule), rule);
+  for (const rule of [...(settings["allow"] ?? []), ...(settings["ask"] ?? []), ...(settings["deny"] ?? [])]) assert(/^Bash\(synth verb [a-z.]+ \*\)$/u.test(rule), rule);
   assert((claude.find((f) => f.path.endsWith("SKILL.md"))?.text ?? "").includes(`allowed-tools: Bash(${command} `));
   assertEquals(rulesOf([V], { verbCommand: command }).allow, rulesOf([V]).allow.map((r) => r.replace(VERB_COMMAND, command)));
   assert(skillMd(V, undefined, { verbCommand: command }).includes(`\`${command} <id>\``));
   assertEquals(projectAll([V], DIALECT_IMPLS, {}), project());
   assertEquals(projectAll([V], DIALECT_IMPLS, { verbCommand: VERB_COMMAND }), project());
   assertEquals(verbCommandOf(), { kind: "ok", value: VERB_COMMAND });
-  assertEquals(verbCommandOf({ verbCommand: "./bin/opsfolio verb" }).kind, "ok");
+  assertEquals(verbCommandOf({ verbCommand: "./bin/synth verb" }).kind, "ok");
   for (const bad of ["a; b", "a && b", "a | b", "$(x) verb", "`x` verb", "a\nb", "", " a", "a  b", "a\"b", "a (b)", "a*", "x".repeat(201)]) {
     const r = verbCommandOf({ verbCommand: bad });
     assert(r.kind === "err" && r.error.code === "E-WL-HARNESS-COMMAND-INVALID" && r.error.fixer === "agent", JSON.stringify(bad));

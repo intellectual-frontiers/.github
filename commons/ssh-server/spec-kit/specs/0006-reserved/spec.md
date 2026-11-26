@@ -19,7 +19,7 @@
 - **FR-008**: Reserved, UNBUILT, NEEDS AN OWNER DECISION: a brokered short-lived credential handed to a device by NAME with a lifetime. The fleet rule is that credentials are names and never values in the repository; a value that passes through the host is a decision for the owner. It MUST NOT be enforced before it is built.
 - **FR-009**: Reserved, UNBUILT: push to connected devices over held-open sessions. It MUST NOT be enforced before it is built.
 - **FR-010**: Reserved, UNBUILT: the controller as an SSH certificate authority that issues short-lived OpenSSH certificates (signed with `ssh-keygen -s` through the outbound technique of headless, not with `ssh2`) and the device trusting the authority (`TrustedUserCAKeys`); the authentication requirement `cert` is reserved for it. It MUST NOT be enforced before it is built.
-- **FR-011**: Reserved, UNBUILT: discovery by mDNS and DNS-SD (`_opsfolio-enroll._tcp`), and the name `opsfolio`: until then the documentation says how to make the name resolve (a DHCP domain-name search entry or a DNS record). It MUST NOT be enforced before it is built.
+- **FR-011**: Reserved, UNBUILT: discovery by mDNS and DNS-SD (`_enroll._tcp`), and a well-known name for the server: until then the documentation says how to make the name resolve (a DHCP domain-name search entry or a DNS record). It MUST NOT be enforced before it is built.
 
 ## Acceptance scenarios
 

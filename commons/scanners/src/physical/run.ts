@@ -1,6 +1,6 @@
 // Spec: 0004-scanners-run FR-001, FR-002, FR-003, FR-004, FR-005
 /**
- * Running a scanner, the safe way. In this order, and stopping at the first that fails: the scanner and the target are known and the target fit to be given to a tool; the engagement allows the technique on the asset (the caller's `authorize`, which is Opsfolio's `pentest authorize`); the tool has a pin and the file at its path has
+ * Running a scanner, the safe way. In this order, and stopping at the first that fails: the scanner and the target are known and the target fit to be given to a tool; the engagement allows the technique on the asset (the caller's `authorize`, which is the product's engagement check); the tool has a pin and the file at its path has
  * the pinned SHA-256; then the tool is run with an argument vector (no shell), in an empty folder, with a bare environment and a time limit. What it prints is read into findings, which are about the estate's asset. Every run, refused or made, gives a record of who it was for, what was run, with which binary and what came of it.
  * Nothing here installs or fetches a tool.
  *
@@ -37,6 +37,8 @@ export type RunInput = {
   readonly timeoutMs?: number;
   /** The built-in check's contact with the target (the real one by default). */
   readonly probe?: (url: string, timeoutMs: number) => Promise<Probed>;
+  /** The name of the program of the product that runs this (default `scanners`): it names the temporary folder (`<program>-scan-`) and the pin command the refusal tells the owner to run (`<program> scan pin`). The product gives it; this library names none. */
+  readonly program?: string;
 };
 
 /** The record of a run, refused or made. */
@@ -65,6 +67,7 @@ const BARE_PATH = "/usr/local/bin:/usr/bin:/bin";
 export async function runScanner(i: RunInput): Promise<Result<RunResult, RunRefusal>> {
   const started = Date.now();
   const scanner = scannerById(i.scanner);
+  const program = i.program ?? "scanners";
   const record = (more: Partial<RunRecord>): RunRecord => ({ scanner: i.scanner, asset: i.asset, target: i.target.value, technique: scanner?.technique ?? "unknown", startedAt: i.now, tookMs: Date.now() - started, exit: null, findings: 0, ...more });
   const refuse = (reason: string, more: Partial<RunRecord> = {}): Result<RunResult, RunRefusal> => err({ reason, record: record({ refused: reason, ...more }) });
   if (scanner === undefined) return refuse(`there is no scanner ${i.scanner}`);
@@ -90,13 +93,13 @@ export async function runScanner(i: RunInput): Promise<Result<RunResult, RunRefu
   }
 
   const pin = i.pins[scanner.tool];
-  if (pin === undefined) return refuse(`${scanner.tool} has no pin: the owner pins the binary (opsfolio scan pin) before it is run`);
+  if (pin === undefined) return refuse(`${scanner.tool} has no pin: the owner pins the binary (${program} scan pin) before it is run`);
   const have = await fs.exists(pin.path) ? await fs.sha256File(pin.path) : undefined;
   if (have === undefined) return refuse(`${pin.path} does not exist: the pinned ${scanner.tool} ${pin.version} is not installed`);
   const tool = { name: scanner.tool, version: pin.version, sha256: pin.sha256 };
   if (have !== pin.sha256) return refuse(`${pin.path} is not the pinned ${scanner.tool} ${pin.version}: its SHA-256 is ${have}, the pin says ${pin.sha256}`, { tool });
 
-  const work = await fs.makeTempDir({ prefix: "opsfolio-scan-" });
+  const work = await fs.makeTempDir({ prefix: `${program}-scan-` });
   try {
     const args = argvOf(i.scanner, target, { outDir: work, ...(i.rate === undefined ? {} : { rate: i.rate }), ...(i.ports === undefined ? {} : { ports: i.ports }) });
     if (args.kind === "err") return refuse(args.error, { tool });
