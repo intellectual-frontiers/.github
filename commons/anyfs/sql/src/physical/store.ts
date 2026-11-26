@@ -69,10 +69,10 @@ import {
   viewOf,
   withBlob,
 } from "@intellectual-frontiers/anyfs/merge";
-import { DEFAULT_MAX_OBJECT, HARD_MAX_OBJECT, type Naming, type NamingOptions, parseNaming, SCHEMA_VERSION, type SqlDialect, type SqlPort, type SqlRunner } from "@intellectual-frontiers/anyfs-sql/governance";
+import { DEFAULT_MAX_OBJECT, HARD_MAX_OBJECT, type Naming, type NamingOptions, parseNaming, type SqlDialect, type SqlPort, type SqlRunner } from "@intellectual-frontiers/anyfs-sql/governance";
 import { type Compacted, type CompactInput, compactDatabase, adoptEpoch, type EpochProposal, retireReplica, retiredOf, type Retired, epochsOf } from "./compact.ts";
 import { type Ctx, type EpochRow, deltaOfDatabase, execQ, runQ, siblingsOfPath, stateOf, takeDelta, vectorOfDatabase, verifyDatabase } from "./merge.ts";
-import { hasSearch, layoutVersion, migrate, type MigrateOptions } from "./schema.ts";
+import { type LayoutOptions, makeLayout } from "./schema.ts";
 import { type Layout, layoutOf } from "./layout.ts";
 import { bytesOf, numberOf, type Sql, sqlFor, textOf } from "./sql.ts";
 
@@ -94,11 +94,9 @@ export type SqlOptions = {
   /** The clock that makes ids, in milliseconds. */
   readonly clock?: () => number;
   /** Whether the store has the index of search: `auto` where the engine has one. */
-  readonly search?: MigrateOptions["search"];
+  readonly search?: LayoutOptions["search"];
   /** The most bytes of an object that are indexed for search (1 MiB where not given). */
   readonly searchMaxBytes?: number;
-  /** Whether the layout is brought to the latest version (`migrate`, the default) or only checked (`check`: a database at an older version is refused). */
-  readonly layout?: "migrate" | "check";
   /** The identity of the replica a new database takes: random where not given. A database that has one keeps it. */
   readonly replica?: ReplicaId;
   /** What tells a copy of the database from the original (the identity of its file): a database whose stored fingerprint is another is a copy and takes a new replica identity. `none` where not given. */
@@ -112,7 +110,7 @@ export type SqlOptions = {
 };
 
 /** What the store knows of its database. */
-export type SqlFacts = { readonly dialect: SqlDialect; readonly naming: Naming; readonly version: number; readonly search: boolean };
+export type SqlFacts = { readonly dialect: SqlDialect; readonly naming: Naming; readonly search: boolean };
 
 /** A sibling: a head of a path that is not the winner. */
 export type SqlSibling = { readonly id: string; readonly kind: "put" | "tombstone"; readonly rev: Revision | undefined; readonly replica: ReplicaId };
@@ -234,7 +232,7 @@ const headOf = (state: MergeState, path: string): Head | undefined => {
   return v.present && v.winner !== undefined && v.winner.blob !== null ? { version: v.winner, sha: v.winner.blob } : undefined;
 };
 
-/** Opens the store of a database: brings the layout to its version, settles who this copy is and whom it trusts, and gives the store. */
+/** Opens the store of a database: makes the layout where the database has none, settles who this copy is and whom it trusts, and gives the store. */
 export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Promise<Result<SqlStore, string>> {
   const naming = parseNaming(options.naming ?? {});
   if (naming.kind === "err") return naming;
@@ -248,17 +246,9 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
   const fingerprint = parseFingerprint(options.fingerprint ?? "none");
   if (fingerprint.kind === "err") return fingerprint;
 
-  let found: { readonly version: number; readonly search: boolean };
-  if (options.layout === "check") {
-    const version = await layoutVersion(port, naming.value);
-    if (version !== SCHEMA_VERSION) return err(`the database is at version ${version} of the layout and this library writes version ${SCHEMA_VERSION}: it was asked only to check`);
-    found = { version, search: options.search !== "off" && (await hasSearch(port, naming.value)) };
-  } else {
-    const migrated = await migrate(port, naming.value, { search: options.search ?? "auto" });
-    if (migrated.kind === "err") return migrated;
-    found = migrated.value;
-  }
-  const searching = found.search;
+  const made = await makeLayout(port, naming.value, { search: options.search ?? "auto" });
+  if (made.kind === "err") return made;
+  const searching = made.value.search;
 
   // who this copy is: kept where the fingerprint is the one stored, new where the database was copied
   const storedReplica = await factOf(port, l, "replica");
@@ -514,7 +504,7 @@ export async function openSqlStore(port: SqlPort, options: SqlOptions = {}): Pro
   return ok({
     store,
     searchable,
-    facts: { dialect, naming: naming.value, version: found.version, search: searching },
+    facts: { dialect, naming: naming.value, search: searching },
     replica,
     forkedFrom: identity.forkedFrom,
     siblings: async (path) => (await siblingsOfPath(port, ctx, path)).map((v): SqlSibling => ({ id: v.id, kind: v.kind, rev: v.blob === null ? undefined : revOf(v.blob), replica: v.replica })),

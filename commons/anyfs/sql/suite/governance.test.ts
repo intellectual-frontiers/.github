@@ -4,9 +4,9 @@
  * @module
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { DEFAULT_MAX_OBJECT, DIALECTS, HARD_MAX_OBJECT, LAYOUT, MIGRATION_PLAN, SCHEMA_VERSION, TABLE_ROLES, defaultMaxObject, isDialect, mediaTypeOf, parseNaming, parseWord, tableOf } from "../src/governance/mod.ts";
+import { DEFAULT_MAX_OBJECT, DIALECTS, HARD_MAX_OBJECT, LAYOUT, TABLE_ROLES, defaultMaxObject, isDialect, mediaTypeOf, parseNaming, parseWord, tableOf } from "../src/governance/mod.ts";
 import { sqlFor } from "../src/physical/mod.ts";
-import { migrate } from "../src/physical/mod.ts";
+import { makeLayout } from "../src/physical/mod.ts";
 import { sqliteMemory } from "./kit.ts";
 
 proves(["0002-sql-governance FR-001"], "the dialects are three, each with a hard limit, and the default largest object is 64 MiB and below every limit", () => {
@@ -30,15 +30,12 @@ proves(["0002-sql-governance FR-002"], "a word of a name is lower case letters, 
   assertEquals(parseNaming({ schema: "no way" }).kind, "err");
 });
 
-proves(["0002-sql-governance FR-003"], "the layout is documented column by column and agrees with the tables the migrations make, and the plan of the migrations lists each version in order", async () => {
-  assertEquals(SCHEMA_VERSION, 3);
-  assertEquals(MIGRATION_PLAN.map((m) => m.version), [3]);
-  assert(MIGRATION_PLAN.every((m) => !m.destructive));
+proves(["0002-sql-governance FR-003"], "the layout is documented column by column and agrees with the tables the layout makes", async () => {
   const port = await sqliteMemory();
   const n = parseNaming();
   assert(n.kind === "ok");
-  const made = await migrate(port, n.value, { search: "auto" });
-  assert(made.kind === "ok" && made.value.version === 3);
+  const made = await makeLayout(port, n.value, { search: "auto" });
+  assert(made.kind === "ok" && made.value.search);
   const sql = sqlFor("sqlite", n.value);
   for (const role of ["versions", "blobs", "meta", "trust", "epochs", "cache"] as const) {
     const rows = await port.query(`PRAGMA table_info(${sql.table(role)})`, []);
@@ -51,7 +48,7 @@ proves(["0002-sql-governance FR-003"], "the layout is documented column by colum
   }
   const search = await port.query(`PRAGMA table_info(${sql.table("search")})`, []);
   assertEquals(search.map((r) => String(r["name"])), LAYOUT.filter((c) => c.table === "search").map((c) => c.column));
-  assert(LAYOUT.every((c) => c.means.length > 5 && c.since >= 1 && c.since <= SCHEMA_VERSION));
+  assert(LAYOUT.every((c) => c.means.length > 5));
 });
 
 proves(["0002-sql-governance FR-004"], "the media type of a path is the one its last extension says, none for a name with no known extension, and nothing is read from bytes", () => {

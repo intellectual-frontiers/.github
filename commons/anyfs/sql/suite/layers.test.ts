@@ -29,7 +29,7 @@ proves(["0001-sql-layers FR-001"], "the manifest is a plugin of the family of An
   assert(library.held.kind === "unfinished" && library.held.reason !== "");
   const manifest = JSON.parse(await fs.readTextFile(path.join(ROOT, "package.json"))) as { exports: Record<string, string> };
   assertEquals([...library.exports].sort(), Object.keys(manifest.exports).sort());
-  assert(Object.keys(governance).includes("parseNaming") && Object.keys(physical).includes("openSqlStore") && Object.keys(physical).includes("migrate"));
+  assert(Object.keys(governance).includes("parseNaming") && Object.keys(physical).includes("openSqlStore") && Object.keys(physical).includes("makeLayout"));
   assertEquals(library.kanon.units.filter((u) => "layer" in u).map((u) => ("layer" in u ? u.layer : "")), ["governance", "physical"]);
 });
 
@@ -40,7 +40,7 @@ proves(["0001-sql-layers FR-002"], "no source of the governance layer reaches a 
   for (const f of files) assertEquals(forbidden.test(f.text), false, `${f.file} does input or output`);
 });
 
-proves(["0001-sql-layers FR-002"], "no source of the physical layer makes the text of a statement by putting a value into it: a template literal with a keyword of a statement and a variable is only in the builder and in the migrations, which write names", async () => {
+proves(["0001-sql-layers FR-002"], "no source of the physical layer makes the text of a statement by putting a value into it: a template literal with a keyword of a statement and a variable is only in the builder and in the making of the layout, which write names", async () => {
   const files = await sources("src/physical");
   assert(files.length >= 8, "the sources are read");
   const statementWithVariable = /`[^`\n]*\b(SELECT|INSERT INTO|UPDATE|DELETE FROM)\b[^`\n]*\$\{/u;

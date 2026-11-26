@@ -31,7 +31,6 @@ requirement	mechanism	by	note
 0005-sql-store FR-008	check	.github: cd commons/anyfs/sql && bun run verify	suite/store.test.ts
 0004-sql-schema FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
 0004-sql-schema FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
-0004-sql-schema FR-003	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
 0004-sql-schema FR-004	check	.github: cd commons/anyfs/sql && bun run verify	suite/schema.test.ts
 0007-sql-merge FR-001	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
 0007-sql-merge FR-002	check	.github: cd commons/anyfs/sql && bun run verify	suite/merge.test.ts
