@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** The foundation that the rest of commons stands on, in a package of its own with no dependency: errors as values, exhaustive matching, branded types, decoders at the boundary, a few pure text helpers, type-level tests, graphs of work and exact optional objects. It is the first library lifted out of `commons/ts` (commons 0032-libraries-by-concern), and its requirements are those that 0005-typescript-practice made of the kernel's foundation, kept here.
+**Input:** The foundation that the rest of commons stands on, in a package of its own with no dependency: errors as values, exhaustive matching, branded types, decoders on entry, a few pure text helpers, type-level tests, graphs of work and exact optional objects. It is the first library lifted out of `commons/ts` (commons 0032-libraries-by-concern), and its requirements are those that 0005-typescript-practice made of the kernel's foundation, kept here.
 
 ## The foundation
 
@@ -57,7 +57,7 @@
 
 ## Success criteria
 
-- **SC-001**: A library of commons uses these and nothing else to be correct at its boundaries.
+- **SC-001**: A library of commons uses these and nothing else to be correct where input enters.
 
 ## Review & acceptance checklist
 

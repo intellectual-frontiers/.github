@@ -42,7 +42,7 @@ The generated files are read by independent tools: rdflib parses the Turtle, pyS
 
 | Weakness | Where it bites | How Mizan addresses it |
 | --- | --- | --- |
-| Guarantees depend on running `tsc` | Inside TypeScript | CI runs `tsc`; the ontology is decoded once at the boundary; runtime findings cover what a type cannot. |
+| Guarantees depend on running `tsc` | Inside TypeScript | CI runs `tsc`; the ontology is decoded once on entry; runtime findings cover what a type cannot. |
 | A typed vocabulary lists only terms someone uses | Inside | Intended: unused terms are not carried. The per-harness `vocabulary()` path is documented, and imports name their slice. |
 | Compile cost of very large code lists | Inside | Split modules; measure compile time before an import lands (not yet measured). |
 | No blank nodes or RDF lists in schema fields | Inside and outside | Imports report them as findings, never silently drop them; typed lists are added only when a real model needs them. |

@@ -23,3 +23,7 @@ requirement	mechanism	by	note
 0004-workload-terms FR-002	check	.github: cd commons/ontology && bun test suite/	workload-ontology.test.ts
 0004-workload-terms FR-003	check	.github: cd commons/ontology && bun test suite/	workload-ontology.test.ts
 0004-workload-terms FR-004	check	.github: cd commons/ontology && bun test suite/	workload-ontology.test.ts
+0005-boundary-terms FR-001	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
+0005-boundary-terms FR-002	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
+0005-boundary-terms FR-003	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts
+0005-boundary-terms FR-004	check	.github: cd commons/ontology && bun test suite/	boundary-ontology.test.ts

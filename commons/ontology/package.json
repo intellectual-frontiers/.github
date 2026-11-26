@@ -21,6 +21,8 @@
     "./planning/planning": "./src/planning/planning.ts",
     "./workload": "./src/workload/mod.ts",
     "./workload/workload": "./src/workload/workload.ts",
+    "./boundary": "./src/boundary/mod.ts",
+    "./boundary/boundary": "./src/boundary/boundary.ts",
     "./ifr": "./src/ifr/mod.ts",
     "./ifr/audit": "./src/ifr/audit.ts",
     "./ifr/ifr": "./src/ifr/ifr.ts",

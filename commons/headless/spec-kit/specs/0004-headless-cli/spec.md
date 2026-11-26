@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** commons
 
-**Input:** Layer 3 of Headless, the command-line surface: the calm renderer (marks from the one table of icons of the terminal's ui, colour from its one theme, emoji and colour chosen by its capabilities, a spinner and a progress bar on a terminal and plain lines elsewhere), the prompts, the run log and the memory of hints in the program's folder of state, the signals, the help, completions and man page generated from the tree, the run boundary `run(program, argv, io)`, and the launcher helpers. It imports the terminal, the system and Core, and the layers below; it does not import the telemetry. Erga's agora (274-agora), arcactl and the fleet programs share this surface. The decisions it takes are in "Decisions" below.
+**Input:** Layer 3 of Headless, the command-line surface: the calm renderer (marks from the one table of icons of the terminal's ui, colour from its one theme, emoji and colour chosen by its capabilities, a spinner and a progress bar on a terminal and plain lines elsewhere), the prompts, the run log and the memory of hints in the program's folder of state, the signals, the help, completions and man page generated from the tree, the run entry `run(program, argv, io)`, and the launcher helpers. It imports the terminal, the system and Core, and the layers below; it does not import the telemetry. Erga's agora (274-agora), arcactl and the fleet programs share this surface. The decisions it takes are in "Decisions" below.
 
 ## What a person sees
 

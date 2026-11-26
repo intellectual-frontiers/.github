@@ -26,9 +26,9 @@
 - **FR-006**: `verifyAuthentication` MUST check, as §7.2 says, against the credential kept at registration (its id, COSE key, algorithm and counter): the response is by that credential; the client data (type `webauthn.get`, challenge, origin, not cross-origin); the authenticator data (RP ID hash, user presence, user verification, its extensions read past); the signature over the authenticator data followed by the SHA-256 of the client data, by ES256 (DER) or Ed25519; and that the counter went up, unless it was and is 0 (an authenticator that keeps none). It MUST give back the counter to keep, whether the user was verified and whether the credential is backed up.
 - **FR-007**: An authentication MUST be refused, with a sentence and never an exception, for a signature that does not verify or is malformed, a counter that does not go up, the wrong challenge, origin, RP ID or client data type, no user verification, another credential, a stored algorithm that is not the stored key's, and authenticator data that is malformed.
 
-## The boundary (kernel)
+## The entry (kernel)
 
-- **FR-008**: The kernel MUST give `parseRegistrationResponse` and `parseAuthenticationResponse`, which read JSON a browser sent (`unknown`) into the response types or refuse it naming the path that is wrong, so that a harness decodes once at its boundary.
+- **FR-008**: The kernel MUST give `parseRegistrationResponse` and `parseAuthenticationResponse`, which read JSON a browser sent (`unknown`) into the response types or refuse it naming the path that is wrong, so that a harness decodes once on entry.
 
 ## Out of scope
 

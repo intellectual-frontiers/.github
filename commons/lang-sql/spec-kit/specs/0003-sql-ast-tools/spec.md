@@ -53,7 +53,7 @@
 
 ## Open questions
 
-- **OQ-1**: Deriving the type of each projected node from the kind it is projected from (a `select` node whose children are typed) needs one cast at the boundary or a projection written out for each of the kinds; the first is against the rules of this library and the second is long. The projection is typed the same for every kind until one of them is chosen.
+- **OQ-1**: Deriving the type of each projected node from the kind it is projected from (a `select` node whose children are typed) needs one cast where the value enters or a projection written out for each of the kinds; the first is against the rules of this library and the second is long. The projection is typed the same for every kind until one of them is chosen.
 
 ## Key entities
 
