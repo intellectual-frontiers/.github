@@ -5,6 +5,7 @@
  *
  * @module
  */
+export * from "./access-decision.ts";
 export * from "./as-of.ts";
 export * from "./assemble.ts";
 export * from "./canonical.ts";

@@ -1107,8 +1107,8 @@ requirement	mechanism	by	note
 0047-zero-trust FR-003	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-004	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-005	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-010	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-011	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0047-zero-trust FR-010	none	-	Deferred: partly built (the record and its pure computations are in grc 0019-grc-access-decision); the signing, the journal and the recording by a program are not
+0047-zero-trust FR-011	none	-	Deferred: partly built (the record and its pure computations are in grc 0019-grc-access-decision); the signing, the journal and the recording by a program are not
 0047-zero-trust FR-012	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-013	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-014	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
@@ -1124,8 +1124,8 @@ requirement	mechanism	by	note
 0047-zero-trust FR-031	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-040	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-041	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-042	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-043	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0047-zero-trust FR-042	none	-	Deferred: partly built (the record and its pure computations are in grc 0019-grc-access-decision); the signing, the journal and the recording by a program are not
+0047-zero-trust FR-043	none	-	Deferred: partly built (the record and its pure computations are in grc 0019-grc-access-decision); the signing, the journal and the recording by a program are not
 0047-zero-trust FR-050	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-060	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-070	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
