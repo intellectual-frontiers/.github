@@ -1,0 +1,64 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45839048544",
+    "workflow": "ci",
+    "commit": "35f430f19bfe6bfb7ac666ff6456c53706276c6e",
+    "at": "2026-11-26T14:28:00Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45839048544"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 8569,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 207,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "workload",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 380,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "workload",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17194,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "workload",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 17194,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": []
+}
