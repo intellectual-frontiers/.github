@@ -20,7 +20,7 @@ export const library = {
     package: "@intellectual-frontiers/linux-services",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["ssh-inbound"] }, { name: "@intellectual-frontiers/linux-services", subpaths: ["governance"] }] },
+      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/desired-os-state", subpaths: ["governance"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["logical", "ssh-inbound", "targets/ssh"] }, { name: "@intellectual-frontiers/formats", subpaths: ["yaml"] }, { name: "@intellectual-frontiers/linux-services", subpaths: ["governance"] }] },
       { folder: "src/physical/", layer: "physical", mayImport: ["src/governance/", "src/logical/"], packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/linux-services", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/system", subpaths: "any" }] },
       { folder: "src/", own: true },
       { folder: "suite/", own: true },

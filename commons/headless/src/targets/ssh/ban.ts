@@ -1,4 +1,5 @@
 // Spec: 0005-reach-and-targets FR-010
+// Spec: 0016-headless-ssh-forward FR-002
 /**
  * The ban on hand-built `ssh` arguments (commons headless 0005-reach-and-targets FR-010): a program that reaches a machine over ssh does it through the executor,
  * so that the options, the quoting and the host-key policy are in one place. This finds, in the text of a program's sources, an `ssh` argument vector that sets the
@@ -36,6 +37,11 @@ export function sshArgumentFindings(files: readonly Source[]): readonly SshFindi
       if (t.startsWith("//") || t.startsWith("*") || t.startsWith("/*")) return;
       if (!SSH_WORD.test(l)) return;
       const near = lines.slice(i, i + 7).join("\n");
+      const forward = /["'`]-[LRD]["'`]/.test(near) || /\bssh\s+(-\S+\s+)*-[LRD]\b/.test(l);
+      if (forward) {
+        out.push({ file: f.path, line: i + 1, rule: "ssh/hand-built", message: "an ssh forward (-L, -R or -D) made by hand: use sshForwardArgv of @intellectual-frontiers/headless/targets/ssh" });
+        return;
+      }
       if (OPTION.test(near) || /\bssh\s+-[oT]\b/.test(l) || /["']-o["']/.test(near)) {
         out.push({ file: f.path, line: i + 1, rule: "ssh/hand-built", message: "an ssh command line with options of its own: run it through the executor of @intellectual-frontiers/headless/targets/ssh" });
       }

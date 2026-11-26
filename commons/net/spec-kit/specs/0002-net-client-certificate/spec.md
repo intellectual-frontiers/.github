@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** net
 
-**Input:** OTLP over HTTPS can be authenticated by a token, which works today, or by a client certificate (mutual TLS), which Net cannot do: `connectTls` and `listenTls` take no client certificate and `serve` has no TLS. Store and forward by SMTP is optional and later, and nothing of SMTP exists in commons. This specification adds the client certificate and states, as optional and later, the SMTP submission client. It is governed by commons 0041-telemetry-and-reach (audit rows A12, H1, H3). **Every requirement that asks for code is Deferred until after the owner's acceptance run of the command line.**
+**Input:** OTLP over HTTPS can be authenticated by a token, which works today, or by a client certificate (mutual TLS), which Net cannot do: `connectTls` and `listenTls` take no client certificate and `serve` has no TLS. Store and forward by SMTP is optional and later, and nothing of SMTP exists in commons. This specification adds the client certificate and states, as optional and later, the SMTP submission client. It is governed by commons 0041-telemetry-and-reach (audit rows A12, H1, H3). **FR-001, FR-002, FR-003 and FR-005 are built; FR-004 and the SMTP requirements stay Deferred.**
 
 ## Client certificate
 
@@ -13,7 +13,7 @@
 - **FR-002**: `ListenTlsOptions` MUST gain `clientCa` (PEM roots) and `requestClientCert` of `none`, `request` or `require`, and a `Conn` of a listener MUST say the verified subject of the client's certificate where there is one. Relies on audit rows: A12.
 - **FR-003**: `ServeOptions` MUST gain an optional `tls` of the cert, the key and the client options of FR-002, so that `serve` can answer HTTPS and say the verified subject to the handler in `ServeInfo`; without it `serve` MUST behave as it does. Relies on audit rows: A12, A11.
 - **FR-004**: `liveTransport` (the HTTP client) MUST accept the client certificate and key for the origins it is given, and MUST refuse to send them to any other origin. Relies on audit rows: A12.
-- **FR-005**: The behaviour on Bun and on Node 26 MUST be the same or each difference MUST be a typed `unsupported` error naming the runtime (UNVERIFIED for `fetch` with a client certificate on both). Relies on audit rows: A12.
+- **FR-005**: The behaviour on Bun and on Node 26 MUST be the same or each difference MUST be a typed `NotSupported` error naming the runtime: on Bun `serve` with a client certificate asked for is `NotSupported`, because its HTTPS server gives a handler no peer certificate (UNVERIFIED for `fetch` with a client certificate on both). Relies on audit rows: A12.
 
 ## SMTP (optional, later)
 

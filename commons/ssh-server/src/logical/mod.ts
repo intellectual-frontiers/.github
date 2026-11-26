@@ -10,6 +10,7 @@ export * from "./chain.ts";
 export * from "./conversations.ts";
 export * from "./decide.ts";
 export * from "./dialogue.ts";
+export * from "./forward.ts";
 export * from "./limits.ts";
 export * from "./network.ts";
 export * from "./oneliner.ts";

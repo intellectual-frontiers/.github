@@ -20,8 +20,9 @@
     "verify": "tsc -p tsconfig.json && bun ../tools/mizan-check.ts --root spec-kit && bun ../libraries/src/check.ts --root spec-kit --level L1 && bun ../kanon/src/check.ts && bun tools/check.ts && bun test suite/"
   },
   "devDependencies": {
-    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/desired-os-state": "link:../desired-os-state",
+    "@intellectual-frontiers/formats": "link:../formats",
     "@intellectual-frontiers/headless": "link:../headless",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",

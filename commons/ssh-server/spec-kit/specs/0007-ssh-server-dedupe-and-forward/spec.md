@@ -5,7 +5,7 @@
 **Owner:** if
 **Domain:** ssh-server
 
-**Input:** The enrollment server was written before the probe, the ledger of evidence, the pins of tools and the stores of AnyFS were what they are, and it holds its own copy of each: its facts, its hash chain, its catalog of pins, its identity resolution and its state file. And it refuses every forward, so a device cannot send its signals to the controller's loopback by a forward of its own. This specification removes the copies in favour of what commons already has, and adds the one forward that a device with an enrolled key may open. It is governed by commons 0041-telemetry-and-reach (audit rows A13, B4, D4, E2 to E7). **The first group is a refactor with no wire change; what changes is said in FR-011.** **Every requirement that asks for code is Deferred until after the owner's acceptance run of the command line.**
+**Input:** The enrollment server was written before the probe, the ledger of evidence, the pins of tools and the stores of AnyFS were what they are, and it holds its own copy of each: its facts, its hash chain, its catalog of pins, its identity resolution and its state file. And it refuses every forward, so a device cannot send its signals to the controller's loopback by a forward of its own. This specification removes the copies in favour of what commons already has, and adds the one forward that a device with an enrolled key may open. It is governed by commons 0041-telemetry-and-reach (audit rows A13, B4, D4, E2 to E7). **The first group is a refactor with no wire change; what changes is said in FR-011.** **The forward (FR-008 to FR-010) is built; the requirements of the first group (FR-001 to FR-007) that ask for code are Deferred until after the owner's acceptance run of the command line.**
 
 ## The dedupe
 
@@ -53,7 +53,7 @@
 
 ## UNVERIFIED
 
-- That `ssh2` lets the server accept `direct-tcpip` to a loopback socket and pipe it as the manual of the library says (read, not run).
+- None for the forward: `ssh2` accepting `direct-tcpip` to a loopback socket and piping it is run by the tests against the OpenSSH client.
 
 ## Key entities
 

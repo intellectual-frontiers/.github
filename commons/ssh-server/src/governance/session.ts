@@ -78,7 +78,7 @@ export type EnrollmentSession = {
 };
 
 /** The kind of an audit event. */
-export type AuditEventKind = "pairing" | "connect" | "auth" | "command" | "refused" | "decision" | "state" | "script" | "plan" | "removal-request" | "limit" | "close";
+export type AuditEventKind = "pairing" | "connect" | "auth" | "command" | "refused" | "decision" | "state" | "script" | "plan" | "removal-request" | "limit" | "forward" | "close";
 
 /** An audit event: what happened, to whom, from where. It holds no secret: a token is never written, only its id. */
 export type AuditEvent = {
@@ -93,6 +93,8 @@ export type AuditEvent = {
   readonly scriptSha256?: string;
   readonly fingerprint?: Fingerprint;
   readonly account?: string;
+  /** For kind `forward`: where the channel goes, as `host:port`. */
+  readonly destination?: string;
   readonly clientIdent?: string;
   /** The SHA-256 of what the client sent and of what the server answered, over the whole conversation (kind `close`). */
   readonly stdinSha256?: string;

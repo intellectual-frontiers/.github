@@ -19,10 +19,10 @@ requirement	mechanism	by	note
 0001-net FR-016	check	.github: cd commons/net && bun test suite/	otel-net.test.ts: with no pipeline the client and serve make no span and pass no traceparent; with one, the server's span is the client's child and the URL is redacted; the receiver makes no span of its own
 0001-net FR-017	check	.github: cd commons/net && bun run verify	the package is built, inspected and packed by tools/pack.ts; tests/commons-packages.test.ts installs the tarball and runs every entry on Node 26 and Bun and type-checks a consumer
 0001-net FR-018	check	.github: cd commons/net && bun test suite/	folder.test.ts: a real folder served on port 0: index, types, traversal and symlink escapes, 405, HEAD, ETag and 304, Range and 416, redirect, no listing
-0002-net-client-certificate FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0002-net-client-certificate FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0002-net-client-certificate FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0002-net-client-certificate FR-001	check	.github: cd commons/net && bun test suite/	client-cert.test.ts: certificate and key together or neither; no key in an error
+0002-net-client-certificate FR-002	check	.github: cd commons/net && bun test suite/	client-cert.test.ts: require refuses no certificate and a certificate of another root; the verified subject; roots needed
+0002-net-client-certificate FR-003	check	.github: cd commons/net && bun test suite/	client-cert.test.ts: serve answers HTTPS, tells the handler the verified subject on Node, runs no handler for a client refused
 0002-net-client-certificate FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0002-net-client-certificate FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0002-net-client-certificate FR-005	check	.github: cd commons/net && bun test suite/	client-cert.test.ts: on Bun serve names the runtime in a typed NotSupported; on Node it works
 0002-net-client-certificate FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0002-net-client-certificate FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

@@ -6,11 +6,12 @@
  * @module
  */
 import { createHash, randomBytes } from "node:crypto";
+import { createConnection } from "node:net";
 import { reverse } from "node:dns/promises";
 import { readFile } from "node:fs/promises";
 import ssh2 from "ssh2";
-import type { AuthContext, Connection, ServerChannel, Session } from "ssh2";
-import { SERVER_POLICY_DEFAULTS, brandProblems, PERSON_DECIDES, accountOf } from "@intellectual-frontiers/ssh-server/governance";
+import type { AuthContext, Connection, ServerChannel, Session, TcpipRequestInfo } from "ssh2";
+import { SERVER_POLICY_DEFAULTS, brandProblems, PERSON_DECIDES, accountOf, policyProblems } from "@intellectual-frontiers/ssh-server/governance";
 import type { AuditEvent, ChainedEvent, EnrollPolicy, EnrollmentSession, Facts, Fingerprint, HostKey, InstallPlan, OfferedKey, ServerIdentity, ServerPolicy, SessionId, ServiceAccount } from "@intellectual-frontiers/ssh-server/governance";
 import {
   CLEAN,
@@ -23,6 +24,7 @@ import {
   commandOf,
   defaultPlan,
   forgive,
+  forwardDecision,
   fullBucket,
   runCommand,
   sourceAllowed,
@@ -56,6 +58,8 @@ export type EnrollServerOptions = {
   readonly lookup?: Lookup;
   /** The address of a peer as the server judges it. Identity by default; a deployment behind a proxy that says the true address (and a test) replaces it. */
   readonly peerAddress?: (socketAddress: string) => string;
+  /** How often an open forward is checked against the store (its key is still an enrolled device's): 2 seconds by default. */
+  readonly forwardRecheckMs?: number;
 };
 
 /** A running server. */
@@ -118,6 +122,8 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
   const policy: ServerPolicy = { ...SERVER_POLICY_DEFAULTS, ...options.policy };
   const bad = brandProblems(policy.brand);
   if (bad.length > 0) throw new Error(`the brand is not usable: ${bad.join("; ")}`);
+  const wrong = policyProblems(policy);
+  if (wrong.length > 0) throw new Error(`the policy is not usable: ${wrong.join("; ")}`);
   const cidrs = checkCidrs(policy.allowCidrs);
   if (cidrs.kind === "err") throw new Error(cidrs.error);
   const clock = options.clock ?? Date.now;
@@ -133,6 +139,9 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
   const buckets = new Map<string, Bucket>();
   const penalties = new Map<string, Penalty>();
   const perIp = new Map<string, number>();
+  /** The forwards each device holds now, over all its connections, by the fingerprint of its proven key. */
+  const forwarding = new Map<string, number>();
+  const recheckMs = options.forwardRecheckMs ?? 2000;
   let total = 0;
 
   const sha = (text: string): string => createHash("sha256").update(text).digest("hex");
@@ -195,6 +204,7 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
     let failures = 0;
     let executed = false;
     let account: ServiceAccount = "s-enroll";
+    let provenKey: Fingerprint | undefined;
     const stdinHash = createHash("sha256");
     const stdoutHash = createHash("sha256");
     let bytesIn = 0;
@@ -248,6 +258,7 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
             else offered.push({ algo: key.algo, fingerprint: key.fingerprint, proven: true });
           }
           account = ctx.username as ServiceAccount;
+          if (d.proven !== undefined) provenKey = d.proven;
           event("auth", "ok", d.proven === undefined ? "anonymous" : "key proven", { account: ctx.username, ...(d.proven === undefined ? {} : { fingerprint: d.proven }) });
           ctx.accept();
           return;
@@ -277,11 +288,101 @@ export async function createEnrollServer(options: EnrollServerOptions): Promise<
     };
 
     client.on("request", (_accept: unknown, reject?: () => void) => {
-      event("command", "refused", "a global request (forwarding) was refused");
+      event("refused", "refused", "a remote forward or another global request was refused", { account });
       reject?.();
     });
-    client.on("tcpip", (_accept: unknown, reject: () => void) => reject());
-    client.on("openssh.streamlocal", (_accept: unknown, reject: () => void) => reject());
+    client.on("openssh.streamlocal", (_accept: unknown, reject: () => void) => {
+      event("refused", "refused", "a socket forward was refused", { account });
+      reject();
+    });
+
+    const forward = async (accept: () => ServerChannel, reject: () => void, info: TcpipRequestInfo): Promise<void> => {
+      const destination = `${info.destIP}:${info.destPort}`;
+      const key = provenKey;
+      const enrolled = key !== undefined && (await store.assets()).some((a) => a.revoked !== true && a.keys.includes(key));
+      const d = forwardDecision(policy, { kind: "direct-tcpip", account: key === undefined ? undefined : account, proven: key, enrolled, destHost: info.destIP, destPort: info.destPort, open: key === undefined ? 0 : (forwarding.get(key) ?? 0) });
+      const who = key === undefined ? { account } : { account, fingerprint: key };
+      if (d.kind === "refuse" || key === undefined) {
+        event("refused", "refused", d.kind === "refuse" ? d.reason : "a forward before the key is proven is refused", { ...who, destination });
+        reject();
+        return;
+      }
+      forwarding.set(key, (forwarding.get(key) ?? 0) + 1);
+      const release = (): void => {
+        const n = (forwarding.get(key) ?? 1) - 1;
+        if (n <= 0) forwarding.delete(key);
+        else forwarding.set(key, n);
+      };
+      const socket = createConnection({ host: "127.0.0.1", port: d.rule.port });
+      socket.once("error", () => {
+        if (!socket.connecting) return;
+        release();
+        event("refused", "error", "the forward could not reach its port", { ...who, destination });
+        reject();
+      });
+      socket.once("connect", () => {
+        const channel = accept();
+        const inHash = createHash("sha256");
+        const outHash = createHash("sha256");
+        let fIn = 0;
+        let fOut = 0;
+        let why = "closed";
+        let closed = false;
+        event("forward", "ok", "open", { ...who, destination });
+        const end = (reason: string): void => {
+          if (why === "closed") why = reason;
+          socket.destroy();
+          channel.close();
+        };
+        const watch = (n: number): void => {
+          touch();
+          if (fIn + fOut + n > policy.maxForwardBytes) end("the byte limit of a forward was reached");
+        };
+        channel.on("data", (chunk: Buffer) => {
+          watch(chunk.length);
+          fIn += chunk.length;
+          inHash.update(chunk);
+          socket.write(chunk);
+        });
+        socket.on("data", (chunk: Buffer) => {
+          watch(chunk.length);
+          fOut += chunk.length;
+          outHash.update(chunk);
+          channel.write(chunk);
+        });
+        channel.on("end", () => socket.end());
+        socket.on("end", () => channel.end());
+        const total = setTimeout(() => end("the time limit of a forward was reached"), policy.totalTimeoutMs);
+        total.unref();
+        const recheck = setInterval(() => {
+          void store.assets().then((assets) => {
+            if (!assets.some((a) => a.revoked !== true && a.keys.includes(key))) end("the key was revoked");
+          });
+        }, recheckMs);
+        recheck.unref();
+        const done = (): void => {
+          if (closed) return;
+          closed = true;
+          clearTimeout(total);
+          clearInterval(recheck);
+          release();
+          event("forward", why === "closed" ? "ok" : "refused", why === "closed" ? "close" : `close: ${why}`, { ...who, destination, bytesIn: fIn, bytesOut: fOut, stdinSha256: inHash.digest("hex"), stdoutSha256: outHash.digest("hex") });
+        };
+        channel.on("close", () => {
+          socket.destroy();
+          done();
+        });
+        socket.on("close", () => {
+          channel.close();
+          done();
+        });
+        socket.on("error", () => end("the port failed"));
+        channel.on("error", () => end("the channel failed"));
+      });
+    };
+    client.on("tcpip", (accept: () => ServerChannel, reject: () => void, info: TcpipRequestInfo) => {
+      void forward(accept, reject, info);
+    });
 
     client.on("ready", () => {
       clearTimeout(handshake);

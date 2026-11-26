@@ -47,7 +47,14 @@ export type ListenTlsOptions = ListenOptions & {
   readonly cert: string;
   /** The certificate's private key, in PEM. */
   readonly key: string;
+  /** The roots, in PEM, a client's certificate must chain to (required where a client certificate is requested). */
+  readonly clientCa?: readonly string[];
+  /** Whether a client certificate is asked for: `none` (the default), `request` (a client may give one, and an unverified one is no subject) or `require` (a client with none, or one that does not verify, is refused at the handshake). */
+  readonly requestClientCert?: ClientCertMode;
 };
+
+/** Whether a TLS listener asks the client for a certificate. */
+export type ClientCertMode = "none" | "request" | "require";
 
 /** Where to connect. */
 export type ConnectOptions = {
@@ -65,6 +72,9 @@ export type ConnectTlsOptions = ConnectOptions & {
   readonly caCerts?: readonly string[];
   /** The name the certificate must be for, where it is not `hostname` (SNI is sent only for a name, never for an address). */
   readonly serverName?: string;
+  /** The client's certificate chain and its private key, in PEM: both or neither. A key never appears in an error. */
+  readonly clientCert?: string;
+  readonly clientKey?: string;
 };
 
 /** A connection: its two ends, its bytes as web streams, and how to end it. */
@@ -73,6 +83,8 @@ export type Conn = {
   readonly localAddr: NetAddr;
   /** The other end's address. */
   readonly remoteAddr: NetAddr;
+  /** Where this is a TLS connection that a client certificate verified against the listener's `clientCa`: the subject of that certificate (`CN=device-01`); nothing otherwise. */
+  readonly peerSubject?: string;
   /** The bytes the other end sends; ends when it closes its side; cancelling it closes the connection. */
   readonly readable: ReadableStream<Uint8Array>;
   /** The bytes to send; each write settles once the system has taken it; closing it ends this side (as `closeWrite`). */
@@ -173,7 +185,9 @@ function wrapSocket(socket: net.Socket): Conn {
     closed = true;
     socket.destroy();
   };
+  const peerSubject = subjectOf(socket);
   return {
+    ...(peerSubject === undefined ? {} : { peerSubject }),
     localAddr: { hostname: hostOf(socket.localAddress), port: socket.localPort ?? 0 },
     remoteAddr: { hostname: hostOf(socket.remoteAddress), port: socket.remotePort ?? 0 },
     readable,
@@ -182,6 +196,14 @@ function wrapSocket(socket: net.Socket): Conn {
     close,
     [Symbol.dispose]: close,
   };
+}
+
+/** The subject of the certificate the peer of a TLS socket gave, where it verified: `CN=device-01`, or the pairs in the order the certificate holds them. */
+export function subjectOf(socket: net.Socket): string | undefined {
+  if (!(socket instanceof tls.TLSSocket) || !socket.authorized) return undefined;
+  const cert = socket.getPeerCertificate();
+  const pairs = Object.entries(cert.subject ?? {}).map(([k, v]) => `${k}=${Array.isArray(v) ? v.join("+") : String(v)}`);
+  return pairs.length === 0 ? undefined : pairs.join(", ");
 }
 
 function endSocket(socket: net.Socket): Promise<void> {
@@ -272,9 +294,17 @@ export function listen(options: ListenOptions = {}): Promise<Listener> {
   return makeListener(net.createServer({ pauseOnConnect: false, allowHalfOpen: HALF_OPEN }), "connection", options);
 }
 
+/** The options of a TLS server that ask for a client certificate (none for the mode `none`). */
+export function clientAuth(o: { readonly clientCa?: readonly string[]; readonly requestClientCert?: ClientCertMode }): tls.TlsOptions {
+  const mode = o.requestClientCert ?? "none";
+  return mode === "none" ? {} : { requestCert: true, rejectUnauthorized: mode === "require", ca: [...(o.clientCa ?? [])] };
+}
+
 /** Listen for TLS connections with a certificate and key in PEM; `AddrInUse` where the port is taken. */
 export function listenTls(options: ListenTlsOptions): Promise<Listener> {
-  return makeListener(tls.createServer({ cert: options.cert, key: options.key, allowHalfOpen: HALF_OPEN }), "secureConnection", options);
+  const mode = options.requestClientCert ?? "none";
+  if (mode !== "none" && (options.clientCa === undefined || options.clientCa.length === 0)) return Promise.reject(new InvalidData("a client certificate is asked for, so the roots it must chain to (clientCa) are needed", "", ""));
+  return makeListener(tls.createServer({ cert: options.cert, key: options.key, allowHalfOpen: HALF_OPEN, ...clientAuth(options) }), "secureConnection", options);
 }
 
 function abortError(signal: AbortSignal): Error {
@@ -331,6 +361,7 @@ export function connectTls(options: ConnectTlsOptions): Promise<Conn> {
   const host = options.hostname ?? "127.0.0.1";
   const where = `${host}:${options.port}`;
   if (options.signal?.aborted === true) return Promise.reject(abortError(options.signal));
+  if ((options.clientCert === undefined) !== (options.clientKey === undefined)) return Promise.reject(new InvalidData("a client certificate and its key are given together or not at all", "", where));
   const name = options.serverName ?? host;
   const tlsOptions: tls.ConnectionOptions = {
     host,
@@ -339,6 +370,7 @@ export function connectTls(options: ConnectTlsOptions): Promise<Conn> {
     checkServerIdentity: (_host, cert) => tls.checkServerIdentity(name, cert),
     ...(net.isIP(name) === 0 ? { servername: name } : {}),
     ...(options.caCerts === undefined ? {} : { ca: [...options.caCerts] }),
+    ...(options.clientCert === undefined || options.clientKey === undefined ? {} : { cert: options.clientCert, key: options.clientKey }),
   };
   return open(tls.connect(tlsOptions), "secureConnect", where, options.signal);
 }

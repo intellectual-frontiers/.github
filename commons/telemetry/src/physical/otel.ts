@@ -29,6 +29,7 @@ import { dirname } from "node:path";
 import process from "node:process";
 import { absurd, formatDecodeError, err, ok, type Result } from "@intellectual-frontiers/core";
 import { retryAfterMs } from "@intellectual-frontiers/formats/http";
+import { newLimiter, take as takeAllowance, type SourceLimits } from "@intellectual-frontiers/telemetry/limits";
 import { accept as acceptBatch, type EnvelopeSigner, openEnvelope, type SeenLedger, TELEMETRY_PAYLOAD_TYPE } from "@intellectual-frontiers/telemetry/envelope";
 import {
   type AttributeValue,
@@ -1025,7 +1026,17 @@ export type ReceiverPolicy = {
   readonly signatures: "required" | "optional";
   /** What was taken, to drop a replay (FR-007); the receiver updates `current`. */
   readonly ledger?: { current: SeenLedger };
+  /** What a source may send (0003-telemetry-reach FR-023): the body it may send is read up to `maxBodyBytes` (413 past it) and the batches it may send are limited by a bucket per source (429 with `Retry-After`, the code `E-TELEM-RATE-LIMITED`); a batch refused is not taken and not marked seen, so the sender keeps it. */
+  readonly limits?: { readonly limits: SourceLimits; readonly now?: () => number };
 };
+
+/** The answer to a source over its limits: 429, the code, and when to try again. */
+function limited(retryAfterMs: number): Response {
+  return new Response(JSON.stringify({ code: 8, message: "E-TELEM-RATE-LIMITED: this source is over its limit; send the batch again later" }), {
+    status: 429,
+    headers: { "content-type": "application/json", "retry-after": String(Math.max(1, Math.ceil(retryAfterMs / 1000))) },
+  });
+}
 
 const ASSET = "if.asset.id";
 const RELAY = "if.relay.id";
@@ -1051,6 +1062,15 @@ const stamp = <B extends { readonly resource: Resource }>(batches: readonly B[],
  * already took with a success answer so that the sender removes it from its queue.
  */
 export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (request: Request) => Promise<Response> {
+  let limiter = policy?.limits === undefined ? undefined : newLimiter(policy.limits.limits);
+  const clock = policy?.limits?.now ?? Date.now;
+  /** Whether the source may send a batch now: a refusal to give, or nothing. */
+  const overLimit = (who: DeviceIdentity): Response | undefined => {
+    if (limiter === undefined) return undefined;
+    const t = takeAllowance(limiter, who.assetId ?? who.relayId ?? "anonymous", clock());
+    limiter = t.limiter;
+    return t.kind === "limited" ? limited(t.retryAfterMs) : undefined;
+  };
   return untraced(async (request: Request): Promise<Response> => {
     const path = new URL(request.url).pathname;
     const signal = Object.hasOwn(RECEIVER_PATHS, path) ? RECEIVER_PATHS[path] : undefined;
@@ -1061,6 +1081,14 @@ export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (re
     if (type !== "application/json" && !signed) {
       await request.body?.cancel().catch(() => undefined);
       return statusResponse(415, 3, `the content type ${type === "" ? "(none)" : type} is not supported; send application/json`);
+    }
+    const cap = policy?.limits?.limits.maxBodyBytes;
+    if (cap !== undefined) {
+      const declared = Number(request.headers.get("content-length") ?? "0");
+      if (declared > cap) {
+        await request.body?.cancel().catch(() => undefined);
+        return statusResponse(413, 3, `the body is larger than the limit of ${cap} bytes`);
+      }
     }
     let who: DeviceIdentity | undefined;
     if (policy !== undefined && !signed) {
@@ -1074,9 +1102,15 @@ export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (re
         return statusResponse(401, 16, "the sender is not identified");
       }
       who = a.value;
+      const over = overLimit(who);
+      if (over !== undefined) {
+        await request.body?.cancel().catch(() => undefined);
+        return over;
+      }
     }
     const text = await bodyText(request);
     if (text.kind === "err") return text.error;
+    if (cap !== undefined && new TextEncoder().encode(text.value).length > cap) return statusResponse(413, 3, `the body is larger than the limit of ${cap} bytes`);
     let parsed: unknown;
     try {
       parsed = JSON.parse(text.value);
@@ -1091,6 +1125,8 @@ export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (re
       if (known === undefined || known.assetId !== opened.value.predicate.device) return statusResponse(401, 16, "the sender is not an enrolled device");
       if (opened.value.predicate.signal !== signal) return statusResponse(400, 3, "the envelope is of another signal than the path");
       who = known;
+      const over = overLimit(who);
+      if (over !== undefined) return over;
       if (policy.ledger !== undefined) {
         const [verdict, next] = acceptBatch(policy.ledger.current, opened.value.predicate);
         if (verdict.kind === "err") return new Response(JSON.stringify(encodeResponse(signal, { rejected: 0, errorMessage: "" })), { status: 200, headers: { "content-type": "application/json" } });

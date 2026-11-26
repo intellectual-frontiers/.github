@@ -14,3 +14,4 @@
  */
 export * as console from "./console.ts";
 export * as otel from "./otel.ts";
+export * as relay from "./relay.ts";

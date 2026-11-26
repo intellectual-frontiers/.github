@@ -18,17 +18,23 @@
 import { createReadStream } from "node:fs";
 import { realpath, stat } from "node:fs/promises";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { createServer as createSecureServer } from "node:https";
 import type { AddressInfo } from "node:net";
 import { isAbsolute, join, relative, sep } from "node:path";
 import { Readable } from "node:stream";
-import { mapError } from "@intellectual-frontiers/system/errors";
+import { InvalidData, mapError, NotSupported } from "@intellectual-frontiers/system/errors";
+import { clientAuth, subjectOf, type ClientCertMode } from "./tcp.ts";
 import { traceServer } from "@intellectual-frontiers/telemetry/host/otel";
 
 /** Where the server listens, or where a request came from. */
 export type NetAddr = { readonly hostname: string; readonly port: number };
 
 /** What a handler knows of a request besides the request itself. */
-export type ServeInfo = { readonly remoteAddr: NetAddr };
+export type ServeInfo = {
+  readonly remoteAddr: NetAddr;
+  /** The subject of the client's certificate where `tls` asked for one and it verified (`CN=device-01`); nothing otherwise. */
+  readonly clientSubject?: string;
+};
 
 /** A function from a request to its response. */
 export type ServeHandler = (request: Request, info: ServeInfo) => Response | Promise<Response>;
@@ -41,6 +47,13 @@ export type ServeOptions = {
   readonly hostname?: string;
   /** Aborting it shuts the server down. */
   readonly signal?: AbortSignal;
+  /** Answer HTTPS: the certificate chain and key in PEM, and where a client certificate is asked for, the roots it must chain to and whether it is required. Without it the server answers plain HTTP. */
+  readonly tls?: {
+    readonly cert: string;
+    readonly key: string;
+    readonly clientCa?: readonly string[];
+    readonly requestClientCert?: ClientCertMode;
+  };
   /** The response where the handler throws (a plain 500 by default). */
   readonly onError?: (error: unknown) => Response | Promise<Response>;
 };
@@ -103,23 +116,30 @@ async function send(res: ServerResponse, response: Response, head: boolean): Pro
 export function serve(options: ServeOptions, handler: ServeHandler): Promise<Server> {
   const hostname = options.hostname ?? "127.0.0.1";
   const onError = options.onError ?? (() => new Response("internal server error", { status: 500 }));
-  const server = createServer((req, res) => {
+  const mode = options.tls?.requestClientCert ?? "none";
+  if (mode !== "none" && (options.tls?.clientCa === undefined || options.tls.clientCa.length === 0)) return Promise.reject(new InvalidData("a client certificate is asked for, so the roots it must chain to (clientCa) are needed", "", ""));
+  if (mode !== "none" && "Bun" in globalThis) return Promise.reject(new NotSupported("a client certificate in serve is not supported on Bun: its HTTPS server gives a handler no peer certificate, so it cannot say who the client is; run it on Node 26, or authenticate by a token over TLS (without requestClientCert)", "", ""));
+  const handle = (req: IncomingMessage, res: ServerResponse): void => {
     const { request, abort } = toRequest(req, `${hostname}:${options.port ?? 0}`);
     res.on("close", () => {
       if (!res.writableFinished) abort.abort();
     });
     const remoteAddr = { hostname: req.socket.remoteAddress ?? "", port: req.socket.remotePort ?? 0 };
+    const clientSubject = subjectOf(req.socket);
+    const info: ServeInfo = { remoteAddr, ...(clientSubject === undefined ? {} : { clientSubject }) };
     void (async () => {
       let response: Response;
       try {
         // Where a telemetry pipeline is installed, an `http.server` span, the child of the request's `traceparent` (0001-net FR-016).
-        response = await traceServer(request, () => handler(request, { remoteAddr }), handler);
+        response = await traceServer(request, () => handler(request, info), handler);
       } catch (e) {
         response = await onError(e);
       }
       await send(res, response, request.method === "HEAD").catch(() => res.destroy());
     })();
-  });
+  };
+  const server = options.tls === undefined ? createServer(handle) : createSecureServer({ cert: options.tls.cert, key: options.tls.key, ...clientAuth(options.tls) }, handle);
+  server.on("tlsClientError", (_e, socket) => socket.destroy());
   const finished = new Promise<void>((resolve) => server.on("close", () => resolve()));
   const shutdown = async (): Promise<void> => {
     if (server.listening) {

@@ -1,5 +1,6 @@
 // Spec: 0005-reach-and-targets FR-005, FR-006
 // Spec: 0007-ssh-coverage FR-001, FR-003, FR-006
+// Spec: 0016-headless-ssh-forward FR-001, FR-003, FR-006
 /**
  * The one place the arguments of the system's OpenSSH client are made (commons headless 0005-reach-and-targets FR-005, FR-006; 0007-ssh-coverage FR-001, FR-003, FR-006). `ssh` joins what
  * it is given after the host into one string for the remote shell; `proc.run` does not, so the remote command is quoted here word by word and sent as ONE argument. The options every
@@ -121,6 +122,29 @@ export function sshArgv(t: Target, all: readonly Target[], config: SshConfig, re
   const common = connectionOptions(t, all, config);
   if (common.kind === "err") return common;
   return ok([config.program ?? "ssh", config.pty === true ? "-t" : "-T", ...common.value, ...(t.port === undefined ? [] : ["-p", String(t.port)]), "--", destination(t), remote]);
+}
+
+/** The one forward: a loopback port of this machine to a loopback port of the target. Both ends are `127.0.0.1`, so the type holds no host; a reverse forward and a dynamic forward are not a type here. */
+export type LocalForward = { readonly localPort: number; readonly remotePort: number };
+
+const portOk = (p: number): boolean => Number.isInteger(p) && p >= 1024 && p <= 65535;
+
+/**
+ * The argument vector of a forward that stays up (`-N`): `-L 127.0.0.1:<localPort>:127.0.0.1:<remotePort>`, `ExitOnForwardFailure=yes`, the options of the family `pinned` (only the host key pinned for the target,
+ * batch mode), the port, then `--` and the destination. Any other family is refused, and so is a port outside 1024 to 65535.
+ */
+export function sshForwardArgv(t: Target, all: readonly Target[], config: SshConfig, forward: LocalForward): Result<readonly string[], string> {
+  if ((config.family ?? "batch") !== "pinned") return err("a forward is made only in the family pinned: the one host key pinned for the target");
+  if (!portOk(forward.localPort) || !portOk(forward.remotePort)) return err("the ports of a forward are whole numbers from 1024 to 65535");
+  const { controlDir: _shared, ...alone } = config;
+  const common = connectionOptions(t, all, alone);
+  if (common.kind === "err") return common;
+  return ok([config.program ?? "ssh", "-N", "-T", ...common.value, ...o("ExitOnForwardFailure", "yes"), "-L", `127.0.0.1:${forward.localPort}:127.0.0.1:${forward.remotePort}`, ...(t.port === undefined ? [] : ["-p", String(t.port)]), "--", destination(t)]);
+}
+
+/** The state of a forward as a pure function of a probe the caller made: `up` where the local port accepted a connection, `down` otherwise. The process is supervised by the service of the family, not here. */
+export function forwardState(localPortAccepts: boolean): "up" | "down" {
+  return localPortAccepts ? "up" : "down";
 }
 
 /** A remote path that a remote shell cannot expand or split: letters, digits and `_@%+=:,./-`; no space, quote, glob, `$`, backtick, `;`, `&`, `|`, `<`, `>`, parenthesis, brace, `~` or backslash. */

@@ -79,8 +79,8 @@ requirement	mechanism	by	note
 0007-ssh-server-dedupe-and-forward FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0007-ssh-server-dedupe-and-forward FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0007-ssh-server-dedupe-and-forward FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0007-ssh-server-dedupe-and-forward FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0007-ssh-server-dedupe-and-forward FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0007-ssh-server-dedupe-and-forward FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0007-ssh-server-dedupe-and-forward FR-008	check	.github: cd commons/ssh-server && bun test suite/	forward.test.ts: no forward by default; the check refuses another account, a port outside 1024 to 65535, a second rule and a bad byte limit
+0007-ssh-server-dedupe-and-forward FR-009	check	.github: cd commons/ssh-server && bun test suite/	forward.test.ts: the decision, and the real OpenSSH client: one loopback port, another port or host, a second forward, an unenrolled key, an anonymous account, a remote forward, a revoked key
+0007-ssh-server-dedupe-and-forward FR-010	check	.github: cd commons/ssh-server && bun test suite/	forward.test.ts: open and close audited with counts and digests and no byte; the byte limit closes a forward
 0007-ssh-server-dedupe-and-forward FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0007-ssh-server-dedupe-and-forward FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

@@ -61,8 +61,18 @@ export function brandProblems(b: Brand): readonly string[] {
   return out;
 }
 
+/** The one loopback port an account may reach by a forward (`ssh -L`). The host is `127.0.0.1` and is not a field. */
+export type ForwardRule = { readonly account: ServiceAccount; readonly port: number };
+
+/** The most forwards one enrolled device may hold at once. */
+export const MAX_FORWARDS_PER_DEVICE = 1;
+
 /** The server policy. */
 export type ServerPolicy = {
+  /** The forwards the server accepts: none by default (every forward is refused). Only `s-device` may have a rule, one rule at most, and a port from 1024 to 65535. */
+  readonly forwards: readonly ForwardRule[];
+  /** The most bytes a forward may carry, both ways together, before the server closes it. */
+  readonly maxForwardBytes: number;
   /** The service accounts the server accepts (only built ones can be listed). */
   readonly accounts: readonly ServiceAccount[];
   /** The most bytes of a conversation to keep as a transcript in the audit log (0: digests only). */
@@ -103,6 +113,8 @@ export type ServerIdentity = Pick<ServerPolicy, "endpoint" | "brand">;
 /** The defaults of the server policy, with no endpoint and no brand: see {@link serverPolicy}. */
 export const SERVER_POLICY_DEFAULTS: Omit<ServerPolicy, "endpoint" | "brand"> = {
   accounts: ["s-enroll", "s-device"],
+  forwards: [],
+  maxForwardBytes: 8 * 1024 * 1024,
   transcriptBytes: 0,
   anonymous: "keyboard-interactive",
   allowCidrs: [],
@@ -143,3 +155,19 @@ export type EnrollPolicy = { readonly rules: readonly EnrollRule[] };
 
 /** The policy that approves nothing: a person decides every session. */
 export const PERSON_DECIDES: EnrollPolicy = { rules: [] };
+
+/**
+ * What is wrong with a policy, as sentences (empty where it is well formed): a forward rule for an account other than `s-device`, a port outside 1024 to 65535 or that is not a whole number, a second rule for one account, and a forward byte limit that is not a positive whole number.
+ */
+export function policyProblems(policy: Pick<ServerPolicy, "forwards" | "maxForwardBytes">): readonly string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const rule of policy.forwards) {
+    if (rule.account !== "s-device") out.push(`a forward rule is for s-device only, not ${String(rule.account)}`);
+    if (!Number.isInteger(rule.port) || rule.port < 1024 || rule.port > 65535) out.push(`the port of a forward rule is a whole number from 1024 to 65535, not ${String(rule.port)}`);
+    if (seen.has(rule.account)) out.push(`there is more than one forward rule for ${rule.account}`);
+    seen.add(rule.account);
+  }
+  if (!Number.isInteger(policy.maxForwardBytes) || policy.maxForwardBytes <= 0) out.push("maxForwardBytes is a positive whole number");
+  return out;
+}

@@ -15,13 +15,17 @@
     "./semconv": "./src/governance/semconv.ts",
     "./queue": "./src/logical/queue.ts",
     "./envelope": "./src/logical/envelope.ts",
+    "./limits": "./src/logical/limits.ts",
+    "./retention": "./src/logical/retention.ts",
+    "./syslog": "./src/logical/syslog.ts",
     "./exporter": "./src/logical/exporter.ts",
     "./query": "./src/logical/query.ts",
     "./host/query": "./src/physical/query.ts",
     "./render": "./src/logical/render.ts",
     "./host": "./src/physical/mod.ts",
     "./host/otel": "./src/physical/otel.ts",
-    "./host/console": "./src/physical/console.ts"
+    "./host/console": "./src/physical/console.ts",
+    "./host/relay": "./src/physical/relay.ts"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json",

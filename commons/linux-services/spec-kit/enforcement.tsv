@@ -12,12 +12,12 @@ requirement	mechanism	by	note
 0002-linux-services-profiles FR-007	check	.github: cd commons/linux-services && bun run verify	suite/services.test.ts
 0002-linux-services-profiles FR-008	check	.github: cd commons/linux-services && bun run verify	suite/services.test.ts
 0002-linux-services-profiles FR-009	check	.github: cd commons/linux-services && bun run verify	suite/services.test.ts
-0003-linux-services-otel FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-linux-services-otel FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-linux-services-otel FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-linux-services-otel FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-linux-services-otel FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0003-linux-services-otel FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-linux-services-otel FR-001	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: parse gives every reason; ports; the relay's own program takes tcp syslog and otlp only
+0003-linux-services-otel FR-002	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: a secret-looking field refused; the files name the paths of secrets, never a value
+0003-linux-services-otel FR-003	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: the manifest and the configuration name exactly the same components
+0003-linux-services-otel FR-004	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: the pipelines, otlphttp at the forward in json gzip with a persistent queue and a token file, no public bind unnamed
+0003-linux-services-otel FR-005	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: accepted requirements in order, the unit unprivileged, the forward from the vector of headless
+0003-linux-services-otel FR-006	check	.github: cd commons/linux-services && bun test suite/	relay.test.ts: the program is a pin of our release by SHA-256 for pinned-downloads; a command installs nothing
 0003-linux-services-otel FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0003-linux-services-otel FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
 0003-linux-services-otel FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

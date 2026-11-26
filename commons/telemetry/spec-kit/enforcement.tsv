@@ -54,3 +54,6 @@ requirement	mechanism	by	note
 0003-telemetry-reach FR-020	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: a round collects, signs, numbers, queues and drains with every dependency given; the command of FR-021 is deferred
 0003-telemetry-reach FR-021	none	-	Deferred: not built yet
 0003-telemetry-reach FR-022	none	-	Deferred: not built yet
+0003-telemetry-reach FR-023	check	.github: cd commons/telemetry && bun test suite/	limits.test.ts: the bucket, the body limit, 429 with Retry-After, a batch refused is not marked seen
+0003-telemetry-reach FR-024	check	.github: cd commons/telemetry && bun test suite/	limits.test.ts: the policy, expired and its checks
+0003-telemetry-reach FR-025	check	.github: cd commons/telemetry && bun test suite/	syslog.test.ts: the two formats and what is neither, the batches by host, the relay sends with the token and keeps what it could not send
