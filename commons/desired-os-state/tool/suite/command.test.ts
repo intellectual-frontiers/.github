@@ -83,7 +83,7 @@ async function withWorld<T>(f: (w: World) => Promise<T>, more: { readonly integr
       pins: { lookup: () => err("no pins here") },
       policy: { platform: "linux-x64", integrity: more.integrity ?? "release-line", systemCopy: "never" },
       subject: "build-01.example.test",
-      interlock: () => ok(permit),
+      interlock: () => Promise.resolve(ok(permit)),
       assurance: "solo",
       workFolder: work,
     };

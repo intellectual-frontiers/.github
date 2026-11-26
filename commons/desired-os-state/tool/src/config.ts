@@ -46,7 +46,7 @@ export type ToolPluginConfig = {
   /** The name of this computer, as the fleet names it. */
   readonly subject: string;
   /** The interlock of the fleet (`permits` of estate over its approved boundaries): the permit for `apply` on this computer at an instant, or why it is refused. No step of a plan is made without it. */
-  readonly interlock: (subject: string, at: string) => Result<Permit<"apply">, Refusal>;
+  readonly interlock: (subject: string, at: string) => Promise<Result<Permit<"apply">, Refusal>>;
   /** The assurance profile of the fleet. */
   readonly assurance: ProfileName;
   /** The folder the rendered files go in, under `.desired-os-state/<digest>/`, and the working folder of every step. */

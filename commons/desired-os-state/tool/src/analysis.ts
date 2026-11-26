@@ -76,7 +76,7 @@ export async function analyse(config: ToolPluginConfig, names: readonly string[]
   if (order.kind === "err") return err(order.error.map((p) => JSON.stringify(p)));
   const plan = planOf(order.value, observed);
   const now = new Date().toISOString();
-  const permit = config.interlock(subject.value, now);
+  const permit = await config.interlock(subject.value, now);
   if (permit.kind === "err") return err([`${permit.error.code}: ${permit.error.reason}`]);
   const shares: Share[] = [];
   const problems: string[] = [];
