@@ -5,7 +5,7 @@
  *
  * @remarks
  * It stands on PROV-O and SKOS, whose terms the library `rdf` already holds: each class is a `prov:Entity` and each code list is a SKOS concept. NIST, CISA and the Department of Defense publish no machine-readable vocabulary of these terms that was read, so no IRI of
- * theirs is written (the definitions, in our own words, and what was not read, are in commons 0047-zero-trust `definitions.md`). The maturity stages and the activities of the maturity models are classes without members: their names are written when the models are read.
+ * theirs is written (the definitions, in our own words, and what was not read, are in commons 0047-zero-trust `definitions.md`). The maturity stages and the activities of the maturity models are classes without members: the names of the stages are in the catalog `catalog-zero-trust`, and the activities are written when their source is read.
  *
  * @limits
  * The properties do not yet carry a basis of their own (the baseline holds them until the schemas require it). The pillars are the five areas and three themes of the federal strategy as it cites the maturity model of the Cybersecurity and Infrastructure Security Agency; the seven pillars of the Department of Defense were not read.

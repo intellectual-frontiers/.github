@@ -446,6 +446,7 @@ export const config: DocsConfig = {
     { layout: "commons", dir: "commons/planning-query/spec-kit" },
     { layout: "commons", dir: "commons/workbench/spec-kit" },
     { layout: "commons", dir: "commons/workload/spec-kit" },
+    { layout: "commons", dir: "commons/catalog-zero-trust/spec-kit" },
   ],
   citations: { prefix: "commons", digits: 4, text: ["erga", "desired-os-state", "thyra"] },
   lenses: [guides, releases, dataModels, programs, repoOps],

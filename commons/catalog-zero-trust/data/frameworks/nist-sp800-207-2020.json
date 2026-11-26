@@ -1,0 +1,114 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "nist-sp800-207",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-zero-trust",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/nist.ts",
+      "src/governance/ztmm.ts",
+      "src/governance/omb.ts",
+      "src/governance/crosswalk.ts"
+    ]
+  },
+  "version": "2020",
+  "title": "NIST SP 800-207 Zero Trust Architecture: the tenets and the sources of input, in our own words",
+  "controls": [
+    {
+      "id": "T1",
+      "title": "Everything that holds data or serves is a resource",
+      "statement": "Every data source and every computing service is a resource: small devices that send data, software run by others, systems that command machines and, where the organization chooses, personally owned devices that reach its resources.",
+      "family": "tenet"
+    },
+    {
+      "id": "T2",
+      "title": "Every communication is secured, wherever it comes from",
+      "statement": "Communication is protected in the same way whether it starts inside the organization's network or outside it; being on the inside earns nothing, and each communication keeps its content private, whole and tied to an authenticated source.",
+      "family": "tenet"
+    },
+    {
+      "id": "T3",
+      "title": "Access is granted for one resource and one session",
+      "statement": "A requester is evaluated before it may reach one resource, for one session, with the least privilege the task needs; a grant for one resource is not a grant for another and does not outlast the session.",
+      "family": "tenet"
+    },
+    {
+      "id": "T4",
+      "title": "Access is decided by a dynamic policy",
+      "statement": "The decision uses the observable state of the requester's identity, of the application and of the asset it comes from, and may add behavior and the environment (the time, the place, reported attacks); the more sensitive the resource, the stricter the rule.",
+      "family": "tenet"
+    },
+    {
+      "id": "T5",
+      "title": "The posture of every asset is watched and measured",
+      "statement": "The organization monitors and measures the integrity and security posture of every asset it owns or is associated with, and no asset is trusted for what it is; a vulnerable, subverted or unmanaged asset may be treated differently, up to refusing all of its connections.",
+      "family": "tenet"
+    },
+    {
+      "id": "T6",
+      "title": "Authentication and authorization are dynamic and enforced before access",
+      "statement": "Identity, credential and access management and asset management are in place, and the cycle of granting access, assessing threats, adapting and checking again runs continuously, with a new authentication when an event the policy names occurs.",
+      "family": "tenet"
+    },
+    {
+      "id": "T7",
+      "title": "The organization collects what it can and uses it to improve",
+      "statement": "As much as possible is collected about the state of assets, the network and the communications, and the collection is used to improve the policy and its enforcement.",
+      "family": "tenet"
+    },
+    {
+      "id": "S1",
+      "title": "Continuous diagnostics and mitigation",
+      "statement": "A system that reports the state of the organization's assets: what each runs, what it lacks and what is wrong with it, so that the decision can use the asset's posture.",
+      "family": "input"
+    },
+    {
+      "id": "S2",
+      "title": "Compliance rules",
+      "statement": "The rules of the regimes the organization answers to (the law, the contract, the standard), as the policy must keep them, so that a decision does not permit what a regime forbids.",
+      "family": "input"
+    },
+    {
+      "id": "S3",
+      "title": "Threat intelligence",
+      "statement": "Feeds and services that tell the engine about new attacks and weaknesses, so that a decision can refuse what is under attack even when its own signals look sound.",
+      "family": "input"
+    },
+    {
+      "id": "S4",
+      "title": "Activity logs",
+      "statement": "Records of what happened on the network and on systems (flows, access, changes), so that a decision can use recent behavior and an investigation can follow a path.",
+      "family": "input"
+    },
+    {
+      "id": "S5",
+      "title": "Data access policy",
+      "statement": "The rules about who and what may reach which data, written by the owners of the data, which the engine takes as the starting point of a decision about a resource.",
+      "family": "input"
+    },
+    {
+      "id": "S6",
+      "title": "Public key infrastructure",
+      "statement": "The system that issues and checks the certificates of people, services and devices, so that a decision can rely on who a certificate says its subject is.",
+      "family": "input"
+    },
+    {
+      "id": "S7",
+      "title": "Identity management",
+      "statement": "The system that holds the subjects, their attributes and their roles, so that a decision knows who is asking and what they may be given.",
+      "family": "input"
+    },
+    {
+      "id": "S8",
+      "title": "Security information and event management",
+      "statement": "The system that gathers the security events of the whole estate and finds patterns in them, so that a decision can use an alert as a signal.",
+      "family": "input"
+    }
+  ],
+  "publisher": "National Institute of Standards and Technology (NIST)",
+  "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf"
+}

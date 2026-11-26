@@ -55,14 +55,25 @@ Zero trust is therefore not a product, not a boundary and not a framework of con
 | Data goal | A shared path to protections built on thorough categorization of data, cloud security services that monitor access to sensitive data, and enterprise-wide logging and information sharing. | Same. **Read.** |
 | Date | The goals are to be met by the end of fiscal year 2024. | Same. **Read.** |
 
+## 4b. The maturity model (CISA Zero Trust Maturity Model 2.0)
+
+| Item | Our wording | Source and status |
+| --- | --- | --- |
+| What it is | A model of the gradient of implementation of zero trust across five pillars, with three capabilities that cut across them, for federal civilian agencies and offered to any organization; it is one path among several and reflects the seven tenets of SP 800-207. Version 2.0 was revised to align with OMB M-22-09. | CISA ZTMM 2.0 (April 2023), sections 1 and 5, pages 4 to 7. **Read.** |
+| Pillars | Five: identity, devices, networks, applications and workloads, data. | Section 5, page 6, and figure 1. **Read.** |
+| Cross-cutting capabilities | Three: visibility and analytics, automation and orchestration, governance. | Section 5, pages 6 and 11. **Read.** |
+| Stages | Four: traditional, initial, advanced, optimal. The text calls the journey three steps that advance from a traditional start to the other three. The general criteria of each stage (manual and siloed at the start; automation and cross-pillar solutions beginning at initial; coordinated and risk-driven at advanced; just in time, self-reporting and dynamic at optimal) are in the catalog in our words. | Section 5, page 9 and figure 2. **Read.** |
+| Functions | Twenty-two functions in the five pillars (identity 4, devices 4, networks 4, applications and workloads 5, data 5), each with a description of the four stages, and the three capabilities described for each pillar and in general. | Tables 2 to 7, pages 13 to 30. **Read.** The tables are not carried; the catalog has one sentence of ours for each pillar at each stage and for each function. |
+| What it leaves out | Incident response, the specifics of logging, monitoring, alerting, forensics, risk acceptance and recovery; operational technology and some internet-of-things devices; deception, behavior analytics and machine learning. | Section 5, page 11. **Read.** |
+| Numbers | The model gives no numeric threshold for a stage: the thresholds of the catalog (`catalog-zero-trust` 0003-zero-trust-stages) are ours. | Whole document. **Read.** |
+
 ## 5. Not read
 
 These are the sources this note names but could not read; the rows of the catalog that rest on them are not written until they are read at their source, and a requirement of 0047-zero-trust says so.
 
 | Source | What rests on it | Status |
 | --- | --- | --- |
-| CISA Zero Trust Maturity Model, version 2.0 | The names and meanings of the maturity stages (the memorandum above cites the model and names its pillars and themes; the stage names and the per-function tables are in the model itself) | **Not read**: the host refused the download. The stage names are not written into the ontology. |
-| DoD Zero Trust Strategy and the activities list (target level and advanced) | Its pillars, the activity names and the counts of activities at each level | **Not read**: the host refused the download. The counts of 91 and 152 that the owner named are **unverified**; no activity is written into any file until the list is read. |
+| DoD Zero Trust Strategy and the activities list (target level and advanced) | Its pillars, the activity names and the counts of activities at each level | **Not read**: the host refused the download, and a second attempt through other official addresses was not made because the environment refused the request. The counts of 91 and 152 that the owner named are **unverified**; no activity is written into any file until the list is read. |
 | DoD zero trust reference architecture and overlays | The mapping of activities to controls | **Not read.** |
 | NCCoE supplemental mappings to SP 800-53 Rev. 5 and CSF 2.0 | The crosswalk from controls to the pillars | **Not read**: they are not in the guide. The crosswalk is made from that source when it is read; until then a control maps to a pillar only by a person's decision recorded with a reason. |
 | SP 800-207, sections 3.3 onward and section 4 onward | The variants of the trust algorithm, threats, migration | **Not read.** |

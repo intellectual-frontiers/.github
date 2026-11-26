@@ -1,0 +1,1273 @@
+{
+  "kind": "grc.crosswalk",
+  "schema": "1",
+  "id": "zero-trust-crosswalk",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-zero-trust",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/nist.ts",
+      "src/governance/ztmm.ts",
+      "src/governance/omb.ts",
+      "src/governance/crosswalk.ts"
+    ]
+  },
+  "mappings": [
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AO",
+      "to": "urn:grc:nist-800-171:3:03.06.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for response and orchestration to be automated, which incident handling gives; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AO",
+      "to": "urn:grc:nist-800-53:5.2.0:IR-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for response and orchestration to be automated, which incident handling gives; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-171:3:03.01.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-171:3:03.01.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-171:3:03.05.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-24",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AA",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to an application is authorized, which access enforcement, least privilege and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-171:3:03.01.12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-171:3:03.01.22",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-171:3:03.13.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-22",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.AV",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how far applications can be reached by authorized users from outside, which remote access, boundary protection and publicly accessible content give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-171:3:03.04.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-171:3:03.04.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-171:3:03.16.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.DW",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how code reaches production, which configuration change control, access restrictions for change and developer controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.ST",
+      "to": "urn:grc:nist-800-171:3:03.11.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be tested for security, which developer testing, vulnerability scanning and security assessment give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.ST",
+      "to": "urn:grc:nist-800-171:3:03.12.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be tested for security, which developer testing, vulnerability scanning and security assessment give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.ST",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be tested for security, which developer testing, vulnerability scanning and security assessment give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.ST",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be tested for security, which developer testing, vulnerability scanning and security assessment give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.ST",
+      "to": "urn:grc:nist-800-53:5.2.0:SA-11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be tested for security, which developer testing, vulnerability scanning and security assessment give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-171:3:03.13.13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-171:3:03.14.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-18",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:AW.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that applications be protected from threats, which malicious code protection, monitoring, input validation and the control of mobile code give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-171:3:03.01.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-171:3:03.01.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-171:3:03.08.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AC",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access to data is governed, which access enforcement, information flow enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AV",
+      "to": "urn:grc:nist-800-171:3:03.08.09",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks where data is kept to be available, which backup and the alternate storage site give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AV",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks where data is kept to be available, which backup and the alternate storage site give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.AV",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-9",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks where data is kept to be available, which backup and the alternate storage site give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.CT",
+      "to": "urn:grc:nist-800-171:3:03.08.04",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that data be categorized and labeled, which security categorization, security attributes and media marking give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.CT",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that data be categorized and labeled, which security categorization, security attributes and media marking give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.CT",
+      "to": "urn:grc:nist-800-53:5.2.0:MP-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that data be categorized and labeled, which security categorization, security attributes and media marking give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.CT",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that data be categorized and labeled, which security categorization, security attributes and media marking give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-171:3:03.08.09",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-171:3:03.13.08",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-171:3:03.13.10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-171:3:03.13.11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-28",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.EN",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how data is encrypted and its keys protected, which protection at rest, in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.IN",
+      "to": "urn:grc:nist-800-171:3:03.04.11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how well the organization knows its data, which the inventory of systems and the location of information give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.IN",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how well the organization knows its data, which the inventory of systems and the location of information give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DT.IN",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how well the organization knows its data, which the inventory of systems and the location of information give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-171:3:03.04.10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-171:3:03.17.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-171:3:03.17.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.AS",
+      "to": "urn:grc:nist-800-53:5.2.0:SR-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that assets be tracked and supply chain risk managed, which the inventory of components and the supply chain controls give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-171:3:03.04.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-171:3:03.04.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-171:3:03.14.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.PC",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that device compliance be seen and enforced, which baselines, configuration settings, change control and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-171:3:03.01.12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-171:3:03.01.18",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-171:3:03.05.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-17",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-19",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.RA",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the device be considered in access, which device identification and the controls on remote and mobile access give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-171:3:03.14.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-171:3:03.14.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:DV.TP",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for threat protection on devices, which malicious code protection, monitoring and flaw remediation give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:GV",
+      "to": "urn:grc:nist-800-171:3:03.15.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks that policies be defined and enforced across the enterprise, which policy and procedures and the system security plan give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:GV",
+      "to": "urn:grc:nist-800-171:3:03.15.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks that policies be defined and enforced across the enterprise, which policy and procedures and the system security plan give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:GV",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-1",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks that policies be defined and enforced across the enterprise, which policy and procedures and the system security plan give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:GV",
+      "to": "urn:grc:nist-800-53:5.2.0:PL-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks that policies be defined and enforced across the enterprise, which policy and procedures and the system security plan give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-171:3:03.01.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-171:3:03.01.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-171:3:03.01.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-171:3:03.01.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AM",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how access is given and ended, which account management, access enforcement and least privilege give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AU",
+      "to": "urn:grc:nist-800-171:3:03.05.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how strongly an identity proves itself, which identification and authentication of users and the management of authenticators give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AU",
+      "to": "urn:grc:nist-800-171:3:03.05.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how strongly an identity proves itself, which identification and authentication of users and the management of authenticators give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AU",
+      "to": "urn:grc:nist-800-171:3:03.05.12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how strongly an identity proves itself, which identification and authentication of users and the management of authenticators give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AU",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how strongly an identity proves itself, which identification and authentication of users and the management of authenticators give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.AU",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how strongly an identity proves itself, which identification and authentication of users and the management of authenticators give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.IS",
+      "to": "urn:grc:nist-800-171:3:03.01.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how identities are held and joined, which identifier management and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.IS",
+      "to": "urn:grc:nist-800-171:3:03.05.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how identities are held and joined, which identifier management and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.IS",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how identities are held and joined, which identifier management and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.IS",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks how identities are held and joined, which identifier management and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.RA",
+      "to": "urn:grc:nist-800-171:3:03.11.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that identity risk be judged and used, which risk assessment and system monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.RA",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that identity risk be judged and used, which risk assessment and system monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.RA",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that identity risk be judged and used, which risk assessment and system monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:ID.RA",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that identity risk be judged and used, which risk assessment and system monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.RS",
+      "to": "urn:grc:nist-800-53:5.2.0:CP-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the network meet the availability applications need, which alternate telecommunications and the handling of denial of service give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.RS",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks that the network meet the availability applications need, which alternate telecommunications and the handling of denial of service give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-171:3:03.01.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-171:3:03.12.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-171:3:03.13.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-171:3:03.13.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.SG",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for the division of the network and for service-specific interconnections, which boundary protection, information flow enforcement and system interconnections give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-171:3:03.13.08",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-171:3:03.13.10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-171:3:03.13.11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TE",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic encrypted and its keys kept, which the protection of data in motion, key management and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TM",
+      "to": "urn:grc:nist-800-171:3:03.01.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic managed by the profile of an application, which information flow enforcement and boundary protection give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TM",
+      "to": "urn:grc:nist-800-171:3:03.13.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic managed by the profile of an application, which information flow enforcement and boundary protection give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TM",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic managed by the profile of an application, which information flow enforcement and boundary protection give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TM",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic managed by the profile of an application, which information flow enforcement and boundary protection give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:NW.TM",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the function asks for traffic managed by the profile of an application, which information flow enforcement and boundary protection give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-171:3:03.03.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-171:3:03.03.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-171:3:03.12.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:cisa-ztmm:2.0:VA",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the capability asks for logs and events collected and analyzed, which event logging, review of audit records, monitoring and continuous monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T1",
+      "to": "urn:grc:nist-800-171:3:03.04.10",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that every data source and service be known as a resource, which the inventories of components and systems record; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T1",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that every data source and service be known as a resource, which the inventories of components and systems record; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T1",
+      "to": "urn:grc:nist-800-53:5.2.0:PM-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that every data source and service be known as a resource, which the inventories of components and systems record; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-171:3:03.13.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-171:3:03.13.08",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-171:3:03.13.11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-13",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T2",
+      "to": "urn:grc:nist-800-53:5.2.0:SC-8",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that communication be protected wherever it starts, which boundary protection and the protection of data in motion and cryptography give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-171:3:03.01.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-171:3:03.01.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-171:3:03.01.11",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-12",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T3",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for access to one resource for one session with least privilege, which access enforcement, least privilege and session termination give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T4",
+      "to": "urn:grc:nist-800-171:3:03.01.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that a policy over the attributes of the requester decide, which access enforcement, attribute-based access and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-16",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that a policy over the attributes of the requester decide, which access enforcement, attribute-based access and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-24",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that a policy over the attributes of the requester decide, which access enforcement, attribute-based access and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T4",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that a policy over the attributes of the requester decide, which access enforcement, attribute-based access and access control decisions give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-171:3:03.04.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-171:3:03.11.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-171:3:03.12.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-53:5.2.0:CM-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-53:5.2.0:RA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T5",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that the posture of every asset be measured, which baselines, monitoring and vulnerability scanning give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-171:3:03.01.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-171:3:03.05.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-171:3:03.05.02",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-171:3:03.05.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-53:5.2.0:AC-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-3",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T6",
+      "to": "urn:grc:nist-800-53:5.2.0:IA-5",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks for authentication and authorization before access and for repeating them, which identification, authenticators and account management give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-171:3:03.03.01",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-171:3:03.03.05",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-171:3:03.12.03",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-171:3:03.14.06",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-2",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-53:5.2.0:AU-6",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-53:5.2.0:CA-7",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    },
+    {
+      "from": "urn:grc:nist-sp800-207:2020:T7",
+      "to": "urn:grc:nist-800-53:5.2.0:SI-4",
+      "relationship": "intersects-with",
+      "strength": 1,
+      "note": "person-decision-required: the tenet asks that as much as possible be collected about assets and communications and used, which event logging, review of audit records and monitoring give; the published mapping of the example architecture to the controls has not been read, so a person decides whether this pair holds and how strongly"
+    }
+  ]
+}

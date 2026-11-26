@@ -23,7 +23,7 @@
 
 ## Out of scope
 
-- The maturity stages and the activities of the maturity models, and the seven pillars of the Department of Defense: they are written when the models are read (commons 0047-zero-trust FR-022).
+- The names of the maturity stages are in the catalog `catalog-zero-trust` (the model of the Cybersecurity and Infrastructure Security Agency, read), not in the ontology; the activities of the maturity models and the seven pillars of the Department of Defense are written when their sources are read (commons 0047-zero-trust FR-022).
 
 ## Edge cases
 
@@ -50,7 +50,8 @@
 | Standards first (commons 0018-standards-first, read in this repository) | A term rests on a standard's term where one names it and is `unaligned` only by a Decision of the owner; no IRI is written that was not read | The specification itself |
 | PROV-O and SKOS, the terms the library `rdf` holds (read 2026-11-25, see 0003-planning-terms) | A class is a `prov:Entity`; each code list is a `skos:Concept` | The library `rdf` |
 | NIST SP 800-207, SP 800-207A, SP 1800-35 and OMB M-22-09 | The meanings of the terms, the seven tenets, the eight sources of input and the five areas with the three themes, in our own words | commons 0047-zero-trust `definitions.md`; none publishes a vocabulary with IRIs that was read |
-| CISA Zero Trust Maturity Model 2.0 and the DoD Zero Trust Strategy and activities | The maturity stages, the activities and the DoD pillars | Not read; nothing of them is written |
+| CISA Zero Trust Maturity Model 2.0 | The maturity stages, the pillars and the functions | Read; written in the catalog `catalog-zero-trust`, not in the ontology |
+| DoD Zero Trust Strategy and activities | The activities and the DoD pillars | Not read; nothing of them is written |
 
 ## Success criteria
 

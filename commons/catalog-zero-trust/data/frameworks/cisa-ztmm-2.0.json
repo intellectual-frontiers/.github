@@ -1,0 +1,420 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "cisa-ztmm",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-zero-trust",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/nist.ts",
+      "src/governance/ztmm.ts",
+      "src/governance/omb.ts",
+      "src/governance/crosswalk.ts"
+    ]
+  },
+  "version": "2.0",
+  "title": "CISA Zero Trust Maturity Model 2.0: the pillars, the cross-cutting capabilities, the functions and the stages, in our own words",
+  "controls": [
+    {
+      "id": "ALL@traditional",
+      "title": "Traditional",
+      "statement": "Lifecycles and the attributes of assets (for security and for logging) are set by hand; policies are fixed and deal with one pillar at a time; least privilege is set only when something is provisioned; pillars enforce on their own; response is manual; logs and telemetry are little correlated.",
+      "family": "stage"
+    },
+    {
+      "id": "ALL@initial",
+      "title": "Initial",
+      "statement": "Attributes and lifecycles begin to be assigned and configured by automation, as do policy decisions and their enforcement; the first solutions cross pillars and tie in outside systems; privilege is sometimes changed after provisioning; visibility is pooled for internal systems.",
+      "family": "stage"
+    },
+    {
+      "id": "ALL@advanced",
+      "title": "Advanced",
+      "statement": "Where it applies, lifecycles, configurations and policies are automated and coordinated across pillars; visibility and identity control are central; enforcement is joined up across pillars; response follows predefined mitigations; privilege changes with risk and posture; awareness grows across the enterprise, outside-hosted resources included.",
+      "family": "stage"
+    },
+    {
+      "id": "ALL@optimal",
+      "title": "Optimal",
+      "statement": "Lifecycles and attributes are assigned just in time and fully automatically, assets and resources report on themselves, and policies change on observed triggers; privilege is just enough, within thresholds, for assets and what they depend on; pillars interoperate under continuous monitoring with central visibility and full situational awareness.",
+      "family": "stage"
+    },
+    {
+      "id": "ID",
+      "title": "Identity",
+      "statement": "What uniquely describes a user or an entity that is not a person, and whether each gets the right access to the right resources at the right time for the right purpose and no more, through identity, credential and access management that proves, authorizes and judges the risk of an identity.",
+      "family": "pillar"
+    },
+    {
+      "id": "DV",
+      "title": "Devices",
+      "statement": "Any asset that can join a network, whether the organization's or a guest's, from servers to printers and network equipment, with its hardware, software and firmware, and the cloud and virtual assets that stand in for devices: kept in a live inventory with their configuration and known weaknesses, secured, and refused when unauthorized.",
+      "family": "pillar"
+    },
+    {
+      "id": "NW",
+      "title": "Networks",
+      "statement": "The open media that carry messages (internal, wireless, the internet, cellular and application channels), where zero trust moves the controls from the perimeter to the flows: isolating hosts, enforcing encryption, segmenting activity and seeing traffic, with each application treated by its own profile.",
+      "family": "pillar"
+    },
+    {
+      "id": "AW",
+      "title": "Applications and workloads",
+      "statement": "The systems, programs and services that run on premises, on mobile devices and in clouds, managed and delivered securely with fine access control and threat protection, and treated as if reachable from outside, so that the weight of assurance moves from the accreditation boundary to the application itself.",
+      "family": "pillar"
+    },
+    {
+      "id": "DT",
+      "title": "Data",
+      "statement": "All structured and unstructured files and fragments that live or lived in systems, devices, networks, applications, databases, infrastructure and backups, with their metadata: inventoried, categorized and labeled, protected at rest and in transit, watched for exfiltration and governed over their life.",
+      "family": "pillar"
+    },
+    {
+      "id": "VA",
+      "title": "Visibility and analytics",
+      "statement": "The observable artifacts that the characteristics and the events of an environment leave, analyzed to inform policy decisions and response and to build a risk profile that lets security act before an incident.",
+      "family": "theme"
+    },
+    {
+      "id": "AO",
+      "title": "Automation and orchestration",
+      "statement": "The use of automated tools and workflows that support security response across products and services, with oversight, security and interaction kept over how those functions, products and services are developed.",
+      "family": "theme"
+    },
+    {
+      "id": "GV",
+      "title": "Governance",
+      "statement": "The definition and enforcement of the policies, procedures and processes of cybersecurity within and across pillars, to manage the enterprise and reduce risk in support of zero trust and of the requirements the organization answers to.",
+      "family": "theme"
+    },
+    {
+      "id": "ID.AU",
+      "title": "Authentication",
+      "statement": "How strongly an identity proves itself and whether that is checked once at the start or throughout the session: from a password or multi-factor authentication with standing access, through phishing-resistant multi-factor authentication such as FIDO2 or PIV, to continuous validation.",
+      "family": "ID"
+    },
+    {
+      "id": "ID.IS",
+      "title": "Identity stores",
+      "statement": "How many places hold identities and how well they are joined: from self-run, on-premises stores only, to stores that are consolidated and securely integrated across partners and environments.",
+      "family": "ID"
+    },
+    {
+      "id": "ID.RA",
+      "title": "Risk assessments",
+      "statement": "How the risk that an identity is compromised is judged and used: from rare determinations, through manual methods and static rules, to analysis in real time with dynamic rules that feed access decisions.",
+      "family": "ID"
+    },
+    {
+      "id": "ID.AM",
+      "title": "Access management",
+      "statement": "How access is given and ended: from permanent access reviewed from time to time, through expiring grants with automatic review and then need-based, per-session access, to just-in-time and just-enough access tailored to each action and resource.",
+      "family": "ID"
+    },
+    {
+      "id": "DV.PC",
+      "title": "Policy enforcement and compliance monitoring",
+      "statement": "How much the organization can see of a device's compliance and make it comply: from little visibility, through self-reported characteristics, to verified insight at first access and compliance enforced for the whole life of devices and virtual assets, with automated management of software, configuration and patches.",
+      "family": "DV"
+    },
+    {
+      "id": "DV.AS",
+      "title": "Asset and supply chain risk management",
+      "statement": "How assets are tracked and their supply chain risk managed: from ad hoc acquisition with no enterprise view, to a near-real-time view across vendors and providers and supply chain risk handled with automation and tolerance for failures.",
+      "family": "DV"
+    },
+    {
+      "id": "DV.RA",
+      "title": "Resource access",
+      "statement": "Whether access to a resource takes the requesting device into account: from no requirement to see the device, through devices that report characteristics, to decisions that use verified insight and real-time risk analytics from the device.",
+      "family": "DV"
+    },
+    {
+      "id": "DV.TP",
+      "title": "Device threat protection",
+      "statement": "How threat protection is deployed to devices and virtual assets: from manual deployment to some devices, to one central solution with advanced capability and a single approach to protection, policy enforcement and compliance monitoring.",
+      "family": "DV"
+    },
+    {
+      "id": "NW.SG",
+      "title": "Network segmentation",
+      "statement": "How finely the network is divided: from large perimeter segments with few limits on reach and bulk tunnels, through isolation of critical workloads and service-specific interconnections, to distributed micro-perimeters around application profiles with just-in-time, just-enough connectivity.",
+      "family": "NW"
+    },
+    {
+      "id": "NW.TM",
+      "title": "Network traffic management",
+      "statement": "How traffic is steered and prioritized by application: from static rules set by hand at provisioning, through application profiles with distinct traffic features, to rules that evolve continuously and reprioritize by mission criticality and risk.",
+      "family": "NW"
+    },
+    {
+      "id": "NW.TE",
+      "title": "Traffic encryption",
+      "statement": "How much traffic is encrypted and how its keys are kept: from minimal encryption and ad hoc keys, through encryption of all internal traffic and formal key policy, to all applicable traffic encrypted with least-privilege key management and cryptographic agility.",
+      "family": "NW"
+    },
+    {
+      "id": "NW.RS",
+      "title": "Network resilience",
+      "statement": "How the network meets the availability that applications need: from case-by-case configuration with little resilience for non-critical work, to holistic delivery that adapts to changing demand for all workloads in proportion.",
+      "family": "NW"
+    },
+    {
+      "id": "AW.AA",
+      "title": "Application access",
+      "statement": "How access to an application is authorized: from local authorization on static attributes, through per-request decisions with context such as identity and device compliance, with expiry, to continuous authorization from real-time risk, behavior and usage.",
+      "family": "AW"
+    },
+    {
+      "id": "AW.TP",
+      "title": "Application threat protections",
+      "statement": "How applications are protected from threats: from general-purpose protections for known threats, to protections woven into every workflow that are content aware and tailored to sophisticated attacks, with real-time visibility.",
+      "family": "AW"
+    },
+    {
+      "id": "AW.AV",
+      "title": "Accessible applications",
+      "statement": "How far applications can be reached by authorized users over open networks: from private networks and VPNs only, through brokered connections for some, to all applicable applications available to authorized users and devices.",
+      "family": "AW"
+    },
+    {
+      "id": "AW.DW",
+      "title": "Secure application development and deployment workflow",
+      "statement": "How code reaches production: from ad hoc environments and non-robust deployment, through pipelines with least-privilege access, to coordinated teams, no developer access to production, immutable workloads and change only by redeployment.",
+      "family": "AW"
+    },
+    {
+      "id": "AW.ST",
+      "title": "Application security testing",
+      "statement": "How applications are tested for security: from manual tests before deployment, through static and dynamic testing with expert analysis, to testing built into the whole lifecycle with routine automated tests of deployed applications.",
+      "family": "AW"
+    },
+    {
+      "id": "DT.IN",
+      "title": "Data inventory management",
+      "statement": "How well the organization knows what data it has: from a manual inventory of the data that matters most, to continuous inventory of all applicable data with loss prevention that blocks suspected exfiltration dynamically.",
+      "family": "DT"
+    },
+    {
+      "id": "DT.CT",
+      "title": "Data categorization",
+      "statement": "How data is categorized and labeled: from limited ad hoc capability, through a strategy with defined labels and manual enforcement, to automated categorization and labeling across the enterprise in granular, structured formats for all data types.",
+      "family": "DT"
+    },
+    {
+      "id": "DT.AV",
+      "title": "Data availability",
+      "statement": "Where data is kept to be available: from on-premises stores with some off-site backups, to redundant, highly available stores with access to history, optimized dynamically for what users and entities need.",
+      "family": "DT"
+    },
+    {
+      "id": "DT.AC",
+      "title": "Data access",
+      "statement": "How access to data is governed: from static access controls, through automated controls with elements of least privilege, to dynamic just-in-time and just-enough controls using identity, device risk, application and data category, with continuous review of permissions.",
+      "family": "DT"
+    },
+    {
+      "id": "DT.EN",
+      "title": "Data encryption",
+      "statement": "How data is encrypted and its keys protected: from minimal encryption at rest and in transit and ad hoc keys, through all data in transit and key policies, to all data at rest and in transit, rotated keys with no secrets hard coded, and encryption in use where appropriate.",
+      "family": "DT"
+    },
+    {
+      "id": "ID@traditional",
+      "title": "Identity, traditional",
+      "statement": "Identities prove themselves with passwords or multi-factor authentication and hold standing access that is reviewed from time to time; the identity stores are self-run and on premises, identity risk is judged rarely and by hand, logs are read by hand, and people and entities are onboarded and removed manually.",
+      "family": "ID"
+    },
+    {
+      "id": "ID@initial",
+      "title": "Identity, initial",
+      "statement": "Multi-factor authentication is required and looks at more than one attribute of the entity; self-run and hosted identity stores exist with little joining between them; risk is judged by hand with static rules; access that is granted, privileged access too, expires and is reviewed automatically; non-privileged onboarding is automated.",
+      "family": "ID"
+    },
+    {
+      "id": "ID@advanced",
+      "title": "Identity, advanced",
+      "statement": "Phishing-resistant multi-factor authentication begins to cover every identity and password-free methods begin; stores are being consolidated; identity risk is analyzed in part automatically with dynamic rules that inform access decisions; access is need-based and per session; the orchestration of every identity is automated across environments.",
+      "family": "ID"
+    },
+    {
+      "id": "ID@optimal",
+      "title": "Identity, optimal",
+      "statement": "Identity is validated continuously, not only when access is first granted; identity stores are joined across partners and environments; risk is determined in real time; access is just in time and just enough for each action and resource; orchestration is fully automated.",
+      "family": "ID"
+    },
+    {
+      "id": "DV@traditional",
+      "title": "Devices, traditional",
+      "statement": "There is little or no insight into what a device does or whether it complies, and few ways to enforce policy; physical and virtual assets are tracked ad hoc and not across vendors; no view of the devices that reach resources is required; protections are deployed to some devices by hand.",
+      "family": "DV"
+    },
+    {
+      "id": "DV@initial",
+      "title": "Devices, initial",
+      "statement": "Devices report some of their own characteristics, with weak enforcement; a basic process approves software and pushes updates; physical assets and some virtual ones are tracked and supply chain policy follows a framework; some devices must report before they reach a resource; some deployment of protection is automated.",
+      "family": "DV"
+    },
+    {
+      "id": "DV@advanced",
+      "title": "Devices, advanced",
+      "statement": "An administrator can verify a device's data at first access and compliance is enforced on most devices; management, software approval, vulnerability finding and patching are mostly automated; a cross-vendor view of assets builds up; access uses verified insight; non-compliant devices are found and isolated.",
+      "family": "DV"
+    },
+    {
+      "id": "DV@optimal",
+      "title": "Devices, optimal",
+      "statement": "Compliance is verified and enforced for the whole life of devices and virtual assets; the view of all assets across vendors and providers is at or near real time; access uses real-time risk analysis from the device; one unified solution protects, enforces and monitors; provisioning to removal is automated.",
+      "family": "DV"
+    },
+    {
+      "id": "NW@traditional",
+      "title": "Networks, traditional",
+      "statement": "The network is a few large perimeter segments with few limits on reach inside them, possibly with bulk tunnels between sites; rules are static and set by hand; little traffic is encrypted and keys are managed ad hoc; resilience is case by case; monitoring looks at the boundary.",
+      "family": "NW"
+    },
+    {
+      "id": "NW@initial",
+      "title": "Networks, initial",
+      "statement": "Critical workloads are isolated and their connectivity limited to what they need; applications get profiles with distinct traffic handling; all traffic to internal applications begins to be encrypted under a formal key policy; monitoring uses known indicators of compromise in each environment; some automation appears.",
+      "family": "NW"
+    },
+    {
+      "id": "NW@advanced",
+      "title": "Networks, advanced",
+      "statement": "Isolation reaches more of the network with micro-perimeters at ingress and egress and service-specific interconnections; rules adapt to risk assessments; all applicable traffic is encrypted with keys and certificates rotated; anomaly-based detection correlates telemetry; changes are made through automated change management.",
+      "family": "NW"
+    },
+    {
+      "id": "NW@optimal",
+      "title": "Networks, optimal",
+      "statement": "Micro-perimeters and micro-segmentation are distributed around application profiles with just-in-time, just-enough connectivity; rules evolve continuously and reprioritize by criticality and risk; keys are managed with least privilege and cryptographic agility; all detection sources are correlated automatically; networks are defined as code.",
+      "family": "NW"
+    },
+    {
+      "id": "AW@traditional",
+      "title": "Applications and workloads, traditional",
+      "statement": "Access to applications rests on local authorization and static attributes; threat protections are general-purpose; some applications are reachable only over private networks or VPNs; environments are ad hoc with weak deployment; security testing is manual and comes before deployment.",
+      "family": "AW"
+    },
+    {
+      "id": "AW@initial",
+      "title": "Applications and workloads, initial",
+      "statement": "Authorization starts to use context per request, with expiry; protections are woven into critical workflows; some applications are reachable by brokered connection over open networks; pipelines and least-privilege controls give environments for development, testing and production; static and dynamic testing begin.",
+      "family": "AW"
+    },
+    {
+      "id": "AW@advanced",
+      "title": "Applications and workloads, advanced",
+      "statement": "Access decisions are automated with richer context and enforced expiry; protections cover all workflows and some application-specific threats; most applicable applications are reachable by authorized users; development, security and operations are coordinated and developers do not reach production; testing is part of the pipeline.",
+      "family": "AW"
+    },
+    {
+      "id": "AW@optimal",
+      "title": "Applications and workloads, optimal",
+      "statement": "Access is authorized continuously from real-time risk and behavior; protections are content aware; all applicable applications are available to authorized users and devices; workloads are immutable where feasible and change only by redeployment with automated deployment and no administrator access; deployed applications are tested routinely.",
+      "family": "AW"
+    },
+    {
+      "id": "DT@traditional",
+      "title": "Data, traditional",
+      "statement": "Only some data, mainly the data critical to the mission, is inventoried by hand; categorization is ad hoc; data is mostly on premises with off-site backups; access is governed by static controls; little is encrypted and keys are handled ad hoc; visibility into location, access and use is limited and manual.",
+      "family": "DT"
+    },
+    {
+      "id": "DT@initial",
+      "title": "Data, initial",
+      "statement": "Inventory is automating for on-premises and cloud and covers most data, with the first protection against loss; a categorization strategy has defined labels and manual enforcement; some data is on redundant, highly available stores; automated access controls with elements of least privilege begin; data in transit is encrypted.",
+      "family": "DT"
+    },
+    {
+      "id": "DT@advanced",
+      "title": "Data, advanced",
+      "statement": "Inventory and tracking are automated enterprise-wide with loss prevention on static attributes and labels; some categorization and labeling are automated in a consistent, tiered manner; access controls are automated, consider identity, device risk, application and category, and expire where applicable; data at rest and in transit is encrypted and keys are rotated.",
+      "family": "DT"
+    },
+    {
+      "id": "DT@optimal",
+      "title": "Data, optimal",
+      "statement": "All applicable data is inventoried continuously and loss prevention dynamically blocks suspected exfiltration; categorization and labeling are automated for every data type; availability is optimized dynamically; access is just in time and just enough with continuous review; data in use is encrypted where appropriate and visibility spans the whole data lifecycle.",
+      "family": "DT"
+    },
+    {
+      "id": "VA@traditional",
+      "title": "Visibility and analytics, traditional",
+      "statement": "Logs are collected by hand across the enterprise with low fidelity and minimal analysis.",
+      "family": "VA"
+    },
+    {
+      "id": "VA@initial",
+      "title": "Visibility and analytics, initial",
+      "statement": "The collection and analysis of logs and events for mission-critical functions begins to be automated, and the gaps in visibility are assessed regularly.",
+      "family": "VA"
+    },
+    {
+      "id": "VA@advanced",
+      "title": "Visibility and analytics, advanced",
+      "statement": "Automated collection of logs and events grows enterprise-wide, virtual environments included, into central analysis that correlates across several sources.",
+      "family": "VA"
+    },
+    {
+      "id": "VA@optimal",
+      "title": "Visibility and analytics, optimal",
+      "statement": "Visibility is comprehensive across the enterprise through central, dynamic monitoring and advanced analysis of logs and events.",
+      "family": "VA"
+    },
+    {
+      "id": "AO@traditional",
+      "title": "Automation and orchestration, traditional",
+      "statement": "Operations and response rest on static, manual processes with little automation.",
+      "family": "AO"
+    },
+    {
+      "id": "AO@initial",
+      "title": "Automation and orchestration, initial",
+      "statement": "Orchestration and response begin to be automated for the functions critical to the mission.",
+      "family": "AO"
+    },
+    {
+      "id": "AO@advanced",
+      "title": "Automation and orchestration, advanced",
+      "statement": "Orchestration and response are automated enterprise-wide and use context from several sources to inform decisions.",
+      "family": "AO"
+    },
+    {
+      "id": "AO@optimal",
+      "title": "Automation and orchestration, optimal",
+      "statement": "Orchestration and response change dynamically with the requirements and the environment of the whole enterprise.",
+      "family": "AO"
+    },
+    {
+      "id": "GV@traditional",
+      "title": "Governance, traditional",
+      "statement": "Policies are made ad hoc across the enterprise and enforced by manual processes or static technical means.",
+      "family": "GV"
+    },
+    {
+      "id": "GV@initial",
+      "title": "Governance, initial",
+      "statement": "Policies for enterprise-wide enforcement are defined and begin to be implemented, with little automation and manual updates.",
+      "family": "GV"
+    },
+    {
+      "id": "GV@advanced",
+      "title": "Governance, advanced",
+      "statement": "Tiered, tailored policies apply enterprise-wide with automation where possible, and access policy decisions use context from several sources.",
+      "family": "GV"
+    },
+    {
+      "id": "GV@optimal",
+      "title": "Governance, optimal",
+      "statement": "Enterprise-wide policies that allow tailored local controls are implemented and automated, with continuous enforcement and dynamic updates.",
+      "family": "GV"
+    }
+  ],
+  "publisher": "Cybersecurity and Infrastructure Security Agency (CISA)",
+  "source": "https://www.cisa.gov/sites/default/files/2023-04/zero_trust_maturity_model_v2_508.pdf"
+}

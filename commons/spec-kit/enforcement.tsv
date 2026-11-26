@@ -1050,6 +1050,7 @@ requirement	mechanism	by	note
 0027-commons-libraries FR-204	check	.github: cd commons/dossier && bun run verify	commons/dossier: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-205	check	.github: cd commons/dossier-assurance && bun run verify	commons/dossier-assurance: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0027-commons-libraries FR-206	check	.github: cd commons/posture-report && bun run verify	commons/posture-report: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
+0027-commons-libraries FR-207	check	.github: cd commons/catalog-zero-trust && bun run verify	commons/catalog-zero-trust: the verify of the library (its compiler, specification checker, rules and tests); the manifest library.ts agrees with the folder and the package (commons-libraries.test.ts)
 0043-asset-properties FR-033	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0046-dossiers FR-001	check	.github: cd commons/dossier && bun run verify	dossier 0002-dossier-core FR-001
 0046-dossiers FR-002	none	-	Deferred: stated before it is built; each is proved by the dossier library's specifications as they land
@@ -1115,9 +1116,9 @@ requirement	mechanism	by	note
 0047-zero-trust FR-015	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-016	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-020	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-021	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-022	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
-0047-zero-trust FR-023	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
+0047-zero-trust FR-021	check	.github: cd commons/catalog-zero-trust && bun run verify	catalog-zero-trust suite/zero-trust.test.ts: the package of the tenets, the sources of input, the pillars, the functions, the stages and the goals loads through the loader of grc
+0047-zero-trust FR-022	check	.github: cd commons/catalog-zero-trust && bun run verify	catalog-zero-trust suite/zero-trust.test.ts and suite/stages.test.ts: the stages are those of the model that was read, the thresholds are published as ours, and nothing of the Department of Defense model is written
+0047-zero-trust FR-023	check	.github: cd commons/catalog-zero-trust && bun run verify	catalog-zero-trust suite/zero-trust.test.ts: every row of the crosswalk is a proposal that carries person-decision-required and reaches a control that exists
 0047-zero-trust FR-024	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-025	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line
 0047-zero-trust FR-030	none	-	Deferred: stated before it is built; verified after the owner's acceptance run of the command line

@@ -1,0 +1,54 @@
+{
+  "kind": "grc.framework",
+  "schema": "1",
+  "id": "omb-m-22-09",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-zero-trust",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/nist.ts",
+      "src/governance/ztmm.ts",
+      "src/governance/omb.ts",
+      "src/governance/crosswalk.ts"
+    ]
+  },
+  "version": "2022",
+  "title": "OMB M-22-09: the goals of the federal zero trust strategy for each pillar, in our own words",
+  "controls": [
+    {
+      "id": "ID",
+      "title": "Identity",
+      "statement": "Staff use identities managed by the enterprise to reach the applications of their work, and phishing-resistant multi-factor authentication protects them from sophisticated online attacks; agencies manage identity centrally, apply strong multi-factor authentication throughout and take at least one device-level signal into account when they authorize a user.",
+      "family": "goal"
+    },
+    {
+      "id": "DV",
+      "title": "Devices",
+      "statement": "The agency has a complete inventory of every device it operates and authorizes for government use and can prevent, detect and respond to incidents on them; its assets are inventoried through the continuous diagnostics and mitigation program and its endpoint detection and response tools meet its requirements.",
+      "family": "goal"
+    },
+    {
+      "id": "NW",
+      "title": "Networks",
+      "statement": "All DNS requests and HTTP traffic in the environment are encrypted, and the agency has begun to plan how to break its perimeter into isolated environments.",
+      "family": "goal"
+    },
+    {
+      "id": "AW",
+      "title": "Applications and workloads",
+      "statement": "Every application is treated as connected to the internet, is tested rigorously and is open to external reports of vulnerabilities.",
+      "family": "goal"
+    },
+    {
+      "id": "DT",
+      "title": "Data",
+      "statement": "The agency follows a path to protections that rest on thorough categorization of its data, uses cloud security services that monitor access to sensitive data and logs and shares information across the enterprise.",
+      "family": "goal"
+    }
+  ],
+  "publisher": "Office of Management and Budget (OMB), Executive Office of the President",
+  "source": "https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf"
+}

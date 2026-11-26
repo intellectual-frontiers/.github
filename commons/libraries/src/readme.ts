@@ -143,6 +143,7 @@ export const ROLE_OF: ReadonlyMap<string, Role> = new Map<string, Role>([
   ["quality", "standard"],
   ["catalog-soc2", "standard"],
   ["integrations-identity", "standard"],
+  ["catalog-zero-trust", "standard"],
 ]);
 
 const roleRank = (r: Role): number => {

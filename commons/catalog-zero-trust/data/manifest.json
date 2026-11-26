@@ -1,0 +1,72 @@
+{
+  "kind": "grc.catalog-package",
+  "schema": "1",
+  "id": "catalog-zero-trust",
+  "createdAt": "2026-11-26T00:00:00Z",
+  "provenance": {
+    "producer": {
+      "name": "catalog-zero-trust",
+      "version": "1"
+    },
+    "inputs": [
+      "src/governance/nist.ts",
+      "src/governance/ztmm.ts",
+      "src/governance/omb.ts",
+      "src/governance/crosswalk.ts"
+    ]
+  },
+  "version": "1",
+  "title": "Zero trust: the tenets of SP 800-207, the CISA maturity model 2.0 and the goals of OMB M-22-09, in our own words, with a crosswalk to SP 800-53 and SP 800-171",
+  "source": {
+    "publisher": "Intellectual Frontiers LLC, reading the publications of NIST, CISA and OMB",
+    "edition": "Special Publication 800-207, Zero Trust Architecture (August 2020), read on 2026-11-26, https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf; Zero Trust Maturity Model, Version 2.0 (April 2023), read on 2026-11-26, https://www.cisa.gov/sites/default/files/2023-04/zero_trust_maturity_model_v2_508.pdf; Memorandum M-22-09, Moving the U.S. Government Toward Zero Trust Cybersecurity Principles (January 26, 2022), read on 2026-11-26, https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf",
+    "url": "https://www.cisa.gov/sites/default/files/2023-04/zero_trust_maturity_model_v2_508.pdf"
+  },
+  "licence": "Own words of Intellectual Frontiers LLC under the PolyForm Noncommercial License 1.0.0. The identifiers and the names of the pillars, functions and stages refer to NIST SP 800-207, the CISA Zero Trust Maturity Model and OMB M-22-09, which are works of the United States government; the titles and statements are a reading of each, not a quotation and not a substitute for the publication. The stages of the Department of Defense model and its activities are not in this package: the source has not been read.",
+  "redistributable": true,
+  "holds": [
+    {
+      "kind": "grc.framework",
+      "id": "nist-sp800-207",
+      "file": "frameworks/nist-sp800-207-2020.json",
+      "digest": "ec5192d7dff44e86e0dcb82bb68c635f0424ebdc45becf50e3352422b92b51aa"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "cisa-ztmm",
+      "file": "frameworks/cisa-ztmm-2.0.json",
+      "digest": "14e17ab518e2636bbfa434b4f689f01ec2c8c1dbc87985b11be9cbeac59cb994"
+    },
+    {
+      "kind": "grc.framework",
+      "id": "omb-m-22-09",
+      "file": "frameworks/omb-m-22-09-2022.json",
+      "digest": "1b0acc9f0ff5ad165870d3cf4ecef8bed39621840349504e7e46cb408e433a6c"
+    },
+    {
+      "kind": "grc.crosswalk",
+      "id": "zero-trust-crosswalk",
+      "file": "crosswalks/zero-trust-crosswalk.json",
+      "digest": "79182a960d99e8822a25331ad4917ebcf76a8656a1af9db59228c3a26dac1676"
+    }
+  ],
+  "sources": [
+    {
+      "url": "src/governance/nist.ts",
+      "sha256": "643753e2a9b3d81651a77a636e10515ce1f0d0063755ff7cb651c17390ae4c8e"
+    },
+    {
+      "url": "src/governance/ztmm.ts",
+      "sha256": "67921ece37fefc745a05c1cf502fa23d80a1a913921c78f1dce75bf68fe39f7a"
+    },
+    {
+      "url": "src/governance/omb.ts",
+      "sha256": "018634a8ab519f53e6982b23c2f19746e42ae392c5490b29c765c2bc3787c828"
+    },
+    {
+      "url": "src/governance/crosswalk.ts",
+      "sha256": "8e4a446d6e40be60d673bedaa3a91156d2a477aeeb300c8d21af6c13cf5d0ed4"
+    }
+  ],
+  "notice": "The stages and the activities of the Department of Defense zero trust model are not in this package: its source has not been read. The rows of the crosswalk are proposals that each carry the words person-decision-required: the published mapping of the example architecture has not been read, and a row that still carries them is not counted."
+}

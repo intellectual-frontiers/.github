@@ -89,11 +89,11 @@
 - **OQ-1**: Where does the typed `AccessDecision` live? Default: in `grc` beside the signers it uses and the evidence types, because it is evidence, with the properties in `estate`.
 - **OQ-2**: Does a protect surface need its own kind of asset? Default: no; it is a boundary of the kind `trust` (FR-030), and a population is already an asset (0044).
 - **OQ-3**: What are the names of the attributes of an access decision as a log record? Default: ours (FR-015) until a semantic convention is read.
-- **OQ-4**: Are the thresholds of a stage data of the catalog or of a profile? Default: data of the catalog, once the model is read.
+- **OQ-4**: Are the thresholds of a stage data of the catalog or of a profile? Default: data of the catalog (catalog-zero-trust 0003-zero-trust-stages), with values that are ours and wait for the owner to confirm them.
 
 ## UNVERIFIED
 
-- The maturity stages and the pillar and function tables of the model of the Cybersecurity and Infrastructure Security Agency, and the strategy, pillars, activities and counts (91 at the target level and 152 at the advanced level, as the owner named them) of the Department of Defense: not read, the hosts refused the download (`definitions.md`, section 5).
+- The strategy, pillars, activities and counts (91 at the target level and 152 at the advanced level, as the owner named them) of the Department of Defense: not read, the host refused the download (`definitions.md`, section 5). The model of the Cybersecurity and Infrastructure Security Agency has been read (`definitions.md`, section 4b).
 - The published mappings of the architecture guide to SP 800-53 Rev. 5 and to the Cybersecurity Framework: not read (supplemental to SP 1800-35).
 - Sections 3.3 onward and section 4 onward of SP 800-207, and the body of SP 800-207A: not read.
 - The licences and the formats of the candidate sources of FR-060: not read.
