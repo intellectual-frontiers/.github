@@ -1,0 +1,269 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45878756111",
+    "workflow": "ci",
+    "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+    "at": "2026-11-26T18:49:54Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45878756111"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5871,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 183,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5817,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "verify",
+      "outcome": "findings",
+      "findings": 12,
+      "durationMs": 48661,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "ssh-server",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 48661,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-10d850d3b5eefbe4",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-21444d98e91ea3f2",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/docker.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-4c8dc9b1a5d9fc15",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-526ec008770bf7ce",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-7721374a787cf282",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it",
+      "key": "0002-enrollment-protocol FR-011, 0002-enrollment-protocol FR-022, 0002-enrollment-protocol FR-023: after enrollment the device keeps its key and the pinned host key, and reconnects as s-device by that key; then it rotates its key without a person, and revokes it"
+    },
+    {
+      "id": "f-7ecd2aab20c80ec6",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs",
+      "key": "0004-scripts FR-007, 0004-scripts FR-011: a download whose SHA-256 is wrong stops the install; a right one is verified before the installer runs"
+    },
+    {
+      "id": "f-9f9fd80acc081de9",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-b434535bf3b65c07",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit",
+      "key": "0005-enrollment-policy FR-001, 0005-enrollment-policy FR-002, 0002-enrollment-protocol FR-009: a token in scope and a pairing code approve without a person, with the rule and the explanation in the audit"
+    },
+    {
+      "id": "f-c951ce1aa954aaaa",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    },
+    {
+      "id": "f-ca9ec679a907346c",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/registry.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin",
+      "key": "0004-scripts FR-009: the sh script on a real Debian 13 container: facts asserted, osquery installed from its pin"
+    },
+    {
+      "id": "f-ddbe08700bbec987",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated",
+      "key": "0005-enrollment-policy FR-003: a device that an asset already describes is adopted and not duplicated"
+    },
+    {
+      "id": "f-fb73d4b87e115cb7",
+      "tool": "verify",
+      "module": "ssh-server",
+      "evidence": {
+        "run": "45878756111",
+        "commit": "244570f971f7ae36312c7b7af3d95578e04324c1",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "f23a49b0c8f4d3798c76f9a62a62f5b51084404896444749af1ddf09b9e6bc7b"
+      },
+      "at": "2026-11-26T18:49:35Z",
+      "code": "test-failed",
+      "file": "suite/enroll-flow.test.ts",
+      "severity": "error",
+      "message": "the test failed: 0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled",
+      "key": "0004-scripts FR-003, 0004-scripts FR-007, 0002-enrollment-protocol FR-008: the full dialogue: facts, pending, approve by a person, consent, the typed plan runs without a shell, done, enrolled"
+    }
+  ]
+}
