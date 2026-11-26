@@ -23,7 +23,7 @@ const fromText = (read: (text: string) => { readonly kind: "ok"; readonly value:
   const parsed = read(text.value.value);
   if (parsed.kind === "err") return err(problem("malformed", parsed.error));
   const tree = toJsonValue(parsed.value);
-  return tree.kind === "ok" ? ok({ value: tree.value, stale: false }) : err(problem("malformed", tree.error));
+  return tree.kind === "ok" ? ok({ value: tree.value }) : err(problem("malformed", tree.error));
 };
 
 /** JSON5 trees: comments and trailing commas are read; the text written is the format's own. */
