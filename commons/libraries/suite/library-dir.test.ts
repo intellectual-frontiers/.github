@@ -12,7 +12,7 @@ import { decodeLibrarySource } from "../src/libraries.ts";
 
 const SPEC = "0027-commons-libraries";
 const manifest = (o: Readonly<Record<string, unknown>>): string =>
-  `export const library = ${JSON.stringify({ verify: "bun run verify", version: "0.1.0", exports: ["."], level: "L0", ...o })};\n`;
+  `export const library = ${JSON.stringify({ verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], level: "L0", ...o })};\n`;
 
 /** Writes a library of the given folder (from `commons/`) with its manifest and its package. */
 function lib(root: string, dir: string, name: string, extra: Readonly<Record<string, unknown>> = {}): void {

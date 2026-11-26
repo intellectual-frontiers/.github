@@ -125,7 +125,7 @@ async function withLibrary<T>(use: (dir: string) => Promise<T>): Promise<T> {
     await git(root, "init", "-q", "--bare", path.join(root, "remote.git"));
     const name = "libraries";
     const rel = (v: string): string => `export const release = ${JSON.stringify({ slug: name, kind: "Library", title: name, authors: [{ name: "x" }], version: v, repository: "https://example.org/r" })};\n`;
-    await put(dir, `commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], distribution: ["github", "npm"] })};\n`);
+    await put(dir, `commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], distribution: ["github", "npm"] })};\n`);
     await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
     await put(dir, `commons/${name}/src/mod.ts`, "export const x = 1;\n");
     await put(dir, `commons/${name}/release.ts`, rel("0.1.0"));

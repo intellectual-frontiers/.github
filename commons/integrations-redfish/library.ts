@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified against recorded, made-up answers and never against a live system: the owner releases the fleet libraries together, when a first site has been read" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "A read-only observer of baseboard management controllers that answer Redfish over HTTPS: the service root, systems, chassis, managers and firmware by the links of the documents, bounded, with the OEM extensions dropped, the identity keys for the estate, written against the HTTP read port of Integrations and proved over made-up documents.",
   kanon: {

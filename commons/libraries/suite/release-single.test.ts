@@ -16,7 +16,7 @@ import { currentLook } from "@intellectual-frontiers/system/tty";
 const SPEC = "0001-libraries";
 
 const manifest = (name: string, version: string, extra: Record<string, unknown> = {}): string =>
-  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"], ...extra })};\n`;
+  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version, exports: ["."], distribution: ["github", "npm"], ...extra })};\n`;
 
 function put(dir: string, name: string, version: string, extra: Record<string, unknown> = {}): void {
   mkdirSync(join(dir, "commons", name, "src"), { recursive: true });
@@ -27,7 +27,7 @@ function put(dir: string, name: string, version: string, extra: Record<string, u
 
 const offline = async (): Promise<undefined> => undefined;
 
-proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by the greatest Impact across all libraries (a minor for a major while 0.x), a held library counted, a version ahead of its tag released as it is, and the record has the one entry and its tag", async () => {
+proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by the greatest Impact across all libraries (a minor for a major while 0.x), the library `lab` counted, a version ahead of its tag released as it is, and the record has the one entry and its tag", async () => {
   const git = proc.which("git");
   if (git === undefined) return;
   await withTempDir(async (dir) => {
@@ -38,7 +38,7 @@ proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by 
     };
     await g("init", "-q", "-b", "main");
     put(dir, "core", "0.1.5");
-    put(dir, "lab", "0.1.0", { held: { kind: "tests-only", reason: "tests only" } });
+    put(dir, "lab", "0.1.0", { maturity: "experimental", limits: ["its tests run only in a lab"] });
     put(dir, "commons", "0.2.0", { bundle: "commons" });
     await g("add", ".");
     await g("commit", "-q", "-m", "Start");
@@ -51,7 +51,7 @@ proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by 
     assertEquals(await plan(), ["commons 0.2.0>0.2.0 commons-v0.2.0 as-is github"]);
     await g("tag", "commons-v0.2.0");
     assertEquals(await plan(), [], "tagged and unchanged: nothing");
-    // a change of a held library, with a major impact, raises the one package's minor
+    // a change of the library lab, with a major impact, raises the one package's minor
     writeTextFileSync(join(dir, "commons/lab/src/extra.ts"), "export const x = 1;\n");
     await g("add", ".");
     await g("commit", "-q", "-m", "Change the held lab\n\nImpact: major");
@@ -65,7 +65,6 @@ proves([`${SPEC} FR-032`], "single mode plans one release of commons: raised by 
     // no library is raised by itself: the only step is commons
     const p = await releasePlan(dir, { mode: "single", registry: offlineRegistry, published: offline });
     assert(p.kind === "ok");
-    assertEquals(p.value.held, []);
     assertEquals(p.value.steps.length, 1);
     // the floor of the keys of exports against the version npm holds: a key that is gone is breaking, which raises the minor while 0.x
     const floor = await releasePlan(dir, { mode: "single", registry: offlineRegistry, published: () => Promise.resolve(["./core", "./gone"]) });

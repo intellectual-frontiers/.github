@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.2.7",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./otel", "./otlp", "./signals", "./semconv", "./queue", "./envelope", "./exporter", "./render", "./query", "./host/query", "./host", "./host/otel", "./host/console", "./limits", "./retention", "./syslog", "./host/relay"],
   summary:

@@ -29,7 +29,6 @@
  */
 import process from "node:process";
 import {
-  absurd,
   array,
   type Decoder,
   describe,
@@ -106,83 +105,45 @@ export type Library = {
   readonly versionConstants?: readonly VersionConstant[];
   /** The package the library publishes where it is not `@intellectual-frontiers/<name>` (the `data` library publishes `@intellectual-frontiers/arcactl`; commons 0036-distribution FR-009). */
   readonly publishes?: PackageName;
-  /** The typed reason the library is not released, where there is one: a library with none is released (0001-libraries FR-024); a held library is verified and packed like any other, and has no release record entry, no tag, no set and no registry. */
-  readonly held?: Hold;
+  /** How far the library is built and proved, said honestly (0001-libraries FR-024): `experimental` (parts are missing or it is proved only against fakes; its `limits` say which), `preview` (complete and verified, its interface may still change) or `stable` (in use by a product and versioned with care). Every library is released whatever it says; a reader of a registry, a table or a package description sees it. */
+  readonly maturity: Maturity;
+  /** What is not done, one line each, where the library is `experimental`: the parts missing and the places it is proved only against fakes. */
+  readonly limits?: readonly [MaturityText, ...MaturityText[]];
   /** The set the library is, where it is a metapackage: a folder with no code of its own whose package depends on the libraries of the set at exact versions (commons 0036-distribution FR-005). */
   readonly bundle?: BundleName;
 };
 
-/** The kinds of reason not to release a library: a closed union, and the only reasons there are (0001-libraries FR-024). */
-export const HOLD_KINDS = ["tests-only", "unfinished", "owner-blocked"] as const;
+/** The degrees of maturity of a library: a closed union, and the only ones there are (0001-libraries FR-024). */
+export const MATURITIES = ["experimental", "preview", "stable"] as const;
+/** How far a library is built and proved. */
+export type Maturity = (typeof MATURITIES)[number];
 
-/** One line of text of a hold: non-empty, trimmed, on one line, made only by {@link parseHoldText}. */
-export type HoldText = Brand<string, "hold text">;
-const holdTextDecoder = refine(string, "hold text", (t) => t.trim() !== "" && t.trim() === t && !t.includes("\n"));
+/** One line of text of a maturity: non-empty, trimmed, on one line, made only by {@link parseMaturityText}. */
+export type MaturityText = Brand<string, "maturity text">;
+const maturityTextDecoder = refine(string, "maturity text", (t) => t.trim() !== "" && t.trim() === t && !t.includes("\n"));
 
-/** A line of a hold from text, or why the text is not one. */
-export function parseHoldText(text: string, where: string): Result<HoldText, string> {
-  const r = holdTextDecoder(text, where);
+/** A line of what is not done from text, or why the text is not one. */
+export function parseMaturityText(text: string, where: string): Result<MaturityText, string> {
+  const r = maturityTextDecoder(text, where);
   return r.kind === "ok" ? ok(r.value) : err(`${where} is one non-empty line, with no space around it`);
 }
 
-/**
- * The reason a library is not released (0001-libraries FR-024): a library is released unless its manifest carries one, and every one has its text. A library that is `tests-only` is a tool of tests that nothing depends on at run time;
- * an `unfinished` one names what is missing and the condition that lifts the hold; an `owner-blocked` one is held by a decision of the owner that the text states.
- */
-export type Hold =
-  | { readonly kind: "tests-only"; readonly reason: HoldText }
-  | { readonly kind: "unfinished"; readonly reason: HoldText; readonly missing: readonly [HoldText, ...HoldText[]]; readonly liftedWhen: HoldText }
-  | { readonly kind: "owner-blocked"; readonly reason: HoldText };
-
-const holdExpected = `library.held is { kind: ${HOLD_KINDS.map((k) => `"${k}"`).join(" | ")}, reason } and, for "unfinished", missing (the parts that are not done) and liftedWhen (the condition that lifts the hold)`;
-
-/** The hold of a manifest from its value, or why it is not one. */
-export function decodeHold(input: unknown): Result<Hold, string> {
-  if (typeof input !== "object" || input === null || Array.isArray(input)) return err(holdExpected);
-  const o = Object.fromEntries(Object.entries(input));
-  const kind = HOLD_KINDS.find((k) => k === o["kind"]);
-  if (kind === undefined) return err(holdExpected);
-  const allowed: readonly string[] = kind === "unfinished" ? ["kind", "reason", "missing", "liftedWhen"] : ["kind", "reason"];
-  const stray = Object.keys(o).find((k) => !allowed.includes(k));
-  if (stray !== undefined) return err(`library.held.${stray} is not a field of a hold of kind ${kind} (${allowed.join(", ")})`);
-  const text = (field: string): Result<HoldText, string> => parseHoldText(typeof o[field] === "string" ? o[field] : "", `library.held.${field}`);
-  const reason = text("reason");
-  if (reason.kind === "err") return reason;
-  switch (kind) {
-    case "tests-only":
-    case "owner-blocked":
-      return ok({ kind, reason: reason.value });
-    case "unfinished": {
-      const liftedWhen = text("liftedWhen");
-      if (liftedWhen.kind === "err") return liftedWhen;
-      const list: readonly unknown[] = Array.isArray(o["missing"]) ? o["missing"] : [];
-      const parts: HoldText[] = [];
-      for (const [i, m] of list.entries()) {
-        const p = parseHoldText(typeof m === "string" ? m : "", `library.held.missing[${i}]`);
-        if (p.kind === "err") return p;
-        parts.push(p.value);
-      }
-      const [first, ...rest] = parts;
-      if (first === undefined) return err("library.held.missing names at least one part that is not done");
-      return ok({ kind, reason: reason.value, missing: [first, ...rest], liftedWhen: liftedWhen.value });
-    }
-    default:
-      return absurd(kind);
+/** The limits of a library from their value: at least one line, each one line of text; or why they are not. */
+function decodeLimits(input: unknown): Result<readonly [MaturityText, ...MaturityText[]], string> {
+  const list: readonly unknown[] = Array.isArray(input) ? input : [];
+  const parts: MaturityText[] = [];
+  for (const [i, m] of list.entries()) {
+    const p = parseMaturityText(typeof m === "string" ? m : "", `library.limits[${i}]`);
+    if (p.kind === "err") return p;
+    parts.push(p.value);
   }
+  const [first, ...rest] = parts;
+  return first === undefined ? err("library.limits names at least one part that is not done") : ok([first, ...rest]);
 }
 
-/** The hold in one sentence, for a plan, a table and the register: its kind, its reason and, where it has them, what is missing and what lifts it. */
-export function holdSentence(h: Hold): string {
-  switch (h.kind) {
-    case "tests-only":
-      return `tests only: ${h.reason}`;
-    case "owner-blocked":
-      return `owner-blocked: ${h.reason}`;
-    case "unfinished":
-      return `unfinished (missing ${h.missing.join("; ")}): ${h.reason}; lifted when ${h.liftedWhen}`;
-    default:
-      return absurd(h);
-  }
+/** The maturity in one sentence, for a plan, a table and the register: its word and, where the library is experimental, what is not done. */
+export function maturitySentence(l: Pick<Library, "maturity" | "limits">): string {
+  return l.maturity === "experimental" && l.limits !== undefined ? `experimental (${l.limits.join("; ")})` : l.maturity;
 }
 
 /** The scope of the packages of commons. */
@@ -241,10 +202,10 @@ const constantName: Decoder<string> = (input, path = "$") => {
     : err({ kind: "decode", path, expected: "the name of a constant: letters, digits and underscores", found: describe(input) });
 };
 const body = object(
-  { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty) },
-  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, group: nameDecoder, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), workbench: unknownValue, held: unknownValue },
+  { name: nameDecoder, verify: nonEmpty, version: nonEmpty, exports: array(nonEmpty), maturity: literal(...MATURITIES) },
+  { level: literal(...LEVELS), specKit: nonEmpty, summary: nonEmpty, distribution: array(literal(...REGISTRIES)), kanon: unknownValue, group: nameDecoder, family: object({ host: nonEmpty, role: literal(...ROLES) }), license: nonEmpty, versionConstants: array(object({ file: nonEmpty, name: constantName })), publishes: nonEmpty, bundle: literal(...BUNDLES), workbench: unknownValue, limits: unknownValue },
 );
-const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "group", "license", "versionConstants", "publishes", "bundle", "held", "workbench"] as const;
+const FIELDS = ["name", "level", "specKit", "verify", "version", "exports", "summary", "distribution", "kanon", "family", "group", "license", "versionConstants", "publishes", "bundle", "maturity", "limits", "workbench"] as const;
 
 /** The manifest read from the text of its file: `export const library = { ... }` and no other export, read as data and never run (0027-commons-libraries FR-012). */
 export function decodeLibrarySource(source: string): Result<Library, string> {
@@ -262,19 +223,19 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
   if (r.kind === "err") return err(formatDecodeError(r.error));
   const v = r.value;
   const distribution = v.distribution ?? DEFAULT_DISTRIBUTION;
-  let held: Hold | undefined;
-  if (v.held !== undefined) {
-    const h = decodeHold(v.held);
-    if (h.kind === "err") return h;
-    held = h.value;
-    if (v.publishes !== undefined || v.bundle !== undefined) return err("library.held is not given with library.publishes or library.bundle: a held library is published nowhere");
-  }
-  if (held === undefined && (distribution.length === 0 || new Set(distribution).size !== distribution.length))
-    return err("library.distribution lists each registry once and at least one (FR-015)");
-  if (held === undefined && !distribution.includes("github"))
+  if (distribution.length === 0 || new Set(distribution).size !== distribution.length) return err("library.distribution lists each registry once and at least one (FR-015)");
+  if (!distribution.includes("github"))
     return err(
       "library.distribution includes github: a library is published to the GitHub package registry whatever else it is published to (FR-015, FR-016)",
     );
+  let limits: readonly [MaturityText, ...MaturityText[]] | undefined;
+  if (v.limits !== undefined) {
+    const l = decodeLimits(v.limits);
+    if (l.kind === "err") return l;
+    limits = l.value;
+  }
+  if (v.maturity === "experimental" && limits === undefined) return err("library.limits is given where library.maturity is experimental: it names what is not done (0001-libraries FR-024)");
+  if (v.maturity !== "experimental" && limits !== undefined) return err(`library.limits is given only where library.maturity is experimental, and this one is ${v.maturity} (0001-libraries FR-024)`);
   let kanon: Table | undefined;
   if (v.kanon !== undefined) {
     const t = decodeTable(v.kanon);
@@ -318,7 +279,8 @@ export function decodeLibrarySource(source: string): Result<Library, string> {
     ...(v.versionConstants === undefined ? {} : { versionConstants: v.versionConstants }),
     ...(publishes === undefined ? {} : { publishes }),
     ...(v.bundle === undefined ? {} : { bundle: v.bundle }),
-    ...(held === undefined ? {} : { held }),
+    maturity: v.maturity,
+    ...(limits === undefined ? {} : { limits }),
     ...(v.workbench === undefined ? {} : { workbench: v.workbench }),
   });
 }
@@ -516,10 +478,10 @@ const list = (items: readonly string[]): string => {
 export function requirementOf(id: string, l: Library, dir: string = l.name): string {
   const kit = l.specKit === undefined ? "" : `, its spec kit at \`commons/${dir}/${l.specKit}\``;
   const summary = l.summary === undefined ? "" : ` ${l.summary}`;
-  const where = l.held === undefined ? l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ") : `no registry (not released, ${holdSentence(l.held)})`;
+  const where = l.distribution.map((r) => REGISTRY_NAME[r]).join(" and ");
   const own = l.publishes === undefined ? `@intellectual-frontiers/${l.name}` : l.publishes;
   const sets = l.bundle === undefined ? "" : `, a metapackage with no code of its own (the set ${l.bundle}, 0036-distribution FR-005)`;
-  return `- **${id}**: \`commons/${dir}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where}, proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
+  return `- **${id}**: \`commons/${dir}\` MUST be a library at conformance level ${l.level} (\`${LEVEL_TERM[l.level]}\`): the package \`${own}\`${sets} at version \`${l.version}\`${kit}, exporting ${list(l.exports)}, published to ${where} (${maturitySentence(l)}), proved by \`cd commons/${l.name} && ${l.verify}\`.${summary}`;
 }
 
 /** The row of `enforcement.tsv` of a library's requirement. */

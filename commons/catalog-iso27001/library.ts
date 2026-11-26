@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "ISO/IEC 27001:2022 as a grc catalog package, in our own words: the clauses of the management system and the controls of Annex A, with the themes and attributes of ISO/IEC 27002.",
   kanon: {

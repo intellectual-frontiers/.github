@@ -6,6 +6,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./rendition"],
   summary: "Collects governed claims and their evidence into a checked model for publication.",

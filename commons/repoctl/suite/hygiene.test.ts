@@ -262,7 +262,7 @@ proves(["0007-repoctl-hygiene FR-006", "0007-repoctl-hygiene FR-003"], "a reposi
 });
 
 proves(["0007-repoctl-hygiene FR-005", "0036-distribution FR-009"], "status asks npm for the package a library publishes", async () => {
-  const lib: LibraryInfo = { name: "data", package: "@intellectual-frontiers/arcactl", folder: "commons/data", version: "0.9.0", level: "L1", specKit: undefined, npm: true, held: undefined, versionConstants: [] };
+  const lib: LibraryInfo = { name: "data", package: "@intellectual-frontiers/arcactl", folder: "commons/data", version: "0.9.0", level: "L1", specKit: undefined, npm: true, maturity: "stable", versionConstants: [] };
   const asked: string[] = [];
   const world: World = {
     repo: "/nowhere",

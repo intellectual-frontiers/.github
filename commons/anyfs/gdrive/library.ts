@@ -11,8 +11,9 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "unfinished", reason: "built and verified against an in-process fake of the Drive API and the documented response shapes, and not yet run against a live account, which needs a test account from the owner", missing: ["a run against a live Google Drive account"], liftedWhen: "the suite has run against a test account and its findings are in the issue" },
+  distribution: ["github", "npm"],
+  maturity: "experimental",
+  limits: ["not yet run against a live Google Drive account"],
   exports: ["."],
   family: { host: "anyfs", role: "plugin" },
   summary:

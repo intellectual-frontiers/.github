@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Change control for a fleet's repository: each change is accepted only if a signer of the fleet signed it, a change to a controlled path is blocked until a different signer of an approving role approves it, and what is refused or blocked is said with the reason; the signers are the fleet's own and the check reads Git with its own signature verification.",
   workbench: {

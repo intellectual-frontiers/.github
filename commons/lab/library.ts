@@ -12,8 +12,9 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "tests-only", reason: "a library of disposable machines that no program of ours depends on at run time" },
+  distribution: ["github", "npm"],
+  maturity: "experimental",
+  limits: ["a tool of tests: disposable machines that no program of ours depends on at run time"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Disposable machines for tests: a systemd and sshd container of the Debian, RHEL or Arch family rendered from a typed description, and a virtual machine of the published Omarchy image under QEMU, each started and removed per test with a throwaway key, and what each can and cannot stand in for.",
   kanon: {

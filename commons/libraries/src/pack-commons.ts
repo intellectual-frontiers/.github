@@ -9,7 +9,7 @@
  *     bun commons/libraries/src/pack-commons.ts --tools [--check]    the packages that compiling needs, in `commons/commons/package.json` and `bun.lock` (pack-tools.ts, FR-029)
  *
  * @remarks
- * A library is a folder of commons with a manifest that is not a metapackage ({@link packableLibraries}); `single` mode leaves none out unless `SINGLE_EXCLUDED` names it (a `held` library is packed like any other). The package maps a library to
+ * A library is a folder of commons with a manifest that is not a metapackage ({@link packableLibraries}); `single` mode leaves none out unless `SINGLE_EXCLUDED` names it. The package maps a library to
  * `./<library>` (its `.` entry) and `./<library>/<subpath>` (each other key), because the subpaths of two libraries collide (`./governance` is a key of ten of them). Each entry names its declarations (`types`), its source for Bun (`bun`) and its compiled file
  * (`default`); a library's declarations are under `<library>/dist/` at the same paths as its sources are in its folder, its compiled files are beside their sources, and its sources at those paths, so that a library keeps the shape it has in this repository. The compiler builds each library by itself
  * (the same configuration as the packer of a library: the base of commons, `preserveSymlinks`, so that a declaration names another library by its package and not by a path), and every specifier that names a library, `@intellectual-frontiers/<library>[/<subpath>]`,
@@ -41,7 +41,7 @@ import { existsSync, mkdirSync, readDirSync, readFileSync, readTextFileSync, rem
 import { dirname, join, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
 import { activeMode, GITHUB_REGISTRY, MODE_VARIABLE, optionalPeersAsPeerDependencies, SINGLE, SINGLE_BUDGET, SINGLE_EXCLUDED, SINGLE_PEERS, SINGLE_TARGETS } from "./distribution.ts";
-import { folderOf, type Library, readLibraries } from "./libraries.ts";
+import { folderOf, type Library, maturitySentence, readLibraries } from "./libraries.ts";
 import { licenseOf } from "./license.ts";
 import { linkAll } from "./link.ts";
 import { devDependenciesOf, importedPackages, linkTools, sourcesOf, syncTools, toolFindings, toolsOf, type Tools } from "./pack-tools.ts";
@@ -73,6 +73,8 @@ export type Facts = {
   readonly dir: string;
   readonly version: string;
   readonly summary: string;
+  /** How far the library is built and proved, in a sentence: `stable`, `preview`, or `experimental` with what is not done. */
+  readonly maturity: string;
   /** Each key of the library's `exports` and the source file it names, from the library's folder (`./src/mod.ts`). */
   readonly exports: Readonly<Record<string, string>>;
   /** The folders of the library's folder that its entries and commands are in (`src`; `engine`, `sql`, ... for `data`). */
@@ -87,7 +89,6 @@ export type Facts = {
   readonly peers: Readonly<Record<string, string>>;
   /** Its `devDependencies` that are not of commons: what the compiler needs of it besides its runtime dependencies. */
   readonly devDependencies: Readonly<Record<string, string>>;
-  readonly held: boolean;
 };
 
 /** The key an entry of a library has in the package: `.` of `core` is `./core`, `./sha256` of it is `./core/sha256`. */
@@ -154,6 +155,7 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
       dir: folderOf(l),
       version: l.version,
       summary: l.summary ?? text(pkg["description"]),
+      maturity: maturitySentence(l),
       exports: exportsOut,
       roots,
       folders,
@@ -161,7 +163,6 @@ export function factsOf(repo: string, l: Library): { readonly facts: Facts; read
       dependencies,
       peers,
       devDependencies: Object.fromEntries(Object.entries(dev).filter(([k]) => !k.startsWith(`${SCOPE}/`))),
-      held: l.held !== undefined,
     },
     problems,
   };
@@ -636,11 +637,11 @@ export function launcherOf(c: Command): string {
 
 /** The README of the package: what it is, how it is installed, how a library is imported, and the table of the libraries. */
 export function readmeOf(version: string, facts: readonly Facts[], commands: readonly Command[]): string {
-  const rows = [...facts].sort((a, b) => byName(a.name, b.name)).map((f) => `| \`${SELF}/${f.name}\` | ${f.summary.replace(/\|/g, "\\|").split(/(?<=\.)\s/)[0] ?? ""} |`);
+  const rows = [...facts].sort((a, b) => byName(a.name, b.name)).map((f) => `| \`${SELF}/${f.name}\` | ${f.maturity.replace(/\|/g, "\\|")} | ${f.summary.replace(/\|/g, "\\|").split(/(?<=\.)\s/)[0] ?? ""} |`);
   return [
     `# ${SELF}`,
     "",
-    "Intellectual Frontiers Commons as one package: every library of commons, at one version.",
+    "Intellectual Frontiers Commons as one package: every library of commons, at one version. The table says how far each library is built and proved: `experimental` (parts are missing, or it is proved only against fakes), `preview` (complete and verified, its interface may still change) or `stable`.",
     "",
     "```sh",
     `bun add ${SELF}@${version}     # or: npm install --save-exact ${SELF}@${version}`,
@@ -655,8 +656,8 @@ export function readmeOf(version: string, facts: readonly Facts[], commands: rea
     "",
     `The package runs on Node 26 and Bun from its compiled files (Bun reads the sources by the \`bun\` condition) and carries the declarations of every entry. Pin it at an exact version.${commands.length === 0 ? "" : ` Its commands are ${commands.map((c) => `\`${c.name}\``).join(", ")}.`}`,
     "",
-    "| Import | What it is |",
-    "| --- | --- |",
+    "| Import | Maturity | What it is |",
+    "| --- | --- | --- |",
     ...rows,
     "",
     `License: PolyForm-Noncommercial-1.0.0. Sources and specifications: https://github.com/intellectual-frontiers/.github/tree/main/commons`,

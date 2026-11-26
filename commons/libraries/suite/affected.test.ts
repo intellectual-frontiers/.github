@@ -17,7 +17,7 @@ const put = (root: string, file: string, text: string): void => {
   writeTextFileSync(join(root, file), text);
 };
 const lib = (name: string, extra: Readonly<Record<string, unknown>> = {}): string =>
-  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: [], ...extra })};\n`;
+  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: [], ...extra })};\n`;
 
 /** commons/base (the kernel, the runtime, a tool), commons/alpha (imports the kernel, runs a tool) and commons/beta (imports alpha and the runtime's whole package). */
 function repo(root: string): void {

@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Crosswalks between frameworks as grc catalog packages, as proposals for a person to decide, and the pure view of the coverage of a framework through them.",
   kanon: {

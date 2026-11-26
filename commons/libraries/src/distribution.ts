@@ -52,8 +52,7 @@ export function activeMode(fromEnvironment: string | undefined): Result<Distribu
 export const SINGLE = { package: "@intellectual-frontiers/commons", slug: "commons", folder: "commons/commons" } as const;
 
 /**
- * The libraries that `single` mode leaves out of the package, each with its reason: the policy of the one package, which is none while the owner orders every library in. A library with a `held` reason is not left out by that (a held library is packed
- * like any other); it is left out only by an entry here.
+ * The libraries that `single` mode leaves out of the package, each with its reason: the policy of the one package, which is none while the owner orders every library in. A library is left out only by an entry here.
  */
 export const SINGLE_EXCLUDED: ReadonlyMap<string, string> = new Map<string, string>();
 

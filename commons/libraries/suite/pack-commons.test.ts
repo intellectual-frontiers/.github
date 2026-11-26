@@ -45,6 +45,7 @@ const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   dir: name,
   version: "0.1.0",
   summary: `${name}.`,
+  maturity: "stable",
   exports: { ".": "./src/mod.ts" },
   roots: ["src"],
   folders: [],
@@ -52,7 +53,6 @@ const facts = (name: string, extra: Partial<Facts> = {}): Facts => ({
   dependencies: {},
   peers: {},
   devDependencies: {},
-  held: false,
   ...extra,
 });
 
@@ -183,7 +183,7 @@ function make(dir: string): void {
     writeTextFileSync(join(dir, file), text);
   };
   const manifest = (name: string, extra: Record<string, unknown>): string =>
-    `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", distribution: ["github", "npm"], ...extra })};\n`;
+    `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", distribution: ["github", "npm"], ...extra })};\n`;
   w("commons/tsconfig.base.json", readTextFileSync(join(REPO, "commons", "tsconfig.base.json")));
   w("commons/alpha/library.ts", manifest("alpha", { exports: [".", "./util"] }));
   w("commons/alpha/package.json", JSON.stringify({ name: "@intellectual-frontiers/alpha", version: "0.1.0", type: "module", exports: { ".": "./src/mod.ts", "./util": "./src/util.ts" } }));

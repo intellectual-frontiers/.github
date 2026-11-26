@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.6",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./dialect", "./cli"],
   family: { host: "desired-os-state", role: "host" },

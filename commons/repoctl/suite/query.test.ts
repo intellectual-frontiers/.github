@@ -9,7 +9,7 @@ import { VERBS, verbIds } from "@intellectual-frontiers/repoctl/governance";
 import { askRepository, repositoryRelations, type LibraryInfo, type RepositorySource, type World } from "@intellectual-frontiers/repoctl/logical";
 import { execute, hostOf } from "./world.ts";
 
-const lib = (name: string, specKit: string | undefined = "spec-kit"): LibraryInfo => ({ name, package: `@scope/${name}`, folder: `commons/${name}`, version: "1.2.3", level: "L1", specKit, npm: true, held: undefined, versionConstants: [] });
+const lib = (name: string, specKit: string | undefined = "spec-kit"): LibraryInfo => ({ name, package: `@scope/${name}`, folder: `commons/${name}`, version: "1.2.3", level: "L1", specKit, npm: true, maturity: "stable", versionConstants: [] });
 const registry = "number\tslug\tstate\n0001\tlayers\tin force\n0002\tparser\tdraft\n";
 const enforcement = "0001-layers FR-001\tcheck\t.github: cd x && bun run verify\tsuite/a.test.ts\n0001-layers FR-002\tnone\t-\tnot yet\n0002-parser FR-001\tcheck\t.github: cd x && bun run verify\tsuite/b.test.ts\nnot a row\n";
 const sources: readonly RepositorySource[] = [{ library: lib("alpha"), registry, enforcement }, { library: lib("beta", undefined), registry: undefined, enforcement: undefined }];

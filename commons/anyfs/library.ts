@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local", "./merge", "./queue", "./memory-merge", "./docs", "./docs/formats"],
   family: { host: "anyfs", role: "host" },

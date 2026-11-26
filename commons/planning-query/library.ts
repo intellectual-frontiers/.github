@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The items of Planning as read-only SQL relations: issues, events, links and traces, with a catalog that is data made from the same list of columns as the rows, asked with one read-only statement through the guard and the engine of lang-sql, a proposed item counted only where the question says so.",

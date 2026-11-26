@@ -4,7 +4,7 @@ requirement	mechanism	by	note
 0001-anyfs-ssh-layers FR-001	check	.github: cd commons/anyfs/ssh && bun run verify	suite/layers.test.ts: the table decodes and the checker finds nothing
 0001-anyfs-ssh-layers FR-002	check	.github: cd commons/anyfs/ssh && bun run verify	suite/layers.test.ts: verify runs every check of the library
 0001-anyfs-ssh-layers FR-003	check	.github: cd commons/anyfs/ssh && bun run verify	suite/protocol.test.ts: the ban finds nothing in the sources
-0001-anyfs-ssh-layers FR-004	check	.github: cd commons/anyfs/ssh && bun run verify	suite/layers.test.ts: the manifest says held
+0001-anyfs-ssh-layers FR-004	check	.github: cd commons/anyfs/ssh && bun run verify	suite/layers.test.ts: the manifest says experimental, with its limits
 0001-anyfs-ssh-layers FR-005	check	.github: cd commons/anyfs/ssh && bun run verify	bun run verify: the packer inspects the package
 0002-anyfs-ssh-helper FR-001	check	.github: cd commons/anyfs/ssh && bun run verify	suite/helper.test.ts: the module is made from the script and the hash is the hash of the script
 0002-anyfs-ssh-helper FR-002	check	.github: cd commons/anyfs/ssh && bun run verify	suite/protocol.test.ts: the posix helper; tsc: the exhaustive match of helperOf

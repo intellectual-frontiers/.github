@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The unattended capture of evidence: which assets are due, the canonical state of each kept on a branch of Git with a commit only where it changed, a hash-chained journal of every look, batched commits and a push that is configured, never forced.",
   workbench: {

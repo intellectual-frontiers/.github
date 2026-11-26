@@ -20,7 +20,7 @@ const library = (root: string, name: string, links: readonly string[] = []): voi
     mkdirSync(join(root, file, ".."), { recursive: true });
     writeTextFileSync(join(root, file), text);
   };
-  put(`commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], distribution: ["github", "npm"] })};\n`);
+  put(`commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], distribution: ["github", "npm"] })};\n`);
   put(
     `commons/${name}/package.json`,
     `${JSON.stringify({ name: `@x/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" }, devDependencies: Object.fromEntries(links.map((l) => [`@x/${l}`, `link:../${l}`])) }, null, 2)}\n`,

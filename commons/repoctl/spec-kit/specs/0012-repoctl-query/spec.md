@@ -9,7 +9,7 @@
 
 ## Relations
 
-- **FR-001**: The relations MUST be `libraries` (`name`, `package`, `folder`, `version`, `level`, `npm`, `held`), `specs` (`library`, `number`, `slug`, `state`: a row of `registry.tsv`) and `requirements` (`library`, `spec`, `fr`, `mechanism`, `by`, `note`: a row of `enforcement.tsv`, its first column split into the specification and the requirement); a library with no spec kit MUST have rows in `libraries` only, and a line of a table that is not a row (a header, a blank line, a line that is not an id of a requirement) MUST be left out.
+- **FR-001**: The relations MUST be `libraries` (`name`, `package`, `folder`, `version`, `level`, `npm`, `maturity`), `specs` (`library`, `number`, `slug`, `state`: a row of `registry.tsv`) and `requirements` (`library`, `spec`, `fr`, `mechanism`, `by`, `note`: a row of `enforcement.tsv`, its first column split into the specification and the requirement); a library with no spec kit MUST have rows in `libraries` only, and a line of a table that is not a row (a header, a blank line, a line that is not an id of a requirement) MUST be left out.
 
 ## Questions
 

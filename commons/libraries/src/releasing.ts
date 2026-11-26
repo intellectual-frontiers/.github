@@ -8,7 +8,7 @@
  *     other flags: --repo DIR, and for apply --no-tests (leave out the tests that pack: for trying the command, never for a release)
  *
  * @remarks
- * A library is released unless its manifest carries a typed `held` reason not to (`tests-only`, `unfinished`, `owner-blocked`); `plan` names each such library and its reason. A library is released at the version its manifest has, and its version is raised here and nowhere else: a library whose files changed since its last tag (its folder, and the paths its record adds) is raised by the greater of the `Impact:`
+ * Every library is released, at the version its manifest has, and its version is raised here and nowhere else: a library whose files changed since its last tag (its folder, and the paths its record adds) is raised by the greater of the `Impact:`
  * of the commits since that tag (a patch where none states one) and the floor of its `exports` (a key removed or renamed since the version npm holds is breaking, a key added a feature; a breaking change raises the minor while the major version is 0), and a library that imports a library that is raised is raised by at least a patch, and so on up the imports. A library whose version is not tagged yet is released as it is,
  * whatever the tags say of earlier versions: a library that has never been tagged (the first release of it, or a backlog that was never tagged), or whose manifest is ahead of its last tag (a version raised by hand). A library whose
  * version is tagged and whose files did not change is left alone. The order of the release is the order of the imports, a library after the libraries it imports. The record, `commons/generated/release.auto.json`, lists what the release
@@ -49,7 +49,7 @@ import { inputsOf } from "./affected.ts";
 import { exportsLine } from "./plan.ts";
 import { activeMode, type DistributionMode, GITHUB_REGISTRY, MODE_VARIABLE, type PublishTarget, PUBLISH_TARGETS, SINGLE, SINGLE_TARGETS } from "./distribution.ts";
 import { packableLibraries, rewriteSpecifiers, singleExportKeys } from "./pack-commons.ts";
-import { decodeLibrarySource, folderOf, type Hold, holdSentence, LIBRARY_FILE, libraryDirs, publishedPackage, readLibraries, type VersionConstant } from "./libraries.ts";
+import { decodeLibrarySource, folderOf, LIBRARY_FILE, libraryDirs, publishedPackage, readLibraries, type VersionConstant } from "./libraries.ts";
 import { membersOf } from "./metapackages.ts";
 import { everyLibrary } from "./affected.ts";
 
@@ -137,11 +137,8 @@ export type Step = {
   readonly decision: Exclude<Decision, { readonly kind: "unchanged" }>;
 };
 
-/** A library that is not released, and the typed reason (0001-libraries FR-024). */
-export type HeldLibrary = { readonly name: string; readonly hold: Hold };
-
-/** The plan: every step in the order of the imports, the libraries that are left alone, and the libraries that are not released with their reasons. */
-export type Plan = { readonly steps: readonly Step[]; readonly unchanged: readonly Slug[]; readonly held: readonly HeldLibrary[] };
+/** The plan: every step in the order of the imports, and the libraries that are left alone. */
+export type Plan = { readonly steps: readonly Step[]; readonly unchanged: readonly Slug[] };
 
 const tagOf = (slug: string, version: string): string => `${slug}-v${version}`;
 
@@ -183,16 +180,11 @@ export function describe(d: Decision, from: string): string {
  * The plan of a release from the facts of the libraries (FR-013): a library with no tag, or ahead of its last tag, is released as it is; one that is tagged at its version and changed is raised by its impact; one that is tagged,
  * unchanged and imports a library that is raised, directly or through another, is raised by a patch; the rest are left alone. A library whose version is below its last tag is an error, and so is a cycle of imports.
  */
-export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, Impact | undefined> = new Map(), held: readonly HeldLibrary[] = []): Result<Plan, string> {
+export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, Impact | undefined> = new Map()): Result<Plan, string> {
   const by = new Map(facts.map((f) => [f.slug as string, f] as const));
-  const heldBy = new Map(held.map((h) => [h.name, h] as const));
   const unknown = [...raise.keys()].filter((k) => !by.has(k));
-  const named = (k: string): string => {
-    const h = heldBy.get(k);
-    return h === undefined ? k : `${k} (not released: ${holdSentence(h.hold)})`;
-  };
   if (unknown.length > 0)
-    return err(`--raise names ${unknown.map(named).join(", ")}, which ${unknown.length === 1 ? "is" : "are"} no library that is released (they are: ${facts.map((f) => f.slug).join(", ")})`);
+    return err(`--raise names ${unknown.join(", ")}, which ${unknown.length === 1 ? "is" : "are"} no library that is released (they are: ${facts.map((f) => f.slug).join(", ")})`);
   const decided = new Map<Slug, Decision>();
   // the impact of the commits and the floor of the exports: the greater wins (FR-027), and while the major version is 0 a breaking change raises the minor
   const raised = (f: Facts, impact: Impact, why: Why): Result<Decision, string> => {
@@ -249,7 +241,7 @@ export function planRelease(facts: readonly Facts[], raise: ReadonlyMap<string, 
     const to = d.kind === "as-is" ? f.version : d.to;
     steps.push({ slug, folder: f.folder, package: f.package, from: f.version, to, tag: tagOf(slug, to), publish: f.publish, ...(f.registries === undefined ? {} : { registries: f.registries }), decision: d });
   }
-  return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug), held: [...held].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) });
+  return ok({ steps, unchanged: facts.filter((f) => decided.get(f.slug)?.kind === "unchanged").map((f) => f.slug) });
 }
 
 function compare(a: string, b: string): number | undefined {
@@ -506,12 +498,7 @@ export function exportKeys(packageJson: string): readonly string[] {
   }
 }
 
-/** The libraries that are not released, each with its typed reason, in the order of their names (0001-libraries FR-024). */
-export function heldLibraries(repo: string): readonly HeldLibrary[] {
-  return everyLibrary(repo).flatMap((l) => (l.held === undefined ? [] : [{ name: l.name, hold: l.held }]));
-}
-
-/** The plan of a repository: the facts of the libraries that are released, the libraries that are held, and the rules of the plan. */
+/** The plan of a repository: the facts of the libraries and the rules of the plan. */
 export async function releasePlan(
   repo: string,
   options: { readonly raise?: ReadonlyMap<string, Impact | undefined>; readonly registry?: Registry; readonly published?: PublishedExports; readonly mode?: DistributionMode } = {},
@@ -519,14 +506,14 @@ export async function releasePlan(
   const mode = options.mode === undefined ? activeMode(env.get(MODE_VARIABLE)) : ok(options.mode);
   if (mode.kind === "err") return mode;
   if (mode.value === "single") {
-    // the one package is the one release: no library is raised by itself, and none is held out of it by its own hold (0036-distribution FR-027)
+    // the one package is the one release: no library is raised by itself (0036-distribution FR-027)
     const single = await singleFactsOf(repo, options.registry ?? realRegistrySingle(repo), options.published);
     if (single.kind === "err") return single;
-    return planRelease([single.value], options.raise, []);
+    return planRelease([single.value], options.raise);
   }
   const facts = await factsOf(repo, options.registry, options.published);
   if (facts.kind === "err") return facts;
-  return planRelease(facts.value, options.raise, heldLibraries(repo));
+  return planRelease(facts.value, options.raise);
 }
 
 /**
@@ -620,7 +607,7 @@ export async function factsOf(repo: string, registry: Registry = realRegistry(re
   const head = await resolveCommit(repo, "HEAD");
   if (head.kind === "err") return err(formatGitError(head.error));
   const folders = workFolders(tree.value.paths);
-  const libs = everyLibrary(repo).filter((l) => l.held === undefined);
+  const libs = everyLibrary(repo);
   const slugs = new Map<string, Slug>();
   for (const l of libs) {
     const s = slugOf(l.name);
@@ -810,13 +797,12 @@ export async function applyRelease(
 
 /** The lines the plan prints: one for each library that is released, and the libraries left alone. */
 export function planLines(look: Look, plan: Plan): readonly string[] {
-  const heldLines = plan.held.map((h) => `${label("skipped", `${h.name} not released`, look)}  ${paint("dim", holdSentence(h.hold), look)}`);
-  if (plan.steps.length === 0) return [`${label("skipped", "nothing to release: every library is tagged at its version and unchanged", look)}`, ...heldLines];
+  if (plan.steps.length === 0) return [`${label("skipped", "nothing to release: every library is tagged at its version and unchanged", look)}`];
   const out = plan.steps.map(
     (s) => `${label("action", `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? (s.registries === undefined ? "" : ` (to ${s.registries.join(" and ")})`) : " (tag only)"}`, look)}  ${paint("dim", describe(s.decision, s.from), look)}`,
   );
   if (plan.unchanged.length > 0) out.push(`${paint("dim", `left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`, look)}`);
-  return [...out, ...heldLines];
+  return out;
 }
 
 /** What the publication needs from the world, so that its order and its rules are a pure function of what these say. */

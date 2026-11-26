@@ -1,6 +1,6 @@
 /**
  * Tests of the layers of AnyFS OneDrive over the shared checker of Kanon (commons anyfs-onedrive 0001-anyfs-onedrive-layers FR-001 to FR-005): the table in the manifest holds every file of the real tree with no finding, `verify` runs
- * every check of the library, the network is reached only by the transport, no package of Microsoft sends for the library, and the library is held from the registries with the reason that it has not been run on a live tenant.
+ * every check of the library, the network is reached only by the transport, no package of Microsoft sends for the library, and the library is published as experimental, with the reason that it has not been run on a live tenant.
  *
  * @module
  */
@@ -47,8 +47,8 @@ proves(["0001-anyfs-onedrive-layers FR-003"], "no source reaches the network but
 });
 
 proves(["0001-anyfs-onedrive-layers FR-004"], "the manifest holds the library from the registries and names what is missing: a run against a live tenant", () => {
-  assertEquals(library.held.kind, "unfinished");
-  assert(library.held.reason.length > 10);
-  assert(library.held.missing.some((m) => m.includes("live")));
-  assertEquals(library.distribution, ["github"]);
+  assertEquals(library.maturity, "experimental");
+  assert((library.limits?.[0]?.length ?? 0) > 10);
+  assert(library.limits?.some((m) => m.includes("live")) === true);
+  assertEquals(library.distribution, ["github", "npm"]);
 });

@@ -15,7 +15,7 @@ import { assert, assertEquals, assertStringIncludes, proves } from "@intellectua
 const SPEC = "0035-licensing";
 const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 const read = (p: string): string => readTextFileSync(join(ROOT, p));
-const manifest = (extra = ""): string => `export const library = { name: "alpha", verify: "bun run verify", version: "0.1.0", exports: ["."], ${extra} };\n`;
+const manifest = (extra = ""): string => `export const library = { name: "alpha", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], ${extra} };\n`;
 
 /** A small repository: one library, the hand-written files with the facts they need and the vendored files the record names. */
 function fixture(dir: string, files: Readonly<Record<string, string>> = {}): void {

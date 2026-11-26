@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Tenancy for service providers: the parties (an operator and its clients), the engagements between them with roles and dates, deny-by-default authorization of what a principal may do to which client, portfolio views that carry only what a principal may see, and the shared-responsibility matrix that says who answers for each requirement, with inheritance from a provider.",
   kanon: {

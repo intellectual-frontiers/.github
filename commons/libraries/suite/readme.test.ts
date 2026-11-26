@@ -15,7 +15,7 @@ const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 const SPEC = "0001-libraries";
 
 const manifest = (name: string, extra = ""): string =>
-  `export const library = { name: "${name}", verify: "bun run verify", version: "0.1.0", exports: ["."], ${extra} };\n`;
+  `export const library = { name: "${name}", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], ${extra} };\n`;
 const about = (summary: string): string => `export const about = {\n  title: "X",\n  summary:\n    ${summary},\n  folders: [],\n};\n`;
 
 proves([`${SPEC} FR-017`], "a summary is read as data from its literals joined by +, and the first clause is the first sentence cut at a clause", () => {

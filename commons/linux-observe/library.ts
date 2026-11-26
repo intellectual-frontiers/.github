@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "What a Linux machine is, read with no change: the resources that an Desired OS State requirement declares (a package, a user, a group, a file, a directory, a service, an authorized key, a system setting) observed in the shape the requirement declares them, through any way of running a program.",
   kanon: {

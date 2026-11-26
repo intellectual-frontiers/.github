@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical"],
   summary: "The lenses of an assurance dossier, as a plugin of the dossier family: the acceptance of a case with each step's result and who attested it, the findings with a plan of action and milestones, how each requirement stands with counts and never a percentage, and the negative space (what has no evidence, has gone stale, is not met or is only partly met), each plate citing its sources and saying how old they are.",
   kanon: {

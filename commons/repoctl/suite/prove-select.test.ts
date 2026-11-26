@@ -110,7 +110,7 @@ proves(["0008-repoctl-prove FR-011", "0008-repoctl-prove FR-013"], "over a real 
     await git(dir, "branch", "-M", "main");
     const world: World = {
       ...systemWorld(dir, () => undefined, LIBRARIES),
-      libraries: { list: () => Promise.resolve(ok([{ name: "prov", folder: "commons/prov", version: "0.1.0", level: "L1", specKit: undefined, npm: false, held: undefined, versionConstants: [], package: "@intellectual-frontiers/prov" }])) },
+      libraries: { list: () => Promise.resolve(ok([{ name: "prov", folder: "commons/prov", version: "0.1.0", level: "L1", specKit: undefined, npm: false, maturity: "stable", versionConstants: [], package: "@intellectual-frontiers/prov" }])) },
     };
     const cache = { folder: path.join(dir, "..", `cache-${path.basename(dir)}`), runtime: "test" };
     const run = async (quarantine = parseQuarantine("[]")) => {

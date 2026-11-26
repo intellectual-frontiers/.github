@@ -33,7 +33,7 @@ const put = (root: string, file: string, text: string): void => {
   writeTextFileSync(join(root, file), text);
 };
 const manifest = (name: string): string =>
-  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."] })};\n`;
+  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."] })};\n`;
 
 /** Two libraries of a repository: `base` and `top`, whose own code imports `base` by its package name. */
 function repo(root: string): void {

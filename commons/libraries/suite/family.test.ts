@@ -38,7 +38,7 @@ const GOOD: readonly Entry[] = [
 ];
 
 const manifest = (o: Readonly<Record<string, unknown>>): string =>
-  `export const library = ${JSON.stringify({ name: "desired-os-state", verify: "bun run verify", version: "0.1.0", exports: ["."], ...o })};\n`;
+  `export const library = ${JSON.stringify({ name: "desired-os-state", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], ...o })};\n`;
 
 proves(["0001-libraries FR-016"], "a manifest's family is decoded and refused where it is not a host and a role", () => {
   const r = decodeLibrarySource(manifest({ family: { host: "desired-os-state", role: "dialect" } }));

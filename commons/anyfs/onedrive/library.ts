@@ -11,8 +11,9 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "unfinished", reason: "built and verified against an in-process fake of Microsoft Graph and the documented response shapes, and not yet run against a live tenant, which needs a test tenant and an account from the owner", missing: ["a run against a live Microsoft Graph tenant"], liftedWhen: "the suite has run against a test tenant and its findings are in the issue" },
+  distribution: ["github", "npm"],
+  maturity: "experimental",
+  limits: ["not yet run against a live Microsoft Graph tenant"],
   exports: ["."],
   family: { host: "anyfs", role: "plugin" },
   summary:

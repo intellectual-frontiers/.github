@@ -15,7 +15,6 @@
 import { type ConsumerReport, CONSUMER_FILE, checksOf, findingsOfHandoff, findingsOfPublish, finding, findingsOfSync, folderOf, gate, handoffOf, orderGenerators, type Pin, type PinState, pinsOf, planPublish, reportData, reportText, repinned, type Released, runPublish, runSync, STAGED_NOTE, type TrainReport, underFolder, type Verified, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
 import { activeMode, applyRelease, describe, offlinePublishedExports, offlineRegistry, type DistributionMode, type Plan, raiseOf, readRecord, MODE_VARIABLE, publishedOf, REAL, registryOf, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
 import { CHECK_CLASS, checkOf } from "@intellectual-frontiers/libraries/ci/policy";
-import { holdSentence } from "@intellectual-frontiers/libraries/libraries";
 import type { Outcome } from "@intellectual-frontiers/headless/logical";
 import { join, resolve } from "@intellectual-frontiers/system/path";
 import { flag, many, value } from "@intellectual-frontiers/terminal/args";
@@ -23,10 +22,9 @@ import { type Done, defineVerb, generatorsOf, type Host, outcomeOfDone, outcomeO
 
 /** The lines of a plan for a person: one for each library that is released, and the libraries that are left alone. */
 export function planText(plan: Plan): string {
-  const held = plan.held.map((h) => `${h.name} not released  ${holdSentence(h.hold)}`);
-  if (plan.steps.length === 0) return ["nothing to release: every library is tagged at its version and unchanged", ...held].join("\n");
+  if (plan.steps.length === 0) return "nothing to release: every library is tagged at its version and unchanged";
   const lines = plan.steps.map((s) => `${s.slug} ${s.from === s.to ? s.to : `${s.from} -> ${s.to}`}${s.publish ? "" : " (tag only)"}  ${describe(s.decision, s.from)}`);
-  return [...lines, ...(plan.unchanged.length > 0 ? [`left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`] : []), ...held].join("\n");
+  return [...lines, ...(plan.unchanged.length > 0 ? [`left alone (${plan.unchanged.length}): ${plan.unchanged.join(", ")}`] : [])].join("\n");
 }
 
 /** The data of a plan, for `--json`. */
@@ -34,7 +32,6 @@ export function planData(plan: Plan): unknown {
   return {
     steps: plan.steps.map((s) => ({ library: s.slug, from: s.from, to: s.to, tag: s.tag, publish: s.publish, why: describe(s.decision, s.from) })),
     unchanged: plan.unchanged,
-    held: plan.held.map((h) => ({ library: h.name, kind: h.hold.kind, why: holdSentence(h.hold) })),
   };
 }
 

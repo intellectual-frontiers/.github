@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.2.8",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   versionConstants: [{ file: "src/governance/version.ts", name: "REPOCTL_VERSION" }],

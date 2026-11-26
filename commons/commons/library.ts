@@ -8,6 +8,7 @@ export const library = {
   level: "L0",
   verify: "bun run verify",
   version: "0.35.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: ["."],
   bundle: "commons",

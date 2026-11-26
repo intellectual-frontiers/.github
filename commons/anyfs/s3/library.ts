@@ -11,8 +11,9 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "unfinished", reason: "built and verified but not released until the first consumer runs on it", missing: ["its first consumer"], liftedWhen: "the first consumer runs on it" },
+  distribution: ["github", "npm"],
+  maturity: "experimental",
+  limits: ["no program runs on it yet"],
   exports: ["."],
   family: { host: "anyfs", role: "plugin" },
   summary:

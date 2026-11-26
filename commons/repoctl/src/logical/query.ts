@@ -28,7 +28,7 @@ export type RepositoryQueryOptions = { readonly limit?: number; readonly params?
 export type RepositoryAnswer = { readonly columns: readonly string[]; readonly rows: readonly (readonly Value[])[]; readonly truncated: boolean };
 
 const SCHEMA: Readonly<Record<string, readonly (readonly [string, Type])[]>> = {
-  libraries: [["name", "text"], ["package", "text"], ["folder", "text"], ["version", "text"], ["level", "text"], ["npm", "bool"], ["held", "text"]],
+  libraries: [["name", "text"], ["package", "text"], ["folder", "text"], ["version", "text"], ["level", "text"], ["npm", "bool"], ["maturity", "text"]],
   specs: [["library", "text"], ["number", "text"], ["slug", "text"], ["state", "text"]],
   requirements: [["library", "text"], ["spec", "text"], ["fr", "text"], ["mechanism", "text"], ["by", "text"], ["note", "text"]],
 };
@@ -48,7 +48,7 @@ export function repositoryRelations(sources: readonly RepositorySource[]): Reado
   const specs: (readonly Value[])[] = [];
   const requirements: (readonly Value[])[] = [];
   for (const { library: l, registry, enforcement } of sources) {
-    libraries.push([l.name, l.package, l.folder, l.version, l.level, l.npm, l.held ?? null]);
+    libraries.push([l.name, l.package, l.folder, l.version, l.level, l.npm, l.maturity]);
     for (const [number, slug, state] of lines(registry)) if (number !== undefined && /^\d+$/.test(number)) specs.push([l.name, number, slug ?? "", state ?? ""]);
     for (const [id, mechanism, by, note] of lines(enforcement)) {
       const m = /^(\S+) (FR-\d+)$/.exec(id ?? "");

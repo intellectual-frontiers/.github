@@ -16,7 +16,7 @@ const SPEC = "0030-generated-workflows";
 const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 
 const manifest = (o: Readonly<Record<string, unknown>> = {}): string =>
-  `export const library = ${JSON.stringify({ name: "alpha", level: "L1", specKit: "spec-kit", verify: "bun run verify", version: "0.2.0", exports: ["./a"], ...o })};\n`;
+  `export const library = ${JSON.stringify({ name: "alpha", level: "L1", specKit: "spec-kit", verify: "bun run verify", maturity: "stable", version: "0.2.0", exports: ["./a"], ...o })};\n`;
 
 /** A repository of one library, `alpha`, and an empty folder of workflows. */
 function repo(root: string, libraries: readonly string[] = ["alpha"]): void {

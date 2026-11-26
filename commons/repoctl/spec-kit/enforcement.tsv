@@ -79,7 +79,7 @@ requirement	mechanism	by	note
 0010-repoctl-host FR-001	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: no quoted path of the repository of commons in the source of the host
 0010-repoctl-host FR-002	check	.github: cd commons/repoctl && bun run verify	suite/host.test.ts: the capabilities turn verbs on and off
 0010-repoctl-host FR-003	check	.github: cd commons/repoctl && bun run verify	suite/package.test.ts: the packed tarball installed in a scratch project runs --help and doctor offline
-0010-repoctl-host FR-004	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: a held library is held in the status
+0010-repoctl-host FR-004	check	.github: cd commons/repoctl && bun run verify	suite/status-release.test.ts: the state of a library is released, unpublished, untagged or unknown, from what npm and the tags hold
 0011-repoctl-docs FR-001	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the verbs are there only with docs settings
 0011-repoctl-docs FR-002	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: the generator is loaded from the repository and missing is its typed problem
 0011-repoctl-docs FR-003	check	.github: cd commons/repoctl && bun run verify	suite/docs.test.ts: a failing generator is E-DOCS-FAILED

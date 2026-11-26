@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Reads infrastructure as code (OpenTofu and Terraform plans and state as JSON, CloudFormation templates, Kubernetes manifests, Compose files, Pulumi stack exports) into assets and links of the estate, with where each came from, and compares what the code says with what a cloud shows. It reads files and runs no tool.",
   kanon: {

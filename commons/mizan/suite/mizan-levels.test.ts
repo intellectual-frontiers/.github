@@ -215,7 +215,7 @@ function library(root: string, name: string, verify: string): void {
   mkdirSync(join(root, "commons", name), { recursive: true });
   writeTextFileSync(
     join(root, "commons", name, "library.ts"),
-    `export const library = { name: "${name}", level: "L0", verify: "bun run verify", version: "0.1.0", exports: [] };\n`,
+    `export const library = { name: "${name}", level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: [] };\n`,
   );
   writeTextFileSync(
     join(root, "commons", name, "package.json"),

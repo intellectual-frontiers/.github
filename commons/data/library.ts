@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.10.1",
+  maturity: "stable",
   distribution: ["github", "npm"],
   publishes: "@intellectual-frontiers/arcactl",
   exports: [

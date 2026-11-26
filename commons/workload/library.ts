@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical", "./forms/runbook", "./forms/reconcile", "./forms/graph", "./dialects/claude-code", "./dialects/codex", "./dialects/human", "./runners/bash", "./runners/pwsh", "./runners/github-actions"],
   summary: "Workload: units of operated work (not running software) as typed data of a form, a runbook being one form, with effects, autonomy derived from them, static checks and projections for each harness and for auditors; a Kanon pattern with a governance core, forms as logical modules and runners behind ports.",

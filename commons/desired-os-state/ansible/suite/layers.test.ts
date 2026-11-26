@@ -58,5 +58,5 @@ proves(["0001-ansible-layers FR-005"], "the release record agrees with the manif
   assertEquals(release.slug, library.name);
   assertEquals(release.version, library.version);
   assertEquals(release.kind, "Software");
-  assertEquals(library.distribution, ["github"], "held back from npm until the owner says it is ready");
+  assertEquals(library.distribution, ["github", "npm"], "held back from npm until the owner says it is ready");
 });

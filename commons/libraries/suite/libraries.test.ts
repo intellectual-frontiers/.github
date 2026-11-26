@@ -25,7 +25,7 @@ const SPEC = "0027-commons-libraries";
 const ROOT = resolve(fromFileUrl(new URL("../../..", import.meta.url)));
 
 const manifest = (o: Readonly<Record<string, unknown>> = {}): string =>
-  `export const library = ${JSON.stringify({ name: "alpha", level: "L1", specKit: "spec-kit", verify: "bun run verify", version: "0.2.0", exports: ["./a", "./b"], ...o })};\n`;
+  `export const library = ${JSON.stringify({ name: "alpha", level: "L1", specKit: "spec-kit", verify: "bun run verify", maturity: "stable", version: "0.2.0", exports: ["./a", "./b"], ...o })};\n`;
 
 proves(
   [`${SPEC} FR-012`],
@@ -37,7 +37,7 @@ proves(
       [ok.value.name, ok.value.level, ok.value.specKit, ok.value.version, ok.value.exports],
       ["alpha", "L1", "spec-kit", "0.2.0", ["./a", "./b"]],
     );
-    const plain = decodeLibrarySource('export const library = { name: "b", verify: "bun run verify", version: "1.0.0", exports: [] };\n');
+    const plain = decodeLibrarySource('export const library = { name: "b", verify: "bun run verify", maturity: "stable", version: "1.0.0", exports: [] };\n');
     assert(plain.kind === "ok" && plain.value.level === "L1" && plain.value.specKit === undefined);
     const l0 = decodeLibrarySource(manifest({ level: "L0", specKit: undefined }));
     assert(l0.kind === "ok" && l0.value.level === "L0");
@@ -46,7 +46,7 @@ proves(
       [manifest({ owner: "me" }), "library.owner is an unknown field"],
       [manifest({ name: "Not Lower" }), "name"],
       [manifest({ exports: "./a" }), "exports"],
-      ['export const library = { name: "a", verify: "x", version: "1", exports: [] };\nexport const other = 1;\n', "exports only library"],
+      ['export const library = { name: "a", verify: "x", maturity: "stable", version: "1", exports: [] };\nexport const other = 1;\n', "exports only library"],
       ["export const library = makeIt();\n", "not a literal"],
     ] as const) {
       const r = decodeLibrarySource(text);
@@ -108,7 +108,7 @@ proves(
     }
     const text = generated("x\n<!-- libraries:begin -->\n\n<!-- libraries:end -->\ny\n", "", [both.value]);
     assert(text.kind === "ok");
-    assertStringIncludes(text.value.spec, "published to the GitHub package registry and npm, proved by");
+    assertStringIncludes(text.value.spec, "published to the GitHub package registry and npm (stable), proved by");
   },
 );
 
@@ -231,7 +231,7 @@ proves(
       writeTextFileSync(join(root, "commons", "spec-kit", "specs", SPEC, "spec.md"), "## The libraries\n");
       assertStringIncludes(synchronize(root, false).problems.join("\n"), "has no <!-- libraries:begin -->");
     });
-    const lib = { name: "a", level: "L1" as const, verify: "bun run verify", version: "1", exports: [], distribution: ["github" as const] };
+    const lib = { name: "a", level: "L1" as const, verify: "bun run verify", maturity: "stable" as const, version: "1", exports: [], distribution: ["github" as const] };
     const libs = [lib];
     assertEquals([...idsFor(libs, new Map()).values()], [`FR-${FIRST_GENERATED}`]);
     assertEquals([...idsFor(libs, new Map([["a", "FR-150"]])).values()], ["FR-150"]);

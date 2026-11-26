@@ -31,7 +31,7 @@ const HELD: readonly Held[] = [
 proves(["0005-repoctl-library-commit-doctor FR-001"], "the scaffold has every file of a library, each with the name in it, and a title is made of the name", () => {
   const files = filesOf({ name: "widget-kit", summary: "Widgets, made by the book.", folder: "commons" });
   const paths = files.map((f) => f.path);
-  for (const p of ["library.ts", "package.json", "release.ts", "tsconfig.json", "about.ts", "src/mod.ts", "src/governance/mod.ts", "src/logical/mod.ts", "src/physical/mod.ts", "spec-kit/registry.tsv", "spec-kit/enforcement.tsv", "spec-kit/mizan.baseline.txt", "spec-kit/specs/0001-widget-kit-layers/spec.md", "suite/layers.test.ts", "tools/check.ts", "trace.baseline.txt"])
+  for (const p of ["library.ts", "package.json", "release.ts", "tsconfig.json", "about.ts", "src/mod.ts", "src/governance/mod.ts", "src/logical/mod.ts", "src/physical/mod.ts", "spec-kit/registry.tsv", "spec-kit/enforcement.tsv", "spec-kit/mizan.baseline.txt", "spec-kit/specs/0001-widget-kit-layers/spec.md", "suite/layers.test.ts", "tools/check.ts", "tools/pack.ts", "trace.baseline.txt"])
     assert(paths.includes(`commons/widget-kit/${p}`), `${p} is made`);
   assertEquals(new Set(paths).size, paths.length);
   assertEquals(titleOf("widget-kit"), "Widget Kit");
@@ -262,7 +262,7 @@ proves(["0005-repoctl-library-commit-doctor FR-008"], "each thing wrong with a c
 proves(["0005-repoctl-library-commit-doctor FR-008"], "the facts of a real checkout are gathered through the ports: a folder with no dependencies and an old Node is found as such", async () => {
   if (!CAN_RUN) return;
   await withCommits([], async (dir, base) => {
-    await put(dir, "commons/core/library.ts", `export const library = ${JSON.stringify({ name: "core", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."] })};\n`);
+    await put(dir, "commons/core/library.ts", `export const library = ${JSON.stringify({ name: "core", level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."] })};\n`);
     const old: Process = { run: (argv, options) => (argv[0] === "node" ? Promise.resolve({ code: 0, stdout: "v22.1.0\n", stderr: "" }) : systemProcess.run(argv, options)) };
     const world: World = { ...base, process: old };
     const facts = await gatherFacts(world, [], DOCTOR);

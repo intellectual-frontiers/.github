@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The HIPAA Security Rule as a grc catalog package: its standards and implementation specifications, in our own words, with whether each is required or addressable.",
   kanon: {

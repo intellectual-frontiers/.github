@@ -35,7 +35,7 @@ import { CAN_RUN, execute, git, hostOf, put, LIBRARIES, genOf } from "./world.ts
 const TOKEN = `npm_${"A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"}`;
 
 const manifest = (name: string, version: string, distribution: readonly string[]): string =>
-  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution })};\n`;
+  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version, exports: ["."], distribution })};\n`;
 
 /** A registry of the test: what npm shows of each package, or a reason it cannot be asked. */
 const registryOf = (shown: Readonly<Record<string, { latest: string; versions: readonly string[] } | "absent" | "down">>, asked: string[] = []): Registry => ({
@@ -56,13 +56,13 @@ proves(["0004-repoctl-status-release FR-001"], "versions are ordered by their nu
   assertEquals([...tags.entries()], [["core", ["0.1.0", "0.2.0"]], ["integrations-github", ["1.2.3-rc.1"]]]);
   const found = { kind: "found", latest: "0.1.0", hasRepoVersion: true } as const;
   const tagged = { kind: "found", latest: "0.1.0", hasRepoVersion: true, source: "remote" } as const;
-  assertEquals(stateOf({ npm: true, held: undefined }, found, tagged), "released");
-  assertEquals(stateOf({ npm: true, held: undefined }, { ...found, hasRepoVersion: false }, tagged), "unpublished");
-  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "absent" }, tagged), "unpublished");
-  assertEquals(stateOf({ npm: false, held: undefined }, { kind: "not-published" }, { ...tagged, hasRepoVersion: false }), "untagged");
-  assertEquals(stateOf({ npm: true, held: undefined }, found, { kind: "none", source: "remote" }), "untagged");
-  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "skipped" }, tagged), "unknown");
-  assertEquals(stateOf({ npm: true, held: undefined }, { kind: "unreachable", why: "x" }, tagged), "unknown");
+  assertEquals(stateOf({ npm: true }, found, tagged), "released");
+  assertEquals(stateOf({ npm: true }, { ...found, hasRepoVersion: false }, tagged), "unpublished");
+  assertEquals(stateOf({ npm: true }, { kind: "absent" }, tagged), "unpublished");
+  assertEquals(stateOf({ npm: false }, { kind: "not-published" }, { ...tagged, hasRepoVersion: false }), "untagged");
+  assertEquals(stateOf({ npm: true }, found, { kind: "none", source: "remote" }), "untagged");
+  assertEquals(stateOf({ npm: true }, { kind: "skipped" }, tagged), "unknown");
+  assertEquals(stateOf({ npm: true }, { kind: "unreachable", why: "x" }, tagged), "unknown");
 });
 
 /** A repository with a bare remote, two libraries and tags pushed to the remote. */
@@ -146,7 +146,7 @@ async function withLibraries<T>(mode: "single" | "per-library", use: (dir: strin
   return await fs.withTempDir(async (dir) => {
     const folders = mode === "single" ? ([["libraries", "0.4.0"], ["alpha", "0.1.0"], ["commons", "0.3.0"]] as const) : ([["libraries", "0.4.0"], ["alpha", "0.1.0"]] as const);
     for (const [name, version] of folders) {
-      await put(dir, `commons/${name}/library.ts`, name === "commons" ? `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"], bundle: "commons" })};\n` : manifest(name, version, ["github", "npm"]));
+      await put(dir, `commons/${name}/library.ts`, name === "commons" ? `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version, exports: ["."], distribution: ["github", "npm"], bundle: "commons" })};\n` : manifest(name, version, ["github", "npm"]));
       await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version, exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
       await put(dir, `commons/${name}/src/mod.ts`, `export const ${name} = 1;\n`);
       await put(dir, `commons/${name}/release.ts`, `export const release = ${JSON.stringify({ slug: name, kind: "Library", title: name, authors: [{ name: "x" }], version, repository: "https://example.org/r" })};\n`);
@@ -197,7 +197,7 @@ for (const mode of ["single", "per-library"] as const) {
     await fs.withTempDir(async (dir) => {
       const name = "libraries";
       const record = (slug: string, v: string): string => `export const release = ${JSON.stringify({ slug, kind: "Library", title: slug, authors: [{ name: "x" }], version: v, repository: "https://example.org/r" })};\n`;
-      const manifestText = (v: string): string => `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: v, exports: ["."], distribution: ["github", "npm"], versionConstants: [{ file: "src/version.ts", name: "LIBRARIES_VERSION" }] })};\n`;
+      const manifestText = (v: string): string => `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: v, exports: ["."], distribution: ["github", "npm"], versionConstants: [{ file: "src/version.ts", name: "LIBRARIES_VERSION" }] })};\n`;
       await put(dir, `commons/${name}/library.ts`, manifestText("0.1.0"));
       await put(dir, `commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version: "0.1.0", exports: { ".": "./src/mod.ts" } }, null, 2)}\n`);
       await put(dir, `commons/${name}/src/mod.ts`, "export const x = 1;\n");
@@ -205,7 +205,7 @@ for (const mode of ["single", "per-library"] as const) {
       await put(dir, `commons/${name}/release.ts`, record(name, "0.1.0"));
       if (mode === "single") {
         // the one package of `single` mode: the release raises it and no library
-        await put(dir, "commons/commons/library.ts", `export const library = ${JSON.stringify({ name: "commons", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], distribution: ["github", "npm"], bundle: "commons", versionConstants: [{ file: "src/version.ts", name: "COMMONS_VERSION" }] })};\n`);
+        await put(dir, "commons/commons/library.ts", `export const library = ${JSON.stringify({ name: "commons", level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], distribution: ["github", "npm"], bundle: "commons", versionConstants: [{ file: "src/version.ts", name: "COMMONS_VERSION" }] })};\n`);
         await put(dir, "commons/commons/package.json", `${JSON.stringify({ name: "@intellectual-frontiers/commons", version: "0.1.0", exports: { ".": "./index.js" } }, null, 2)}\n`);
         await put(dir, "commons/commons/src/version.ts", 'export const COMMONS_VERSION = "0.1.0";\n');
         await put(dir, "commons/commons/release.ts", record("commons", "0.1.0"));
@@ -382,8 +382,3 @@ proves(["0004-repoctl-status-release FR-001"], "the manifests of the real reposi
   assertEquals(systemFiles === undefined, false);
 });
 
-proves(["0010-repoctl-host FR-004"], "a library held out of the release is held in the status, with no npm cell and no tag, whatever its distribution says", () => {
-  assertEquals(stateOf({ npm: true, held: "not published yet" }, { kind: "found", latest: "0.1.0", hasRepoVersion: true }, { kind: "none", source: "local" }), "held");
-  assertEquals(stateOf({ npm: false, held: "not published yet" }, { kind: "not-published" }, { kind: "none", source: "local" }), "held");
-  assertEquals(stateOf({ npm: false, held: undefined }, { kind: "not-published" }, { kind: "none", source: "local" }), "untagged");
-});

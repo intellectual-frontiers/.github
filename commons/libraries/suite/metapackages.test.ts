@@ -21,7 +21,7 @@ const SPEC = "0001-libraries";
 const DIST = "0036-distribution";
 
 const manifest = (name: string, extra: Record<string, unknown> = {}, version = "0.1.0"): string =>
-  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"], ...extra })};\n`;
+  `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version, exports: ["."], distribution: ["github", "npm"], ...extra })};\n`;
 const lib = (name: string, extra: Record<string, unknown> = {}, version = "0.1.0"): Library => {
   const r = decodeLibrarySource(manifest(name, extra, version));
   if (r.kind === "err") throw new Error(r.error);
@@ -43,7 +43,7 @@ proves([`${SPEC} FR-022`, `${DIST} FR-009`], "publishes and bundle are read; a p
 proves([`${DIST} FR-004`], "a manifest of github alone is read (a private package), one of npm alone is refused, and the default is github", () => {
   assertEquals(lib("p", { distribution: ["github"] }).distribution, ["github"]);
   assertEquals(decodeLibrarySource(manifest("p", { distribution: ["npm"] })).kind, "err");
-  const none = decodeLibrarySource(`export const library = { name: "p", verify: "bun run verify", version: "0.1.0", exports: [] };\n`);
+  const none = decodeLibrarySource(`export const library = { name: "p", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: [] };\n`);
   assert(none.kind === "ok");
   assertEquals(none.value.distribution, ["github"]);
 });
@@ -88,7 +88,7 @@ proves([`${DIST} FR-005`, `${DIST} FR-006`, `${DIST} FR-007`, `${SPEC} FR-023`],
   const found = readLibraries(ROOT);
   const libraries = found.flatMap((f) => ("library" in f ? [f.library] : []));
   assertEquals(found.filter((f) => "problem" in f).length, 0);
-  for (const l of libraries) if (l.held === undefined) assertEquals([...l.distribution], ["github", "npm"], `${l.name}: none of our libraries is private; one that is not published says why with held`);
+  for (const l of libraries) assertEquals([...l.distribution], ["github", "npm"], `${l.name}: none of our libraries is private, and every library is published to both registries`);
   assertEquals(metapackagesOf(ROOT).map((m) => m.bundle).sort(), [...BUNDLES].sort());
   for (const m of metapackagesOf(ROOT)) {
     assertEquals(m.bundle, m.name);
@@ -205,7 +205,6 @@ proves([`${DIST} FR-008`, `${DIST} FR-015`, `${DIST} FR-009`], "on a real reposi
     put(dir, "data", { publishes: "@intellectual-frontiers/arcactl" });
     put(dir, "foundation", { bundle: "foundation" });
     put(dir, "programs", { bundle: "programs" });
-    put(dir, "desired-os-state", { held: "not published yet", distribution: [] });
     await g("add", ".");
     await g("commit", "-q", "-m", "Start");
     for (const t of ["core-v0.1.0", "data-v0.1.0", "foundation-v0.1.0", "programs-v0.1.0"]) await g("tag", t);

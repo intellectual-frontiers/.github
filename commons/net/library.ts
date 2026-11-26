@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.2.7",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./net", "./tcp", "./dns", "./http-client", "./serve", "./acme"],
   summary:

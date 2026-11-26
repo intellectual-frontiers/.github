@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "A policy gate: policies written as code over the subjects of a change (assets, resources, endpoints), evaluated on what a change adds or alters, with severities that block or warn, waivers that a person grants for a reason and a time, and a verdict that CI and a merge can act on, also as SARIF.",
   kanon: {

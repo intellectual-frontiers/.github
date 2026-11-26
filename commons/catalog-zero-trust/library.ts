@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Zero trust as a grc catalog package: the seven tenets of SP 800-207, the sources of input of its decision, the pillars and cross-cutting capabilities of the CISA maturity model with its stages in our own words, and a crosswalk to the controls of SP 800-53 and SP 800-171.",
   kanon: {

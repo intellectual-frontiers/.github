@@ -67,8 +67,8 @@ export type LibraryInfo = {
   /** Its spec kit from its folder, where it has one. */
   readonly specKit: string | undefined;
   readonly npm: boolean;
-  /** Why the library is held out of the release, where it is: it has no tag, no registry and no set. */
-  readonly held: string | undefined;
+  /** How far the library is built and proved: experimental, preview or stable. */
+  readonly maturity: string;
   readonly versionConstants: readonly VersionConstant[];
 };
 

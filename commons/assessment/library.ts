@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Assessment-objective evidence: what a framework's objectives (SP 800-171A, SP 800-53A) ask, the evidence recorded against each (examine, interview, test; by a tool or a person; with a validity), how each objective and requirement stands from it, and why a tool alone never determines an objective a person must.",
   kanon: {

@@ -227,7 +227,7 @@ async function withLibraries<T>(use: (dir: string, world: World) => Promise<T>):
     const names = ["prov", "user", "idle"];
     const world: World = {
       ...real,
-      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, held: undefined, versionConstants: [], package: `@intellectual-frontiers/${n}` })))) },
+      libraries: { list: () => Promise.resolve(ok(names.map((n) => ({ name: n, folder: `commons/${n}`, version: "0.1.0", level: "L1", specKit: undefined, npm: false, maturity: "stable", versionConstants: [], package: `@intellectual-frontiers/${n}` })))) },
     };
     return await use(dir, world);
   });

@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.2.5",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./rule", "./test-rule"],
   summary:

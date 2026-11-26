@@ -31,7 +31,7 @@ import { stdio } from "@intellectual-frontiers/system";
 import { existsSync, readTextFileSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { env } from "@intellectual-frontiers/system/proc";
 import { activeMode, type DistributionMode, MODE_VARIABLE, SINGLE } from "./distribution.ts";
-import { type Hold, type Library, type Registry, readLibraries } from "./libraries.ts";
+import { type Library, type Maturity, type Registry, readLibraries } from "./libraries.ts";
 
 /** The marker that opens the generated table. */
 export const BEGIN = "<!-- libraries-map:begin -->";
@@ -174,8 +174,8 @@ export type Row = {
   readonly level: string;
   readonly distribution: readonly Registry[];
   readonly published: boolean;
-  /** The typed reason the library is not released, where it has one (0001-libraries FR-024). */
-  readonly held: Hold | undefined;
+  /** How far the library is built and proved (0001-libraries FR-024). */
+  readonly maturity: Maturity;
 };
 
 /**
@@ -262,8 +262,8 @@ export function rowOf(l: Library, summary: string): Result<Row, string> {
     shape: shapeOf(l),
     level: l.level,
     distribution: l.distribution,
-    published: l.held === undefined && l.distribution.includes("npm"),
-    held: l.held,
+    published: l.distribution.includes("npm"),
+    maturity: l.maturity,
   });
 }
 
@@ -272,11 +272,11 @@ const REGISTRY_TITLE: Readonly<Record<Registry, string>> = { github: "GitHub", n
 /** The table, as Markdown, for the rows given: sorted by role, then by name. */
 export function tableOf(rows: readonly Row[]): string {
   const sorted = [...rows].sort((a, b) => roleRank(a.role) - roleRank(b.role) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  const head = ["| Library | Role | What it is | Kanon | Level | Published to |", "| --- | --- | --- | --- | --- | --- |"];
+  const head = ["| Library | Role | What it is | Kanon | Level | Maturity | Published to |", "| --- | --- | --- | --- | --- | --- | --- |"];
   const body = sorted.map((r) => {
     const pkg = `@intellectual-frontiers/${r.name}`;
     const href = r.published ? `https://www.npmjs.com/package/${pkg}` : `commons/${r.dir ?? r.name}`;
-    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.held === undefined ? r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ") : `not released (${r.held.kind})`} |`;
+    return `| [\`${pkg}\`](${href}) | ${ROLE_TITLE[r.role]} | ${r.purpose} | ${r.shape} | ${r.level} | ${r.maturity} | ${r.distribution.map((d) => REGISTRY_TITLE[d]).join(", ")} |`;
   });
   return [...head, ...body].join("\n");
 }

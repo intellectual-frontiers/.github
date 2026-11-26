@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "A sealed, point-in-time file on one subject, compiled from signed evidence through lenses as deterministic AsciiDoc: sources with hashes, lenses that select, project and disclose by class, plates with citations, a manifest of the evidence that a stranger can verify offline, a seal that only a person makes, and a diff by meaning; the same evidence, lenses and parameters give the same bytes, and no reader sees more than their class allows.",
   kanon: {

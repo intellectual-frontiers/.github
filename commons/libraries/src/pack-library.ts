@@ -26,7 +26,7 @@ import { chmod, readTextFile, writeTextFile } from "@intellectual-frontiers/syst
 import { existsSync, mkdirSync, readDirSync, readTextFileSync, removeSync, writeTextFileSync } from "@intellectual-frontiers/system/fs";
 import { importSpecifiers } from "./scan.ts";
 import { activeMode, MODE_VARIABLE } from "./distribution.ts";
-import { decodeLibrarySource, type Library, LIBRARY_FILE, libraryDirs, readLibraries } from "./libraries.ts";
+import { decodeLibrarySource, type Library, LIBRARY_FILE, libraryDirs, maturitySentence, readLibraries } from "./libraries.ts";
 import { COMMAND as LICENSE_COMMAND, licenseOf } from "./license.ts";
 import { dirname, join, relative, resolve, toPosix } from "@intellectual-frontiers/system/path";
 import { env, run, which } from "@intellectual-frontiers/system/proc";
@@ -186,15 +186,14 @@ export function rewriteDeclarationSpecifiers(source: string): string {
 export const tarballName = (name: string, version: string): string => `${name.replace(/^@/, "").replace("/", "-")}-${version}.tgz`;
 
 /** The version of a library of commons, from its `package.json`, and whether it is published to npm (its manifest names that). */
-function libraryOf(commons: string, name: string): { readonly version: string; readonly npm: boolean; readonly held: boolean } | undefined {
+function libraryOf(commons: string, name: string): { readonly version: string; readonly npm: boolean } | undefined {
   const folder = libraryDirs(readLibraries(dirname(commons))).get(name) ?? name; // an extension of a host is inside the folder of its host (0027-commons-libraries FR-026)
   const pkg = join(commons, folder, "package.json");
   if (!existsSync(pkg)) return undefined;
   const lib = join(commons, folder, "library.ts");
   const source = existsSync(lib) ? readTextFileSync(lib) : "";
   const npm = /distribution:\s*\[[^\]]*"npm"/.test(source);
-  const held = /\bheld:\s*\{/.test(source);
-  return { version: text((JSON.parse(readTextFileSync(pkg)) as Json)["version"]), npm, held };
+  return { version: text((JSON.parse(readTextFileSync(pkg)) as Json)["version"]), npm };
 }
 
 /**
@@ -289,6 +288,11 @@ export type PackOptions = {
 };
 
 /** The manifest of the library at `root`, where it has one that can be read. */
+/** The description of a package: the library's, and where the library is not stable, its maturity first, so that a reader of a registry sees it (0001-libraries FR-024). */
+function describedAs(description: string, lib: Library | undefined): string {
+  return lib === undefined || lib.maturity === "stable" ? description : `[${maturitySentence(lib)}] ${description}`;
+}
+
 function manifestOf(root: string): Library | undefined {
   const file = join(root, LIBRARY_FILE);
   if (!existsSync(file)) return undefined;
@@ -445,7 +449,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
       if (pkg.startsWith(`${SCOPE}/`) && pkg !== `${SCOPE}/commons`) {
         const lib = libraryOf(commons, pkg.slice(SCOPE.length + 1));
         if (lib === undefined) findings.push(`${file} imports ${pkg}, which is no library of commons`);
-        else if (!lib.npm && !(libraryOf(commons, short)?.held === true && lib.held)) findings.push(`${file} imports ${pkg}, which is not published to npm`);
+        else if (!lib.npm) findings.push(`${file} imports ${pkg}, which is not published to npm`);
         else dependencies[pkg] = lib.version;
       } else if (pkg !== `${SCOPE}/commons`) {
         const v = declaredDeps[pkg];
@@ -459,7 +463,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
   const manifest: Json = {
     name,
     version: text(own["version"]),
-    description: text(own["description"]),
+    description: describedAs(text(own["description"]), manifestOf(root)),
     license: licenseOf(manifestOf(root)),
     type: "module",
     engines: { node: ">=26" },
@@ -495,7 +499,7 @@ export async function packLibrary(root: string, options: PackOptions = {}): Prom
       [
         `# ${name}`,
         "",
-        text(own["description"]),
+        describedAs(text(own["description"]), manifestOf(root)),
         "",
         "```sh",
         `bun add ${name}     # or: npm install ${name}`,

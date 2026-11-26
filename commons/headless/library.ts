@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.5.7",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./cli", "./targets/local", "./targets/ssh", "./targets/container", "./ssh-inbound", "./otel", "./askpass", "./mcp", "./rest", "./describe"],
   summary:

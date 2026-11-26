@@ -45,8 +45,8 @@ export type Member = { readonly library: string; readonly package: string; reado
 export type Dependencies = Readonly<Record<string, string>>;
 
 /** Whether a library is installed by a set: it names npm, it is no metapackage and it is not held back. */
-export function isConsumerFacing(l: Pick<Library, "name" | "bundle" | "distribution" | "held">): boolean {
-  return l.held === undefined && l.bundle === undefined && l.distribution.includes("npm") && !HELD_BACK.has(l.name);
+export function isConsumerFacing(l: Pick<Library, "name" | "bundle" | "distribution">): boolean {
+  return l.bundle === undefined && l.distribution.includes("npm") && !HELD_BACK.has(l.name);
 }
 
 /** Whether a set holds a library of this role. */

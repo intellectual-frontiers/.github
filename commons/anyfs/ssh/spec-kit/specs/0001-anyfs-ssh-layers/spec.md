@@ -12,7 +12,7 @@
 - **FR-001**: The library MUST be a plugin of the family of AnyFS: its manifest `library.ts` MUST name the host `anyfs` and the role `plugin`, declare `extends: "@intellectual-frontiers/anyfs"` and the table of its units in the field `kanon`, and the shared checker of `@intellectual-frontiers/kanon` MUST find nothing in its tree.
 - **FR-002**: `bun run verify` in the folder of the library MUST run the check that the module of the helper is made from its script, the TypeScript 7 compiler, the checks of the specification kit, the check of the level L1, the layers check of Kanon, the trace check, the tests and the packer.
 - **FR-003**: No source of the library MUST build an `ssh` command line of its own: it MUST reach a host only through an `Executor` of `@intellectual-frontiers/headless`, so that the options, the quoting and the host-key policy are those of the executor, and the ban of Headless on hand-built ssh arguments MUST find nothing in `src/` and `tools/`.
-- **FR-004**: The library MUST be held from the registries (`held` in its manifest, with the reason) until the fleet store runs on it, and its distribution MUST be the GitHub package registry alone until it is released.
+- **FR-004**: The manifest of the library MUST say that it is experimental and what is not done (`maturity` and `limits`), and the library MUST be published like every library, with its maturity in its package description and in the table of the libraries.
 - **FR-005**: `bun tools/pack.ts` MUST pack the library as the package `@intellectual-frontiers/anyfs-ssh` with declarations for every export, and `verify` MUST run it with `--check`.
 
 ## Acceptance scenarios

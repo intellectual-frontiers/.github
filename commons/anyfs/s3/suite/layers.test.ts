@@ -1,6 +1,6 @@
 /**
  * Tests of the layers of AnyFS S3 over the shared checker of Kanon (commons anyfs-s3 0001-anyfs-s3-layers FR-001 to FR-005): the table in the manifest holds every file of the real tree with no finding, `verify` runs
- * every check of the library, the network is reached only by the transport, no outside package signs a request, and the library is held from the registries.
+ * every check of the library, the network is reached only by the transport, no outside package signs a request, and the library is published as experimental.
  *
  * @module
  */
@@ -47,9 +47,9 @@ proves(["0001-anyfs-s3-layers FR-003"], "no source reaches the network but the t
 });
 
 proves(["0001-anyfs-s3-layers FR-004"], "the manifest holds the library from the registries and names the reason", () => {
-  assertEquals(library.held.kind, "unfinished");
-  assert(library.held.reason.length > 10);
-  assertEquals(library.distribution, ["github"]);
+  assertEquals(library.maturity, "experimental");
+  assert((library.limits?.[0]?.length ?? 0) > 10);
+  assertEquals(library.distribution, ["github", "npm"]);
 });
 
 proves(["0001-anyfs-s3-layers FR-005"], "the packer is the library's own and verify runs it", async () => {

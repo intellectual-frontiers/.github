@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner releases it with the controller that calls it" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The SSH server of enrollment: a device with only an ssh client enrolls inbound against our own server on ssh2, which speaks a closed registry of typed commands, renders the bootstrap scripts for POSIX sh and PowerShell 7, decides by typed policy, keeps the session in a store port and never gives a shell.",
   kanon: {

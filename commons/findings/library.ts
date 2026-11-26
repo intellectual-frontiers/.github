@@ -11,8 +11,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the fleet libraries together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "Test results from other tools (SARIF, OWASP ZAP, Burp Suite and Nessus reports) read into findings that keep where they came from, with a lifecycle (open, triaged, accepted for a time, fixed, verified or reopened by a retest) worked out from a log of events, and the NIST SP 800-53 controls each finding is evidence against. It reads reports and runs no tool.",
   kanon: {

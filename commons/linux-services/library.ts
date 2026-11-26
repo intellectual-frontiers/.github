@@ -12,7 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
+  maturity: "stable",
+  distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "The services a Linux machine runs, said as data: a PostgreSQL instance, a send-only mail relay, a certificate and a set of DNS records, each a profile that becomes the requirements of Desired OS State (packages, files, directories and services), with the secret never in the model.",
   kanon: {

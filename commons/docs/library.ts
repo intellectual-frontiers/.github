@@ -11,6 +11,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.3.7",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./lens/layered", "./lens/program", "./lens/guides", "./lens/releases", "./lens/repo-ops"],
   summary:

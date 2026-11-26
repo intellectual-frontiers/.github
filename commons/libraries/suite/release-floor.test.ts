@@ -109,7 +109,7 @@ const library = (root: string, name: string, exportKeys: readonly string[]): voi
     mkdirSync(join(root, file, ".."), { recursive: true });
     writeTextFileSync(join(root, file), text);
   };
-  put(`commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version: "0.1.0", exports: [...exportKeys], distribution: ["github", "npm"] })};\n`);
+  put(`commons/${name}/library.ts`, `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: [...exportKeys], distribution: ["github", "npm"] })};\n`);
   put(`commons/${name}/package.json`, `${JSON.stringify({ name: `@intellectual-frontiers/${name}`, version: "0.1.0", exports: Object.fromEntries(exportKeys.map((k) => [k, `./src/${k === "." ? "mod" : k.slice(2)}.ts`])) }, null, 2)}\n`);
   for (const k of exportKeys) put(`commons/${name}/src/${k === "." ? "mod" : k.slice(2)}.ts`, `export const ${name}${k === "." ? "" : k.slice(2)} = 1;\n`);
   put(`commons/${name}/release.ts`, `export const release = ${JSON.stringify({ slug: name, kind: "Library", title: name, authors: [{ name: "x" }], version: "0.1.0", repository: "https://example.org/r" })};\n`);

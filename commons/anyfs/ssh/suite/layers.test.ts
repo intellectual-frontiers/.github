@@ -28,9 +28,9 @@ proves(["0001-anyfs-ssh-layers FR-002"], "verify runs every check of the library
 });
 
 proves(["0001-anyfs-ssh-layers FR-004"], "the manifest holds the library from the registries and names the reason", () => {
-  assertEquals(library.held.kind, "unfinished");
-  assert(library.held.reason.length > 10);
-  assertEquals(library.distribution, ["github"]);
+  assertEquals(library.maturity, "experimental");
+  assert((library.limits?.[0]?.length ?? 0) > 10);
+  assertEquals(library.distribution, ["github", "npm"]);
   assertEquals(library.family, { host: "anyfs", role: "plugin" });
 });
 

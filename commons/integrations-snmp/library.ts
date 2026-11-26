@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified against recorded, made-up answers and never against a live system: the owner releases the fleet libraries together, when a first site has been read" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "A read-only observer of network devices that answer SNMPv3: GET and GETNEXT with authentication and privacy (HMAC-SHA-2 and AES), a bounded walk of an allow-list of subtrees, the posture of each device in the vocabulary of GRC and its identity keys for the estate, written against the read port of Integrations and proved over recorded, made-up messages.",
   kanon: {

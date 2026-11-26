@@ -110,7 +110,7 @@ proves(
     assertStringIncludes(lines[1] ?? "", "it imports a");
     assertStringIncludes(lines[2] ?? "", "d 0.1.0  released as it is");
     assertEquals(lines[3], "left alone (1): c");
-    assertStringIncludes(planLines(PLAIN, { steps: [], unchanged: [], held: [] })[0] ?? "", "nothing to release");
+    assertStringIncludes(planLines(PLAIN, { steps: [], unchanged: [] })[0] ?? "", "nothing to release");
     return Promise.resolve();
   },
 );
@@ -151,7 +151,7 @@ const library = (root: string, name: string, version: string, imports: readonly 
   };
   put(
     `commons/${name}/library.ts`,
-    `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", version, exports: ["."], distribution: ["github", "npm"] })};\n`,
+    `export const library = ${JSON.stringify({ name, level: "L0", verify: "bun run verify", maturity: "stable", version, exports: ["."], distribution: ["github", "npm"] })};\n`,
   );
   put(
     `commons/${name}/package.json`,
@@ -257,7 +257,7 @@ proves(
       await g("commit", "-q", "-m", "Release");
       await g("tag", "a-v0.2.0");
       const out = join(dir, "output");
-      writeTextFileSync(join(dir, RECORD_PATH), recordText({ steps: plan.value.steps, unchanged: plan.value.unchanged, held: [] }));
+      writeTextFileSync(join(dir, RECORD_PATH), recordText({ steps: plan.value.steps, unchanged: plan.value.unchanged }));
       assertEquals(await main(["matrix", "--repo", dir, "--github-output", out, "--distribution", "per-library"]), 0);
       const text = readTextFileSync(out);
       assertStringIncludes(text, "has-build=true");
@@ -437,7 +437,7 @@ proves(
         writeTextFileSync(join(dir, file), text);
       };
       const manifest = (constants: readonly { file: string; name: string }[]): string =>
-        `export const library = ${JSON.stringify({ name: "k", level: "L0", verify: "bun run verify", version: "0.1.0", exports: ["."], versionConstants: constants })};\n`;
+        `export const library = ${JSON.stringify({ name: "k", level: "L0", verify: "bun run verify", maturity: "stable", version: "0.1.0", exports: ["."], versionConstants: constants })};\n`;
       put("commons/k/package.json", `${JSON.stringify({ name: "@x/k", version: "0.1.0" }, null, 2)}\n`);
       put("commons/k/src/v.ts", `export const K_VERSION = "0.1.0";\nexport const OTHER_VERSION = "9.9.9";\n`);
       const step = { slug: slug("k"), folder: "commons/k", package: "@intellectual-frontiers/k", from: "0.1.0", to: "0.2.0", tag: "k-v0.2.0", publish: true, decision: { kind: "raised", to: "0.2.0", impact: "minor", why: "changed", floor: undefined } } as const;

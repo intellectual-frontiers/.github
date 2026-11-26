@@ -12,8 +12,8 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "owner-blocked", reason: "built and verified but not released: the owner publishes the libraries of the fleet work together, when the first fleet runs on them" },
+  distribution: ["github", "npm"],
+  maturity: "preview",
   exports: [".", "./governance", "./logical", "./physical"],
   summary: "SOC 2 Trust Services Criteria as a grc catalog package, in our own words: the criteria of security, availability, processing integrity, confidentiality and privacy, with where they came from and why the AICPA text is not carried.",
   kanon: {

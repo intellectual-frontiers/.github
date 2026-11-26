@@ -12,8 +12,9 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
-  distribution: ["github"],
-  held: { kind: "unfinished", reason: "built and verified but not released until the fleet store runs on it", missing: ["its first consumer, the fleet store"], liftedWhen: "the fleet store runs on it" },
+  distribution: ["github", "npm"],
+  maturity: "experimental",
+  limits: ["no program runs on it yet; the fleet store is its first consumer"],
   exports: [".", "./governance", "./physical", "./sqlite", "./libsql", "./pg", "./pglite", "./duckdb"],
   family: { host: "anyfs", role: "plugin" },
   summary:

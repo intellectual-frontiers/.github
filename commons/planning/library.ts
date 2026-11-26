@@ -12,6 +12,7 @@ export const library = {
   specKit: "spec-kit",
   verify: "bun run verify",
   version: "0.1.0",
+  maturity: "stable",
   distribution: ["github", "npm"],
   exports: [".", "./governance", "./logical", "./records", "./physical"],
   summary: "Planning content from many places as one item each with one stable id, its history as append-only events and its state a fold of them, with every act of an agent made on behalf of a person; sources are lenses over the places, and a write goes back in the place's own form.",
