@@ -1,0 +1,312 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45877900150",
+    "workflow": "ci",
+    "commit": "a8a018b03c9a296ca3a5afc5f5832f24bf321416",
+    "at": "2026-11-26T18:44:37Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45877900150"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10225,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 215,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 115,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 131829,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-ansible",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 131829,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 133,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 916,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-opentofu",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 916,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 139,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2056,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-pinned-downloads",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2056,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 170,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1556,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state-tool",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1556,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 152,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1195,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "desired-os-state",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1195,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 144,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2579,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "package-managers",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 2579,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 191,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1307,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "toolchain",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1307,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 264,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1678,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "workbench",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1678,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "workload",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 296,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "workload",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10605,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "workload",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 10605,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": []
+}
