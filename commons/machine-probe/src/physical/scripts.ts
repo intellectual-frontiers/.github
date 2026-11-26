@@ -24,7 +24,18 @@ export async function probeScript(kind: ScriptKind): Promise<string> {
   return fs.readTextFile(path.join(HERE, "scripts", kind === "posix" ? "machine-probe.sh" : "machine-probe.ps1"));
 }
 
-/** The path of the POSIX script in the library, for a test or an installer that copies the file. */
-export function posixScriptPath(): string {
-  return path.join(HERE, "scripts", "machine-probe.sh");
+/** The path of the script for a system in the library, for a test or an installer that copies the file. */
+export function probeScriptPath(kind: ScriptKind): string {
+  return path.join(HERE, "scripts", kind === "posix" ? "machine-probe.sh" : "machine-probe.ps1");
+}
+
+/** The command that runs a script on the machine itself: `sh` for the POSIX script, PowerShell 7 (`pwsh`) with no profile and no prompt for the Windows one. The request is the words of the probe, each its own argument, which both scripts join as a forced command would give them. */
+export function probeCommand(kind: ScriptKind, scriptPath: string, request: string): readonly string[] {
+  const words = request.split(" ").filter((w) => w !== "");
+  return kind === "posix" ? ["sh", scriptPath, ...words] : ["pwsh", "-NoProfile", "-NonInteractive", "-File", scriptPath, ...words];
+}
+
+/** The system a family of operating system is run on: Windows for `windows`, POSIX for any other. */
+export function scriptKindOf(family: string): ScriptKind {
+  return family.toLowerCase() === "windows" ? "windows" : "posix";
 }

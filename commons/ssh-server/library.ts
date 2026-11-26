@@ -20,7 +20,11 @@ export const library = {
     package: "@intellectual-frontiers/ssh-server",
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
-      { folder: "src/logical/", layer: "logical", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/ssh-server", subpaths: ["governance"] }] },
+      {
+        folder: "src/logical/",
+        layer: "logical",
+        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/estate", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/ssh-server", subpaths: ["governance"] }],
+      },
       {
         folder: "src/physical/",
         layer: "physical",

@@ -5,6 +5,9 @@
  * @module
  */
 import type { DeviceClass, EnrollPolicy, EnrollRule, Facts, KnownAsset, EnrollmentSession } from "@intellectual-frontiers/ssh-server/governance";
+import { type Result } from "@intellectual-frontiers/core";
+import { keyOf, type IdentityKey } from "@intellectual-frontiers/estate/governance";
+import { resolveIdentity, type KnownKeys, type Resolution as EstateResolution } from "@intellectual-frontiers/estate/logical";
 import { inAnyCidr } from "./network.ts";
 
 /** Guess the class of a device from the banner of its client (`SSH-2.0-...`). */
@@ -21,29 +24,32 @@ export function classifyClient(ident: string): DeviceClass {
   return "other";
 }
 
-/** How a session matched an asset. */
-export type Resolution =
-  | { readonly kind: "new" }
-  | { readonly kind: "adopt"; readonly assetId: string; readonly matchedOn: readonly string[] }
-  | { readonly kind: "conflict"; readonly assetIds: readonly string[] };
+/** How a session matched an asset: the resolution of estate over the keys of the device. */
+export type Resolution = EstateResolution;
 
-/** Resolve a device to the assets known: by machine id, serial, MAC or host key. One asset that matches is adopted (merged), none is new, and two or more is a conflict that a person settles. */
-export function resolveIdentity(facts: Facts, assets: readonly KnownAsset[]): Resolution {
-  const macs = new Set(facts.nics.map((n) => n.mac));
-  const keys = new Set(facts.hostKeys.map((k) => k.fingerprint as string));
-  const found = new Map<string, string[]>();
-  for (const a of assets) {
-    const on: string[] = [];
-    if (a.machineId !== undefined && a.machineId !== "" && a.machineId === facts.machineId) on.push("machine-id");
-    if (a.serial !== undefined && a.serial !== "" && facts.serial !== undefined && a.serial === facts.serial) on.push("serial");
-    if (a.macs.some((m) => macs.has(m.toLowerCase()))) on.push("mac");
-    if (a.hostKeys.some((k) => keys.has(k))) on.push("host-key");
-    if (on.length > 0) found.set(a.id, on);
-  }
-  if (found.size === 0) return { kind: "new" };
-  if (found.size > 1) return { kind: "conflict", assetIds: [...found.keys()].sort() };
-  const [id, on] = [...found.entries()][0] as [string, string[]];
-  return { kind: "adopt", assetId: id, matchedOn: on };
+const keysOfFacts = (facts: Facts): readonly IdentityKey[] => {
+  const made: (Result<IdentityKey, string> | undefined)[] = [
+    facts.machineId === undefined || facts.machineId === "" ? undefined : keyOf("machine-id", facts.machineId),
+    facts.serial === undefined || facts.serial === "" ? undefined : keyOf("serial", facts.serial),
+    ...facts.nics.map((n) => keyOf("mac", n.mac)),
+    ...facts.hostKeys.map((k) => keyOf("host-key", k.fingerprint as string)),
+  ];
+  return made.flatMap((r) => (r !== undefined && r.kind === "ok" ? [r.value] : []));
+};
+
+const keysOfAsset = (a: KnownAsset): KnownKeys => ({
+  id: a.id,
+  keys: [
+    ...(a.machineId === undefined || a.machineId === "" ? [] : [keyOf("machine-id", a.machineId)]),
+    ...(a.serial === undefined || a.serial === "" ? [] : [keyOf("serial", a.serial)]),
+    ...a.macs.map((m) => keyOf("mac", m)),
+    ...a.hostKeys.map((k) => keyOf("host-key", k as string)),
+  ].flatMap((r) => (r.kind === "ok" ? [r.value] : [])),
+});
+
+/** Resolve a device to the assets known: by machine id, serial, MAC or host key, through the one resolution of estate (a strong key or a weak one adopts here). One asset that matches is adopted (merged), none is new, and two or more is a conflict that a person settles. */
+export function resolveFacts(facts: Facts, assets: readonly KnownAsset[]): Resolution {
+  return resolveIdentity(keysOfFacts(facts), assets.map(keysOfAsset), { weakAdopts: true });
 }
 
 /** What the policy decided. */
@@ -81,7 +87,7 @@ function matches(rule: EnrollRule, s: Pick<EnrollmentSession, "binding" | "sourc
 
 /** Decide a session whose facts are in. The first rule that matches decides. Where the device matches two assets, or no rule matches, a person decides. A decision always carries its explanation. */
 export function decideEnrollment(policy: EnrollPolicy, session: Pick<EnrollmentSession, "binding" | "sourceIp">, facts: Facts, assets: readonly KnownAsset[]): EnrollDecision {
-  const identity = resolveIdentity(facts, assets);
+  const identity = resolveFacts(facts, assets);
   if (identity.kind === "conflict") return { outcome: "pending", explanation: `the device matches more than one known asset (${identity.assetIds.join(", ")}): a person settles which it is` };
   const adopted = identity.kind === "adopt" ? { assetId: identity.assetId } : {};
   const suffix = identity.kind === "adopt" ? `; it is adopted by asset ${identity.assetId} (matched on ${identity.matchedOn.join(", ")})` : "";

@@ -13,7 +13,7 @@ if (-not $req) { $req = if ($args.Count) { $args -join ' ' } else { 'facts' } }
 
 function kv($k, $v) { Write-Output ('{0}={1}' -f $k, ("$v" -replace '[\r\n]+', ' ').Trim()) }
 
-function Get-Facts {
+function Get-ProbeFact {
   $os = Get-CimInstance Win32_OperatingSystem
   $cs = Get-CimInstance Win32_ComputerSystem
   $bios = Get-CimInstance Win32_BIOS
@@ -33,7 +33,7 @@ function Get-Facts {
     if ($null -eq $enc) {
       # Without administrator rights (a controller PC observing itself): the Shell's
       # BitLocker property, which any user may read (1 on, 3 encrypting, 2 off).
-      $bp = $null; try { $bp = (New-Object -ComObject Shell.Application).NameSpace("$($env:SystemDrive)\").Self.ExtendedProperty('System.Volume.BitLockerProtection') } catch {}
+      $bp = $null; try { $bp = (New-Object -ComObject Shell.Application).NameSpace("$($env:SystemDrive)\").Self.ExtendedProperty('System.Volume.BitLockerProtection') } catch { $bp = $null }
       if ($bp -eq 1 -or $bp -eq 3) { kv disk_encryption 'on' } elseif ($bp -eq 2) { kv disk_encryption 'off' } else { kv disk_encryption 'unknown' }
     } elseif ($enc.ProtectionStatus -eq 1) { kv disk_encryption 'on' } else { kv disk_encryption 'off' }
   } elseif ("$($bl.ProtectionStatus)" -eq 'On') { kv disk_encryption 'on' } else { kv disk_encryption 'off' }
@@ -62,7 +62,7 @@ function Get-Facts {
 }
 
 switch -regex ($req) {
-  '^facts$' { Get-Facts; exit 0 }
+  '^facts$' { Get-ProbeFact; exit 0 }
   '^version$' { Write-Output $version; exit 0 }
   '^osquery (\S+)$' {
     $oq = Join-Path $env:ProgramFiles 'osquery\osqueryi.exe'

@@ -12,6 +12,7 @@ import {
   decodeRows,
   defineRequirement,
   driftOf,
+  driftSummaryOf,
   observedFromFacts,
   observedFromRows,
   parseSubjectName,
@@ -161,4 +162,22 @@ proves(["0007-desired-os-state-observe-osquery FR-008", "0007-desired-os-state-o
   for (const q of pack.queries) assert(q.sql.startsWith(capture.queries[q.table]?.sql.split(" WHERE ")[0] ?? "?"), `the pack selects what the capture selected: ${q.table}`);
   const plan = driftOf(order, rowsOf, "debian");
   assertEquals(plan.entries.map((e) => `${e.id}:${e.action}`).sort(), ["r.bash:none", "r.etc:none", "r.group:none", "r.missing:create", "r.passwd:none", "r.root:none"]);
+});
+
+proves(["0007-desired-os-state-observe-osquery FR-009"], "the summary of the drift counts what differs by kind and by action, and counts nothing for a kind osQuery does not say", () => {
+  const order = orderOf([
+    { id: "r.git", desired: { name: "git", version: "2.39.2" } },
+    { id: "r.curl", desired: { name: "curl" } },
+    { id: "r.gone", desired: { name: "telnet" }, ensure: "absent", change: "destructive", rollback: "restore-from-backup" },
+    { id: "r.motd", kind: "system-setting", desired: { name: "motd", value: "hello" } },
+  ]);
+  const plan = driftOf(order, new Map([["deb_packages", rows({ name: "git", version: "1:2.30.0-1" }, { name: "telnet", version: "1" })]]), "debian");
+  const s = driftSummaryOf(order, plan, "debian");
+  assertEquals(s.ids, ["r.curl", "r.git", "r.gone"]);
+  assertEquals(s.count, 3);
+  assertEquals(s.watched, 3);
+  assertEquals(s.byAction, { create: 1, update: 1, remove: 1 });
+  assertEquals(s.byKind, { package: 3 });
+  const none = driftSummaryOf(order, driftOf(order, new Map([["deb_packages", rows({ name: "git", version: "2.39.2" }, { name: "curl", version: "7" })]]), "debian"), "debian");
+  assertEquals([none.count, none.ids], [0, []]);
 });

@@ -20,7 +20,7 @@ import { sshExecutor, type SshConfig } from "@intellectual-frontiers/headless/ta
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import type { ProbeReach } from "@intellectual-frontiers/machine-probe/governance";
 import { probeKeyLine } from "./key.ts";
-import { posixScriptPath } from "./scripts.ts";
+import { probeScriptPath } from "./scripts.ts";
 
 /** `user@host[:port]` read, or why not. */
 export function parseSsh(text: string): Result<{ readonly user: string; readonly address: string; readonly port?: number }, string> {
@@ -91,7 +91,7 @@ export async function enrollProbe(ssh: EnrollTarget, o: EnrollOptions): Promise<
     const config: SshConfig = { knownHostsRepository: o.knownHosts, knownHostsUser: o.knownHosts, ...(o.identity === undefined ? {} : { identityFor: (n: string) => (n === "person" ? o.identity : undefined) }) };
     const executor = sshExecutor(person.value, [person.value], config);
     const script = path.join(dir, "machine-probe");
-    await copyFile(posixScriptPath(), script);
+    await copyFile(probeScriptPath("posix"), script);
     for (const step of [
       () => executor.exec(["mkdir", "-p", ".local/bin"]),
       () => executor.put?.([script], ".local/bin") ?? Promise.reject(new Error("no copy")),

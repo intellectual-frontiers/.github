@@ -84,7 +84,7 @@ export function syntheticFacts(n = 1): Facts {
     os: { family: "linux", name: "Debian GNU/Linux", version: "13", arch: "x86_64" },
     kernel: "Linux 6.12.0",
     hostname: `synthetic-host-${nn}`,
-    machineId: `synthetic-machine-id-${nn}`,
+    machineId: `${"0".repeat(30)}${nn}`,
     serial: `synthetic-serial-${nn}`,
     cpus: 4,
     memoryBytes: 8 * 1024 ** 3,

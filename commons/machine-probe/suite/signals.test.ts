@@ -6,7 +6,7 @@
  */
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { parseProbe, toObserved, type Observed } from "../src/logical/observed.ts";
-import { signalsOf, type Rows } from "../src/logical/signals.ts";
+import { platformOfFamily, signalsOf, tablesFor, type Rows } from "../src/logical/signals.ts";
 import { namesOutsideTable, toGapLogBatch, toMetricBatch } from "../src/logical/signals-otlp.ts";
 
 const S = (n: string): string => `0009-machine-probe-signals ${n}`;
@@ -104,4 +104,24 @@ proves([S("FR-005"), S("FR-008")], "the metrics become one batch with the resour
   const full = toMetricBatch(signalsOf(observed(), ROWS, { platform: "debian" }));
   const net = full.metrics.find((x) => x.name === "system.network.io");
   assert(net?.data.kind === "sum" && net.data.monotonic && net.data.temporality === "cumulative");
+});
+
+proves([S("FR-012")], "the platform of a family and the tables claimed for it: a platform with none claimed is asked for no table", () => {
+  assertEquals(["windows", "macos", "darwin", "debian", "ubuntu", "rocky", "opensuse-leap", "alpine", "freebsd"].map((f) => platformOfFamily(f)), ["windows", "macos", "macos", "debian", "debian", "redhat", "suse", "alpine", undefined]);
+  assertEquals(tablesFor("windows"), []);
+  assertEquals(tablesFor("macos"), []);
+  assertEquals(tablesFor("debian"), ["uptime", "load_average", "memory_info", "cpu_time", "interface_details"]);
+  const m = signalsOf(observed(), new Map(), { platform: "windows" });
+  assertEquals(m.gaps.map((g) => g.why), ["unsupported", "unsupported", "unsupported", "unsupported", "unsupported"]);
+  assertEquals(m.signals.some((s) => s.name === "system.filesystem.utilization"), true);
+});
+
+proves([S("FR-013")], "a drift count is a gauge in all and by kind, named by the table of conventions, and none is given where none is passed", () => {
+  const none = signalsOf(observed(), undefined, { platform: "debian" });
+  assertEquals(none.signals.some((x) => x.name === "if.host.drift.requirements"), false);
+  const m = signalsOf(observed(), undefined, { platform: "debian", drift: { count: 3, byKind: { service: 1, package: 2 } } });
+  const drift = m.signals.filter((x) => x.name === "if.host.drift.requirements");
+  assertEquals(drift.map((x) => [x.attributes["if.drift.kind"] ?? "all", x.value]), [["all", 3], ["package", 2], ["service", 1]]);
+  assertEquals(drift.every((x) => x.kind === "gauge" && x.unit === "{requirement}"), true);
+  assertEquals(signalsOf(observed(), undefined, { platform: "debian", drift: { count: 0, byKind: {} } }).signals.filter((x) => x.name === "if.host.drift.requirements").map((x) => x.value), [0]);
 });

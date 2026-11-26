@@ -17,6 +17,7 @@
 - **FR-006**: The drift of an order MUST be the plan of the order against `observedFromRows`, so that desired versus osQuery is one comparison and is the same plan and the same hash the reconcile loop makes.
 - **FR-007**: A fallback observation (`observedFromFacts`) MUST take the same shape of facts a package manager's own query gives (a name and a version for each installed package) and MUST give the same observed state for packages as osQuery would, so that a platform without osQuery has the same drift for packages.
 - **FR-008**: The decoder and the observation MUST be proved against a capture of the real output of `osqueryi` (its version, platform and image named in the capture) as well as against synthetic rows, and what no capture proves (Red Hat, Alpine, macOS and Windows tables, systemd units and the registry) MUST be said in this specification as unverified on a real host; the other fixtures MUST be synthetic.
+- **FR-009**: `driftSummaryOf(order, plan, platform)` MUST summarize the drift as the count of requirements that differ, the count watched, the counts by action (`create`, `update`, `remove`) and by kind, and their ids in the order of the sequence, and MUST count only a requirement of a kind that a table says on the platform, so that a kind osQuery does not say is not watched and is never drift.
 
 ## Acceptance scenarios
 

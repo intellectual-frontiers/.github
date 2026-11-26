@@ -15,7 +15,7 @@
 import { array, err, formatDecodeError, json, ok, record, string, type Result } from "@intellectual-frontiers/core";
 import { type JsonValue, type Requirement } from "@intellectual-frontiers/desired-os-state/governance";
 import type { Order } from "./order.ts";
-import { planOf, type Observed, type Plan } from "./state.ts";
+import { changesOf, planOf, type Observed, type Plan } from "./state.ts";
 
 /** The platform whose tables answer: the family of the Linux distribution, macOS or Windows. */
 export type Platform = "debian" | "redhat" | "suse" | "alpine" | "macos" | "windows";
@@ -243,6 +243,30 @@ export function observedFromRows(order: Order, rows: OsRows, platform?: Platform
 /** The drift of an order: the plan of the order against what osQuery says, the same plan and the same hash the reconcile loop makes. */
 export function driftOf(order: Order, rows: OsRows, platform?: Platform): Plan {
   return planOf(order, observedFromRows(order, rows, platform));
+}
+
+/** What the drift of an order comes to: the requirements that osQuery says something of and that differ from the order, by kind and by what would be done, and their ids in the order of the sequence. */
+export type DriftSummary = {
+  readonly count: number;
+  readonly watched: number;
+  readonly byAction: { readonly create: number; readonly update: number; readonly remove: number };
+  readonly byKind: Readonly<Record<string, number>>;
+  readonly ids: readonly string[];
+};
+
+/** The summary of a plan that is the drift of an order: only a requirement of a kind that a table says on the platform is counted (a kind osQuery does not say is never drift, it is not watched). */
+export function driftSummaryOf(order: Order, plan: Plan, platform: Platform): DriftSummary {
+  const watched = new Set<string>(order.requirements.filter((r) => nameOf(r) !== undefined && tableFor(r.kind, platform, r) !== undefined).map((r) => r.id));
+  const byAction = { create: 0, update: 0, remove: 0 };
+  const byKind: Record<string, number> = {};
+  const ids: string[] = [];
+  for (const e of changesOf(plan)) {
+    if (!watched.has(e.id) || e.action === "none") continue;
+    byAction[e.action] += 1;
+    byKind[e.kind] = (byKind[e.kind] ?? 0) + 1;
+    ids.push(e.id);
+  }
+  return { count: ids.length, watched: watched.size, byAction, byKind, ids };
 }
 
 /** What a package manager's own query says of an installed package. */

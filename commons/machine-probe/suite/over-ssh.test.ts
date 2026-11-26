@@ -13,7 +13,7 @@ import { runtimeUsable, startMachine } from "@intellectual-frontiers/lab/physica
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { observedState, evaluate } from "../src/logical/mod.ts";
-import { observe, posixScriptPath, probeKeyLine, sendVia } from "../src/physical/mod.ts";
+import { observe, probeScriptPath, probeKeyLine, sendVia } from "../src/physical/mod.ts";
 
 const reason = await runtimeUsable("docker");
 
@@ -31,7 +31,7 @@ proves(
       const dir = path.dirname(m.identityFile);
       // install the probe for the account, and the key restricted to it, in place of the key the lab gave
       const script = path.join(dir, "machine-probe");
-      await fs.copyFile(posixScriptPath(), script);
+      await fs.copyFile(probeScriptPath("posix"), script);
       const put = await m.executor.put?.([script], "/home/probe/.local/bin");
       assertEquals(put?.code, 0);
       const probeKey = path.join(dir, "probe_key");

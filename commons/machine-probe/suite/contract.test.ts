@@ -4,12 +4,13 @@
  *
  * @module
  */
+import { spawnSync } from "node:child_process";
 import * as proc from "@intellectual-frontiers/system/proc";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { target } from "@intellectual-frontiers/headless/logical";
 import { sshExecutor } from "@intellectual-frontiers/headless/targets/ssh";
 import { encodeRequest, parseRequest, PROBE_PATH } from "../src/governance/mod.ts";
-import { posixScriptPath, probeKeyLine, probeScript, sendVia } from "../src/physical/mod.ts";
+import { probeCommand, probeScriptPath, probeKeyLine, probeScript, scriptKindOf, sendVia } from "../src/physical/mod.ts";
 
 const KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
 
@@ -57,7 +58,7 @@ proves(["0002-machine-probe-contract FR-003"], "a request is sent as the last ar
 });
 
 const sh = async (request: string, env: Record<string, string> = {}) => {
-  const r = await proc.run(["sh", posixScriptPath()], { env: { SSH_ORIGINAL_COMMAND: request, ...env } });
+  const r = await proc.run(["sh", probeScriptPath("posix")], { env: { SSH_ORIGINAL_COMMAND: request, ...env } });
   return { code: r.code, stdout: r.stdout, stderr: r.stderr };
 };
 
@@ -79,4 +80,33 @@ proves(["0002-machine-probe-contract FR-004"], "the POSIX script answers facts a
   const ps1 = await probeScript("windows");
   for (const word of ["'^facts$'", "'^version$'", "'^osquery (\\S+)$'", "only SELECT", "one statement", "exit 2"]) assert(ps1.includes(word), `the PowerShell script has ${word}`);
   assert((await probeScript("posix")).startsWith("#!/bin/sh"));
+});
+
+proves(["0002-machine-probe-contract FR-004"], "the Windows script is run by PowerShell 7 with the same requests and refuses the same", async () => {
+  const pwsh = await proc.run(["sh", "-c", "command -v pwsh"], {});
+  if (!pwsh.success) return;
+  const run = (request: string) => {
+    const argv = probeCommand("windows", probeScriptPath("windows"), request);
+    return proc.run([...argv], {});
+  };
+  assertEquals((await run("version")).stdout, "1\n");
+  for (const bad of ["id", "facts; id", "facts && id", "$(id)", "sh", "cat /etc/shadow", "osquery"]) {
+    const r = await run(bad);
+    assert(r.code === 2 || r.code === 3, `${JSON.stringify(bad)} ends with ${r.code}`);
+    assertEquals(r.stdout, "", `${JSON.stringify(bad)} prints nothing`);
+  }
+  assertEquals([...probeCommand("windows", "/p.ps1", "osquery QUJD")], ["pwsh", "-NoProfile", "-NonInteractive", "-File", "/p.ps1", "osquery", "QUJD"]);
+  assertEquals([...probeCommand("posix", "/p.sh", "facts")], ["sh", "/p.sh", "facts"]);
+  assertEquals([scriptKindOf("windows"), scriptKindOf("debian"), scriptKindOf("macos")], ["windows", "posix", "posix"]);
+});
+
+proves(["0002-machine-probe-contract FR-006"], "PSScriptAnalyzer finds nothing in the Windows script and PowerShell parses it", () => {
+  const has = (args: string[]) => spawnSync("pwsh", ["-NoProfile", "-Command", ...args], { encoding: "utf8" }).status === 0;
+  if (!has(["exit 0"])) return;
+  const file = probeScriptPath("windows");
+  const parse = spawnSync("pwsh", ["-NoProfile", "-Command", `$e=$null;[void][System.Management.Automation.Language.Parser]::ParseFile('${file}',[ref]$null,[ref]$e); $e.Count`], { encoding: "utf8" });
+  assertEquals(parse.stdout.trim(), "0");
+  if (!has(["if (Get-Module -ListAvailable PSScriptAnalyzer) { exit 0 } else { exit 1 }"])) return;
+  const r = spawnSync("pwsh", ["-NoProfile", "-Command", `Invoke-ScriptAnalyzer -Path '${file}' | ForEach-Object { $_.RuleName + ' ' + $_.Line }`], { encoding: "utf8" });
+  assertEquals(r.stdout.trim(), "");
 });

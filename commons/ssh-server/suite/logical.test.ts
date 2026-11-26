@@ -9,7 +9,7 @@ import { GENESIS, SERVER_POLICY_DEFAULTS } from "../src/governance/mod.ts";
 import type { AuditEvent, Fingerprint, KnownAsset } from "../src/governance/mod.ts";
 import {
   CLEAN, TOKEN, authDecision, blocked, chainNext, checkPairing, checkToken, classify, classifyClient, constantTimeEqual, decideEnrollment, factsDrift, forgive, fullBucket, inAnyCidr, pairingCode,
-  parseCidr, parseIp, resolveIdentity, sourceAllowed, strike, take, verifyChain, WORDS,
+  parseCidr, parseIp, resolveFacts, sourceAllowed, strike, take, verifyChain, WORDS,
 } from "../src/logical/mod.ts";
 import { seeded } from "./governance.test.ts";
 import { syntheticFacts } from "./helpers.ts";
@@ -143,18 +143,18 @@ proves(["0005-enrollment-policy FR-001", "0005-enrollment-policy FR-002", "0005-
   assertEquals(decideEnrollment(p([{ kind: "token", labels: ["other"] }]), bound("t1"), facts, []).outcome, "pending");
   assertEquals(decideEnrollment(p([{ kind: "pairing-code" }]), bound("t1", "pairing"), facts, []).outcome, "approve");
   assertEquals(decideEnrollment(p([{ kind: "pairing-code" }]), bound("t1"), facts, []).outcome, "pending");
-  for (const entry of [{ serial: "synthetic-serial-01" }, { machineId: "synthetic-machine-id-01" }, { mac: "02:00:00:00:00:01" }, { hostKey: `SHA256:${"A".repeat(43)}` }]) assertEquals(decideEnrollment(p([{ kind: "inventory", allow: [entry] }]), { sourceIp: "10.0.0.5" }, facts, []).outcome, "approve", JSON.stringify(entry));
+  for (const entry of [{ serial: "synthetic-serial-01" }, { machineId: "00000000000000000000000000000001" }, { mac: "02:00:00:00:00:01" }, { hostKey: `SHA256:${"A".repeat(43)}` }]) assertEquals(decideEnrollment(p([{ kind: "inventory", allow: [entry] }]), { sourceIp: "10.0.0.5" }, facts, []).outcome, "approve", JSON.stringify(entry));
   assertEquals(decideEnrollment(p([{ kind: "inventory", allow: [{ serial: "other" }] }]), { sourceIp: "10.0.0.5" }, facts, []).outcome, "pending");
   assertEquals(decideEnrollment(p([{ kind: "source-network", cidrs: ["10.0.0.0/24"] }]), { sourceIp: "10.0.0.5" }, facts, []).outcome, "approve");
   assertEquals(decideEnrollment(p([{ kind: "cloud-attestation", provider: "aws" }]), { sourceIp: "10.0.0.5" }, facts, []).outcome, "pending", "reserved, never matches");
   const refuse = decideEnrollment(p([{ kind: "refuse-network", cidrs: ["10.0.0.0/8"] }, { kind: "source-network", cidrs: ["10.0.0.0/8"] }]), { sourceIp: "10.0.0.5" }, facts, []);
   assertEquals(refuse.outcome, "refuse");
-  const a: KnownAsset = { id: "asset-a", machineId: "synthetic-machine-id-01", macs: [], hostKeys: [], keys: [] };
+  const a: KnownAsset = { id: "asset-a", machineId: "00000000000000000000000000000001", macs: [], hostKeys: [], keys: [] };
   const b: KnownAsset = { id: "asset-b", macs: ["02:00:00:00:00:01"], hostKeys: [], keys: [] };
-  assertEquals(resolveIdentity(facts, []), { kind: "new" });
-  assertEquals(resolveIdentity(facts, [a]), { kind: "adopt", assetId: "asset-a", matchedOn: ["machine-id"] });
-  assertEquals(resolveIdentity(facts, [b]).kind, "adopt");
-  assertEquals(resolveIdentity(facts, [a, b]), { kind: "conflict", assetIds: ["asset-a", "asset-b"] });
+  assertEquals(resolveFacts(facts, []), { kind: "new" });
+  assertEquals(resolveFacts(facts, [a]), { kind: "adopt", assetId: "asset-a", matchedOn: ["machine-id"] });
+  assertEquals(resolveFacts(facts, [b]).kind, "adopt");
+  assertEquals(resolveFacts(facts, [a, b]), { kind: "conflict", assetIds: ["asset-a", "asset-b"] });
   const adopted = decideEnrollment(p([{ kind: "token" }]), bound("t1"), facts, [a]);
   assertEquals(adopted.assetId, "asset-a");
   assert(adopted.explanation.includes("adopted"), adopted.explanation);

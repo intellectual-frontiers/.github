@@ -16,6 +16,7 @@ requirement	mechanism	by	note
 0003-machine-probe-observation FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/observation.test.ts
 0004-machine-probe-policies FR-004	check	.github: cd commons/machine-probe && bun run verify	suite/policies.test.ts
 0002-machine-probe-contract FR-005	check	.github: cd commons/machine-probe && bun run verify	suite/over-ssh.test.ts
+0002-machine-probe-contract FR-006	check	.github: cd commons/machine-probe && bun run verify	suite/contract.test.ts: the Windows script is run by PowerShell 7
 0005-machine-probe-state FR-001	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
 0005-machine-probe-state FR-002	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
 0005-machine-probe-state FR-003	check	.github: cd commons/machine-probe && bun run verify	suite/state.test.ts
@@ -43,3 +44,5 @@ requirement	mechanism	by	note
 0009-machine-probe-signals FR-009	none	-	Deferred: not built yet (the identity section of the probe, factsOf, the strict row decoder, no process in the mapper is by construction)
 0009-machine-probe-signals FR-010	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the table of tables per platform is data; Linux only is claimed
 0009-machine-probe-signals FR-011	check	.github: cd commons/machine-probe && bun test suite/	layers.test.ts: the shared checker holds the unit table
+0009-machine-probe-signals FR-012	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the platform of a family and the tables claimed for it
+0009-machine-probe-signals FR-013	check	.github: cd commons/machine-probe && bun test suite/	signals.test.ts: the drift count as a gauge

@@ -39,6 +39,9 @@ export type DeclaredSignal = {
 /** A table that gave no value, and why. */
 export type Gap = { readonly table: string; readonly why: "unsupported" | "absent" | "unreadable" };
 
+/** The drift of the host against its desired OS state, as counts: in all and by kind of requirement (the summary of desired-os-state, which this library does not import). */
+export type DriftCounts = { readonly count: number; readonly byKind: Readonly<Record<string, number>> };
+
 /** What the mapper gave: the resource, the signals, the gaps (each becomes a log record `if.probe.gap`) and the count of values refused for not being numbers. */
 export type Mapped = {
   readonly resource: Readonly<Record<string, string>>;
@@ -59,13 +62,30 @@ export const SIGNAL_TABLES: readonly { readonly table: string; readonly platform
   { table: "interface_details", platforms: LINUX },
 ];
 
+/** The tables of level 3 that are claimed for a platform: what a device asks of osQuery on it, and no more (a table is never asked of a platform it is not proved for). */
+export function tablesFor(platform: SignalPlatform): readonly string[] {
+  return SIGNAL_TABLES.filter((t) => t.platforms.includes(platform)).map((t) => t.table);
+}
+
+/** The platform of the pack of an operating system family the probe names (`family` and `name` of `@os`), or `undefined` where the family is none of those the pack knows. */
+export function platformOfFamily(family: string): SignalPlatform | undefined {
+  const f = family.toLowerCase();
+  if (f === "windows") return "windows";
+  if (f === "macos" || f === "darwin") return "macos";
+  if (f.startsWith("debian") || f.startsWith("ubuntu") || f.startsWith("raspbian")) return "debian";
+  if (/^(rhel|fedora|centos|rocky|almalinux|ol|amzn)/u.test(f)) return "redhat";
+  if (/^(opensuse|sles|suse)/u.test(f)) return "suse";
+  if (f.startsWith("alpine")) return "alpine";
+  return undefined;
+}
+
 /** The ticks per second that osQuery's `cpu_time` counts in on Linux (USER_HZ). */
 const TICKS_PER_SECOND = 100;
 
 const osType = (family: string): string => (family === "windows" ? "windows" : family === "macos" || family === "darwin" ? "darwin" : "linux");
 
 /** The signals of an observation (level 2) and, given rows, of osQuery (level 3). `hostId` is the machine id where the caller has it. */
-export function signalsOf(observed: Observed, rows: Rows | undefined, options: { readonly platform: SignalPlatform; readonly hostId?: string }): Mapped {
+export function signalsOf(observed: Observed, rows: Rows | undefined, options: { readonly platform: SignalPlatform; readonly hostId?: string; readonly drift?: DriftCounts }): Mapped {
   const at = observed.at;
   const signals: DeclaredSignal[] = [];
   const gaps: Gap[] = [];
@@ -93,6 +113,11 @@ export function signalsOf(observed: Observed, rows: Rows | undefined, options: {
 
   if (observed.hardware.diskUsedPct !== undefined) push("system.filesystem.utilization", "gauge", "1", observed.hardware.diskUsedPct / 100);
   if (observed.software.pendingUpdates !== undefined) push("if.host.updates.pending", "gauge", "{package}", observed.software.pendingUpdates);
+
+  if (options.drift !== undefined) {
+    push("if.host.drift.requirements", "gauge", "{requirement}", options.drift.count);
+    for (const kind of Object.keys(options.drift.byKind).sort()) push("if.host.drift.requirements", "gauge", "{requirement}", options.drift.byKind[kind], { "if.drift.kind": kind });
+  }
 
   if (rows !== undefined) {
     for (const t of SIGNAL_TABLES) {

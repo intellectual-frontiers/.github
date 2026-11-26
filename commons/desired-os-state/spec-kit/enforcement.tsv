@@ -48,6 +48,7 @@ requirement	mechanism	by	note
 0007-desired-os-state-observe-osquery FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: drift is the plan
 0007-desired-os-state-observe-osquery FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the fallback
 0007-desired-os-state-observe-osquery FR-008	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the capture of real osqueryi 5.12.1 decodes and is observed
+0007-desired-os-state-observe-osquery FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/osquery.test.ts: the summary of the drift
 0001-desired-os-state-layers FR-006	check	.github: cd commons/desired-os-state && bun run verify	suite/layers.test.ts: desired-os-state depends on workload and workload does not import desired-os-state
 0002-desired-os-state-governance FR-009	check	.github: cd commons/desired-os-state && bun run verify	suite/governance.test.ts: each control is mapped or kept
 0004-desired-os-state-dialects FR-007	check	.github: cd commons/desired-os-state && bun run verify	suite/dialects.test.ts: argv steps

@@ -102,6 +102,8 @@ export const SEMCONV: readonly SemconvEntry[] = [
   mine("if.level", "resource", "int", "The capability level of the asset, 0 to 3."),
   mine("if.relay.id", "resource", "string", "The id of the site relay that carried a batch."),
   metric("if.host.updates.pending", "{package}", "gauge", "Packages with an update waiting.", true),
+  metric("if.host.drift.requirements", "{requirement}", "gauge", "Requirements of the desired OS state of the host that osQuery says differ from it, in all or by kind.", true),
+  mine("if.drift.kind", "attribute", "string", "The kind of requirement a drift count is of: package, user, group, service, file, directory, sysctl or system-setting."),
   metric("if.telemetry.queue.length", "{segment}", "gauge", "Segments waiting in the queue.", true),
   metric("if.telemetry.queue.age", "s", "gauge", "Age of the oldest segment in the queue.", true),
   metric("if.telemetry.dropped", "{segment}", "counter", "Segments the queue dropped, by the kind of signal.", true),

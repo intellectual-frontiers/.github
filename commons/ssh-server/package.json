@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@intellectual-frontiers/core": "link:../core",
+    "@intellectual-frontiers/estate": "link:../estate",
     "@intellectual-frontiers/kanon": "link:../kanon",
     "@intellectual-frontiers/libraries": "link:../libraries",
     "@intellectual-frontiers/mizan": "link:../mizan",

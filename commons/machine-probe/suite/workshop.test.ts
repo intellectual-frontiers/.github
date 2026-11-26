@@ -14,7 +14,7 @@ import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
 import { checkInvariants } from "@intellectual-frontiers/estate/logical";
 import { defineAsset } from "@intellectual-frontiers/estate/governance";
 import { workshopRules, compareDotted, evaluate, evaluateWorkshop, evaluateRules, observedState, OPERATORS, parseProbe, toObserved, type Observed, type ProbeRule } from "../src/logical/mod.ts";
-import { posixScriptPath } from "../src/physical/mod.ts";
+import { probeScriptPath } from "../src/physical/mod.ts";
 
 const HERE = dirname(fromFileUrl(import.meta.url));
 const OMARCHY = readTextFileSync(resolve(HERE, "fixtures", "facts-omarchy-4.5.0.txt"));
@@ -91,7 +91,7 @@ proves(["0008-machine-probe-agent-workspace FR-003", "0008-machine-probe-agent-w
 proves(["0008-machine-probe-agent-workspace FR-001", "0008-machine-probe-agent-workspace FR-005"], "the real script on this machine gives the section and the name of a variable that looks like a secret and never its value, and changes nothing", async (t) => {
   if (proc.which("sh") === undefined) return t.skip("no POSIX shell here");
   const value = "zq-not-a-real-value-91827";
-  const run = (env: Record<string, string>) => proc.run(["sh", posixScriptPath()], { env: { SSH_ORIGINAL_COMMAND: "facts", PATH: "/usr/bin:/bin:/usr/sbin:/sbin", HOME: "/nonexistent-home", ...env } });
+  const run = (env: Record<string, string>) => proc.run(["sh", probeScriptPath("posix")], { env: { SSH_ORIGINAL_COMMAND: "facts", PATH: "/usr/bin:/bin:/usr/sbin:/sbin", HOME: "/nonexistent-home", ...env } });
   const bin = mkdtempSync(join(tmpdir(), "probe-bin-"));
   writeFileSync(join(bin, "codex"), "#!/bin/sh\n");
   chmodSync(join(bin, "codex"), 0o755);
@@ -101,6 +101,6 @@ proves(["0008-machine-probe-agent-workspace FR-001", "0008-machine-probe-agent-w
   assert(!r.stdout.includes("PROBE_TEST_PLAIN") && !r.stdout.includes("PROBE_TEST_TOKEN_FILE") && !r.stdout.includes("PROBE_TEST_MAX_TOKENS"), "a variable that does not look like a secret, a path and a count are not named");
   const o = observed(r.stdout);
   assert(o.agent !== undefined && o.agent.harnesses.includes("codex") && o.agent.ambientSecretNames.includes("PROBE_TEST_API_TOKEN") && o.agent.uid !== undefined);
-  const quiet = await proc.run(["sh", "-c", `cd "$(mktemp -d)" && HOME=/nonexistent-home SSH_ORIGINAL_COMMAND=facts PATH=/usr/bin:/bin sh ${posixScriptPath()} >/dev/null; ls -A | wc -l`]);
+  const quiet = await proc.run(["sh", "-c", `cd "$(mktemp -d)" && HOME=/nonexistent-home SSH_ORIGINAL_COMMAND=facts PATH=/usr/bin:/bin sh ${probeScriptPath("posix")} >/dev/null; ls -A | wc -l`]);
   assertEquals(quiet.stdout.trim(), "0", "the probe wrote no file");
 });
