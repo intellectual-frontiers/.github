@@ -24,3 +24,7 @@ requirement	mechanism	by	note
 0001-formats FR-021	check	.github: cd commons/formats && bun test suite/	xz.test.ts: files made by the system xz (every check, several blocks, several streams, uncompressed chunks), every flipped byte and every truncation refused
 0001-formats FR-022	check	.github: cd commons/formats && bun test suite/	xz.test.ts: a file that expands to sixteen mebibytes stops at a limit of one, the output is a copy, a tar.xz untars
 0001-formats FR-023	check	.github: cd commons/formats && bun test suite/	archive.test.ts: a tar with symbolic and hard links gives link entries and linksOf lists them
+0002-formats-mime-and-protobuf FR-001	none	-	Deferred and optional: later, only if the owner decides it
+0002-formats-mime-and-protobuf FR-002	none	-	Deferred and optional: later, only if the owner decides it
+0002-formats-mime-and-protobuf FR-003	none	-	Deferred and optional: later, only if the owner decides it
+0002-formats-mime-and-protobuf FR-004	none	-	Deferred and optional: later, only if the owner decides it

@@ -77,3 +77,16 @@ requirement	mechanism	by	note
 0008-estate-workstations FR-020	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
 0008-estate-workstations FR-021	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
 0008-estate-workstations FR-022	check	.github: cd commons/estate && bun run verify	suite/workshops.test.ts
+0009-estate-sightings FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0009-estate-sightings FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
