@@ -85,13 +85,18 @@ const utf8 = new TextEncoder();
 const redactedResources = <B extends { readonly resource: Resource }>(batches: readonly B[]): readonly B[] =>
   batches.map((b) => ({ ...b, resource: { attributes: redactAttributes(b.resource.attributes) } }));
 
+/** What turns an encoded batch into the bytes that wait in the queue: the batch itself, or a signed envelope of it. It is given the signal, the encoded JSON and the count of signals. */
+export type Wrap = (signal: QueueSignal, json: string, count: number) => Promise<Result<Uint8Array, string>>;
+
 /**
- * An `Exporter` that encodes each export request as OTLP JSON and enqueues it before it answers success (FR-003); it answers failure only where the queue refused. Resource attributes are redacted
- * before the batch is encoded, so that nothing a redaction would remove is at rest in the queue (FR-005).
+ * An `Exporter` that encodes each export request as OTLP JSON, wraps it (a signed envelope, FR-008) and enqueues it before it answers success (FR-003); it answers failure only where the queue or the wrap refused.
+ * Resource attributes are redacted before the batch is encoded, so that nothing a redaction would remove is at rest in the queue (FR-005).
  */
-export function queueExporter(queue: SegmentQueue, now: () => number): Exporter {
+export function queueExporter(queue: SegmentQueue, now: () => number, wrap: Wrap = (_s, json) => Promise.resolve(ok(utf8.encode(json)))): Exporter {
   const put = async (signal: QueueSignal, body: object, count: number): Promise<ExportResult> => {
-    const r = await queue.enqueue(utf8.encode(JSON.stringify(body)), { signal, at: now(), count });
+    const w = await wrap(signal, JSON.stringify(body), count);
+    if (w.kind === "err") return { kind: "failure", message: w.error };
+    const r = await queue.enqueue(w.value, { signal, at: now(), count });
     return r.kind === "ok" ? { kind: "success" } : { kind: "failure", message: r.error.message };
   };
   const total = (n: readonly { readonly spans?: readonly unknown[]; readonly records?: readonly unknown[]; readonly metrics?: readonly unknown[] }[]): number =>

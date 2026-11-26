@@ -44,13 +44,13 @@ requirement	mechanism	by	note
 0003-telemetry-reach FR-010	none	-	Deferred: not built yet
 0003-telemetry-reach FR-011	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: a bad signature, a changed batch and a plain body on a required path are refused without naming a key; a relay by its token
 0003-telemetry-reach FR-012	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the asset id from the key that signed, the sender's claim overwritten, 401 where not identified
-0003-telemetry-reach FR-013	none	-	Deferred: not built yet
+0003-telemetry-reach FR-013	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the sender refuses an address that is not loopback; the forward state is the caller's
 0003-telemetry-reach FR-014	none	-	Deferred: not built yet
 0003-telemetry-reach FR-015	none	-	Deferred: not built yet
 0003-telemetry-reach FR-016	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: the table has its version and a finding for an unknown name
 0003-telemetry-reach FR-017	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: ours under if. and marked ours
 0003-telemetry-reach FR-018	none	-	Deferred: not built yet
 0003-telemetry-reach FR-019	none	-	Deferred: not built yet
-0003-telemetry-reach FR-020	none	-	Deferred: not built yet
+0003-telemetry-reach FR-020	check	.github: cd commons/telemetry && bun test suite/	reach.test.ts: a round collects, signs, numbers, queues and drains with every dependency given; the command of FR-021 is deferred
 0003-telemetry-reach FR-021	none	-	Deferred: not built yet
 0003-telemetry-reach FR-022	none	-	Deferred: not built yet

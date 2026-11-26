@@ -102,6 +102,8 @@ export const SEMCONV: readonly SemconvEntry[] = [
   mine("if.level", "resource", "int", "The capability level of the asset, 0 to 3."),
   mine("if.relay.id", "resource", "string", "The id of the site relay that carried a batch."),
   metric("if.host.updates.pending", "{package}", "gauge", "Packages with an update waiting.", true),
+  metric("if.telemetry.queue.length", "{segment}", "gauge", "Segments waiting in the queue.", true),
+  metric("if.telemetry.queue.age", "s", "gauge", "Age of the oldest segment in the queue.", true),
   metric("if.telemetry.dropped", "{segment}", "counter", "Segments the queue dropped, by the kind of signal.", true),
   mine("if.telemetry.signal", "attribute", "string", "The kind of signal a drop count is of: traces, logs or metrics."),
   mine("if.probe.table", "attribute", "string", "The osQuery table a gap record is about."),

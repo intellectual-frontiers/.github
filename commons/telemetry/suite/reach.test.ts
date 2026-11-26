@@ -217,3 +217,46 @@ proves([S("FR-016"), S("FR-017")], "the table has a version, ours are under if. 
   assertEquals(unknownNames(["system.uptime", "made.up", "made.up"]), ["made.up"]);
   assertEquals(new Set(SEMCONV.map((e) => e.name)).size, SEMCONV.length);
 });
+
+// --- the exporter -----------------------------------------------------------------------------------------------------------------
+
+import { exportOnce, httpSender, type SequenceStore } from "../src/exporter.ts";
+import type { Sequence } from "../src/envelope.ts";
+
+proves([S("FR-020"), S("FR-013")], "a round signs, numbers and queues a batch, waits while the forward is down, and sends in order when it is up", async () => {
+  const { signer } = await keys();
+  const q = memoryQueue();
+  let saved: Sequence | undefined;
+  const sequence: SequenceStore = { load: () => Promise.resolve(saved), save: (s) => ((saved = s), Promise.resolve()) };
+  const c = clock();
+  let forward: "up" | "down" = "down";
+  const sent: string[] = [];
+  const deps = {
+    device: "device-01",
+    now: c.now,
+    random: () => new Uint8Array([9, 9, 9, 9]),
+    queue: q,
+    signer,
+    sequence,
+    collect: () => Promise.resolve({ metrics: metricBatch("synthetic-host-01", 5) }),
+    send: (s: Segment): Promise<SendOutcome> => {
+      sent.push(new TextDecoder().decode(s.bytes));
+      return Promise.resolve(outcomeOfStatus(200));
+    },
+    forward: () => forward,
+  };
+  const first = await exportOnce(deps);
+  assert(first.kind === "ok" && first.value.drained === undefined && first.value.queued === 1);
+  assertEquals(sent.length, 0);
+  forward = "up";
+  const second = await exportOnce(deps);
+  assert(second.kind === "ok" && second.value.drained?.sent === 2 && second.value.drained.remaining === 0);
+  const seqs = sent.map((s) => (JSON.parse(s) as { envelope: string }).envelope).map((e) => JSON.parse(atob((JSON.parse(e) as { payload: string }).payload)).predicate.seq as number);
+  assertEquals(seqs, [1, 2]);
+  assertEquals(saved?.last, 2);
+});
+
+proves([S("FR-013")], "the sender over the forward refuses an address that is not loopback", () => {
+  assertEquals(httpSender("http://192.0.2.10:4318", { loopbackOnly: true }).kind, "err");
+  assertEquals(httpSender("http://127.0.0.1:4318", { loopbackOnly: true }).kind, "ok");
+});

@@ -15,6 +15,7 @@
     "./semconv": "./src/semconv.ts",
     "./queue": "./src/queue.ts",
     "./envelope": "./src/envelope.ts",
+    "./exporter": "./src/exporter.ts",
     "./query": "./src/query.ts",
     "./host/query": "./src/host/query.ts",
     "./render": "./src/render.ts",
