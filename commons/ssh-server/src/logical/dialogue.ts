@@ -7,7 +7,7 @@
  */
 import { err, ok } from "@intellectual-frontiers/core";
 import type { Result } from "@intellectual-frontiers/core";
-import { decodeFacts, planWire, TERMINAL } from "@intellectual-frontiers/ssh-server/governance";
+import { decodeFacts, planWire, requiredFailed, TERMINAL } from "@intellectual-frontiers/ssh-server/governance";
 import type { AuditEvent, EnrollPolicy, EnrollmentSession, Facts, InstallPlan, KnownAsset, SessionState, StepResult } from "@intellectual-frontiers/ssh-server/governance";
 import { decideEnrollment } from "./decide.ts";
 
@@ -26,7 +26,7 @@ export type EnrollMessage =
   | { readonly type: "facts"; readonly facts: Facts }
   | { readonly type: "consent"; readonly granted: boolean }
   | { readonly type: "plan" }
-  | { readonly type: "result"; readonly ok: boolean; readonly steps: readonly StepResult[] };
+  | { readonly type: "result"; readonly ok: boolean; readonly steps: readonly StepResult[]; readonly left: readonly string[]; readonly cleanup: readonly string[] };
 
 /** What a step needs besides the session. */
 export type StepEnv = {
@@ -62,8 +62,9 @@ export const MOVES: Readonly<Record<SessionState, readonly SessionState[]>> = {
   pending: ["interrogated", "approved", "refused", "expired"],
   interrogated: ["approved", "refused", "expired"],
   approved: ["installing", "refused", "expired"],
-  installing: ["enrolled", "approved", "refused", "expired"],
+  installing: ["enrolled", "failed", "refused", "expired"],
   enrolled: [],
+  failed: [],
   refused: [],
   expired: [],
 };
@@ -105,6 +106,8 @@ export function step(session: EnrollmentSession, message: EnrollMessage, env: St
           return ok({ session, reply: line("REFUSED", session.decision?.by === "policy" ? "policy" : "person"), effects: [] });
         case "enrolled":
           return ok({ session, reply: line("ENROLLED"), effects: [] });
+        case "failed":
+          return ok({ session, reply: line("FAILED"), effects: [] });
         case "expired":
           return ok({ session, reply: line("EXPIRED"), effects: [] });
       }
@@ -121,9 +124,15 @@ export function step(session: EnrollmentSession, message: EnrollMessage, env: St
     }
     case "result": {
       if (session.state !== "installing") return err(`a result is not taken in the state ${session.state}`);
-      const failed = !message.ok || message.steps.some((r) => !r.ok);
-      const s = moved(session, failed ? "approved" : "enrolled", env.now);
-      const detail = failed ? `install failed at ${message.steps.filter((r) => !r.ok).map((r) => r.index).join(",") || "?"}` : "enrolled";
+      const failed = requiredFailed(message.ok, message.steps);
+      const outcome = { steps: message.steps, left: message.left, cleanup: message.cleanup };
+      const s = moved(session, failed ? "failed" : "enrolled", env.now, { outcome });
+      const skipped = message.steps.filter((r) => !r.ok && r.optional === true);
+      const detail = failed
+        ? `install failed at ${message.steps.filter((r) => !r.ok).map((r) => r.index).join(",") || "?"}`
+        : skipped.length === 0
+          ? "enrolled"
+          : `enrolled; optional steps not done: ${skipped.map((r) => `${r.index} (${r.detail})`).join("; ")}`;
       return ok({ session: s, reply: line("OK", s.state), effects: [{ kind: "put-session", session: s }, audit(env, s, "state", failed ? "error" : "ok", detail)] });
     }
   }
@@ -142,6 +151,18 @@ export function refuseSession(session: EnrollmentSession, by: string, reason: st
   if (TERMINAL.includes(session.state)) return err(`a session in the state ${session.state} is not refused`);
   if (by.trim() === "") return err("a person's name is needed to refuse");
   return ok(moved(session, "refused", now, { decision: { outcome: "refuse", by, at: now, explanation: reason } }));
+}
+
+/** A device's words, made fit to show: printable characters only, at most `max`. */
+function displayed(text: string, max: number): string {
+  return text.replace(/[^\x20-\x7e]/g, " ").slice(0, max);
+}
+
+/** A list of the device's lines (what a failed install left, what cleans it): at most 8, each shown and never run. */
+function decodeLines(v: unknown, name: string): Result<readonly string[], string> {
+  if (v === undefined) return ok([]);
+  if (!Array.isArray(v) || v.length > 8 || !v.every((x) => typeof x === "string")) return err(`${name} is up to 8 lines`);
+  return ok((v as string[]).map((x) => displayed(x, 200)));
 }
 
 /** Read a message from the text a client sent on the standard input: one JSON line, at most `max` bytes. */
@@ -167,9 +188,14 @@ export function decodeMessage(command: "report" | "done", text: string, max: num
     for (const r of raw) {
       const x = r as Record<string, unknown>;
       if (typeof x["index"] !== "number" || typeof x["ok"] !== "boolean" || typeof x["detail"] !== "string") return err("a step result has index, ok and detail");
-      steps.push({ index: x["index"], ok: x["ok"], detail: x["detail"].slice(0, 200) });
+      if (x["optional"] !== undefined && typeof x["optional"] !== "boolean") return err("optional is true or false");
+      steps.push({ index: x["index"], ok: x["ok"], detail: displayed(x["detail"], 200), ...(x["optional"] === true ? { optional: true as const } : {}) });
     }
-    return ok({ type: "result", ok: o["ok"], steps });
+    const left = decodeLines(o["left"], "left");
+    if (left.kind === "err") return left;
+    const cleanup = decodeLines(o["cleanup"], "cleanup");
+    if (cleanup.kind === "err") return cleanup;
+    return ok({ type: "result", ok: o["ok"], steps, left: left.value, cleanup: cleanup.value });
   }
   return err(`a message of type ${String(o["type"])} does not belong to ${command}`);
 }

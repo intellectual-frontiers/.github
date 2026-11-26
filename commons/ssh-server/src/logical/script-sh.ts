@@ -75,7 +75,7 @@ announce() {
   say "  2. send them to $HOST port $PORT, session $SESSION"
   say "  3. wait until a person approves this machine"
   say "  4. ask you, here, before it installs anything, and only then run the steps of the approved plan"
-  say "A plan may install, from a pinned address with a verified SHA-256:"
+  say "A plan may install, from a pinned address with a verified SHA-256 (an optional step never stops the enrollment: if it cannot be done, this script says why):"
   case "$(uname -s)" in
   Linux)
 ${lines("linux")}
@@ -227,10 +227,21 @@ sha_of() {
   else die "no program to compute a SHA-256"; fi
 }
 
+# the programs that can download over https, in order: curl, wget, python3; where there is none the step says what to install
 fetch() {
   if have curl; then curl -fsSL -o "$2" "$1"
   elif have wget; then wget -q -O "$2" "$1"
-  else die "no curl or wget to download with"; fi
+  elif have python3; then python3 -c 'import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], sys.argv[2])' "$1" "$2"
+  else die "no-downloader: this machine has no curl, wget or python3 to download with; $(downloader_hint)"; fi
+}
+
+downloader_hint() {
+  if have apt-get; then echo "install one (as root: apt-get install curl), then ask for the plan again"
+  elif have dnf; then echo "install one (as root: dnf install curl), then ask for the plan again"
+  elif have yum; then echo "install one (as root: yum install curl), then ask for the plan again"
+  elif have zypper; then echo "install one (as root: zypper install curl), then ask for the plan again"
+  elif have apk; then echo "install one (as root: apk add curl), then ask for the plan again"
+  else echo "install curl or wget with this system's package manager, then ask for the plan again"; fi
 }
 
 step_install_package() {
@@ -360,19 +371,19 @@ main() {
     WAIT)
       [ "$waited" -lt "$WAIT_MAX" ] || { rm -f "$plan"; die "no decision within $WAIT_MAX seconds"; }
       sleep "$POLL"; waited=$((waited + POLL)) ;;
-    REFUSED|EXPIRED|ENROLLED) say "the server says: $head"; rm -f "$plan"; exit 0 ;;
+    REFUSED|EXPIRED|ENROLLED|FAILED) say "the server says: $head"; rm -f "$plan"; exit 0 ;;
     *) rm -f "$plan"; die "an answer this script does not know: $tag" ;;
     esac
   done
   say "approved. The plan:"
   while IFS=$tab read -r tag kind f1 f2 f3 f4 f5; do
-    [ "$tag" = STEP ] || continue
+    case "$tag" in STEP) note= ;; OPT) note=" (optional)" ;; *) continue ;; esac
     for v in "$kind" "$f1" "$f2" "$f3" "$f4" "$f5"; do [ -z "$v" ] || safe "$v"; done
     case "$kind" in
-    install-package) say "  install $f2 $f3 ($f1) from $f4" ;;
+    install-package) say "  install $f2 $f3 ($f1) from $f4$note" ;;
     authorize-key) say "  authorize a $f2 key for the account $f1" ;;
     ensure-account) say "  make sure the account $f1 exists ($f2)" ;;
-    run) say "  run as $f1: $f3" ;;
+    run) say "  run as $f1: $f3$note" ;;
     pin-controller) say "  remember the host key of the controller $f1:$f2" ;;
     *) die "a step this script does not know: $kind" ;;
     esac
@@ -386,29 +397,61 @@ main() {
     exit 0
   fi
   results=
+  left=
+  cleanup=
   index=0
   failed=false
+  kept=false
   while IFS=$tab read -r tag kind f1 f2 f3 f4 f5; do
-    [ "$tag" = STEP ] || continue
+    case "$tag" in STEP) optional=false ;; OPT) optional=true ;; *) continue ;; esac
+    # the required steps are done and verified: keep the key of this machine before the first optional step, so that what comes after cannot undo the enrollment
+    if [ "$optional" = true ] && [ "$kept" = false ]; then
+      kept=true
+      (keep_device_key) || { failed=true; results="$results\${results:+,}{\"index\":$index,\"ok\":false,\"detail\":\"keep the key of this machine\"}"; break; }
+    fi
     say "step $index: $kind"
+    existed=yes
+    case "$kind" in ensure-account) id "$f1" >/dev/null 2>&1 || existed=no ;; esac
     ok=true
+    reason=
+    errs=$(mktemp)
     case "$kind" in
-    install-package) (step_install_package "$f1" "$f2" "$f3" "$f4" "$f5") || ok=false ;;
-    authorize-key) (step_authorize_key "$f1" "$f2" "$f3") || ok=false ;;
-    ensure-account) (step_ensure_account "$f1" "$f2") || ok=false ;;
-    run) (step_run "$f1" "$f2" "$f3") || ok=false ;;
-    pin-controller) (step_pin_controller "$f1" "$f2" "$f3" "$f4") || ok=false ;;
+    install-package) (step_install_package "$f1" "$f2" "$f3" "$f4" "$f5") 2>"$errs" || ok=false ;;
+    authorize-key) (step_authorize_key "$f1" "$f2" "$f3") 2>"$errs" || ok=false ;;
+    ensure-account) (step_ensure_account "$f1" "$f2") 2>"$errs" || ok=false ;;
+    run) (step_run "$f1" "$f2" "$f3") 2>"$errs" || ok=false ;;
+    pin-controller) (step_pin_controller "$f1" "$f2" "$f3" "$f4") 2>"$errs" || ok=false ;;
     esac
-    [ "$ok" = true ] || failed=true
-    results="$results\${results:+,}{\"index\":$index,\"ok\":$ok,\"detail\":\"$kind\"}"
+    cat "$errs" >&2
+    if [ "$ok" = false ]; then reason=$(tail -n 1 "$errs" | sed 's/^enroll: //' | cut -c1-150); fi
+    rm -f "$errs"
+    if [ "$ok" = true ]; then
+      case "$kind" in
+      ensure-account) if [ "$existed" = no ]; then left="$left\${left:+,}\"$(js "the account $f1")\""; cleanup="$cleanup\${cleanup:+,}\"$(js "remove the account as root: userdel -r $f1")\""; fi ;;
+      authorize-key) left="$left\${left:+,}\"$(js "a key authorized for the account $f1")\""; cleanup="$cleanup\${cleanup:+,}\"$(js "remove the line of the controller's key from ~$f1/.ssh/authorized_keys (it ends with $(printf '%s' "$f3" | tail -c 12))")\""; ;;
+      pin-controller) left="$left\${left:+,}\"$(js "the host key of the controller in $DIR/known_hosts")\""; cleanup="$cleanup\${cleanup:+,}\"$(js "remove the line of $f1 from $DIR/known_hosts as root")\""; ;;
+      esac
+    fi
+    if [ "$ok" = true ]; then flag=; else flag=$(printf ' (%s)' "$reason"); fi
+    if [ "$optional" = true ]; then
+      if [ "$ok" = false ]; then say "  not done (optional, the enrollment goes on)$flag"; fi
+      results="$results\${results:+,}{\"index\":$index,\"ok\":$ok,\"optional\":true,\"detail\":\"$(js "$kind: $reason")\"}"
+    else
+      if [ "$ok" = false ]; then failed=true; fi
+      results="$results\${results:+,}{\"index\":$index,\"ok\":$ok,\"detail\":\"$(js "$kind: $reason")\"}"
+    fi
     index=$((index + 1))
     [ "$failed" = false ] || break
   done < "$plan"
   rm -f "$plan"
-  if [ "$failed" = false ]; then (keep_device_key) || failed=true; fi
+  if [ "$failed" = false ] && [ "$kept" = false ]; then (keep_device_key) || failed=true; fi
   if [ "$failed" = true ]; then okjson=false; else okjson=true; fi
-  printf '{"type":"result","ok":%s,"steps":[%s]}\n' "$okjson" "$results" | ssh_s "done" "$SESSION" > /dev/null
-  if [ "$failed" = true ]; then die "a step failed: see above"; fi
+  printf '{"type":"result","ok":%s,"steps":[%s],"left":[%s],"cleanup":[%s]}\n' "$okjson" "$results" "$left" "$cleanup" | ssh_s "done" "$SESSION" > /dev/null
+  if [ "$failed" = true ]; then
+    say "a required step failed, so this machine is not enrolled."
+    if [ -n "$cleanup" ]; then say "what it left here, and how to remove it, is recorded on the controller (see the enrollment status there)."; fi
+    die "a step failed: see above"
+  fi
   say "done: this machine is enrolled"
 }
 

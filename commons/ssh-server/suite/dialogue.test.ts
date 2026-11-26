@@ -12,7 +12,7 @@ import { syntheticFacts } from "./helpers.ts";
 const env = (over: Partial<StepEnv> = {}): StepEnv => ({ now: 1000, enroll: { rules: [] }, assets: [], planFor: () => ({ steps: [{ kind: "run", argv: ["/bin/true"], as: "user", expect: [0] }] }), sourceIp: "10.0.0.2", ...over });
 const session = (state: SessionState): EnrollmentSession => ({ id: "en-aaaaaaaaaaaaaaaa" as SessionId, state, sourceIp: "10.0.0.2", clientIdent: "SSH-2.0-OpenSSH_9.6", deviceClass: "openssh", offeredKeys: [], createdAt: 0, updatedAt: 0, expiresAt: 100_000 });
 const STATES = Object.keys(MOVES) as SessionState[];
-const messages: EnrollMessage[] = [{ type: "hello" }, { type: "facts", facts: syntheticFacts(1) }, { type: "consent", granted: true }, { type: "consent", granted: false }, { type: "plan" }, { type: "result", ok: true, steps: [] }, { type: "result", ok: false, steps: [{ index: 0, ok: false, detail: "x" }] }];
+const messages: EnrollMessage[] = [{ type: "hello" }, { type: "facts", facts: syntheticFacts(1) }, { type: "consent", granted: true }, { type: "consent", granted: false }, { type: "plan" }, { type: "result", ok: true, steps: [], left: [], cleanup: [] }, { type: "result", ok: false, steps: [{ index: 0, ok: false, detail: "x" }], left: ["the account s-device"], cleanup: ["remove the account as root: userdel -r s-device"] }];
 
 proves(["0002-enrollment-protocol FR-004"], "every state moves only by the table: the state after a step is the state or one the table allows, and the final states do not move", () => {
   for (const from of STATES) {
@@ -23,7 +23,7 @@ proves(["0002-enrollment-protocol FR-004"], "every state moves only by the table
       assert(to === from || MOVES[from].includes(to), `${from} -> ${to} on ${m.type}`);
     }
   }
-  for (const final of ["enrolled", "refused", "expired"] as const) {
+  for (const final of ["enrolled", "failed", "refused", "expired"] as const) {
     assertEquals(MOVES[final], []);
     for (const m of messages) {
       const r = step(session(final), m, env());
@@ -40,21 +40,22 @@ proves(["0002-enrollment-protocol FR-004", "0002-enrollment-protocol FR-008"], "
   s = facts.value.session;
   assertEquals(step(s, { type: "plan" }, env()).kind === "ok" && (step(s, { type: "plan" }, env()) as { value: { reply: { stdout: string } } }).value.reply.stdout.startsWith("WAIT"), true);
   assertEquals(step(s, { type: "consent", granted: true }, env()).kind, "err", "no consent before approval");
-  assertEquals(step(s, { type: "result", ok: true, steps: [] }, env()).kind, "err");
+  assertEquals(step(s, { type: "result", ok: true, steps: [], left: [], cleanup: [] }, env()).kind, "err");
   const approved = approveSession(s, "synthetic-person-01", { steps: [{ kind: "run", argv: ["/bin/true"], as: "user", expect: [0] }] }, 2000);
   assert(approved.kind === "ok");
   s = approved.value;
   const plan = step(s, { type: "plan" }, env());
   assert(plan.kind === "ok" && plan.value.reply.stdout.startsWith("PLAN\t1\ten-aaaaaaaaaaaaaaaa\n"));
-  assertEquals(step(s, { type: "result", ok: true, steps: [] }, env()).kind, "err", "no result before consent");
+  assertEquals(step(s, { type: "result", ok: true, steps: [], left: [], cleanup: [] }, env()).kind, "err", "no result before consent");
   const consent = step(s, { type: "consent", granted: true }, env());
   assert(consent.kind === "ok");
   s = consent.value.session;
   assertEquals(s.state, "installing");
-  const failed = step(s, { type: "result", ok: false, steps: [{ index: 0, ok: false, detail: "x" }] }, env());
+  const failed = step(s, { type: "result", ok: false, steps: [{ index: 0, ok: false, detail: "x" }], left: ["the account s-device"], cleanup: ["remove the account as root: userdel -r s-device"] }, env());
   assert(failed.kind === "ok");
-  assertEquals(failed.value.session.state, "approved", "a failed install can be tried again");
-  const done = step(s, { type: "result", ok: true, steps: [{ index: 0, ok: true, detail: "run" }] }, env());
+  assertEquals(failed.value.session.state, "failed", "a failed required step ends the session with what it left and how to clean it");
+  assertEquals(failed.value.session.outcome?.cleanup, ["remove the account as root: userdel -r s-device"]);
+  const done = step(s, { type: "result", ok: true, steps: [{ index: 0, ok: true, detail: "run" }], left: [], cleanup: [] }, env());
   assert(done.kind === "ok");
   assertEquals(done.value.session.state, "enrolled");
   const declined = step(approved.value, { type: "consent", granted: false }, env());
@@ -97,4 +98,17 @@ proves(["0002-enrollment-protocol FR-016"], "the enrollment is a conversation of
   assert(r.kind === "ok");
   assertEquals(r.value.state.state, "interrogated");
   assertEquals(r.value.out.length, 1);
+});
+
+proves(["0002-enrollment-protocol FR-004", "0002-enrollment-protocol FR-008", "0004-scripts FR-011"], "an optional step that fails does not stop the enrollment: the session is enrolled and the audit says which optional step was not done", () => {
+  const installing: EnrollmentSession = { ...session("installing"), plan: { steps: [{ kind: "ensure-account", name: "s-device", sudo: false }, { kind: "run", argv: ["/bin/true"], as: "user", expect: [0], optional: true }] } };
+  const r = step(installing, { type: "result", ok: true, steps: [{ index: 0, ok: true, detail: "ensure-account: " }, { index: 1, ok: false, optional: true, detail: "run: no-downloader: no curl" }], left: [], cleanup: [] }, env());
+  assert(r.kind === "ok");
+  assertEquals(r.value.session.state, "enrolled");
+  assertEquals(r.value.session.outcome?.steps[1]?.optional, true);
+  const audited = r.value.effects.find((e) => e.kind === "audit");
+  assert(audited?.kind === "audit" && audited.event.detail.includes("optional steps not done: 1 (run: no-downloader: no curl)"));
+  const required = step(installing, { type: "result", ok: false, steps: [{ index: 0, ok: false, detail: "ensure-account: x" }], left: [], cleanup: [] }, env());
+  assert(required.kind === "ok");
+  assertEquals(required.value.session.state, "failed");
 });

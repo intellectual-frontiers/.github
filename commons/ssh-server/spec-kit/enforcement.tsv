@@ -56,6 +56,8 @@ requirement	mechanism	by	note
 0004-scripts FR-008	check	.github: cd commons/ssh-server && bun run verify	scripts.test.ts: the catalog; the hashes were computed on 2026-11-26
 0004-scripts FR-009	check	.github: cd commons/ssh-server && bun run verify	docker.test.ts
 0004-scripts FR-010	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: the real client with the embedded line, and another key refused
+0004-scripts FR-011	check	.github: cd commons/ssh-server && bun run verify	enroll-flow.test.ts: an optional step with a wrong hash does not stop the enrollment; dialogue.test.ts: an optional step that fails
+0004-scripts FR-012	check	.github: cd commons/ssh-server && bun run verify	docker.test.ts: a bare Debian 13 container
 0005-enrollment-policy FR-001	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts
 0005-enrollment-policy FR-002	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts and enroll-flow.test.ts
 0005-enrollment-policy FR-003	check	.github: cd commons/ssh-server && bun run verify	logical.test.ts

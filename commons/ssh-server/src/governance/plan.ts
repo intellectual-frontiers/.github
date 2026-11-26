@@ -23,13 +23,15 @@ export type InstallPackageStep = {
   readonly url: string;
   readonly sha256: string;
   readonly installer: InstallerKind;
+  /** An optional step runs only after every required step is in place and verified; its failure is reported and never stops the enrollment. */
+  readonly optional?: true;
 };
 /** Add a public key to the authorized keys of a named account. */
 export type AuthorizeKeyStep = { readonly kind: "authorize-key"; readonly account: string; readonly publicKey: string };
 /** Create the enrollment account (or make sure it exists), with or without administrative rights. */
 export type EnsureAccountStep = { readonly kind: "ensure-account"; readonly name: string; readonly sudo: boolean };
 /** Run a program with an argument vector, as the user or as root, and expect one of the exit codes. */
-export type RunStep = { readonly kind: "run"; readonly argv: readonly string[]; readonly as: "user" | "root"; readonly expect: readonly number[] };
+export type RunStep = { readonly kind: "run"; readonly argv: readonly string[]; readonly as: "user" | "root"; readonly expect: readonly number[]; readonly optional?: true };
 /** Pin the host key of the controller on the device (a known_hosts line for the host and port), so that the device reconnects as `s-device` with strict checking. */
 export type PinControllerStep = { readonly kind: "pin-controller"; readonly host: string; readonly port: number; readonly publicKey: string };
 /** One step. */
@@ -57,9 +59,17 @@ export function decodePlan(input: unknown): Result<InstallPlan, string> {
   for (const [i, s] of raw.entries()) {
     const r = decodeStep(s, `plan.steps[${i}]`);
     if (r.kind === "err") return r;
+    if (!isOptional(r.value) && steps.some(isOptional)) return err(`plan.steps[${i}]: a required step comes before every optional step`);
     steps.push(r.value);
   }
   return ok({ steps });
+}
+
+/** Read the `optional` field of a step that may be optional: absent or false is a required step. */
+function decodeOptional(v: unknown, at: string): Result<{ readonly optional?: true }, string> {
+  if (v === undefined || v === false) return ok({});
+  if (v === true) return ok({ optional: true });
+  return err(`${at}.optional: true or false`);
 }
 
 function decodeStep(s: unknown, at: string): Result<PlanStep, string> {
@@ -74,7 +84,9 @@ function decodeStep(s: unknown, at: string): Result<PlanStep, string> {
       if (typeof url !== "string" || !URL_OK.test(url)) return err(`${at}.url: an https URL of the safe alphabet`);
       if (typeof sha256 !== "string" || !SHA.test(sha256)) return err(`${at}.sha256: 64 lowercase hex characters`);
       if (installer !== "deb" && installer !== "rpm" && installer !== "msi" && installer !== "pkg") return err(`${at}.installer: deb, rpm, msi or pkg`);
-      return ok({ kind: "install-package", osFamily, name, version, url, sha256, installer });
+      const optional = decodeOptional(o["optional"], at);
+      if (optional.kind === "err") return optional;
+      return ok({ kind: "install-package", osFamily, name, version, url, sha256, installer, ...optional.value });
     }
     case "authorize-key": {
       const { account, publicKey } = o;
@@ -95,7 +107,9 @@ function decodeStep(s: unknown, at: string): Result<PlanStep, string> {
       for (const w of argv) if (typeof w !== "string" || !ARGV_WORD.test(w)) return err(`${at}.argv: words of the safe alphabet (no space, quote, glob or shell syntax)`);
       if (as !== "user" && as !== "root") return err(`${at}.as: user or root`);
       if (!Array.isArray(expect) || expect.length === 0 || expect.length > 8 || !expect.every((n) => Number.isInteger(n) && n >= 0 && n <= 255)) return err(`${at}.expect: 1 to 8 exit codes`);
-      return ok({ kind: "run", argv: argv as string[], as, expect: expect as number[] });
+      const optional = decodeOptional(o["optional"], at);
+      if (optional.kind === "err") return optional;
+      return ok({ kind: "run", argv: argv as string[], as, expect: expect as number[], ...optional.value });
     }
     case "pin-controller": {
       const { host, port, publicKey } = o;
@@ -114,25 +128,26 @@ function decodeStep(s: unknown, at: string): Result<PlanStep, string> {
 export function planWire(session: string, plan: InstallPlan): string {
   const lines = [`PLAN\t1\t${session}`];
   for (const s of plan.steps) {
+    const tag = isOptional(s) ? "OPT" : "STEP";
     switch (s.kind) {
       case "install-package":
-        lines.push(["STEP", s.kind, s.installer, s.name, s.version, s.url, s.sha256].join("\t"));
+        lines.push([tag, s.kind, s.installer, s.name, s.version, s.url, s.sha256].join("\t"));
         break;
       case "authorize-key": {
         const [algo, b64] = s.publicKey.split(" ");
-        lines.push(["STEP", s.kind, s.account, algo, b64].join("\t"));
+        lines.push([tag, s.kind, s.account, algo, b64].join("\t"));
         break;
       }
       case "ensure-account":
-        lines.push(["STEP", s.kind, s.name, s.sudo ? "sudo" : "nosudo"].join("\t"));
+        lines.push([tag, s.kind, s.name, s.sudo ? "sudo" : "nosudo"].join("\t"));
         break;
       case "pin-controller": {
         const [algo, b64] = s.publicKey.split(" ");
-        lines.push(["STEP", s.kind, s.host, String(s.port), algo, b64].join("\t"));
+        lines.push([tag, s.kind, s.host, String(s.port), algo, b64].join("\t"));
         break;
       }
       case "run":
-        lines.push(["STEP", s.kind, s.as, s.expect.join(","), s.argv.join(" ")].join("\t"));
+        lines.push([tag, s.kind, s.as, s.expect.join(","), s.argv.join(" ")].join("\t"));
         break;
     }
   }
@@ -141,4 +156,14 @@ export function planWire(session: string, plan: InstallPlan): string {
 }
 
 /** A result a device reports for one step. */
-export type StepResult = { readonly index: number; readonly ok: boolean; readonly detail: string };
+export type StepResult = { readonly index: number; readonly ok: boolean; readonly detail: string; /** The step was optional: its failure does not stop the enrollment. */ readonly optional?: true };
+
+/** Whether a step of a plan is optional. */
+export function isOptional(step: PlanStep): boolean {
+  return "optional" in step && step.optional === true;
+}
+
+/** Whether a result of a device holds a failure of a required step. */
+export function requiredFailed(ok: boolean, steps: readonly StepResult[]): boolean {
+  return !ok || steps.some((r) => !r.ok && r.optional !== true);
+}
