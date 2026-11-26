@@ -14,3 +14,9 @@ requirement	mechanism	by	note
 0002-mizan-query FR-003	check	.github: cd commons/mizan && bun test suite/	query.test.ts
 0002-mizan-query FR-004	check	.github: cd commons/mizan && bun test suite/	query.test.ts
 0002-mizan-query FR-005	check	.github: cd commons/mizan && bun test suite/	query.test.ts
+0003-mizan-case-proofs FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-mizan-case-proofs FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-mizan-case-proofs FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-mizan-case-proofs FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-mizan-case-proofs FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-mizan-case-proofs FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

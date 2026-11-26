@@ -76,3 +76,26 @@ requirement	mechanism	by	note
 0002-quality-query FR-004	check	.github: cd commons/quality && bun test suite/	quality-query.test.ts
 0002-quality-query FR-005	check	.github: cd commons/quality && bun test suite/	quality-query.test.ts
 0001-quality-evidence FR-070	check	.github: cd commons/quality && bun test suite/	host-test-run.test.ts: the coverage of a suite is kept from the run that makes its record
+0003-quality-case-runs FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-014	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-015	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-016	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-017	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-018	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-019	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-020	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-021	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-022	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0003-quality-case-runs FR-023	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
