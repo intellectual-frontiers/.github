@@ -25,7 +25,7 @@
 
 ## Out of scope
 
-- The netboot server that serves these files (a plugin of the command: commons archon-boot).
+- Serving these files at boot: booting is not a concern of commons.
 - Running the installer: it needs a machine that boots from the network; the lab proves what a container can (FR-006).
 
 ## Edge cases

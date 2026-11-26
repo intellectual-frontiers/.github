@@ -28,7 +28,6 @@ ok    The specification kit of anyfs-serve
 ok    The specification kit of anyfs-sql
 ok    The specification kit of anyfs-ssh
 ok    The specification kit of archon
-ok    The specification kit of archon-boot
 ok    The specification kit of archon-converge
 ok    The specification kit of archon-dialect-ansible
 ok    The specification kit of archon-dialect-apt
@@ -75,7 +74,6 @@ ok    The specification kit of linux-services
 ok    The specification kit of machine-probe
 ok    The specification kit of mizan
 ok    The specification kit of net
-ok    The specification kit of netboot
 ok    The specification kit of ontology
 ok    The specification kit of package-managers
 ok    The specification kit of pentest

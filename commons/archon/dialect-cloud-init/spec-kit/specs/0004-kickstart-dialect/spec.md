@@ -23,7 +23,7 @@
 
 ## Out of scope
 
-- The netboot server that serves the file and the boot profile that points the installer at it (commons netboot 0005-netboot-profiles).
+- Serving the file and pointing the installer at it: booting is not a concern of commons.
 - Running the installer: it needs a machine that boots from the network, which the owner verifies on hardware.
 - The blank-disk guard: Anaconda's environment has neither `curl` nor `lsblk`, so the boot command asks for `--confirm-destroy yes` when it arms an asset for this installer.
 

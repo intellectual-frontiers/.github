@@ -90,7 +90,6 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/workload`](https://www.npmjs.com/package/@intellectual-frontiers/workload) | Pattern | Workload: units of operated work (not running software) as typed data of a form | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/anyfs-cli`](commons/anyfs/cli) | Program | The `anyfs` program: POSIX-style access to any AnyFS store (ls, cat, cp, rm, find, grep, diff) and the bridge verbs (sync, bisync, mirror, check, merge, sync-medium) | layers, extension | L1 | not released (unfinished) |
 | [`@intellectual-frontiers/archon`](https://www.npmjs.com/package/@intellectual-frontiers/archon) | Program | A Kanon library that orders subjects: a machine, a device, a workstation or a cloud account | layers, instances, plugins | L1 | GitHub, npm |
-| [`@intellectual-frontiers/archon-boot`](commons/archon/boot) | Program | The plugin that gives `archon` its verbs for the network install | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/archon-converge`](commons/archon/converge) | Program | The plugin that gives `archon` its verbs for convergence | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/archon-dialect-ansible`](commons/archon/dialect-ansible) | Program | The dialect of Archon that converges a Linux host with Ansible | layers, extension | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/archon-dialect-apt`](commons/archon/dialect-apt) | Program | The dialect of tools that installs them with apt | layers, extension | L1 | not released (owner-blocked) |
@@ -120,7 +119,6 @@ Bun is the default runtime and Node 26 the backup. Each library is proved by one
 | [`@intellectual-frontiers/linux-observe`](commons/linux-observe) | Program | What a Linux machine is, read with no change | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/linux-services`](commons/linux-services) | Program | The services a Linux machine runs | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/machine-probe`](commons/machine-probe) | Program | The probe a machine runs for its fleet | layers | L1 | not released (owner-blocked) |
-| [`@intellectual-frontiers/netboot`](commons/netboot) | Program | The network boot of a blank machine | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/package-managers`](https://www.npmjs.com/package/@intellectual-frontiers/package-managers) | Program | The shared kit of the dialects that drive a package manager | layers | L1 | GitHub, npm |
 | [`@intellectual-frontiers/pentest`](commons/pentest) | Program | The rules of an authorized security test of an estate | layers | L1 | not released (owner-blocked) |
 | [`@intellectual-frontiers/planning-query`](https://www.npmjs.com/package/@intellectual-frontiers/planning-query) | Program | The items of Planning as read-only SQL relations | layers | L1 | GitHub, npm |

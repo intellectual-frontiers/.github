@@ -30,7 +30,7 @@ export const library = {
       { name: "cloud-init", instanceOf: "src/physical/dialect/", placement: "package" },
       { name: "opentofu", instanceOf: "src/physical/dialect/", placement: "package" },
     ],
-    plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "boot" }, { noun: "dns" }],
+    plugins: [{ noun: "tool" }, { noun: "converge" }, { noun: "dns" }],
     units: [
       { folder: "src/governance/", layer: "governance", packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }] },
       {

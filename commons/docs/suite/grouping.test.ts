@@ -32,7 +32,7 @@ proves(["0001-docs FR-044"], "a family is one folder of the navigation: its host
     { slug: "anyfs-bridge", title: "AnyFS Bridge", family: "anyfs", role: "plugin" },
     { slug: "anyfs-cli", title: "AnyFS command line", family: "anyfs", role: "plugin" },
     { slug: "archon", title: "Archon", family: "archon", role: "host" },
-    { slug: "archon-boot", title: "Archon plugin: boot", family: "archon", role: "plugin" },
+    { slug: "archon-dns", title: "Archon plugin: dns", family: "archon", role: "plugin" },
     { slug: "archon-dialect-ansible", title: "Archon dialect: Ansible", family: "archon", role: "dialect" },
     { slug: "catalog-soc2", title: "Catalog Soc2", family: "catalogs", role: "member" },
     { slug: "catalog-nist-sp800", title: "Catalog Nist Sp800", family: "catalogs", role: "member" },
@@ -41,7 +41,7 @@ proves(["0001-docs FR-044"], "a family is one folder of the navigation: its host
   ]);
   assertEquals(placements.get("anyfs-bridge"), { parent: "anyfs", navTitle: "Bridge", navKind: "Plugins" });
   assertEquals(placements.get("anyfs-cli")?.navTitle, "Command line");
-  assertEquals(placements.get("archon-boot"), { parent: "archon", navTitle: "Boot", navKind: "Plugins" });
+  assertEquals(placements.get("archon-dns"), { parent: "archon", navTitle: "Dns", navKind: "Plugins" });
   assertEquals(placements.get("archon-dialect-ansible"), { parent: "archon", navTitle: "Ansible", navKind: "Dialects" });
   assertEquals(placements.get("catalog-soc2")?.parent, "group:catalogs");
   assertEquals(groupPages, [{ key: "catalogs", title: "Catalogs" }]);
