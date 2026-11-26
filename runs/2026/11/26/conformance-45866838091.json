@@ -1,0 +1,73 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45866838091",
+    "workflow": "conformance",
+    "commit": "265c2aa24f3e6146bed865ee6e3f21481712dff9",
+    "at": "2026-11-26T17:21:22Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45866838091"
+  },
+  "steps": [
+    {
+      "id": "built-for-this-computer-with-an-embedded-4",
+      "job": "compile",
+      "module": "system",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 3934,
+      "exitStatus": 0
+    },
+    {
+      "id": "built-for-windows-from-linux-by-the-pinn-5",
+      "job": "compile",
+      "module": "system",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1186,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-3",
+      "job": "compile",
+      "module": "system",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 430,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-conformance-test-on-bun-and-on-node-5",
+      "job": "otel-conformance",
+      "module": "repository",
+      "tool": "bun-test",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 555,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-3",
+      "job": "otel-conformance",
+      "module": "repository",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 140,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-opentelemetry-collector-verified-aga-4",
+      "job": "otel-conformance",
+      "module": "repository",
+      "tool": "exit-status",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1707,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
