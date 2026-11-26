@@ -1,0 +1,64 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45754120196",
+    "workflow": "ci",
+    "commit": "52e02027b2669d4037c6faec92ba7d451ccf1fe9",
+    "at": "2026-11-26T04:17:18Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45754120196"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 176,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1865,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-native-pinned",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1865,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 5767,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 161,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
