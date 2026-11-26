@@ -40,3 +40,4 @@ number	slug	state
 0039	content-method	in force
 0040	workload-pattern	in force
 0041	telemetry-and-reach	in force
+0042	tests-as-workloads	in force

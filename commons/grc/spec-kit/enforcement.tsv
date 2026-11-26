@@ -138,9 +138,15 @@ requirement	mechanism	by	note
 0016-grc-poam FR-005	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the controls of two frameworks in one document, the crosswalk to a framework, the findings and risks of the assessment kept, and the empty document
 0016-grc-poam FR-006	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: an option that is not planned findings is an invalid problem and writes nothing, and another model ignores it
 0016-grc-poam FR-007	check	.github: cd commons/grc && bun run verify	suite/poam.test.ts: the document written with milestones, owners and two frameworks is valid against NIST's published schema where the schema and ajv are at hand
-0017-grc-sshsig-namespace FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0017-grc-sshsig-namespace FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0017-grc-sshsig-namespace FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0017-grc-sshsig-namespace FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0017-grc-sshsig-namespace FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0017-grc-sshsig-namespace FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-grc-sshsig-namespace FR-001	check	.github: cd commons/grc && bun test suite/	sshsig.test.ts: sshsigSignerFor and the unchanged grc-evidence signer
+0017-grc-sshsig-namespace FR-002	check	.github: cd commons/grc && bun test suite/	sshsig.test.ts: parseNamespace and the closed table
+0017-grc-sshsig-namespace FR-003	check	.github: cd commons/grc && bun test suite/	sshsig.test.ts: another namespace is refused naming both; a non-Ed25519 key is refused
+0017-grc-sshsig-namespace FR-004	check	.github: cd commons/grc && bun test suite/	sshsig.test.ts: verifySshsig over any message
+0017-grc-sshsig-namespace FR-005	check	.github: cd commons/grc && bun test suite/	sshsig.test.ts: pae is crypto's
+0017-grc-sshsig-namespace FR-006	none	-	Deferred: a signer in pure code from an OpenSSH private key is not specified here
+0018-grc-acceptance-attestation FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0018-grc-acceptance-attestation FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0018-grc-acceptance-attestation FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0018-grc-acceptance-attestation FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0018-grc-acceptance-attestation FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0018-grc-acceptance-attestation FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

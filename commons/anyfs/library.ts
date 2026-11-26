@@ -13,7 +13,7 @@ export const library = {
   verify: "bun run verify",
   version: "0.1.0",
   distribution: ["github", "npm"],
-  exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local", "./merge", "./memory-merge", "./docs", "./docs/formats"],
+  exports: [".", "./governance", "./logical", "./physical", "./layers", "./conformance", "./memory", "./local", "./merge", "./queue", "./memory-merge", "./docs", "./docs/formats"],
   family: { host: "anyfs", role: "host" },
   summary:
     "One typed interface to every place bytes live: paths and places as types, a revision on every read and a stated expectation on every write, the capabilities of a store in its type so that code needing one cannot be given a store without it, attenuation, mounts, composable layers and one conformance suite that every backend passes; and a merge by nature: the files of a store are a view of immutable version rows, so any two replicas, or any two SQL dumps of them, merge by taking the union of their rows, with no conflict and in any order.",
@@ -38,6 +38,12 @@ export const library = {
           { name: "@intellectual-frontiers/core", subpaths: [] },
           { name: "@intellectual-frontiers/crypto", subpaths: ["sha256"] },
         ],
+      },
+      {
+        folder: "src/queue/",
+        layer: "logical",
+        mayImport: ["src/governance/", "src/logical/"],
+        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }],
       },
       {
         folder: "src/physical/memory-merge/",

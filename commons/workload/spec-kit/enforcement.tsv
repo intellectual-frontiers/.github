@@ -168,3 +168,29 @@ requirement	mechanism	by	note
 0016-ci-on-graph FR-003	check	.github: cd commons/workload && bun run verify	suite/ci-graph.test.ts
 0016-ci-on-graph FR-004	check	.github: cd commons/workload && bun run verify	suite/ci-graph.test.ts
 0016-ci-on-graph FR-005	check	.github: cd commons/workload && bun run verify	suite/ci-graph.test.ts
+0017-workload-test-cases FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-010	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-011	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-012	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-013	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-014	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-015	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-016	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-017	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-018	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-019	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-020	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-021	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-022	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-023	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-024	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-025	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0017-workload-test-cases FR-026	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line

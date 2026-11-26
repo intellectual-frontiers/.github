@@ -30,6 +30,11 @@ export const OSQUERY_TABLES: readonly OsqueryTable[] = [
   t("deb_packages", "The packages of a Debian family machine.", [["name", "text"], ["version", "text"], ["arch", "text"], ["source", "text"], ["status", "text"]]),
   t("rpm_packages", "The packages of an RPM family machine.", [["name", "text"], ["version", "text"], ["release", "text"], ["arch", "text"], ["source", "text"]]),
   t("mounts", "The file systems mounted.", [["device", "text"], ["path", "text"], ["type", "text"], ["flags", "text"]]),
+  t("uptime", "How long the machine has been up.", [["days", "int"], ["hours", "int"], ["minutes", "int"], ["seconds", "int"], ["total_seconds", "int"]]),
+  t("load_average", "The load average of the last 1, 5 and 15 minutes.", [["period", "text"], ["average", "text"]]),
+  t("memory_info", "The memory of the machine in bytes.", [["memory_total", "int"], ["memory_free", "int"], ["memory_available", "int"], ["buffers", "int"], ["cached", "int"], ["swap_total", "int"], ["swap_free", "int"]]),
+  t("cpu_time", "The time each core spent in each mode, in ticks.", [["core", "int"], ["user", "int"], ["nice", "int"], ["system", "int"], ["idle", "int"], ["iowait", "int"], ["irq", "int"], ["softirq", "int"], ["steal", "int"]]),
+  t("interface_details", "The network interfaces and their counters.", [["interface", "text"], ["mac", "text"], ["type", "int"], ["mtu", "int"], ["ibytes", "int"], ["obytes", "int"], ["ipackets", "int"], ["opackets", "int"], ["ierrors", "int"], ["oerrors", "int"]]),
 ];
 
 /** The prefix of the relation of an osquery table. */

@@ -78,7 +78,7 @@ proves(
     assertStringIncludes(ci, "bun commons/libraries/src/plan.ts");
     assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.linux) }}");
     assertStringIncludes(ci, "matrix: ${{ fromJSON(needs.plan.outputs.systems) }}");
-    assertStringIncludes(ci, "needs: [plan, verify, systems]");
+    assertStringIncludes(ci, "needs: [seen, plan, verify, systems]");
     assertStringIncludes(ci, "fetch-depth: 0");
     for (const [name, c] of Object.entries(LIBRARY_CI)) {
       for (const os of c.systems ?? []) assert(os === "windows-latest" || os === "macos-latest", `${name} asks for ${os}`);

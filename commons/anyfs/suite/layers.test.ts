@@ -23,6 +23,7 @@ const EXPORTS: Record<string, string> = {
   "./memory": "./src/physical/memory/mod.ts",
   "./local": "./src/physical/local/mod.ts",
   "./merge": "./src/merge/mod.ts",
+  "./queue": "./src/queue/mod.ts",
   "./memory-merge": "./src/physical/memory-merge/mod.ts",
   "./docs": "./src/docs/mod.ts",
   "./docs/formats": "./src/docs/formats/mod.ts",

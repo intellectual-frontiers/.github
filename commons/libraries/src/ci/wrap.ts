@@ -68,7 +68,7 @@ export function gatherJob(w: Workflow, makers: readonly string[], expectScript: 
     permissions: { contents: "read", checks: "write", actions: "read" },
     steps: [
       { ...use("actions/checkout@v4", { with: { "fetch-depth": 1 } }), policy: redCause("reports-not-produced") },
-      { ...use("./.github/actions/bun"), policy: redCause("reports-not-produced") },
+      { ...use("./.github/actions/bun", { with: { tools: "false" } }), policy: redCause("reports-not-produced") },
       { ...use("actions/download-artifact@v4", { name: "The findings every job kept", with: { pattern: `findings-${w.file}-*`, path: "_findings", "merge-multiple": true } }), policy: plumbing, continueOnError: true },
       {
         ...run(expectScript, {
@@ -98,7 +98,7 @@ export function keepJob(w: Workflow, gatherId: string): Job {
     permissions: { contents: "write" },
     steps: [
       { ...use("actions/checkout@v4"), continueOnError: true, policy: plumbing },
-      { ...use("./.github/actions/bun"), continueOnError: true, policy: plumbing },
+      { ...use("./.github/actions/bun", { with: { tools: "false" } }), continueOnError: true, policy: plumbing },
       { ...use("actions/download-artifact@v4", { name: "The merged findings of this workflow", with: { name: `findings-${w.file}`, path: "_findings-merged" } }), continueOnError: true, policy: plumbing },
       {
         ...run(

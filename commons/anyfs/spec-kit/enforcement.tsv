@@ -89,12 +89,12 @@ requirement	mechanism	by	note
 0010-anyfs-merge-signing FR-004	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
 0010-anyfs-merge-signing FR-005	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
 0010-anyfs-merge-signing FR-006	check	.github: cd commons/anyfs && bun run verify	suite/merge-signing.test.ts
-0011-anyfs-queue FR-001	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-002	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-003	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-004	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-005	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-006	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-007	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-008	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
-0011-anyfs-queue FR-009	none	-	Deferred: UNBUILT; verified after the owner's acceptance run of the command line
+0011-anyfs-queue FR-001	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: openQueue over a store of read, write, list, delete and cas
+0011-anyfs-queue FR-002	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: names order the queue; two writers never make one number twice
+0011-anyfs-queue FR-003	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: a merging store is refused (the folder store writes whole objects)
+0011-anyfs-queue FR-004	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: peek in order after a restart; ack twice succeeds
+0011-anyfs-queue FR-005	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: evictions by age, by bytes, refuse-new; drops counted and returned
+0011-anyfs-queue FR-006	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: statsOf is a fold of a listing
+0011-anyfs-queue FR-007	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: a merging store is refused
+0011-anyfs-queue FR-008	none	-	Deferred: the traced layer does not yet trace a queue
+0011-anyfs-queue FR-009	check	.github: cd commons/anyfs && bun test suite/	suite/queue.test.ts: the cases run on the memory store and the folder store

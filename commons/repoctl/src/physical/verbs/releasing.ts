@@ -12,9 +12,11 @@
  *
  * @module
  */
-import { findingsOfPublish, finding, findingsOfSync, gate, orderGenerators, planPublish, runPublish, runSync, STAGED_NOTE, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
+import { type ConsumerReport, CONSUMER_FILE, checksOf, findingsOfHandoff, findingsOfPublish, finding, findingsOfSync, folderOf, gate, handoffOf, orderGenerators, type Pin, type PinState, pinsOf, planPublish, reportData, reportText, repinned, type Released, runPublish, runSync, STAGED_NOTE, type TrainReport, underFolder, type Verified, type Finding, type PublishPlan, type Published, type ReleaseEntry, type World } from "@intellectual-frontiers/repoctl/logical";
 import { activeMode, applyRelease, describe, offlinePublishedExports, offlineRegistry, type DistributionMode, type Plan, raiseOf, readRecord, MODE_VARIABLE, publishedOf, REAL, registryOf, RECORD_PATH, releasePlan } from "@intellectual-frontiers/libraries/releasing";
 import { holdSentence } from "@intellectual-frontiers/libraries/libraries";
+import type { Outcome } from "@intellectual-frontiers/headless/logical";
+import { join, resolve } from "@intellectual-frontiers/system/path";
 import { flag, many, value } from "@intellectual-frontiers/terminal/args";
 import { type Done, defineVerb, generatorsOf, type Host, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
@@ -73,6 +75,23 @@ export const releasePlanVerb = defineVerb({
   },
 });
 
+/** What `release apply` and `release train` give for the options of a release. */
+type MakeOptions = { readonly tests: boolean; readonly raise: readonly string[]; readonly distribution: string | undefined; readonly offline: boolean };
+
+/** The release made: the plan, the files written, the findings of the generators; or the outcome that says why it could not be made. */
+async function makeRelease(o: MakeOptions, w: World, host: Host): Promise<{ readonly outcome: Outcome } | { readonly plan: Plan; readonly written: readonly string[]; readonly findings: readonly Finding[] }> {
+  const raise = raiseOf(o.raise);
+  if (raise.kind === "err") return { outcome: outcomeOfUsage(raise.error, "E-USAGE", "repoctl release apply --help") };
+  const chosen = modeOf(o.distribution, host);
+  if ("problem" in chosen) return { outcome: outcomeOfUsage(chosen.problem, "E-USAGE", "repoctl release apply --help") };
+  const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: o.tests, raise: raise.value, registry: o.offline ? offlineRegistry : registryOf(chosen.mode, w.repo), published: o.offline ? offlinePublishedExports : publishedOf(chosen.mode), mode: chosen.mode });
+  if (made.kind === "err") return { outcome: outcomeOfDone({ data: null, text: made.error, findings: [finding("fail", "E-RELEASE-FAILED", made.error, "repoctl release plan")] }) };
+  const order = orderGenerators(generatorsOf(host));
+  if (order.kind === "err") return { outcome: outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`) };
+  const synced = await runSync(w, "write", order.value);
+  return { plan: made.value.plan, written: made.value.written, findings: findingsOfSync(synced) };
+}
+
 /** `repoctl release apply`. */
 export const releaseApplyVerb = defineVerb({
   name: "apply",
@@ -89,23 +108,186 @@ export const releaseApplyVerb = defineVerb({
       if ("problem" in got) return outcomeOfDone({ data: null, text: got.problem, findings: [finding("fail", "E-RELEASE-FAILED", got.problem, "repoctl release plan")] });
       return outcomeOfDone({ data: planData(got.plan), text: planText(got.plan), findings: [], title: "Planned" });
     }
-    const raise = raiseOf(args.options.raise ?? []);
-    if (raise.kind === "err") return outcomeOfUsage(raise.error, "E-USAGE", "repoctl release apply --help");
-    const chosen = modeOf(args.options.distribution, host);
-    if ("problem" in chosen) return outcomeOfUsage(chosen.problem, "E-USAGE", "repoctl release apply --help");
-    const made = await applyRelease(w.repo, host.releasing ?? REAL, { tests: args.options.tests, raise: raise.value, registry: args.options.offline ? offlineRegistry : registryOf(chosen.mode, w.repo), published: args.options.offline ? offlinePublishedExports : publishedOf(chosen.mode), mode: chosen.mode });
-    if (made.kind === "err") return outcomeOfDone({ data: null, text: made.error, findings: [finding("fail", "E-RELEASE-FAILED", made.error, "repoctl release plan")] });
-    const order = orderGenerators(generatorsOf(host));
-    if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);
-    const synced = await runSync(w, "write", order.value);
+    const made = await makeRelease({ tests: args.options.tests, raise: args.options.raise ?? [], distribution: args.options.distribution, offline: args.options.offline }, w, host);
+    if ("outcome" in made) return made.outcome;
     const done: Done = {
-      data: { plan: planData(made.value.plan), written: made.value.written },
-      text: `${planText(made.value.plan)}\n${made.value.written.length} files written`,
-      findings: findingsOfSync(synced),
+      data: { plan: planData(made.plan), written: made.written },
+      text: `${planText(made.plan)}\n${made.written.length} files written`,
+      findings: made.findings,
       next: ["repoctl commit -m \"Release\"", "git push origin HEAD:main"],
       title: "Release made",
     };
     return outcomeOfDone(done);
+  },
+});
+
+const sleep = (ms: number): Promise<void> => new Promise((done) => setTimeout(done, ms));
+
+/** Whether the words an installer printed say that a version is not on the registry (yet). */
+const NOT_THERE = /\b404\b|not found|no version matching|failed to resolve/i;
+
+/** The package manifests that Git tracks in a consumer, from its root: their paths, or the sentence that says it is not a checkout. */
+async function trackedManifests(w: World, dir: string): Promise<{ readonly files: readonly string[] } | { readonly problem: string }> {
+  const r = await w.process.run(["git", "ls-files", "--", "package.json", "*/package.json", "**/package.json"], { cwd: dir });
+  if (r.code !== 0) return { problem: `${dir} is not a Git checkout` };
+  return { files: [...new Set(r.stdout.split("\n").filter((l) => l !== ""))].sort() };
+}
+
+type TrainOptions = { readonly offline: boolean; readonly apply: boolean; readonly waitMs: number; readonly pollMs: number; readonly only: readonly string[] };
+
+/** One consumer of the train: its pins found and, where the run applies and is not offline, moved, installed twice and checked. */
+async function trainConsumer(w: World, shown: string, dir: string, released: readonly Released[], o: TrainOptions): Promise<{ readonly report: ConsumerReport; readonly findings: readonly Finding[] }> {
+  const refuse = (message: string): { readonly report: ConsumerReport; readonly findings: readonly Finding[] } => ({ report: { dir: shown, pins: [], declared: false, verify: [], note: "refused" }, findings: [finding("fail", "E-TRAIN-CONSUMER", message, "repoctl release train --help")] });
+  const tracked = await trackedManifests(w, dir);
+  if ("problem" in tracked) return refuse(tracked.problem);
+  const declText = await w.files.read(join(dir, CONSUMER_FILE));
+  const declared = declText === undefined ? undefined : checksOf(declText);
+  if (declared?.kind === "err") return refuse(`${shown}: ${declared.error}`);
+  const found: Pin[] = [];
+  const texts = new Map<string, string>();
+  for (const file of tracked.files) {
+    if (o.only.length > 0 && !o.only.some((scope) => underFolder(folderOf(file), scope.replace(/^\.\//, "")))) continue;
+    const text = await w.files.read(join(dir, file));
+    if (text === undefined) continue;
+    const pins = pinsOf(file, text, released);
+    if (pins.kind === "err") return refuse(`${shown}: ${pins.error}`);
+    if (pins.value.length > 0) {
+      found.push(...pins.value);
+      texts.set(file, text);
+    }
+  }
+  const base = { dir: shown, declared: declared !== undefined, verify: [] as readonly Verified[] };
+  if (found.length === 0) return { report: { ...base, pins: [], note: undefined }, findings: [] };
+  if (!o.apply || o.offline) return { report: { ...base, pins: found.map((p) => ({ ...p, state: "planned" as PinState })), note: o.offline ? "offline: nothing was installed" : "dry run" }, findings: [] };
+  const states = new Map<string, PinState>();
+  const findings: Finding[] = [];
+  const lockFiles = (folder: string): readonly string[] => [...new Set([join(dir, folder, "bun.lock"), join(dir, "bun.lock")])];
+  for (const file of texts.keys()) {
+    const folder = folderOf(file);
+    const mine = found.filter((p) => p.file === file);
+    const lockBefore = new Map<string, string | undefined>();
+    for (const l of lockFiles(folder)) lockBefore.set(l, await w.files.read(l));
+    const original = texts.get(file) ?? "";
+    const put = async (text: string): Promise<void> => w.files.write(join(dir, file), text);
+    const putBack = async (): Promise<void> => {
+      await put(original);
+      for (const [l, text] of lockBefore) if (text !== undefined) await w.files.write(l, text);
+    };
+    const cwd = join(dir, folder);
+    const deadline = Date.now() + o.waitMs;
+    await put(repinned(original, mine));
+    let state: PinState = "moved";
+    for (;;) {
+      const install = await w.process.run(["bun", "install"], { cwd });
+      if (install.code === 0) {
+        const frozen = await w.process.run(["bun", "install", "--frozen-lockfile"], { cwd });
+        if (frozen.code === 0) break;
+        await putBack();
+        state = "failed";
+        findings.push(finding("fail", "E-TRAIN-INSTALL", `${shown}/${file}: the lockfile is not up to date after the install (${frozen.stderr.trim().split("\n").slice(-1)[0] ?? ""})`, "repoctl release train --help"));
+        break;
+      }
+      await putBack();
+      const said = `${install.stderr}\n${install.stdout}`;
+      if (NOT_THERE.test(said)) {
+        if (Date.now() < deadline) {
+          await sleep(o.pollMs);
+          await put(repinned(original, mine));
+          continue;
+        }
+        state = "waiting";
+        findings.push(finding("warn", "E-TRAIN-WAITING", `${shown}/${file}: ${mine.map((p) => `${p.package} ${p.to}`).join(", ")} is not on the registry yet; the consumer was left as it was`, `repoctl release train --consumer ${shown} --wait 300`));
+      } else {
+        state = "failed";
+        findings.push(finding("fail", "E-TRAIN-INSTALL", `${shown}/${file}: the install failed: ${said.trim().split("\n").slice(-1)[0] ?? ""}`, "repoctl release train --help"));
+      }
+      break;
+    }
+    for (const p of mine) states.set(`${p.file}\n${p.package}`, state);
+  }
+  const pins = found.map((p) => ({ ...p, state: states.get(`${p.file}\n${p.package}`) ?? ("failed" as PinState) }));
+  const verify: Verified[] = [];
+  if (declared !== undefined && pins.every((p) => p.state === "moved")) {
+    for (const argv of declared.value) {
+      const r = await w.process.run(argv, { cwd: dir });
+      verify.push({ argv, code: r.code });
+      if (r.code !== 0) {
+        findings.push(finding("fail", "E-TRAIN-VERIFY", `${shown}: ${argv.join(" ")} ended with ${r.code}`, `cd ${shown} && ${argv.join(" ")}`));
+        break;
+      }
+    }
+  }
+  return { report: { ...base, pins, verify, note: undefined }, findings };
+}
+
+/** `repoctl release train`. */
+export const releaseTrainVerb = defineVerb({
+  name: "train",
+  id: "release train",
+  options: {
+    ...OPTIONS,
+    tests: flag({ help: "Run the tests that pack, install and type-check every library (on by default).", negatable: true, default: true }),
+    consumer: many<never>({ help: "A repository whose pins of this release move once it is published (repeatable).", valueName: "DIR" }),
+    only: many<never>({ help: "Move only the pins of the manifests in this folder of a consumer or under it (repeatable).", valueName: "PATH" }),
+    wait: value<never>({ help: "Try an install again for this many seconds while the version is not on the registry yet.", valueName: "SECONDS" }),
+  },
+  examples: [
+    { args: ["--dry-run", "--consumer", "../product"], says: "What each phase would do, writing nothing." },
+    { args: ["--consumer", "../product"], says: "Make the release, say whether it may be published, and move the pins of the consumer once it is." },
+    { args: ["--consumer", "../product", "--only", "services/api", "--wait", "300"], says: "After the publication: move one service's pin, trying again for five minutes while the registry catches up." },
+  ],
+  run: async (args, ctx, w, host) => {
+    const apply = ctx.mode === "apply";
+    const wait = args.options.wait === undefined ? 0 : Number(args.options.wait);
+    if (!Number.isFinite(wait) || wait < 0) return outcomeOfUsage(`--wait is a number of seconds, not ${args.options.wait}`, "E-USAGE", "repoctl release train --help");
+    const findings: Finding[] = [];
+    const read = async (): Promise<readonly Released[] | undefined> => {
+      const file = await w.files.read(`${w.repo}/${RECORD_PATH}`);
+      const entries = file === undefined ? undefined : readRecord(file);
+      return entries?.kind === "ok" ? [...new Map(entries.value.map((e) => [e.package, { package: e.package, version: e.version }])).values()] : undefined;
+    };
+    const before = await read();
+    const recordFile = await w.files.read(`${w.repo}/${RECORD_PATH}`);
+    const recorded = recordFile === undefined ? undefined : readRecord(recordFile);
+    const tagged = await tagNames(w);
+    const untagged = recorded?.kind === "ok" ? recorded.value.filter((e) => !tagged.has(e.tag)) : [];
+    let state: TrainReport["release"]["state"];
+    let packages: readonly Released[] = before ?? [];
+    if (untagged.length > 0) {
+      state = "waiting";
+      packages = untagged.map((e) => ({ package: e.package, version: e.version }));
+    } else {
+      const got = await planOf(w, host, args.options.offline, args.options.raise ?? [], args.options.distribution);
+      if ("problem" in got) return got.usage ? outcomeOfUsage(got.problem, "E-USAGE", "repoctl release train --help") : outcomeOfDone({ data: null, text: got.problem, findings: [finding("fail", "E-RELEASE-FAILED", got.problem, "repoctl release plan")] });
+      if (got.plan.steps.length === 0) state = "nothing";
+      else if (!apply) {
+        state = "planned";
+        packages = got.plan.steps.filter((s) => s.publish).map((s) => ({ package: s.package, version: s.to }));
+      } else {
+        const made = await makeRelease({ tests: args.options.tests, raise: args.options.raise ?? [], distribution: args.options.distribution, offline: args.options.offline }, w, host);
+        if ("outcome" in made) return made.outcome;
+        findings.push(...made.findings);
+        state = "applied";
+        packages = (await read()) ?? [];
+      }
+    }
+    const handoff: TrainReport["handoff"] =
+      state === "applied" || state === "waiting" ? await handoffOf(w, RECORD_PATH) : { kind: "not-reached", why: state === "planned" ? "this is a dry run" : "no release is waiting" };
+    findings.push(...(handoff.kind === "not-reached" ? [] : findingsOfHandoff(handoff, RECORD_PATH)));
+    const consumers: ConsumerReport[] = [];
+    // pins move to the versions of the record, whether they are waiting or were published before
+    const targets = state === "planned" ? packages : ((await read()) ?? packages);
+    for (const dir of args.options.consumer ?? []) {
+      const got = await trainConsumer(w, dir, resolve(w.repo, dir), targets, { offline: args.options.offline, apply, waitMs: wait * 1000, pollMs: host.train?.pollMs ?? 10000, only: args.options.only ?? [] });
+      consumers.push(got.report);
+      findings.push(...got.findings);
+    }
+    const report: TrainReport = { release: { state, packages }, handoff, consumers };
+    const next: string[] = [];
+    if (handoff.kind === "ready") next.push("a person publishes the release: the workflow `release` with publish, or repoctl release publish", `then: repoctl release train${(args.options.consumer ?? []).map((c) => ` --consumer ${c}`).join("")} --wait 300`);
+    if (handoff.kind === "not-committed") next.push('repoctl commit -m "Release"');
+    if (handoff.kind === "not-pushed") next.push("git push origin HEAD:main");
+    return outcomeOfDone({ data: reportData(report), text: reportText(report), findings, next, title: findings.some((f) => f.level === "fail") ? "Stopped" : "Walked" });
   },
 });
 

@@ -6,7 +6,8 @@
  */
 import { fs, path, proc } from "@intellectual-frontiers/system";
 import { assert, assertEquals, proves } from "@intellectual-frontiers/test";
-import { fingerprintOf, NAMESPACE, pae, sshsigSigner } from "../src/signers/sshsig/mod.ts";
+import { fingerprintOf, NAMESPACE, NAMESPACES, pae, parseNamespace, sshsigSigner, sshsigSignerFor, verifySshsig } from "../src/signers/sshsig/mod.ts";
+import { pae as dssePae } from "@intellectual-frontiers/crypto/dsse";
 
 const skip = proc.which("ssh-keygen") === undefined ? { skip: "ssh-keygen is not installed" } : {};
 const TYPE = "application/vnd.example+json";
@@ -108,3 +109,35 @@ proves(["0014-grc-sshsig FR-005"], "the fingerprint is OpenSSH's, a signature ma
     assertEquals(pae("t", bytes("ab")), bytes("DSSEv1 1 t 2 ab"));
   });
 }, skip);
+
+const N = (n: string): string => `0017-grc-sshsig-namespace ${n}`;
+
+proves([N("FR-002")], "a namespace is made only by parseNamespace, which refuses an empty text, a space, a comma, a control character and a text over 64; the known ones are one table", () => {
+  assertEquals([...NAMESPACES], ["grc-evidence", "ifc-telemetry"]);
+  for (const bad of ["", "a b", "a,b", "a\nb", "x".repeat(65)]) assertEquals(parseNamespace(bad).kind, "err");
+  assertEquals(parseNamespace("ifc-telemetry").kind, "ok");
+});
+
+proves([N("FR-001"), N("FR-003"), N("FR-004")], "a signature of the telemetry namespace verifies there, is refused in the evidence namespace with both named, and verifySshsig takes any message", async () => {
+  await fs.withTempDir(async (dir) => {
+    const k = await key(dir, "device");
+    const ns = parseNamespace("ifc-telemetry");
+    assert(ns.kind === "ok");
+    const telemetry = sshsigSignerFor(ns.value);
+    const signed = await telemetry.sign(TYPE, bytes("batch"), [{ keyFile: k.file }]);
+    assert(signed.kind === "ok");
+    assert((await telemetry.verify(signed.value, TYPE, [{ publicKey: k.pub }])).kind === "ok");
+    const wrong = await sshsigSigner.verify(signed.value, TYPE, [{ publicKey: k.pub }]);
+    assert(wrong.kind === "err" && wrong.error.message.includes("ifc-telemetry") && wrong.error.message.includes("grc-evidence"));
+    const armored = signed.value.signatures[0]?.sig ?? "";
+    assert((await verifySshsig(armored, dssePae(TYPE, bytes("batch")), k.pub, "ifc-telemetry")).kind === "ok");
+    assert((await verifySshsig(armored, bytes("another message"), k.pub, "ifc-telemetry")).kind === "err");
+    const ecdsa = await key(dir, "e", "ecdsa");
+    const refused = await verifySshsig(armored, dssePae(TYPE, bytes("batch")), ecdsa.pub, "ifc-telemetry");
+    assert(refused.kind === "err" && refused.error.message.includes("ssh-ed25519"));
+  });
+}, skip);
+
+proves([N("FR-005")], "pae is the one of crypto: both give the same bytes", () => {
+  for (const [t, p] of [[TYPE, "x"], ["a/b", ""], ["application/vnd.ifc.telemetry+json", "{\"a\":[1,2]}"]] as const) assertEquals(pae(t, bytes(p)), dssePae(t, bytes(p)));
+});

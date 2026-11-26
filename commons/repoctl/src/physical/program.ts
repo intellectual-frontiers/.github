@@ -29,7 +29,7 @@ import { ciStepVerb } from "./verbs/ci.ts";
 import { queryVerb } from "./verbs/query.ts";
 import { namesVerb } from "./verbs/names.ts";
 import { usageVerb } from "./verbs/usage.ts";
-import { releaseApplyVerb, releasePlanVerb, releasePublishVerb } from "./verbs/releasing.ts";
+import { releaseApplyVerb, releasePlanVerb, releasePublishVerb, releaseTrainVerb } from "./verbs/releasing.ts";
 import { mergeVerb, syncVerb } from "./verbs/sync.ts";
 
 /** A host that does nothing: the tree of a program is made from it without reading anything, and `describe` never runs a verb. Its configuration is the bare one, so the verbs of every repository are in the tree; a repository's capabilities add theirs. */
@@ -52,7 +52,7 @@ export function repoctlProgram(host: Host): Program {
     mergeVerb(host),
     ...(on.status ? [statusVerb(host)] : []),
     ...(host.config.hygiene === undefined ? [] : [hygieneVerb(host)]),
-    ...(on.release ? [branch({ name: "release", summary: "Plan a release of the libraries, make it, and send it to npm.", children: [releasePlanVerb(host), releaseApplyVerb(host), releasePublishVerb(host)] })] : []),
+    ...(on.release ? [branch({ name: "release", summary: "Plan a release of the libraries, make it, and send it to npm.", children: [releasePlanVerb(host), releaseApplyVerb(host), releaseTrainVerb(host), releasePublishVerb(host)] })] : []),
     ...(on.newLibrary ? [branch({ name: "new", summary: "Make something new in the repository.", children: [newLibraryVerb(host)] })] : []),
     commitVerb(host),
     doctorVerb(host),
