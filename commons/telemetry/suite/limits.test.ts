@@ -54,7 +54,9 @@ proves([S("FR-023")], "the receiver answers 429 with Retry-After over the limit 
   assertEquals(got.length, 2);
   const big = encodeMetrics(Array.from({ length: 200 }, (_, i) => batch(i)));
   now = 5000;
-  assertEquals((await handle(post(big, { "content-length": String(JSON.stringify(big).length) }))).status, 413);
+  const declared = await handle(post(big, { "content-length": String(JSON.stringify(big).length) }));
+  assertEquals(declared.status, 413);
+  assertEquals(declared.headers.get("connection"), "close", "a body refused by its size is not read, so the connection closes");
   assertEquals((await handle(new Request("http://127.0.0.1:1/v1/metrics", { method: "POST", headers: { "content-type": "application/json", authorization: "Bearer synthetic-relay-token" }, body: JSON.stringify(big) }))).status, 413, "also by the length read");
 });
 

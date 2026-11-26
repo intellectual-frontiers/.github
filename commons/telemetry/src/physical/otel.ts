@@ -1030,11 +1030,36 @@ export type ReceiverPolicy = {
   readonly limits?: { readonly limits: SourceLimits; readonly now?: () => number };
 };
 
+/** The most of a body the receiver reads and drops to answer without needing it (a refusal) before it closes the connection instead. */
+const SETTLE_BYTES = 64 * 1024;
+
+/**
+ * Answer a request whose body the answer did not need. The body is read and dropped (up to `SETTLE_BYTES`) so that the connection can be used again for the next request; where there is more, the connection is closed after the answer. A body that is
+ * cancelled instead leaves a connection that is kept alive in a state that makes the next request on it wait.
+ */
+async function settle(request: Request, response: Response): Promise<Response> {
+  const reader = request.body?.getReader();
+  if (reader === undefined) return response;
+  let read = 0;
+  try {
+    for (;;) {
+      const r = await reader.read();
+      if (r.done) return response;
+      read += r.value.length;
+      if (read > SETTLE_BYTES) break;
+    }
+  } catch {
+    /* the sender went away */
+  }
+  response.headers.set("connection", "close");
+  return response;
+}
+
 /** The answer to a source over its limits: 429, the code, and when to try again. */
 function limited(retryAfterMs: number): Response {
   return new Response(JSON.stringify({ code: 8, message: "E-TELEM-RATE-LIMITED: this source is over its limit; send the batch again later" }), {
     status: 429,
-    headers: { "content-type": "application/json", "retry-after": String(Math.max(1, Math.ceil(retryAfterMs / 1000))) },
+    headers: { "content-type": "application/json", "retry-after": String(Math.max(1, Math.ceil(retryAfterMs / 1000))), connection: "close" },
   });
 }
 
@@ -1079,34 +1104,29 @@ export function otlpReceiver(sinks: ReceiverSinks, policy?: ReceiverPolicy): (re
     const type = (request.headers.get("content-type") ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
     const signed = policy !== undefined && type === TELEMETRY_PAYLOAD_TYPE;
     if (type !== "application/json" && !signed) {
-      await request.body?.cancel().catch(() => undefined);
-      return statusResponse(415, 3, `the content type ${type === "" ? "(none)" : type} is not supported; send application/json`);
+      return await settle(request, statusResponse(415, 3, `the content type ${type === "" ? "(none)" : type} is not supported; send application/json`));
     }
     const cap = policy?.limits?.limits.maxBodyBytes;
     if (cap !== undefined) {
       const declared = Number(request.headers.get("content-length") ?? "0");
       if (declared > cap) {
-        await request.body?.cancel().catch(() => undefined);
-        return statusResponse(413, 3, `the body is larger than the limit of ${cap} bytes`);
+        const r = statusResponse(413, 3, `the body is larger than the limit of ${cap} bytes`);
+        r.headers.set("connection", "close");
+        return r;
       }
     }
     let who: DeviceIdentity | undefined;
     if (policy !== undefined && !signed) {
       if (policy.signatures === "required") {
-        await request.body?.cancel().catch(() => undefined);
-        return statusResponse(401, 16, "a signed envelope is required on this path");
+        return await settle(request, statusResponse(401, 16, "a signed envelope is required on this path"));
       }
       const a = policy.authenticate === undefined ? undefined : await policy.authenticate(request);
       if (a === undefined || a.kind === "err") {
-        await request.body?.cancel().catch(() => undefined);
-        return statusResponse(401, 16, "the sender is not identified");
+        return await settle(request, statusResponse(401, 16, "the sender is not identified"));
       }
       who = a.value;
       const over = overLimit(who);
-      if (over !== undefined) {
-        await request.body?.cancel().catch(() => undefined);
-        return over;
-      }
+      if (over !== undefined) return await settle(request, over);
     }
     const text = await bodyText(request);
     if (text.kind === "err") return text.error;
