@@ -24,7 +24,7 @@ export const library = {
       {
         folder: "src/logical/",
         layer: "logical",
-        packages: [{ name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/lang-sql", subpaths: ["aide/catalog", "aide/guard", "aide/relational", "aide/text"] }],
+        packages: [{ name: "@intellectual-frontiers/actor", subpaths: ["logical"] }, { name: "@intellectual-frontiers/core", subpaths: [] }, { name: "@intellectual-frontiers/headless", subpaths: ["governance", "logical"] }, { name: "@intellectual-frontiers/lang-sql", subpaths: ["aide/catalog", "aide/guard", "aide/relational", "aide/text"] }],
       },
       {
         folder: "src/physical/",

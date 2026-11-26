@@ -8,8 +8,8 @@
 import { assert, assertEquals, assertStringIncludes, proves } from "@intellectual-frontiers/test";
 import { ok } from "@intellectual-frontiers/core";
 import { fs, path, proc } from "@intellectual-frontiers/system";
-import { type CommitPolicy, type DoctorPolicy, DEFAULT_ALLOWED_PATHS, DEFAULT_FORBIDDEN_PATHS, DEFAULT_SECRET_PATTERNS, TIERS } from "@intellectual-frontiers/repoctl/governance";
-import { acceptName, diagnose, type Facts, filesOf, forbidden, gatherFacts, type Held, majorOf, messageOf, messageText, type Process, ROLES, secretLike, titleOf, withRole, withSpecKit, type World } from "@intellectual-frontiers/repoctl/logical";
+import { type CommitPolicy, type DoctorPolicy, DEFAULT_ALLOWED_PATHS, DEFAULT_FORBIDDEN_PATHS, DEFAULT_SECRET_PATTERNS, sessionUrlOfRemote, TIERS } from "@intellectual-frontiers/repoctl/governance";
+import { acceptName, actorsOf, diagnose, type Facts, filesOf, forbidden, gatherFacts, type Held, majorOf, messageOf, messageText, type Process, ROLES, secretLike, titleOf, withRole, withSpecKit, type World } from "@intellectual-frontiers/repoctl/logical";
 import { systemProcess, systemWorld } from "@intellectual-frontiers/repoctl/physical";
 import { main } from "@intellectual-frontiers/repoctl";
 import { CAN_RUN, CHECKOUT, checkVerdict, execute, git, hostOf, LIBRARIES, put, TEST_CO_AUTHOR, TEST_IDENTITY, withRepo } from "./world.ts";
@@ -291,4 +291,36 @@ proves(["0005-repoctl-library-commit-doctor FR-003"], "the spec kit of a new lib
   assertEquals(once.value, 'specKits: [\n    { layout: "commons", dir: "commons/a/spec-kit" },\n    { layout: "commons", dir: "commons/b/spec-kit" },\n    { layout: "commons", dir: "commons/c/spec-kit" },\n  ],\n');
   assertEquals(withSpecKit(once.value, "c", "spec-kit"), { kind: "ok", value: once.value });
   assertEquals(withSpecKit("specKits: [],\n", "c", "spec-kit").kind, "err");
+});
+
+proves(["0005-repoctl-library-commit-doctor FR-010"], "the actors of a commit come from the options and the environment, are refused when malformed, and the session is made from the remote id", () => {
+  const WITH = ["issue", "co-author", "session", "prepared-by", "directive", "reviewed-by"];
+  const NAMES = { agent: "AI_AGENT", model: "REPOCTL_MODEL" };
+  const DIGEST = "a".repeat(64);
+  const harness = (name: string): string | undefined => ({ AI_AGENT: "synthetic-harness", REPOCTL_MODEL: "synthetic-model" })[name];
+  const nothing = (): string | undefined => undefined;
+  // An agent runs the command: Prepared-by is made from the environment, and nobody types it.
+  const inferred = actorsOf(WITH, {}, harness, NAMES);
+  assert(inferred.kind === "ok" && inferred.value.preparedBy?.kind === "agent" && inferred.value.preparedBy.id === "synthetic-harness");
+  const m = messageOf({ issue: TRAILERS.issue, trailers: ["issue", "co-author", "session", "prepared-by", "directive", "reviewed-by"] }, { subject: "S", refs: "10", coAuthor: CO_AUTHOR, session: SESSION, actors: inferred.kind === "ok" ? inferred.value : undefined });
+  assertEquals(m.trailers, ["Refs #10", CO_AUTHOR, `Claude-Session: ${SESSION}`, "Prepared-by: synthetic-harness (agent, model synthetic-model reported)"]);
+  // No harness and nothing given: no actors, so a human's commit has no actor trailer.
+  const human = actorsOf(WITH, {}, nothing, NAMES);
+  assert(human.kind === "ok" && human.value.preparedBy === undefined);
+  // The options win, the directive and the reviewer are written in order.
+  const given = actorsOf(WITH, { preparedBy: "synthetic-person-01 (person)", directive: `work-order-001@1 sha256:${DIGEST}`, reviewedBy: "synthetic-person-02" }, harness, NAMES);
+  assert(given.kind === "ok");
+  assertEquals(messageOf({ issue: TRAILERS.issue, trailers: WITH.filter((t) => t !== "issue") as never }, { subject: "S", refs: undefined, coAuthor: CO_AUTHOR, session: SESSION, actors: given.kind === "ok" ? given.value : undefined }).trailers.slice(2), ["Prepared-by: synthetic-person-01 (person)", `Directive: work-order-001@1 sha256:${DIGEST}`, "Reviewed-by: synthetic-person-02 (person)"]);
+  // A repository that does not list the trailers gets none of them.
+  const unlisted = actorsOf(["issue", "co-author", "session"], { directive: "x" }, harness, NAMES);
+  assert(unlisted.kind === "ok" && unlisted.value.preparedBy === undefined && unlisted.value.directive === undefined);
+  // Malformed values are refused.
+  assert(actorsOf(WITH, { preparedBy: "nobody" }, nothing, NAMES).kind === "err");
+  assert(actorsOf(WITH, { directive: "work-order" }, nothing, NAMES).kind === "err");
+  assert(actorsOf(WITH, { reviewedBy: "synthetic-agent-01 (agent)" }, nothing, NAMES).kind === "err", "only a person reviews");
+  // The session address is made from the id a remote session keeps.
+  assertEquals(sessionUrlOfRemote("cse_01AbCdEf"), "https://claude.ai/code/session_01AbCdEf");
+  assertEquals(sessionUrlOfRemote("abc"), undefined);
+  assertEquals(sessionUrlOfRemote(undefined), undefined);
+  assertEquals(sessionUrlOfRemote("cse_../x"), undefined);
 });

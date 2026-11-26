@@ -53,6 +53,8 @@ export type ProblemCode =
   | "E-COMMIT-REFS"
   | "E-COMMIT-IMPACT"
   | "E-COMMIT-SESSION"
+  | "E-COMMIT-ACTORS"
+  | "E-COMMIT-UNDIRECTED"
   | "E-COMMIT-FORBIDDEN"
   | "E-COMMIT-NOTHING"
   | "E-COMMIT-FAILED"
@@ -121,6 +123,8 @@ export const PROBLEM_CODES: readonly ProblemCode[] = [
   "E-COMMIT-REFS",
   "E-COMMIT-IMPACT",
   "E-COMMIT-SESSION",
+  "E-COMMIT-ACTORS",
+  "E-COMMIT-UNDIRECTED",
   "E-COMMIT-FORBIDDEN",
   "E-COMMIT-NOTHING",
   "E-COMMIT-FAILED",
@@ -369,6 +373,18 @@ export const CATALOGUE: Readonly<Record<ProblemCode, Explained>> = {
     what: "The trailer Claude-Session needs an https address, from --session or CLAUDE_SESSION_URL.",
     why: "The variable is not set in this shell, or the address has a credential in it.",
     fix: "repoctl commit --help",
+  },
+  "E-COMMIT-ACTORS": {
+    title: "A trailer that names an actor is not valid",
+    what: "`--prepared-by`, `--directive` or `--reviewed-by` is not in the form of its trailer, or `--reviewed-by` names an agent.",
+    why: "The form is `ID (person)`, `ID (system)` or `ID (agent, model NAME reported)` for who prepared it, `ID@VERSION sha256:DIGEST` for the directive and `ID` for a person who reviewed it; only a person reviews.",
+    fix: "repoctl commit --help",
+  },
+  "E-COMMIT-UNDIRECTED": {
+    title: "An agent prepared this commit and it names no directive",
+    what: "The commit carries `Prepared-by` for an agent and no `Directive` line (commons 0048-actors FR-022): it is undirected.",
+    why: "No work order, specification or recorded request was named with `--directive`. This is advice, not a refusal: the commit is made.",
+    fix: "repoctl commit --directive \"ID@VERSION sha256:DIGEST\"",
   },
   "E-COMMIT-FORBIDDEN": {
     title: "A file that must not be committed is staged",

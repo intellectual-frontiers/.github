@@ -24,11 +24,14 @@ import { parseStepId, parseVariableName, type VariableName } from "./ids.ts";
 import { isProblemCode, type ProblemCode } from "./problems.ts";
 import type { VerbId } from "./verbs.ts";
 
-/** The trailers a commit may carry, in the order a configuration lists them: the reference to an issue, the impact on a version, the line that credits the agent and the address of the session. */
-export type TrailerKind = "issue" | "impact" | "co-author" | "session";
+/** The trailers a commit may carry, in the order a configuration lists them: the reference to an issue, the impact on a version, the line that credits the agent, the address of the session, and the three that name the actors of the commit (commons 0048-actors FR-063): who prepared it, the directive it was done under and the person who reviewed it. */
+export type TrailerKind = "issue" | "impact" | "co-author" | "session" | "prepared-by" | "directive" | "reviewed-by";
 
 /** Every trailer, in the order of the documentation. */
-export const TRAILER_KINDS: readonly TrailerKind[] = ["issue", "impact", "co-author", "session"];
+export const TRAILER_KINDS: readonly TrailerKind[] = ["issue", "impact", "co-author", "session", "prepared-by", "directive", "reviewed-by"];
+
+/** The trailers of a configuration that lists none: the first four; the trailers that name the actors are the repository's to ask for. */
+const DEFAULT_TRAILERS: readonly TrailerKind[] = ["issue", "impact", "co-author", "session"];
 
 /** A path that must not be committed, by a glob from the repository's root, and the reason said to the person. */
 export type ForbiddenPath = { readonly glob: string; readonly why: string };
@@ -259,7 +262,7 @@ export function parseConfig(input: ConfigInput): Result<Config, readonly string[
   if (c.identity.name.trim() === "" || !/^[^@\s]+@[^@\s]+$/.test(c.identity.email)) bad("commit.identity needs a name and an email address");
   for (const h of c.heldMerges ?? []) if (!/^[0-9a-f]{7,40}$/.test(h)) bad(`commit.heldMerges: ${JSON.stringify(h)} is not a hash (seven to forty lower-case hexadecimal characters)`);
   if (new Set(c.heldMerges ?? []).size !== (c.heldMerges ?? []).length) bad("commit.heldMerges names a hash twice");
-  const trailers = c.trailers ?? TRAILER_KINDS.filter((t) => t !== "issue" || c.issue !== undefined);
+  const trailers = c.trailers ?? DEFAULT_TRAILERS.filter((t) => t !== "issue" || c.issue !== undefined);
   if (!dedupe(trailers)) bad("commit.trailers names a trailer twice");
   if (c.issue === undefined && trailers.includes("issue")) bad("commit.trailers has \"issue\" and commit.issue gives no prefix");
   if (c.issue !== undefined && c.issue.prefix.trim() === "") bad("commit.issue.prefix is not empty (for example \"Refs #\")");

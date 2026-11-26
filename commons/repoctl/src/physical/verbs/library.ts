@@ -13,8 +13,8 @@
  * @module
  */
 import { RESERVED, type Match } from "@intellectual-frontiers/libraries/family";
-import { CO_AUTHOR_VARIABLE, parseCommitImpact, parseIssueNumber, parseSessionUrl, parseSubject, SESSION_VARIABLE } from "@intellectual-frontiers/repoctl/governance";
-import { acceptName, filesOf, findingsOfSync, finding, type Held, messageText, orderGenerators, ROLES, type Role, runCommit, runSync, withRole, withSpecKit } from "@intellectual-frontiers/repoctl/logical";
+import { AGENT_VARIABLE, CO_AUTHOR_VARIABLE, MODEL_VARIABLE, parseCommitImpact, parseIssueNumber, parseSessionUrl, parseSubject, REMOTE_SESSION_VARIABLE, SESSION_VARIABLE, sessionUrlOfRemote } from "@intellectual-frontiers/repoctl/governance";
+import { acceptName, actorsOf, filesOf, findingsOfSync, finding, type Held, messageText, orderGenerators, ROLES, type Role, runCommit, runSync, withRole, withSpecKit } from "@intellectual-frontiers/repoctl/logical";
 import { value } from "@intellectual-frontiers/terminal/args";
 import { defineVerb, generatorsOf, outcomeOfDone, outcomeOfEnvironment, outcomeOfUsage } from "../define.ts";
 
@@ -85,7 +85,11 @@ export const commitVerb = defineVerb({
     message: value({ short: "m", help: "The subject of the commit: one line of at most 100 characters, with no full stop at its end.", valueName: "SUBJECT", required: true }),
     refs: value<never>({ help: "The issue the commit refers to: its number, written as the line `Refs #N`.", valueName: "N" }),
     impact: value<never>({ help: "How much the release raises the version of a library this commit changes: major (a breaking change; a minor while the major version is 0), minor (a feature) or patch (a fix), written as the line `Impact:`.", valueName: "IMPACT" }),
-    session: value<never>({ help: `The address of the session, written as the line \`Claude-Session\` (else the variable ${SESSION_VARIABLE}).`, valueName: "URL" }),
+    session: value<never>({ help: `The address of the session, written as the line \`Claude-Session\` (else the variable ${SESSION_VARIABLE}, else made from ${REMOTE_SESSION_VARIABLE} where an agent session sets it).`, valueName: "URL" }),
+    preparedBy: value<never>({ help: `Who prepared the commit, written as the line \`Prepared-by\`: \`ID (person)\`, \`ID (system)\` or \`ID (agent, model NAME reported)\`. Where an agent runs this command (the variable ${AGENT_VARIABLE} is set) it is made from that variable and --model, so nobody types it.`, valueName: "ACTOR" }),
+    model: value<never>({ help: `The model the agent says it runs, for the line \`Prepared-by\` (else the variable ${MODEL_VARIABLE}, else \`unspecified\`).`, valueName: "NAME" }),
+    directive: value<never>({ help: "The directive the work was done under, written as the line `Directive`: `ID@VERSION sha256:DIGEST`. An agent's commit with none is undirected: it is made and advice says so.", valueName: "REF" }),
+    reviewedBy: value<never>({ help: "The person who reviewed the commit, written as the line `Reviewed-by`; only a person reviews.", valueName: "PERSON" }),
     coAuthor: value<never>({ help: `The line that credits the agent (else the variable ${CO_AUTHOR_VARIABLE}, else the configuration's).`, valueName: "LINE" }),
   },
   operands: [{ name: "PATH", help: "Files to stage before the commit; the files already staged are committed in any case.", arity: "many" }],
@@ -103,13 +107,20 @@ export const commitVerb = defineVerb({
     const policy = host.config.commit;
     if (impact !== undefined && !policy.trailers.includes("impact")) return outcomeOfUsage("this repository's commits carry no Impact line: commit.trailers has no \"impact\"", "E-COMMIT-IMPACT", "repoctl commit --help");
     if (policy.issue.required && refs === undefined) return outcomeOfUsage("this repository's commits refer to an issue: give --refs N", "E-COMMIT-REFS", "repoctl commit --help");
-    const text = args.options.session ?? host.env(SESSION_VARIABLE) ?? "";
-    const session = policy.trailers.includes("session") ? parseSessionUrl(text) : undefined;
+    const actors = actorsOf(policy.trailers, args.options, host.env, { agent: AGENT_VARIABLE, model: MODEL_VARIABLE });
+    if (actors.kind === "err") return outcomeOfUsage(actors.error, "E-COMMIT-ACTORS", "repoctl commit --help");
+    const text = args.options.session ?? host.env(SESSION_VARIABLE) ?? sessionUrlOfRemote(host.env(REMOTE_SESSION_VARIABLE)) ?? "";
+    // A repository that asks for the actors of a commit needs the session only where an agent prepared it: a person's commit has none (commons 0048-actors FR-063).
+    const sessionOptional = policy.trailers.includes("prepared-by") && actors.value.preparedBy?.kind !== "agent" && text === "";
+    const session = policy.trailers.includes("session") && !sessionOptional ? parseSessionUrl(text) : undefined;
     if (session?.kind === "err") return outcomeOfUsage(`the session address is missing or not valid: ${session.error}`, "E-COMMIT-SESSION", "repoctl commit --help");
     const coAuthor = policy.trailers.includes("co-author") ? (args.options.coAuthor ?? host.env(CO_AUTHOR_VARIABLE) ?? policy.coAuthor) : undefined;
+    const advice = actors.value.directive === undefined && actors.value.preparedBy?.kind === "agent" && policy.trailers.includes("directive")
+      ? [finding("warn", "E-COMMIT-UNDIRECTED", `${actors.value.preparedBy.id} prepared this and no directive is named (commons 0048-actors FR-022): it is undirected`, "repoctl commit --directive \"ID@VERSION sha256:DIGEST\"")]
+      : [];
     const order = orderGenerators(generatorsOf(host));
     if (order.kind === "err") return outcomeOfEnvironment(`the table of generators waits for itself: ${order.error.join(", ")}`);
-    const report = await runCommit(w, { subject: subject.value, refs: refs?.value, impact: impact?.value, session: session?.value, coAuthor, paths: args.positionals, dryRun: ctx.mode !== "apply" }, order.value, policy);
+    const report = await runCommit(w, { subject: subject.value, refs: refs?.value, impact: impact?.value, session: session?.value, coAuthor, actors: actors.value, advice, paths: args.positionals, dryRun: ctx.mode !== "apply" }, order.value, policy);
     switch (report.kind) {
       case "refused":
         return outcomeOfDone({ data: null, text: "the commit was refused", findings: report.findings });
