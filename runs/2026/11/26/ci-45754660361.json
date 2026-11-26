@@ -1,0 +1,126 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45754660361",
+    "workflow": "ci",
+    "commit": "0b565a93ce4409d525afa37e2f733a4e5aa1be22",
+    "at": "2026-11-26T04:25:35Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45754660361"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 142,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 179227,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-ansible",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 179227,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 138,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1063,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon-dialect-opentofu",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1063,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "archon",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 137,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "archon",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1160,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "archon",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1160,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 7969,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 299,
+      "exitStatus": 0
+    }
+  ],
+  "findings": []
+}
