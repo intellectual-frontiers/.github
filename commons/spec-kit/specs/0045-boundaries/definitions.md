@@ -111,6 +111,26 @@ Which regimes the model carries first, and why: **GDPR** and **UK GDPR** (the br
 | --- | --- | --- |
 | Scope and rules of engagement | A signed engagement says which targets may be tested, which actions may be done to them, in which window, by whom, and which targets are off limits. Testing outside it is unauthorized. | The engagement model of the `tenancy` and `pentest` libraries of this repository (**read**); the rules-of-engagement practice of penetration testing standards (NIST SP 800-115 and others) is **not read** here. |
 
+## The words that collide
+
+The word `boundary`, unqualified, means the accountability scope of this specification in every specification, ontology term, type, message and test of commons and erga. The uses of the word and of its neighbours that the repository held on 2026-11-26 were read, and each is settled here.
+
+| Word and where it is used | What it means there | Settled as |
+| --- | --- | --- |
+| `boundary` as the place where a program decodes its input ("decoded at the boundary", dozens of specifications of commons and of erga, the constitution's principle of parsing, the guides) | The edge of a program | Written `on entry` everywhere ("decoded on entry", "parse on entry, once") |
+| `import-boundary` (the lint rule), a "process boundary", a "library boundary", "the boundaries of a library" (what `exports` makes public), a "module boundary" | A named kind of edge of code | Kept: each is qualified and none is an accountability scope |
+| `boundary` as the scope of a connection to a cloud account, a tenant or a cluster (0044-asset-connections, erga 290, 286, 0041-telemetry-and-reach) | Where assets are found | Renamed `realm`; the enrollment trust word `boundary` is `connected` |
+| `system.boundary`, the free text of the assessment input of `grc`, written as the `authorization-boundary` of an OSCAL plan | An authorization boundary, as a sentence | Replaced by the typed boundary view (0045-boundaries FR-071) |
+| `scope` of a penetration test engagement (`pentest`: two SQL statements) | The targets the engagement allows | Replaced by a boundary of the kind `engagement-scope` (estate 0010-estate-boundaries FR-031) |
+| `scope` as the CMMC "assessment scope" | The assets assessed | A boundary of the kind `cui-environment` |
+| `scope` as the include and exclude of a connection's policy (0044-asset-connections FR-004) | What a connection may read | Kept, written `policy scope`; it is never a boundary |
+| `isolation boundary` of the tenant of a data model (`data` `arca-tenancy`), "a boundary that separates one customer's data from another's" | An organizational boundary | Kept; it is what the kind `organizational` generalizes, and its `Tenant` stays a term of that data model |
+| `authority boundary` of change control (0020-ifccm) | Who may change what | Kept; it is a rule of change, not a scope of assets |
+| `legalBoundary` annotation of the content method (0039-content-method) | The extent of a legal claim in a text | Kept; it is qualified and about content |
+| `realm` of the HTTP `WWW-Authenticate` challenge (`anyfs/serve`) | A protocol field | Kept; it is the protocol's word and never an estate term |
+| The heading "Boundary and reuse" of the sections of specifications | The limits of a specification | Written "Limits and reuse" |
+| `Data boundaries` of a subject profile (0029-subject-profiles) | What a partner sees of its end users | Kept; it is the privacy boundary of a business-to-business subject and the kind `privacy` states it |
+
 ## UNVERIFIED
 
 - The AICPA description criteria (DC 200) and the exact wording and numbering of the criterion on the boundaries of the system and the one on subservice organizations: not read; the AICPA download returned a page.
