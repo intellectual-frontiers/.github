@@ -1,0 +1,112 @@
+{
+  "schema": "build-findings/1",
+  "run": {
+    "id": "45914218166",
+    "workflow": "ci",
+    "commit": "02cc1087aa2fae937db809ec4048891724626c74",
+    "at": "2026-11-27T00:02:02Z",
+    "url": "https://github.com/intellectual-frontiers/.github/actions/runs/45914218166"
+  },
+  "steps": [
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "actor",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 174,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "actor",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1345,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "actor",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 1345,
+      "exitStatus": 0,
+      "kanonCheck": "import"
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "commons",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 20207,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "commons",
+      "tool": "verify",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 273,
+      "exitStatus": 0
+    },
+    {
+      "id": "the-development-tools-from-bun-lock-the--3",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "install",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 243,
+      "exitStatus": 0
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "verify",
+      "outcome": "no-output",
+      "findings": 1,
+      "durationMs": 984,
+      "exitStatus": 1
+    },
+    {
+      "id": "verify-its-packing-is-checked-where-the--4/kanon-import",
+      "job": "verify",
+      "module": "repoctl",
+      "tool": "kanon-check",
+      "outcome": "ok",
+      "findings": 0,
+      "durationMs": 984,
+      "exitStatus": 1,
+      "kanonCheck": "import"
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-2ea7b60b09c8cd35",
+      "tool": "verify",
+      "code": "no-output",
+      "module": "repoctl",
+      "severity": "error",
+      "message": "the command ended with status 1 and printed nothing a parser of verify reads",
+      "key": "verify-its-packing-is-checked-where-the--4:no-output",
+      "evidence": {
+        "run": "45914218166",
+        "commit": "02cc1087aa2fae937db809ec4048891724626c74",
+        "step": "verify-its-packing-is-checked-where-the--4",
+        "logSha256": "fef0fe192b98e170ec84e9dbcaf9fda6b4bfda2b385b08e97db3efa74ee5d7b7"
+      },
+      "at": "2026-11-27T00:01:30Z"
+    }
+  ]
+}
